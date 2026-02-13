@@ -17,13 +17,14 @@
 
         /* حاوية الخلفية والصورة */
         .hero-image {
-            /* هنا نضع اسم صورتك بدقة */
-            /* تأكدي أن الامتداد صحيح: jpg أو png */
-            background-image: url('Background.png'); 
+            /* هنا اسم الصورة كما هو */
+            background-image: url('TheMoroccoAIlogo.jpg'); 
             
-            /* إعدادات لجعل الصورة تغطي كامل الشاشة */
             height: 100%;
-            background-position: center;
+            
+            /* التغيير هنا: هذا السطر يضمن تثبيت الصورة من الأسفل */
+            background-position: center bottom; 
+            
             background-repeat: no-repeat;
             background-size: cover;
             position: relative;
@@ -31,7 +32,7 @@
 
         /* طبقة سوداء شفافة لضمان قراءة النص بوضوح فوق الصورة */
         .hero-text {
-            background: rgba(0, 0, 0, 0.6); /* تعتيم بنسبة 60% */
+            background: rgba(0, 0, 0, 0.5); /* تقليل التعتيم قليلاً لتبدو الخريطة أوضح */
             position: absolute;
             top: 0;
             left: 0;
@@ -40,7 +41,11 @@
             color: white;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            
+            /* التغيير هنا: بدلاً من center نجعلها flex-start لرفع النص */
+            justify-content: flex-start; 
+            padding-top: 150px; /* ندفع النص للأسفل قليلاً بمقدار مناسب */
+            
             align-items: center;
             text-align: center;
         }
