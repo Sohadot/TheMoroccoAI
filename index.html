@@ -1,128 +1,1074 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TheMoroccoAI.com - North Africa's AI Future</title>
-    <style>
-        /* 1. إعدادات الهيكل العام */
-        * {
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheMoroccoAI — Morocco AI Reference Infrastructure</title>
+<meta name="description" content="The sovereign reference infrastructure for artificial intelligence in Morocco. Ontology, governance, landscape, and strategic intelligence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Noto+Kufi+Arabic:wght@300;400;600&display=swap" rel="stylesheet">
 
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #000c1a; /* لون متناسق مع حواف الصورة الداكنة */
-            overflow-x: hidden; /* منع التمرير الأفقي */
-        }
+<style>
+  :root {
+    --ink:       #0a0c10;
+    --paper:     #f4f0e8;
+    --blue:      #1a2e4a;
+    --blue-mid:  #2a4a72;
+    --gold:      #b8892a;
+    --gold-light:#d4a84b;
+    --copper:    #8b4513;
+    --sand:      #e8dcc8;
+    --mist:      #c8d4e0;
+    --text-main: #1a1a1a;
+    --text-sub:  #4a5568;
+    --text-dim:  #7a8899;
+    --border:    rgba(26,46,74,0.12);
+    --border-gold: rgba(184,137,42,0.3);
+  }
 
-        /* 2. حاوية الصورة الرئيسية (Hero Section) */
-        .hero-image {
-            background-image: url('Background.png'); 
-            height: 100vh;
-            width: 100%;
-            
-            /* الحل الجذري للاقتطاع: */
-            /* في الشاشات الكبيرة (اللابتوب) نستخدم 100% 100% لضمان ظهور كل بكسل في الصورة */
-            background-size: 100% 100%; 
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-        }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* 3. طبقة النصوص فوق الصورة */
-        .hero-text {
-            /* إضافة تعتيم دائري بسيط لتحسين قراءة النص دون إخفاء الخريطة */
-            background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* توسيط المحتوى عمودياً */
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
+  html { scroll-behavior: smooth; }
 
-        /* 4. تنسيق العنوان والوصف */
-        h1 {
-            /* استخدام clamp يجعل الخط مرناً (الحد الأدنى 2rem، يتغير حسب العرض، الحد الأقصى 4rem) */
-            font-size: clamp(2.2rem, 8vw, 4.5rem);
-            margin: 0;
-            font-family: 'Times New Roman', Times, serif;
-            letter-spacing: 2px;
-            text-shadow: 3px 3px 20px rgba(0,0,0,1);
-        }
+  body {
+    background: var(--paper);
+    color: var(--text-main);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
 
-        p {
-            font-size: clamp(0.9rem, 3vw, 1.3rem);
-            margin-top: 15px;
-            margin-bottom: 40px;
-            font-weight: 400;
-            color: #e0e0e0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 10px rgba(0,0,0,1);
-        }
+  /* ─── ZELLIGE GRID BACKGROUND ─── */
+  .zellige-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(0deg, var(--blue) 0, var(--blue) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(90deg, var(--blue) 0, var(--blue) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 1px, transparent 56px),
+      repeating-linear-gradient(-45deg, var(--gold) 0, var(--gold) 1px, transparent 1px, transparent 56px);
+  }
 
-        /* 5. تنسيق الزر (CTA) */
-        .cta-button {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1.5px solid rgba(255, 255, 255, 0.7);
-            color: white;
-            padding: 15px 45px;
-            text-decoration: none;
-            font-size: 1.1rem;
-            cursor: pointer;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px); /* تأثير زجاجي عصري */
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
+  /* ─── NAVIGATION ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 56px;
+    background: rgba(244,240,232,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
 
-        .cta-button:hover {
-            background-color: #ffffff;
-            color: #001f3f;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,255,255,0.2);
-        }
+  .nav-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-        /* 6. استعلامات الوسائط (Media Queries) - للموبايل */
-        @media only screen and (max-width: 768px) {
-            .hero-image {
-                /* في الموبايل، العرض ضيق جداً، لذا نستخدم cover مع إزاحة الخريطة لليمين */
-                background-size: cover;
-                background-position: 75% center; 
-            }
+  .nav-sigil {
+    width: 28px;
+    height: 28px;
+    position: relative;
+    flex-shrink: 0;
+  }
 
-            .hero-text {
-                justify-content: flex-start; /* رفع النص للأعلى قليلاً في الموبايل */
-                padding-top: 15vh;
-            }
+  .nav-sigil svg {
+    width: 100%;
+    height: 100%;
+  }
 
-            h1 {
-                line-height: 1.1;
-            }
-        }
-    </style>
+  .nav-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-sub);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  .nav-acquire {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    text-decoration: none;
+    border: 1px solid var(--blue);
+    padding: 6px 14px;
+    transition: all 0.2s;
+  }
+
+  .nav-acquire:hover {
+    background: var(--blue);
+    color: var(--paper);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 32px 64px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-meta-line {
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-meta-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .hero-title-block {
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.4s forwards;
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(42px, 8vw, 80px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--blue);
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-arabic {
+    font-family: 'Noto Kufi Arabic', serif;
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 300;
+    color: var(--blue-mid);
+    margin-top: 8px;
+    direction: rtl;
+    text-align: left;
+    opacity: 0.7;
+  }
+
+  .hero-thesis {
+    margin-top: 36px;
+    max-width: 560px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.6s forwards;
+  }
+
+  .hero-thesis p {
+    font-size: 19px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.7;
+  }
+
+  .hero-thesis p strong {
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    margin-top: 44px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.8s forwards;
+  }
+
+  .btn-primary {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--blue);
+    text-decoration: none;
+    padding: 14px 28px;
+    border: 1px solid var(--blue);
+    transition: all 0.25s;
+  }
+
+  .btn-primary:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .btn-secondary {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    text-decoration: none;
+    padding: 14px 28px;
+    border: 1px solid var(--border-gold);
+    transition: all 0.25s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ─── STATUS BAR ─── */
+  .status-bar {
+    position: relative;
+    z-index: 1;
+    background: var(--blue);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .status-bar::-webkit-scrollbar { display: none; }
+
+  .status-item {
+    padding: 16px 28px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .status-item:first-child { padding-left: 0; }
+
+  .status-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+
+  .status-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--gold-light);
+  }
+
+  /* ─── SECTION SHARED ─── */
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 32px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 52px;
+  }
+
+  .section-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    padding-top: 6px;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 300;
+    color: var(--blue);
+    line-height: 1.15;
+  }
+
+  /* ─── THESIS SECTION ─── */
+  .thesis-section {
+    border-top: 1px solid var(--border);
+  }
+
+  .thesis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .thesis-cell {
+    background: var(--paper);
+    padding: 32px 28px;
+    transition: background 0.2s;
+  }
+
+  .thesis-cell:hover { background: var(--sand); }
+
+  .thesis-cell-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .thesis-cell-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .thesis-cell-body {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  /* ─── LANDSCAPE SECTION ─── */
+  .landscape-section {
+    border-top: 1px solid var(--border);
+    background: var(--blue);
+  }
+
+  .landscape-section .section-number { color: var(--gold-light); }
+  .landscape-section h2 { color: var(--paper); }
+
+  .landscape-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .landscape-node {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 28px 24px;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: default;
+  }
+
+  .landscape-node:hover {
+    border-color: var(--gold);
+    background: rgba(184,137,42,0.06);
+  }
+
+  .node-status {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    opacity: 0.7;
+  }
+
+  .node-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 10px;
+  }
+
+  .node-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--paper);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+
+  .node-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.55;
+  }
+
+  .node-ar {
+    font-family: 'Noto Kufi Arabic', serif;
+    font-size: 12px;
+    color: rgba(212,168,75,0.5);
+    direction: rtl;
+    margin-top: 10px;
+  }
+
+  /* ─── ONTOLOGY SECTION ─── */
+  .ontology-section {
+    border-top: 1px solid var(--border);
+  }
+
+  .ontology-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+
+  .onto-item {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.18s;
+  }
+
+  .onto-item:last-child { border-bottom: none; }
+  .onto-item:hover { background: var(--sand); }
+
+  .onto-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    padding: 20px 20px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .onto-term {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--blue);
+    padding: 20px 24px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .onto-def {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-sub);
+    padding: 20px 24px;
+    line-height: 1.55;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ─── GOVERNANCE POSTURE ─── */
+  .governance-section {
+    border-top: 1px solid var(--border);
+    background: var(--sand);
+  }
+
+  .posture-block {
+    border: 1px solid var(--border-gold);
+    padding: 36px 32px;
+    background: var(--paper);
+    position: relative;
+  }
+
+  .posture-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+  }
+
+  .posture-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .posture-text {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.75;
+    max-width: 680px;
+  }
+
+  .posture-rules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .rule-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .rule-mark {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    flex-shrink: 0;
+    padding-top: 3px;
+  }
+
+  .rule-text {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  /* ─── ACQUIRE SECTION ─── */
+  .acquire-section {
+    border-top: 1px solid var(--border);
+    background: var(--blue);
+  }
+
+  .acquire-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .acquire-left h2 {
+    color: var(--paper);
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 20px;
+  }
+
+  .acquire-left p {
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .acquire-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .acquire-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .acquire-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .acquire-stat-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold-light);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    background: var(--ink);
+    padding: 32px;
+  }
+
+  .footer-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .footer-langs {
+    display: flex;
+    gap: 16px;
+  }
+
+  .footer-lang {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-lang:hover { color: var(--gold-light); }
+
+  .footer-lang.active { color: var(--gold-light); }
+
+  /* ─── DIVIDER ─── */
+  .ornament-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .ornament-divider::before,
+  .ornament-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-gold);
+  }
+
+  .ornament-diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 700px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+
+    .hero { padding: 88px 20px 52px; }
+
+    .thesis-grid { grid-template-columns: 1fr; }
+    .landscape-grid { grid-template-columns: 1fr; }
+    .onto-item { grid-template-columns: 80px 1fr; }
+    .onto-def { display: none; }
+
+    .acquire-inner { grid-template-columns: 1fr; gap: 36px; }
+    .posture-rules { grid-template-columns: 1fr; }
+
+    .section-inner { padding: 56px 20px; }
+    .status-bar { padding: 0 20px; }
+    footer { padding: 24px 20px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
 </head>
-<body>
 
-    <div class="hero-image">
-        <div class="hero-text">
-            <h1>TheMoroccoAI.com</h1>
-            <p>Connecting North Africa’s Intelligence</p>
-            <a href="mailto:agent@sohadot.com" class="cta-button">Inquire about this asset</a>
-        </div>
+<body>
+<div class="zellige-bg" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-mark">
+    <div class="nav-sigil">
+      <svg viewBox="0 0 28 28" fill="none">
+        <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/>
+        <polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/>
+        <circle cx="14" cy="14" r="2.5" fill="#b8892a"/>
+      </svg>
     </div>
+    <span class="nav-name">TheMoroccoAI</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#thesis">Thesis</a></li>
+    <li><a href="#landscape">Landscape</a></li>
+    <li><a href="#ontology">Ontology</a></li>
+    <li><a href="#governance">Governance</a></li>
+    <li><a href="#acquire">Acquire</a></li>
+  </ul>
+  <a href="#acquire" class="nav-acquire">Acquire</a>
+</nav>
+
+<!-- HERO -->
+<main>
+<section class="hero" id="top">
+  <div class="hero-meta">
+    <div class="hero-meta-line"></div>
+    <span class="hero-meta-text">Sovereign Reference Infrastructure · AI · Morocco</span>
+  </div>
+
+  <div class="hero-title-block">
+    <div class="hero-label">MAI-ROOT-001 — Category Anchor</div>
+    <h1>The <em>intelligence</em><br>of a civilization<br>entering AI.</h1>
+    <div class="hero-arabic">المغرب · الذكاء الاصطناعي · البنية المرجعية</div>
+  </div>
+
+  <div class="hero-thesis">
+    <p>
+      Morocco is not merely a country on Africa's AI map.
+      It is a <strong>civilizational node</strong> — four languages,
+      three continents, millennia of knowledge translation.
+      TheMoroccoAI.com is the sovereign reference infrastructure
+      that maps this intelligence transition with governed depth.
+    </p>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#landscape" class="btn-primary">Explore the Landscape</a>
+    <a href="#thesis" class="btn-secondary">Read the Thesis</a>
+  </div>
+</section>
+
+<!-- STATUS BAR -->
+<div class="status-bar" role="complementary" aria-label="Asset status">
+  <div class="status-item">
+    <div class="status-key">Asset ID</div>
+    <div class="status-val">MAI-ROOT-001</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Category</div>
+    <div class="status-val">AI Reference Infrastructure</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Languages</div>
+    <div class="status-val">EN · AR · FR · TZM</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Source Requirement</div>
+    <div class="status-val">Tier 1 Institutional</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Phase</div>
+    <div class="status-val">Reference Build v1</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Last Updated</div>
+    <div class="status-val">June 2026</div>
+  </div>
+</div>
+
+<!-- THESIS -->
+<section class="thesis-section" id="thesis">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">01 — THESIS</span>
+      <h2>Why this asset<br>is inevitable.</h2>
+    </div>
+
+    <div class="thesis-grid">
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-001</div>
+        <div class="thesis-cell-title">Civilizational Positioning</div>
+        <p class="thesis-cell-body">Morocco has functioned as a knowledge bridge between Africa, Europe, and the Arab world for over a thousand years. The AI transition is not a rupture — it is a continuation of this structural role.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-002</div>
+        <div class="thesis-cell-title">Category Scarcity</div>
+        <p class="thesis-cell-body">TheMoroccoAI.com is the only domain that names the category at the nation-level with institutional gravity. It cannot be replicated — only acquired or conceded.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-003</div>
+        <div class="thesis-cell-title">Language Architecture</div>
+        <p class="thesis-cell-body">Four languages as infrastructure, not translation. Arabic, Amazigh (Tamazight), French, and English each unlock a different institutional audience and a different SEO surface.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-004</div>
+        <div class="thesis-cell-title">Governance as Moat</div>
+        <p class="thesis-cell-body">In an era of AI-generated content abundance, governed reference infrastructure with explicit source posture, versioning, and claim restraint is the scarcest digital asset class.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-005</div>
+        <div class="thesis-cell-title">Strategic Timing</div>
+        <p class="thesis-cell-body">Morocco's AI strategy, the 2030 investment horizon, and Africa's emerging AI market are converging. The reference infrastructure must exist before the market matures — or it will not exist at all.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-006</div>
+        <div class="thesis-cell-title">Buyer Logic</div>
+        <p class="thesis-cell-body">Any sovereign institution, global AI company entering Africa, or investment vehicle focused on MENA-Africa tech that does not hold this asset leaves the category's reference layer in unknown hands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LANDSCAPE -->
+<section class="landscape-section" id="landscape">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">02 — LANDSCAPE</span>
+      <h2 style="color:var(--paper)">The nodes of Morocco's<br>AI ecosystem.</h2>
+    </div>
+
+    <div class="landscape-grid">
+      <div class="landscape-node">
+        <span class="node-status">Reference Layer</span>
+        <div class="node-id">MAI-L-001</div>
+        <div class="node-title">National AI Strategy</div>
+        <p class="node-desc">Morocco's Digital Strategy 2030 and AI governance frameworks — institutional commitments and investment vectors.</p>
+        <div class="node-ar">الاستراتيجية الوطنية للذكاء الاصطناعي</div>
+      </div>
+      <div class="landscape-node">
+        <span class="node-status">Reference Layer</span>
+        <div class="node-id">MAI-L-002</div>
+        <div class="node-title">Research Infrastructure</div>
+        <p class="node-desc">University AI labs, CNRST programs, and Mohammed VI Polytechnic University research nodes.</p>
+        <div class="node-ar">البنية التحتية للبحث</div>
+      </div>
+      <div class="landscape-node">
+        <span class="node-status">Reference Layer</span>
+        <div class="node-id">MAI-L-003</div>
+        <div class="node-title">Startup Ecosystem</div>
+        <p class="node-desc">AI-native companies, CIH Bank fintech AI adoption, and Casablanca Tech City as a continental hub.</p>
+        <div class="node-ar">النظام البيئي للشركات الناشئة</div>
+      </div>
+      <div class="landscape-node">
+        <span class="node-status">Mapping Active</span>
+        <div class="node-id">MAI-L-004</div>
+        <div class="node-title">Regulatory Framework</div>
+        <p class="node-desc">Data protection law 09-08, AI ethics considerations, and alignment with EU AI Act as a reference model.</p>
+        <div class="node-ar">الإطار التنظيمي</div>
+      </div>
+      <div class="landscape-node">
+        <span class="node-status">Mapping Active</span>
+        <div class="node-id">MAI-L-005</div>
+        <div class="node-title">Investment Flows</div>
+        <p class="node-desc">Sovereign fund positioning, foreign direct investment in AI infrastructure, and strategic partnerships mapping.</p>
+        <div class="node-ar">تدفقات الاستثمار</div>
+      </div>
+      <div class="landscape-node">
+        <span class="node-status">Forthcoming</span>
+        <div class="node-id">MAI-L-006</div>
+        <div class="node-title">Africa Gateway Role</div>
+        <p class="node-desc">Morocco as the northern entry node for AI capacity building into sub-Saharan Africa. Infrastructure, talent, and protocol.</p>
+        <div class="node-ar">دور البوابة الأفريقية</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ONTOLOGY -->
+<section class="ontology-section" id="ontology">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">03 — ONTOLOGY</span>
+      <h2>The language this<br>asset defines.</h2>
+    </div>
+
+    <div class="ornament-divider"><div class="ornament-diamond"></div></div>
+
+    <div class="ontology-list" role="list">
+      <div class="onto-item" role="listitem">
+        <div class="onto-id">MAI-O-001</div>
+        <div class="onto-term">AI Readiness</div>
+        <div class="onto-def">The institutional, infrastructural, regulatory, and talent capacity of a nation-state to absorb and produce AI systems at scale.</div>
+      </div>
+      <div class="onto-item" role="listitem">
+        <div class="onto-id">MAI-O-002</div>
+        <div class="onto-term">Civilizational Node</div>
+        <div class="onto-def">A geographic and cultural position that functions as a translation and routing layer between distinct knowledge traditions.</div>
+      </div>
+      <div class="onto-item" role="listitem">
+        <div class="onto-id">MAI-O-003</div>
+        <div class="onto-term">Sovereign Reference</div>
+        <div class="onto-def">A governed knowledge infrastructure that defines category terms without dependency on a single institutional authority.</div>
+      </div>
+      <div class="onto-item" role="listitem">
+        <div class="onto-id">MAI-O-004</div>
+        <div class="onto-term">Language Architecture</div>
+        <div class="onto-def">The deliberate structuring of multilingual content as institutional access layers, not mere translation of a primary text.</div>
+      </div>
+      <div class="onto-item" role="listitem">
+        <div class="onto-id">MAI-O-005</div>
+        <div class="onto-term">Category Anchor</div>
+        <div class="onto-def">A domain asset whose name, structure, and reference depth make it the default definitional node for a category — not merely a participant.</div>
+      </div>
+      <div class="onto-item" role="listitem">
+        <div class="onto-id">MAI-O-006</div>
+        <div class="onto-term">Governance Debt</div>
+        <div class="onto-def">The accumulated risk of an AI ecosystem that grows without explicit source posture, claim restraint, or versioned accountability.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GOVERNANCE -->
+<section class="governance-section" id="governance">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">04 — GOVERNANCE</span>
+      <h2>Source posture<br>and claim restraint.</h2>
+    </div>
+
+    <div class="posture-block">
+      <div class="posture-label">MAI-GOV-001 — Editorial Doctrine</div>
+      <p class="posture-text">
+        All reference claims on this asset are tied to verifiable institutional, governmental, or academic sources. 
+        The asset distinguishes explicitly between source-verified facts, institutional summaries, 
+        conceptual framing, and unresolved or emerging scenarios.
+        No claim is made beyond what the source evidence supports.
+      </p>
+      <div class="posture-rules">
+        <div class="rule-item">
+          <span class="rule-mark">◆</span>
+          <span class="rule-text">Tier 1 sources only: official government, peer-reviewed, institutional</span>
+        </div>
+        <div class="rule-item">
+          <span class="rule-mark">◆</span>
+          <span class="rule-text">All pages carry source registry and last-verified date</span>
+        </div>
+        <div class="rule-item">
+          <span class="rule-mark">◆</span>
+          <span class="rule-text">No phantom URLs — only live, verified reference pages published</span>
+        </div>
+        <div class="rule-item">
+          <span class="rule-mark">◆</span>
+          <span class="rule-text">Versioned updates — no silent content modification</span>
+        </div>
+        <div class="rule-item">
+          <span class="rule-mark">◆</span>
+          <span class="rule-text">Claim restraint: framing is labelled as framing, not presented as fact</span>
+        </div>
+        <div class="rule-item">
+          <span class="rule-mark">◆</span>
+          <span class="rule-text">Multilingual parity: each language serves its institutional audience, not merely translated</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACQUIRE -->
+<section class="acquire-section" id="acquire">
+  <div class="acquire-inner">
+    <div class="acquire-left">
+      <h2>This asset<br>is acquirable.</h2>
+      <p>
+        TheMoroccoAI.com is available for strategic acquisition by an institution, 
+        investment vehicle, or organization with the mandate to own Morocco's 
+        AI reference layer. Enquiries via agent@sohadot.com.
+      </p>
+      <a href="mailto:agent@sohadot.com" class="btn-primary">Strategic Enquiry</a>
+    </div>
+    <div class="acquire-right">
+      <div class="acquire-stat">
+        <span class="acquire-stat-label">Asset Class</span>
+        <span class="acquire-stat-val">Category Anchor Domain</span>
+      </div>
+      <div class="acquire-stat">
+        <span class="acquire-stat-label">Reference Depth</span>
+        <span class="acquire-stat-val">Ontology + Governance + Landscape</span>
+      </div>
+      <div class="acquire-stat">
+        <span class="acquire-stat-label">Language Coverage</span>
+        <span class="acquire-stat-val">EN · AR · FR · TZM</span>
+      </div>
+      <div class="acquire-stat">
+        <span class="acquire-stat-label">Buyer Type</span>
+        <span class="acquire-stat-val">Institutional / Strategic Only</span>
+      </div>
+      <div class="acquire-stat">
+        <span class="acquire-stat-label">Contact</span>
+        <span class="acquire-stat-val">agent@sohadot.com</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <span class="footer-brand">TheMoroccoAI.com · Sovereign Reference Infrastructure · 2026</span>
+    <div class="footer-langs">
+      <a href="#" class="footer-lang active">EN</a>
+      <a href="#" class="footer-lang">AR</a>
+      <a href="#" class="footer-lang">FR</a>
+      <a href="#" class="footer-lang">ⵜⵣⵎ</a>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
