@@ -1,0 +1,384 @@
+{
+  "registry": "TheMoroccoAI Evidence Registry",
+  "version": "0.1.0",
+  "as_of": "2026-10-18",
+  "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
+  "classifications": {
+    "VERIFIED FACT": "An event, act or status that the cited source documents directly (for example, a signature, a launch or an appointment).",
+    "OFFICIAL TARGET": "A quantified goal set by an official body. It is not an outcome and must not be read as achieved.",
+    "ANNOUNCED PLAN": "A programme, institution or product an official body has announced or presented, whose operational delivery the registry has not verified.",
+    "INDEPENDENT ANALYSIS": "An inference drawn by TheMoroccoAI from two or more records. It is labelled as interpretation, not as fact.",
+    "UNVERIFIED CLAIM": "A statement attributed to a source whose underlying data the registry has not independently checked."
+  },
+  "verification_statuses": {
+    "verified": "The source page was retrieved on the retrieval date and the excerpt was matched against it.",
+    "partial": "The source was retrieved but does not by itself carry every detail of the claim; the limitation is stated in verification_note."
+  },
+  "records": [
+    {
+      "evidence_id": "MAI-EV-0001",
+      "title": "Official launch of the national strategy \"Maroc Digital 2030\"",
+      "source_organization": "MAP (Maghreb Arabe Presse), MAP Express",
+      "source_type": "state_news_agency",
+      "source_url": "https://www.mapexpress.ma/actualite/activite-gouvernementale/rabat-lancement-officiel-strategie-nationale-maroc-digital-2030/",
+      "source_language": "fr",
+      "publication_date": "2024-09-25",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "The national strategy Digital Morocco 2030 (Maroc Digital 2030) was officially launched in Rabat on 25 September 2024 by the Ministry of Digital Transition and Administration Reform.",
+      "source_excerpts": [
+        "La Stratégie nationale \"Maroc Digital 2030\" (Digital Morocco 2030) a été officiellement lancée, mercredi à Rabat",
+        "Cette stratégie, lancée par le ministère de la Transition numérique et de la Réforme de l'administration"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The dispatch is dated 25 September 2024 (a Wednesday), matching \"mercredi\".",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0002",
+      "title": "Digital Morocco 2030: stated job and e-government objectives",
+      "source_organization": "MAP (Maghreb Arabe Presse), MAP Express",
+      "source_type": "state_news_agency",
+      "source_url": "https://www.mapexpress.ma/actualite/activite-gouvernementale/rabat-lancement-officiel-strategie-nationale-maroc-digital-2030/",
+      "source_language": "fr",
+      "publication_date": "2024-09-25",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "Digital Morocco 2030 sets the objectives of 240,000 direct jobs with a contribution to GDP in 2030, digitalising public services, and moving Morocco from 113th to 50th place worldwide in the e-government development index.",
+      "source_excerpts": [
+        "la création de 240.000 emplois directs et la contribution au produit intérieur brut (PIB) en 2030",
+        "digitaliser les services publics. Le but étant de faire passer le Maroc de la 113e à la 50e place mondiale dans l'indice de développement du e-gouvernement"
+      ],
+      "classification": "OFFICIAL TARGET",
+      "target_year": 2030,
+      "verification_status": "verified",
+      "verification_note": "The source does not give a separate target year for the e-government ranking objective; 2030 is the strategy horizon.",
+      "related_entities": ["digital-morocco-2030", "public-administration", "digital-economy"]
+    },
+    {
+      "evidence_id": "MAI-EV-0003",
+      "title": "Head of Government statement on public digital investment, 2021–2024",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://maroc.ma/en/news/digital-morocco-2030-strategy-drives-competitiveness-social-inclusion",
+      "source_language": "en",
+      "publication_date": "2026-07-01",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "official_statement",
+      "claim": "The Head of Government stated that public investment dedicated to digital technology rose from MAD 11 million in 2021 to more than MAD 1.7 billion in 2024.",
+      "source_excerpts": [
+        "public investment dedicated to digital technology has recorded unprecedented growth, rising from MAD 11 million in 2021 to more than MAD 1.7 billion in 2024"
+      ],
+      "classification": "UNVERIFIED CLAIM",
+      "verification_status": "verified",
+      "verification_note": "The statement itself is verified on the government portal. The underlying budget figures were not checked against finance-law documents, so the figures are recorded as an attributed claim.",
+      "related_entities": ["digital-morocco-2030"]
+    },
+    {
+      "evidence_id": "MAI-EV-0004",
+      "title": "Inaugural National AI Conference opens in Rabat",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/en/news/inaugural-national-ai-conference-kicks-rabat",
+      "source_language": "en",
+      "publication_date": "2025-07-01",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "The inaugural National AI Conference opened in Rabat on 1 July 2025, organised by the Ministry of Digital Transition and Administrative Reform and structured around 13 thematic areas.",
+      "source_excerpts": [
+        "The inaugural National AI Conference, held under the High Patronage of His Majesty King Mohammed VI, was launched on Tuesday in Rabat",
+        "Organized by the Ministry of Digital Transition and Administrative Reform under the theme \"An efficient and ethical AI strategy to serve our society,\"",
+        "The conference is structured around 13 thematic areas"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Page dated Tuesday 1 July 2025. The ministry's synthesis report (MAI-EV-0005) gives the dates as 1 and 2 July 2025.",
+      "related_entities": ["first-national-ai-conference-2025", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0005",
+      "title": "Synthesis report of the First National AI Conference: Al Jazari Institute memorandum (Nador)",
+      "source_organization": "Ministry of Digital Transition and Administration Reform",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf",
+      "source_language": "en",
+      "publication_date": "2025-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "official_report",
+      "claim": "At the First National AI Conference (Rabat, 1–2 July 2025), a memorandum of understanding for the creation of an Al Jazari Institute dedicated to AI research, training and innovation in the Province of Nador was co-signed by the Ministry of Digital Transition, also involving the Ministry of Higher Education, Scientific Research and Innovation and authorities of the Oriental Region.",
+      "source_excerpts": [
+        "The First National Conference on Artificial Intelligence, held in Rabat on July 1st and 2nd, 2025",
+        "The creation of the Al Jazari Institute: A memorandum of understanding co-signed by the Ministry of Digital Transition, also involving the Ministry of Higher Education, Scientific Research, and Innovation.",
+        "This institute is dedicated to AI research, training, and innovation in the Province of Nador."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Report section X, \"Strategic conventions signed\". The PDF's metadata gives a creation date of 3 September 2025; the month is taken from that and from the file path. Line-break hyphenation in the PDF was removed when quoting. The fact recorded is the signature of the memorandum; the institute's operational status is not verified.",
+      "related_entities": ["jazari-institute-nador", "first-national-ai-conference-2025", "ministry-digital-transition", "ministry-higher-education", "education-research"]
+    },
+    {
+      "evidence_id": "MAI-EV-0006",
+      "title": "Synthesis report: agreement on sovereign green data-centre infrastructure",
+      "source_organization": "Ministry of Digital Transition and Administration Reform",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf",
+      "source_language": "en",
+      "publication_date": "2025-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "official_report",
+      "claim": "Among the conventions signed at the First National AI Conference was an agreement with the Ministry of Energy Transition and Sustainable Development on establishing sustainable, high-performing and sovereign digital infrastructures (green data centres).",
+      "source_excerpts": [
+        "the Minister Delegate for the Head of Government in Charge of Digital Transition and Administrative Reform officially signed several important agreements and memoranda during the event or at the closing ceremony.",
+        "The Ministry of Energy Transition and Sustainable Development: For the establishment and development of sustainable, high-performing, and sovereign digital infrastructures, in line with energy and climate challenges (Green Data Centers)."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The fact recorded is the signature of the agreement. No data centre built under it is documented in the registry.",
+      "related_entities": ["green-data-centres-agreement", "first-national-ai-conference-2025", "ministry-digital-transition", "ministry-energy-transition", "data-centres"]
+    },
+    {
+      "evidence_id": "MAI-EV-0007",
+      "title": "Synthesis report: UM6P data-centre partnership convention",
+      "source_organization": "Ministry of Digital Transition and Administration Reform",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf",
+      "source_language": "en",
+      "publication_date": "2025-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "official_report",
+      "claim": "Among the conventions signed at the First National AI Conference was one with Mohammed VI Polytechnic University (UM6P) to formalise a strategic partnership on data centres and on collaboration in research, innovation, training and digital sovereignty.",
+      "source_excerpts": [
+        "These conventions and memoranda of understanding were signed with:",
+        "UM6P aims to formalize a strategic partnership focused on data centers while promoting collaboration in research, innovation, training, and digital sovereignty."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The fact recorded is the signature of the convention. Its stated purpose is quoted as written; delivery is not verified.",
+      "related_entities": ["um6p-data-centre-partnership", "first-national-ai-conference-2025", "ministry-digital-transition", "um6p", "data-centres"]
+    },
+    {
+      "evidence_id": "MAI-EV-0008",
+      "title": "Signature of the constitutive convention of the public-interest group \"Institut Jazari ROOT\"",
+      "source_organization": "CGEM (Confédération Générale des Entreprises du Maroc)",
+      "source_type": "signatory_organization",
+      "source_url": "https://cgem.ma/activites/signature-de-la-convention-constitutive-du-gip-institut-jazari-root/",
+      "source_language": "fr",
+      "publication_date": "2026-01-13",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "press_release",
+      "claim": "On 12 January 2026, at the official launch of the \"AI Made in Morocco\" programme organised by the Ministry of Digital Transition and Administration Reform, the president of CGEM signed the constitutive convention of the public-interest group (GIP) \"Institut Jazari ROOT\" alongside several ministerial departments and public institutions.",
+      "source_excerpts": [
+        "Casablanca, le 12 janvier 2026 - La Confédération Générale des Entreprises du Maroc (CGEM) a pris part à la cérémonie officielle de lancement du programme “AI Made in Morocco – L’IA au cœur de la transformation numérique et des services publics”, organisée par le Ministère de la Transition Numérique et de la Réforme de l’Administration.",
+        "a procédé à la signature de la convention constitutive du Groupement d’Intérêt Public (GIP) “Institut Jazari ROOT”, aux côtés de plusieurs départements ministériels et d’institutions publiques"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Source is a signatory's own publication; it documents the signature, not the group's legal constitution. Press reports from August 2026 say approval decisions for four Jazari institutes were published in the Bulletin Officiel, but the Gazette text was not located (French translation edition issues 7522, 7526, 7532, 7536, 7540 and 7544 checked), so legal constitution is not recorded as verified.",
+      "related_entities": ["jazari-root", "cgem", "ministry-digital-transition", "morocco-ai-2030"]
+    },
+    {
+      "evidence_id": "MAI-EV-0009",
+      "title": "Convention signed in Fès creating the Al-Jazari Institute for Industry \"JAZARI Industrie X.0\"",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de",
+      "source_language": "fr",
+      "publication_date": "2026-03-11",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "On 10 March 2026 in Fès, the Ministry of Industry and Commerce, the Ministry Delegate for Digital Transition and Administration Reform and the Ministry of Economy and Finance signed, with the four universities of the Fès-Meknès region, a convention for the creation of the Al-Jazari Institute for Industry \"JAZARI Industrie X.0\", whose stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
+      "source_excerpts": [
+        "Une convention a été signée, mardi 10 Mars à Fès, pour la création de l’Institut Al-Jazari pour l’Industrie \"JAZARI Industrie X.0\"",
+        "La convention a été signée par le ministère de l’Industrie et du Commerce, le ministère délégué chargé de la Transition numérique et de la Réforme de l’administration et le ministère de l’Economie et des Finances, d’une part, et les quatre université que compte la région Fès-Meknès. Il s’agit de l’Université Euro-Méditerranéenne de Fès, l’Université Sidi Mohammed Ben Abdellah de Fès, l’Université Moulay Ismail de Meknès et l’Université Al Akhawayn d’Ifrane",
+        "le développement de solutions innovantes reposant sur l’intelligence artificielle, l’Internet des objets, la robotique avancée et l’analyse des données industrielles"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The signature is the verified fact. The technology focus is quoted from the institute's stated ambitions (\"ambitionne, selon les promoteurs\") and describes intent, not delivered work.",
+      "related_entities": ["jazari-industrie-x0", "ministry-industry-commerce", "ministry-digital-transition", "ministry-economy-finance", "uemf", "usmba", "umi", "al-akhawayn-university", "artificial-intelligence", "internet-of-things", "robotics", "industrial-data-analytics", "industry"]
+    },
+    {
+      "evidence_id": "MAI-EV-0010",
+      "title": "JAZARI network announced across the twelve regions; JAZARI ROOT as its core",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de",
+      "source_language": "fr",
+      "publication_date": "2026-03-11",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "In January 2026 the Ministry of Digital Transition and Administration Reform announced a network of \"Jazari\" institutes of excellence anchored in the twelve regions of the Kingdom, with JAZARI ROOT as its technical and strategic core, organised around e-government, smart rural and mountain zones, and major sporting events.",
+      "source_excerpts": [
+        "l’ annonce, en janvier dernier, par le ministère de la transition numérique et de la réforme de l’administration de la mise en place du réseau des instituts \"Jazari\", une plateforme d’instituts d’excellence ancrés dans les douze régions du Royaume",
+        "Le noyau technique et stratégique de ce réseau repose sur l’institut \"JAZARI ROOT\" autour de trois thématiques clés, à savoir l’E-GOV, les smart zones rurales et montagneuses, ainsi que les grands événements sportifs."
+      ],
+      "classification": "ANNOUNCED PLAN",
+      "verification_status": "verified",
+      "verification_note": "Coverage of all twelve regions is an announced design. The registry documents signed instruments for JAZARI ROOT (MAI-EV-0008) and JAZARI Industrie X.0 (MAI-EV-0009) only.",
+      "related_entities": ["jazari-network", "jazari-root", "ministry-digital-transition", "public-administration", "rural-development", "sport"]
+    },
+    {
+      "evidence_id": "MAI-EV-0011",
+      "title": "Morocco AI 2030 roadmap: 2030 targets",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030",
+      "source_language": "en",
+      "publication_date": "2026-09-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "The Morocco AI 2030 roadmap, presented by the Ministry of Digital Transition and Administration Reform, sets 2030 targets of MAD 100 billion in added value to GDP, 50,000 direct and indirect jobs, and 200,000 trained and certified AI talents.",
+      "source_excerpts": [
+        "Morocco’s Ministry of Digital Transition and Administration Reform on Tuesday in Rabat presented the main advances under the \"Morocco AI 2030\" roadmap",
+        "The roadmap, also referred to as “AI Made in Morocco,” aims by 2030 to generate 100 billion dirhams ($10 billion) in added value for the country’s GDP, create 50,000 direct and indirect jobs, and train and certify 200,000 AI talents"
+      ],
+      "classification": "OFFICIAL TARGET",
+      "target_year": 2030,
+      "verification_status": "verified",
+      "verification_note": "These are targets. The source gives no progress figures towards them.",
+      "related_entities": ["morocco-ai-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0012",
+      "title": "Morocco AI 2030 roadmap: pillars and the JAZARI Institutes network",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030",
+      "source_language": "en",
+      "publication_date": "2026-09-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "The Ministry of Digital Transition and Administration Reform presented the Morocco AI 2030 roadmap in Rabat in September 2026. As presented, it is structured around three pillars (sovereignty and trust; innovation and competitiveness; impact, adoption and outreach) and relies on the national JAZARI Institutes network, described as comprising JAZARI ROOT, JAZARI Smart City, JAZARI EduTech and JAZARI Industrie X.0.",
+      "source_excerpts": [
+        "Morocco’s Ministry of Digital Transition and Administration Reform on Tuesday in Rabat presented the main advances under the \"Morocco AI 2030\" roadmap",
+        "The strategy is built around three pillars: sovereignty and trust, innovation and competitiveness, and impact, adoption and outreach.",
+        "Its implementation notably relies on the national network of JAZARI Institutes, the operational arm for AI research and innovation, comprising JAZARI ROOT, JAZARI Smart City, JAZARI EduTech and JAZARI Industrie X.0."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The fact recorded is how the ministry described the roadmap's structure. The registry has no separate signed instrument for JAZARI Smart City or JAZARI EduTech.",
+      "related_entities": ["morocco-ai-2030", "ministry-digital-transition", "jazari-network", "jazari-root", "jazari-smart-city", "jazari-edutech", "jazari-industrie-x0"]
+    },
+    {
+      "evidence_id": "MAI-EV-0013",
+      "title": "Sovereign AI marketplace and the Idarati AI assistant presented",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030",
+      "source_language": "en",
+      "publication_date": "2026-09-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "The ministry unveiled a sovereign AI marketplace intended to give access to secure and trusted AI solutions hosted under Moroccan control, and presented Idarati AI, an agentic AI assistant intended to help users with administrative procedures.",
+      "source_excerpts": [
+        "The ministry also unveiled a sovereign AI marketplace designed to provide access to secure and trusted AI solutions while ensuring data protection and maintaining control over infrastructure in Morocco.",
+        "One of the first solutions presented was Idarati AI, an agentic AI assistant intended to inform, guide and assist users with administrative procedures."
+      ],
+      "classification": "ANNOUNCED PLAN",
+      "verification_status": "verified",
+      "verification_note": "The source documents a presentation. Public availability of the marketplace or of Idarati AI was not verified.",
+      "related_entities": ["sovereign-ai-marketplace", "idarati-ai", "morocco-ai-2030", "ministry-digital-transition", "agentic-ai", "public-administration"]
+    },
+    {
+      "evidence_id": "MAI-EV-0014",
+      "title": "New government includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://maroc.ma/en/news/hm-king-chairs-new-government-appointment-ceremony",
+      "source_language": "en",
+      "publication_date": "2026-10-16",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "official_announcement",
+      "claim": "The government appointed on 16 October 2026 includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform, and a Minister Delegate to that minister in charge of Administration Reform.",
+      "source_excerpts": [
+        "chaired on Friday, 4 Jumada I 1448 AH, corresponding to October 16, 2026, at the Royal Palace in Rabat, the appointment ceremony of the members of the new government.",
+        "Ahmed Rahhou : Minister of Artificial Intelligence, Digital Transformation and Administration Reform.",
+        "Aïcha Guellaa : Minister Delegate to the Minister of Artificial Intelligence, Digital Transformation and Administration Reform, in charge of Administration Reform."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The ministry's legal attributions, and whether it takes over the portfolio of the Ministry of Digital Transition and Administration Reform, were not yet published in a source retrieved by the registry.",
+      "related_entities": ["ministry-ai-digital-transformation", "public-administration"]
+    },
+    {
+      "evidence_id": "MAI-EV-0015",
+      "title": "AI Movement established as a UNESCO Category 2 Centre",
+      "source_organization": "UNESCO",
+      "source_type": "intergovernmental_organization",
+      "source_url": "https://www.unesco.org/en/articles/new-milestone-artificial-intelligence-africa-first-unesco-affiliated-centre",
+      "source_language": "en",
+      "publication_date": "2024-07-04",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "press_release",
+      "claim": "UNESCO reports that AI Movement was established as a Category 2 Centre under the auspices of UNESCO, following a tripartite agreement between UNESCO, the Government of Morocco and AI Movement.",
+      "source_excerpts": [
+        "resulted in the establishment of AI Movement as a Category 2 Centre under the auspices of UNESCO",
+        "the official signing of the tripartite agreement between UNESCO, the Government of Morocco and AI Movement"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Both excerpts were matched against the page HTML on the retrieval date. The page places the establishment at the High-Level Forum on AI in Africa held at UM6P in Rabat on 3–5 June 2024.",
+      "related_entities": ["ai-movement", "unesco"]
+    },
+    {
+      "evidence_id": "MAI-EV-0016",
+      "title": "AI Movement: research centre created by UM6P in March 2021",
+      "source_organization": "MAP (Maghreb Arabe Presse), MAP Express",
+      "source_type": "state_news_agency",
+      "source_url": "https://www.mapexpress.ma/actualite/societe-et-regions/ai-movement-centre-international-dintelligence-artificielle-precurseur-au-maroc-en-afrique/",
+      "source_language": "fr",
+      "publication_date": "2024-06-03",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "AI Movement, the International Center for Artificial Intelligence of Morocco, is a research and development centre created in March 2021 by Mohammed VI Polytechnic University (UM6P).",
+      "source_excerpts": [
+        "Le Centre international d'intelligence artificielle du Maroc \"AI Movement\" est un centre de recherche et développement créé en mars 2021 par l'Université Mohammed VI Polytechnique (UM6P)."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "",
+      "related_entities": ["ai-movement", "um6p", "education-research"]
+    },
+    {
+      "evidence_id": "MAI-EV-0017",
+      "title": "CNDP lists Law 09-08 in its regulatory framework",
+      "source_organization": "CNDP (Commission Nationale de contrôle de la protection des Données à caractère Personnel)",
+      "source_type": "regulator",
+      "source_url": "https://www.cndp.ma/loi-09-08/",
+      "source_language": "fr",
+      "publication_date": null,
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "regulatory_page",
+      "claim": "The website of the CNDP (cndp.ma), Morocco's national commission for the control of personal data protection, lists Law 09-08 under \"Cadre règlementaire\" (regulatory framework) in its \"À propos de la CNDP\" section, alongside the Constitution and Decree No. 2-09-165, and has a dedicated page for the law.",
+      "source_excerpts": [
+        "À propos de la CNDP Qui sommes-nous ? Mot du Président Organigramme Missions Cadre règlementaire Constitution du Royaume du Maroc Loi 09-08 Décret n° 2-09-165",
+        "Loi 09-08 - Commission Nationale de Contrôle de Protection des Données à Caractère Personnel"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "partial",
+      "verification_note": "Only the site menu and the page title could be read; the page body is rendered client-side. The first excerpt is the site's navigation menu and the second is the page title. The law's full title, promulgation and Bulletin Officiel references, and current amendment status are not recorded: the official full-text hosts (sgg.gov.ma, adala.justice.gov.ma) were unreachable from the verification environment, and the CNDP site also links to an item about a draft overhaul (\"projet de refonte\") of the law.",
+      "related_entities": ["law-09-08", "cndp"]
+    },
+    {
+      "evidence_id": "MAI-EV-0018",
+      "title": "Synthesis report: conference outcomes as the foundation of a national AI roadmap",
+      "source_organization": "Ministry of Digital Transition and Administration Reform",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf",
+      "source_language": "en",
+      "publication_date": "2025-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "official_report",
+      "claim": "The ministry's synthesis report states that the First National AI Conference outlined and validated the strategic orientations forming the foundation of Morocco's future National AI roadmap, and frames the conference within the Digital Morocco 2030 strategy.",
+      "source_excerpts": [
+        "the conference has outlined and validated the major strategic orientations forming the foundation of Morocco's future National Artificial Intelligence roadmap.",
+        "Driven by the ambitious Morocco Digital 2030 Strategy, the objective of the conference is to make Morocco a pioneer and a regional hub for AI"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The fact recorded is what the report states. The report does not use the name \"Morocco AI 2030\"; linking the two is an independent analysis recorded on the relationship.",
+      "related_entities": ["first-national-ai-conference-2025", "digital-morocco-2030", "morocco-ai-2030"]
+    }
+  ]
+}

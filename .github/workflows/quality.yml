@@ -1,0 +1,26 @@
+name: Quality gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate registry and ontology
+        run: python3 tools/registry.py
+      - name: Generated pages are up to date
+        run: python3 tools/build.py --check
+      - name: Site gates (links, metadata, dependencies, accessibility basics, contact MX)
+        run: python3 tools/check_site.py --network
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
