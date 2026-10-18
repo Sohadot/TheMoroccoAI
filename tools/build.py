@@ -42,6 +42,7 @@ TYPE_SINGULAR = {
 LIFECYCLE_LABELS = {
     "announced": "Announced", "in-development": "In development", "pilot": "Pilot",
     "operational": "Operational", "released": "Released", "discontinued": "Discontinued",
+    "unresolved": "Unresolved",
 }
 ORIGIN_LABELS = {
     "based-in-morocco": "Based in Morocco (independent source)",
@@ -52,7 +53,7 @@ ORIGIN_LABELS = {
 }
 KIND_LABELS = {
     "ai-application": "AI application", "compute-infrastructure": "Compute infrastructure",
-    "institute": "Institute", "agreement": "Agreement",
+    "institute": "Institute", "agreement": "Agreement", "digital-platform": "Digital platform (not AI)",
 }
 SOURCE_TYPE_LABELS = {
     "government_portal": "Government portal",
@@ -72,6 +73,18 @@ SIGIL = ('<svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="fal
          '<polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/>'
          '<polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/>'
          '<circle cx="14" cy="14" r="2.5" fill="#b8892a"/></svg>')
+
+
+STATUS_BASIS_LABELS = {
+    "public-availability-observed": "public availability on the operator's own service (usage not documented)",
+    "operator-report-of-use": "operator's report of use",
+    "independent-listing": "independent listing",
+    "independent-report-of-use": "independent report of use",
+}
+# Evidence-recency convention, not a lifecycle rule: operational or pilot evidence whose latest record is
+# more than this many calendar months before the registry's as-of date is flagged as not reconfirmed.
+# Elapsed time never changes a lifecycle stage; only a record declaring a new status can.
+RECENCY_MONTHS = 12
 
 
 def slug(classification):
@@ -202,6 +215,13 @@ def evidence_card(model, r, *, heading="h3", show_entities=True):
         )
         entities = f"<dt>Related</dt><dd>{links}</dd>"
     note = f'<p class="evidence-note">{escape(r["verification_note"])}</p>' if r["verification_note"] else ""
+    caveats = ""
+    if r.get("superseded_by"):
+        later = ", ".join(f'<a href="/registry/evidence/#{x}">{x}</a>' for x in r["superseded_by"])
+        caveats += f"<dt>Superseded</dt><dd>The quotation still matches its source, but the claim is no longer current; see {later}.</dd>"
+    if r.get("associated_entities"):
+        names = ", ".join(f'<a href="{entity_url(e)}">{escape(model.entities[e]["name"])}</a>' for e in r["associated_entities"])
+        caveats += f"<dt>Identity</dt><dd>Associated with {names} by name and other indicators; not established as the same legal entity.</dd>"
     return f"""<li class="evidence-card" id="{rid}">
   <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#{rid}">{rid}</a>{badge(r["classification"])}</div>
   <{heading}>{escape(r["title"])}</{heading}>
@@ -211,7 +231,7 @@ def evidence_card(model, r, *, heading="h3", show_entities=True):
     <dt>Source</dt><dd><a href="{escape(r["source_url"])}" rel="noopener">{escape(r["source_organization"])}</a> · {escape(SOURCE_TYPE_LABELS[r["source_type"]])}</dd>
     <dt>Published</dt><dd>{escape(human_date(r["publication_date"]))}</dd>
     <dt>Retrieved</dt><dd>{escape(human_date(r["retrieval_date"]))}</dd>{target}
-    <dt>Verification</dt><dd>{status_html}</dd>{entities}
+    <dt>Verification</dt><dd>{status_html}</dd>{entities}{caveats}
   </dl>
   {note}
 </li>"""
@@ -251,7 +271,7 @@ def render_entity(model, e):
     if e.get("project_kind"):
         facts.append(("Kind", escape(KIND_LABELS[e["project_kind"]])))
     if e.get("lifecycle"):
-        facts.append(("Lifecycle", f'{escape(LIFECYCLE_LABELS[e["lifecycle"]])} · {cite(e["lifecycle_evidence"])}'))
+        facts.append(("Lifecycle", f'{escape(stage_label(model, e))} · {cite(e["lifecycle_evidence"])}'))
     if e.get("origin"):
         basis = f' · {cite(e["origin_evidence"])}' if e.get("origin_evidence") else ""
         facts.append(("Origin", f'{escape(ORIGIN_LABELS[e["origin"]])}{basis}'))
@@ -443,15 +463,63 @@ def _table(label, headers, rows, empty):
         return f'<p class="prose">{escape(empty)}</p>'
     head = "".join(f'<th scope="col">{escape(h)}</th>' for h in headers)
     body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
-    return (f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
+    return (f'<p class="table-hint">Scroll the table sideways to see all {len(headers)} columns.</p>'
+            f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
             f'<table class="qtable"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
+
+
+def _evidence_date(r):
+    """Date a status record speaks for: its publication date, or the retrieval date for undated observations."""
+    value = r["publication_date"] or r["retrieval_date"]
+    parts = [int(x) for x in value.split("-")]
+    return datetime.date(parts[0], parts[1], parts[2] if len(parts) > 2 else 1), value, not r["publication_date"]
+
+
+def _months_before(day, months):
+    """The same calendar day `months` earlier (clamped to the month's last day, e.g. 29 Feb -> 28 Feb)."""
+    y, m = divmod(day.year * 12 + day.month - 1 - months, 12)
+    m += 1
+    last = (datetime.date(y + m // 12, m % 12 + 1, 1) - datetime.timedelta(days=1)).day
+    return datetime.date(y, m, min(day.day, last))
+
+
+def stage_label(model, e):
+    """Lifecycle label; an operational or pilot stage resting only on observed availability says so."""
+    label = LIFECYCLE_LABELS[e["lifecycle"]]
+    if e.get("lifecycle") in ("operational", "pilot"):
+        bases = {model.records[x].get("status_basis") for x in e.get("lifecycle_evidence") or []
+                 if model.records[x].get("status_evidence") == e["lifecycle"]}
+        if bases == {"public-availability-observed"}:
+            label += " (public availability; use not documented)"
+    return label
+
+
+def deployment_facts(model, e):
+    """Operator, provider, sectors, basis and evidence currency for a project, computed from the registry."""
+    rels = model.relationships
+    operators = [(r["subject"], r["classification"]) for r in rels if r["predicate"] == "operates" and r["object"] == e["id"]]
+    sectors = [r["object"] for r in rels if r["predicate"] == "targets" and r["subject"] == e["id"]]
+    provider = next((a["value"] for a in e.get("attributes") or [] if a["name"].startswith("Provider")), "")
+    status = [model.records[x] for x in e.get("lifecycle_evidence") or [] if model.records[x].get("status_evidence") == e.get("lifecycle")]
+    latest = max((_evidence_date(r) for r in status), default=None)
+    currency, stale = "", False
+    if latest and e.get("lifecycle") in ("operational", "pilot"):
+        as_of = datetime.date(*[int(x) for x in model.as_of.split("-")])
+        label = f"{human_date(latest[1])}{' (observed)' if latest[2] else ''}"
+        stale = latest[0] < _months_before(as_of, RECENCY_MONTHS)
+        currency = (f"Latest supporting evidence {label} is more than {RECENCY_MONTHS} months old; current operation has not been reconfirmed"
+                    if stale else
+                    f"Latest supporting evidence {label}, within {RECENCY_MONTHS} months; operation after that date not reconfirmed")
+    bases = sorted({STATUS_BASIS_LABELS[r["status_basis"]] for r in status if r.get("status_basis")})
+    return {"operators": operators, "sectors": sectors, "provider": provider, "bases": bases, "currency": currency,
+            "stale": stale, "status_ids": [r["evidence_id"] for r in status]}
 
 
 def render_questions(model):
     rels = model.relationships
     ents = model.entities
     org_types = ("institution", "company")
-    activity_preds = ("develops", "hosts", "created", "invested_in", "signatory_of")
+    activity_preds = ("develops", "hosts", "operates", "created", "invested_in", "signatory_of")
 
     # Q1: organisations with documented AI activity (verified relationships only, plus every company).
     orgs = {}
@@ -473,17 +541,26 @@ def render_questions(model):
         q1.append([_ent_link(model, eid), escape(kind), acts, _ev_links(ev)])
 
     # Q2: projects by lifecycle stage.
-    order = ["operational", "pilot", "in-development", "announced", "discontinued"]
+    order = ["operational", "pilot", "in-development", "unresolved", "announced", "discontinued"]
     projects = sorted((e for e in ents.values() if e["type"] == "project"),
                       key=lambda e: (order.index(e["lifecycle"]), e["name"].lower()))
-    q2 = [[_ent_link(model, e["id"]), escape(KIND_LABELS[e["project_kind"]]), escape(LIFECYCLE_LABELS[e["lifecycle"]]),
+    q2 = [[_ent_link(model, e["id"]), escape(KIND_LABELS[e["project_kind"]]), escape(stage_label(model, e)),
            " ".join(badge(model.records[x]["classification"]) + " " + _ev_links([x]) for x in e["lifecycle_evidence"]),
            escape(e.get("status", ""))] for e in projects]
     counts = {st: sum(1 for e in projects if e["lifecycle"] == st) for st in order}
     stage_line = " · ".join(f"{LIFECYCLE_LABELS[st]}: {n}" for st, n in counts.items() if n)
     ai_running = [e for e in projects if e["project_kind"] == "ai-application" and e["lifecycle"] in ("operational", "pilot")]
-    ai_line = (f"AI applications documented as operational or in pilot: {', '.join(e['name'] for e in ai_running)}." if ai_running else
-               "No AI application recorded here is yet documented as operational or in pilot. This reflects the registry's current coverage, not the state of AI use in Morocco.")
+    listed = "; ".join(f"{e['name']} ({LIFECYCLE_LABELS[e['lifecycle']].lower()}, basis: {', '.join(deployment_facts(model, e)['bases'])})"
+                       for e in ai_running)
+    if len(ai_running) == 1:
+        ai_line = (f"One AI application recorded here is documented as operational or in pilot: {listed}. It is the only one "
+                   "currently documented in this registry, not necessarily the only one in Morocco.")
+    elif ai_running:
+        ai_line = (f"AI applications documented as operational or in pilot: {listed}. These are the ones currently documented "
+                   "in this registry, not necessarily all those in Morocco.")
+    else:
+        ai_line = ("No AI application recorded here is yet documented as operational or in pilot. This reflects the registry's "
+                   "current coverage, not the state of AI use in Morocco.")
 
     # Q3: models and datasets.
     q3 = []
@@ -505,20 +582,42 @@ def render_questions(model):
         cells = []
         for r in links:
             src = ents[r["subject"]]
-            stage = LIFECYCLE_LABELS.get(src.get("lifecycle"), TYPE_SINGULAR[src["type"]])
+            stage = stage_label(model, src) if src.get("lifecycle") else TYPE_SINGULAR[src["type"]]
             cells.append(f'{_ent_link(model, src["id"])} ({escape(stage)})')
             if (src.get("project_kind") == "ai-application" and src.get("lifecycle") in ("operational", "pilot")
                     and r["classification"] == "VERIFIED FACT"):
                 verified_sectors.append(e["id"])
         q4.append([_ent_link(model, e["id"]), "; ".join(cells)])
     if verified_sectors:
-        sector_line = "Sectors with a documented operational or pilot AI application in this registry: " + ", ".join(
-            _ent_link(model, x) for x in dict.fromkeys(verified_sectors)) + "."
+        sector_line = ("Sectors with a documented operational or pilot AI application in this registry: " + ", ".join(
+            _ent_link(model, x) for x in dict.fromkeys(verified_sectors)) + ". See Q6 for the basis of each: public "
+            "availability is not evidence of how widely a system is used. Sectors not listed have no qualifying deployment "
+            "documented in this registry, which reflects its coverage, not the state of AI use in Morocco.")
     else:
         sector_line = ("No qualifying deployment has yet been documented in this registry: no AI application recorded here "
                        "has a verified operational or pilot status in a sector. This reflects the registry's current coverage, "
                        "not the state of AI use in Morocco. The sectors below are targeted only by announced or "
                        "in-development projects, or by initiatives.")
+
+    # Q6: AI applications and their deployment facts.
+    q6 = []
+    apps = [e for e in projects if e["project_kind"] == "ai-application"]
+    for e in apps:
+        f = deployment_facts(model, e)
+        ops = ", ".join(f'{_ent_link(model, o)}{"" if c == "VERIFIED FACT" else " (planned)"}' for o, c in f["operators"]) or "Not documented"
+        q6.append([_ent_link(model, e["id"]), ", ".join(_ent_link(model, x) for x in f["sectors"]) or "Not recorded", ops,
+                   escape(f["provider"]) or "Not documented", escape(stage_label(model, e)),
+                   escape("; ".join(f["bases"])) or "—", (escape(f["currency"]) + " · " + _ev_links(f["status_ids"])) if f["status_ids"] else "—"])
+
+    # Q7: unresolved stages, and operation whose latest evidence is past the recency convention.
+    q7 = []
+    for e in sorted((e for e in ents.values() if e.get("lifecycle") == "unresolved"), key=lambda e: e["name"].lower()):
+        q7.append([_ent_link(model, e["id"]), "Unresolved", escape(e.get("note", "")) + " " + _ev_links(e["lifecycle_evidence"])])
+    for e in projects:
+        f = deployment_facts(model, e)
+        if f["stale"]:
+            q7.append([_ent_link(model, e["id"]), f"Not reconfirmed in {RECENCY_MONTHS} months",
+                       escape(f["currency"]) + " " + _ev_links(f["status_ids"])])
 
     # Q5: relationships between organisations and what they sign, build, host or fund, by classification.
     q5 = []
@@ -543,7 +642,7 @@ def render_questions(model):
 </section>
 <section aria-labelledby="q2-h">
   <h2 id="q2-h"><span class="section-number">Q2</span>Which projects are operational, and which are only announced?</h2>
-  <p class="prose">{escape(stage_line)}. A stage other than "announced" requires a verified record that explicitly documents that stage, and "operational" requires one from a source other than the actor's own website or press; a signature, presentation or announcement is never treated as delivery. The kind column separates AI applications from compute infrastructure: operational infrastructure is not an operational AI application.</p>
+  <p class="prose">{escape(stage_line)}. A stage other than "announced" requires a verified record that explicitly documents that stage. "Operational" and "pilot" must rest on a record published by a verified operator of the project or by an independent source, never on a developer's or vendor's page, press, a procurement notice, a signature or an announcement. The kind column separates AI applications from compute infrastructure and digital platforms, neither of which counts as an AI deployment.</p>
   <p class="prose">{escape(ai_line)}</p>
   {_table("Projects by lifecycle stage", ["Project", "Kind", "Lifecycle", "Basis", "Status"], q2, "No project recorded.")}
 </section>
@@ -557,6 +656,16 @@ def render_questions(model):
   <p class="prose">{sector_line}</p>
   {_table("Sectors and the projects that target them", ["Sector", "Targeted by"], q4, "No sector is targeted by a recorded project.")}
 </section>
+<section aria-labelledby="q6-h">
+  <h2 id="q6-h"><span class="section-number">Q6</span>Which AI applications are deployed, who operates them, and how current is the evidence?</h2>
+  <p class="prose">Every AI application in the registry, with its operator (distinct from any provider or developer), sector, lifecycle stage, the basis of that stage, and the date of the latest status evidence. Public availability shows that a service is offered, not how many people use it. The recency column is a convention, not a finding: when the latest supporting evidence is more than twelve months before the registry date, it says that current operation has not been reconfirmed. Elapsed time never changes a lifecycle stage, old evidence does not show that a system stopped, and recent evidence does not show that it is still running. Deployment is not evidence of performance or outcomes, and none are recorded here.</p>
+  {_table("AI applications and their deployment evidence", ["Application", "Sector", "Operator", "Provider", "Lifecycle", "Basis", "Evidence recency"], q6, "No AI application recorded.")}
+</section>
+<section aria-labelledby="q7-h">
+  <h2 id="q7-h"><span class="section-number">Q7</span>Which claims remain unresolved, and which deployments have not been reconfirmed recently?</h2>
+  <p class="prose">Entities whose evidence conflicts or is insufficient to establish a stage, and operational or pilot projects whose latest supporting evidence is more than twelve months before the registry date. Such a project keeps its stage: the registry records a discontinuation only when a source documents one. Candidates still under review are not published until they pass the registry's evidence rules.</p>
+  {_table("Unresolved and not recently reconfirmed entries", ["Entity", "Status", "Why"], q7, "No unresolved or not recently reconfirmed entry is recorded.")}
+</section>
 <section aria-labelledby="q5-h">
   <h2 id="q5-h"><span class="section-number">Q5</span>Which institutional relationships are supported by evidence?</h2>
   <p class="prose">All relationships by classification: {escape(cls_line)}. The table lists those between organisations and what they launch, sign, build, host or fund.</p>
@@ -564,7 +673,7 @@ def render_questions(model):
 </section>"""
     return page(model, path="/registry/questions/", current="questions",
                 title="Questions the Registry Answers — TheMoroccoAI",
-                description="Evidence-linked answers about Morocco's AI ecosystem: organisations with documented AI activity, operational versus announced projects, public models and datasets, sectors and verified relationships.",
+                description="Evidence-linked answers about Morocco's AI ecosystem: organisations with documented AI activity, deployed versus announced AI applications and their operators, public models and datasets, sectors and verified relationships.",
                 body=body)
 
 

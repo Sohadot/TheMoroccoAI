@@ -1,6 +1,6 @@
 {
   "ontology": "TheMoroccoAI Ontology",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "as_of": "2026-10-18",
   "description": "Entities and relationships of Morocco's AI ecosystem, each tied to records in evidence.json. Chain: Institution → Initiative → Project → Evidence → Technology → Sector.",
   "entity_types": {
@@ -21,13 +21,15 @@
     "pilot": "Running as a documented pilot or trial.",
     "operational": "Documented as running in production by a source independent of announcements.",
     "released": "A model or dataset that is publicly downloadable from its stated repository.",
-    "discontinued": "Documented as stopped or withdrawn."
+    "discontinued": "Documented as stopped or withdrawn.",
+    "unresolved": "The recorded evidence conflicts or is insufficient to establish a stage; the entity's note says why."
   },
   "project_kinds": {
     "ai-application": "An AI system, product or platform meant to be used by people or organisations.",
     "compute-infrastructure": "Computing or data-centre capacity. Operational infrastructure is not, by itself, an operational AI application.",
     "institute": "A research, training or innovation institute being created.",
-    "agreement": "A partnership or framework agreement without a separately documented deliverable."
+    "agreement": "A partnership or framework agreement without a separately documented deliverable.",
+    "digital-platform": "A portal or digital service that is not itself an AI system, such as a catalogue of AI tools. It never counts as an AI deployment."
   },
   "origins": {
     "based-in-morocco": "Stated to be based in Morocco by a source independent of the company. Registration and headquarters are not thereby verified.",
@@ -60,6 +62,7 @@
     "organized": {"label": "organised", "inverse": "organised by", "subject": ["institution"], "object": ["event"]},
     "develops": {"label": "develops", "inverse": "developed by", "subject": ["institution", "company"], "object": ["project", "model", "dataset"]},
     "hosts": {"label": "hosts", "inverse": "hosted by", "subject": ["institution", "company"], "object": ["project"]},
+    "operates": {"label": "operates", "inverse": "operated by", "subject": ["institution", "company"], "object": ["project"]},
     "invested_in": {"label": "invested in", "inverse": "investor", "subject": ["institution", "company"], "object": ["company"]},
     "trained_on": {"label": "trained on", "inverse": "used to train", "subject": ["model"], "object": ["dataset"]},
     "framed_by": {"label": "framed by", "inverse": "frames", "subject": ["event", "initiative"], "object": ["initiative"]},
@@ -85,7 +88,7 @@
       "summary": "The government department that launched Digital Morocco 2030 in September 2024, organised the First National AI Conference in July 2025 and presented the Morocco AI 2030 roadmap in September 2026.",
       "status": "Named in sources up to September 2026. See the note on the October 2026 government.",
       "note": "The government appointed on 16 October 2026 includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform. The registry has not yet verified whether that ministry takes over this department's portfolio.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"]
     },
     {
       "id": "ministry-ai-digital-transformation",
@@ -355,12 +358,12 @@
       "name": "Sovereign AI marketplace",
       "alt_names": [],
       "domain": "infrastructure-sovereignty",
-      "summary": "Platform unveiled by the ministry in September 2026, intended to give access to secure and trusted AI solutions with data protection and infrastructure control in Morocco.",
-      "status": "Presented September 2026. Public availability not verified.",
-      "project_kind": "ai-application",
-      "lifecycle": "announced",
-      "lifecycle_evidence": ["MAI-EV-0013"],
-      "evidence": ["MAI-EV-0013"]
+      "summary": "Ministry portal giving access to AI solutions it describes as secure and trusted, unveiled in September 2026 and publicly accessible at ai.mmsp.gov.ma on 18 October 2026. It is a catalogue platform, not itself an AI system; the products it lists are recorded individually only where their use is documented.",
+      "status": "Operational digital platform, on the basis of public availability observed on 2026-10-18.",
+      "project_kind": "digital-platform",
+      "lifecycle": "operational",
+      "lifecycle_evidence": ["MAI-EV-0034"],
+      "evidence": ["MAI-EV-0013", "MAI-EV-0034"]
     },
     {
       "id": "idarati-ai",
@@ -368,12 +371,17 @@
       "name": "Idarati AI",
       "alt_names": [],
       "domain": "government-policy",
-      "summary": "Agentic AI assistant presented in September 2026, intended to inform, guide and assist users with administrative procedures.",
-      "status": "Presented September 2026. Public availability not verified.",
+      "summary": "Agentic AI assistant for administrative procedures, presented by the Ministry of Digital Transition in September 2026. On 18 October 2026 it was publicly available on the ministry's own services: listed on its AI Marketplace, opened from an \"Assistant Idarati\" button on the national procedures portal idarati.ma, and answering a test question at chatbot.idarati.ma.",
+      "status": "Operational on the basis of public availability: the operator's own services showed it live and responding on 2026-10-18. How many people use it, its accuracy and its outcomes are not documented, and operation after that date has not been reconfirmed.",
       "project_kind": "ai-application",
-      "lifecycle": "announced",
-      "lifecycle_evidence": ["MAI-EV-0013"],
-      "evidence": ["MAI-EV-0013"]
+      "lifecycle": "operational",
+      "lifecycle_evidence": ["MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"],
+      "attributes": [
+        {"name": "Operator", "value": "Ministry of Digital Transition and Administration Reform (as named on its services)", "evidence": "MAI-EV-0038"},
+        {"name": "Access points", "value": "chatbot.idarati.ma, opened from idarati.ma", "evidence": "MAI-EV-0038"},
+        {"name": "Scope", "value": "National public-service portal", "evidence": "MAI-EV-0035"}
+      ],
+      "evidence": ["MAI-EV-0013", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"]
     },
     {
       "id": "law-09-08",
@@ -386,12 +394,12 @@
       "evidence": ["MAI-EV-0017"]
     },
     {"id": "artificial-intelligence", "type": "technology", "name": "Artificial intelligence", "alt_names": [], "summary": "General AI research, development and application.", "evidence": ["MAI-EV-0009"]},
-    {"id": "agentic-ai", "type": "technology", "name": "Agentic AI assistants", "alt_names": [], "summary": "AI systems that act on a user's behalf across multi-step tasks.", "evidence": ["MAI-EV-0013"]},
+    {"id": "agentic-ai", "type": "technology", "name": "Agentic AI assistants", "alt_names": [], "summary": "AI systems that act on a user's behalf across multi-step tasks.", "evidence": ["MAI-EV-0013", "MAI-EV-0034"]},
     {"id": "internet-of-things", "type": "technology", "name": "Internet of Things", "alt_names": [], "summary": "Networked sensors and devices.", "evidence": ["MAI-EV-0009"]},
     {"id": "robotics", "type": "technology", "name": "Advanced robotics", "alt_names": [], "summary": "Robotic systems for production and services.", "evidence": ["MAI-EV-0009"]},
     {"id": "industrial-data-analytics", "type": "technology", "name": "Industrial data analytics", "alt_names": [], "summary": "Analysis of industrial operational data, including for predictive maintenance.", "evidence": ["MAI-EV-0009"]},
     {"id": "data-centres", "type": "technology", "name": "Data centres", "alt_names": [], "summary": "Facilities hosting compute and storage, a base layer for AI capacity and data sovereignty.", "evidence": ["MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0030"]},
-    {"id": "public-administration", "type": "sector", "name": "Public administration and e-government", "alt_names": [], "summary": "Digital public services and administrative procedures.", "evidence": ["MAI-EV-0002", "MAI-EV-0010", "MAI-EV-0013", "MAI-EV-0014"]},
+    {"id": "public-administration", "type": "sector", "name": "Public administration and e-government", "alt_names": [], "summary": "Digital public services and administrative procedures.", "evidence": ["MAI-EV-0002", "MAI-EV-0010", "MAI-EV-0013", "MAI-EV-0014", "MAI-EV-0034"]},
     {"id": "digital-economy", "type": "sector", "name": "Digital economy", "alt_names": [], "summary": "Digital-sector jobs, firms and contribution to GDP.", "evidence": ["MAI-EV-0002"]},
     {"id": "industry", "type": "sector", "name": "Industry and manufacturing", "alt_names": [], "summary": "Industrial production, including Industry 4.0 transformation.", "evidence": ["MAI-EV-0009"]},
     {"id": "education-research", "type": "sector", "name": "Education, training and research", "alt_names": [], "summary": "AI skills training, higher education and applied research.", "evidence": ["MAI-EV-0005", "MAI-EV-0016"]},
@@ -444,7 +452,7 @@
       "summary": "Startup that its investor UM6P Ventures describes as Morocco-based and as having emerged from the AIOX Labs studio, developing AI software for prenatal ultrasound diagnosis. UM6P Ventures states it invested in its pre-seed round. Registration and headquarters are not documented here.",
       "origin": "based-in-morocco",
       "origin_evidence": ["MAI-EV-0028"],
-      "evidence": ["MAI-EV-0027", "MAI-EV-0028", "MAI-EV-0029"]
+      "evidence": ["MAI-EV-0027", "MAI-EV-0028", "MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033", "MAI-EV-0039"]
     },
     {
       "id": "um6p-ventures",
@@ -506,12 +514,17 @@
       "name": "DeepEcho AI ultrasound software",
       "alt_names": [],
       "domain": "companies-deployments",
-      "summary": "Software that uses deep learning to assist ultrasound video diagnosis in prenatal care, including automated fetal measurements. Its developer states that its claims are not yet validated by the FDA and that its clinical studies are under scientific and regulatory review.",
-      "status": "In development: clinical studies under scientific and regulatory review according to its developer. No regulatory clearance or deployment documented.",
+      "summary": "Software that uses deep learning to assist ultrasound video diagnosis in prenatal care. On 23 May 2025 the FDA cleared a device named DEEPECHO under 510(k) K242594, for an applicant named DeepEcho with a Delaware address; the registry associates that record with this software by name, device type, web domain and Moroccan data sites, not by a documented legal identity. The Moroccan government says DeepEcho's solution obtained FDA \"approbation\"; the company's own website still carries an older disclaimer saying its claims are not FDA-validated. A Moroccan public-sector evaluation is planned under a May 2026 convention.",
+      "status": "Unresolved: an associated US 510(k) clearance is documented (May 2025), but no clinical or commercial use in Morocco is documented, and the developer's own site gives an outdated regulatory status.",
+      "note": "Unresolved because the sources conflict and use is undocumented: the FDA database lists 510(k) clearance for a DEEPECHO device (May 2025) while the developer's website still says its claims are not FDA-validated, and no clinical or commercial use in Morocco is documented. A 510(k) clearance permits marketing in the United States; it is not deployment, not authorisation in Morocco and not evidence of clinical outcomes. The applicant's legal relationship to the Morocco-based company is not documented. The planned Moroccan public-sector evaluation is recorded separately as an announced project.",
       "project_kind": "ai-application",
-      "lifecycle": "in-development",
-      "lifecycle_evidence": ["MAI-EV-0029"],
-      "evidence": ["MAI-EV-0028", "MAI-EV-0029"]
+      "lifecycle": "unresolved",
+      "lifecycle_evidence": ["MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033"],
+      "attributes": [
+        {"name": "US FDA 510(k) (associated record)", "value": "K242594, Substantially Equivalent (clearance), 23 May 2025; applicant DeepEcho, Dover, Delaware. Legal identity with the Morocco-based company not documented", "evidence": "MAI-EV-0032"},
+        {"name": "Cleared indication (US; associated record)", "value": "Machine-learning detection of standard fetal biometry views and assistance in computing fetal biometric measurements, for trained healthcare professionals", "evidence": "MAI-EV-0039"}
+      ],
+      "evidence": ["MAI-EV-0028", "MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033", "MAI-EV-0039"]
     },
     {
       "id": "atlas-chat",
@@ -588,7 +601,64 @@
     {"id": "natural-language-processing", "type": "technology", "name": "Natural language processing", "alt_names": [], "summary": "Computational processing and understanding of human language.", "evidence": ["MAI-EV-0024"]},
     {"id": "high-performance-computing", "type": "technology", "name": "High-performance computing", "alt_names": [], "summary": "Supercomputing and large-scale compute infrastructure.", "evidence": ["MAI-EV-0020", "MAI-EV-0030"]},
     {"id": "medical-imaging-ai", "type": "technology", "name": "AI-assisted medical imaging", "alt_names": [], "summary": "Machine learning applied to the interpretation of medical images and video.", "evidence": ["MAI-EV-0029"]},
-    {"id": "health", "type": "sector", "name": "Health", "alt_names": [], "summary": "Healthcare delivery, including prenatal and maternal care.", "evidence": ["MAI-EV-0029"]}
+    {"id": "health", "type": "sector", "name": "Health", "alt_names": [], "summary": "Healthcare delivery, including prenatal and maternal care.", "evidence": ["MAI-EV-0029", "MAI-EV-0033"]},
+    {
+      "id": "ministry-health",
+      "type": "institution",
+      "name": "Ministry of Health and Social Protection",
+      "alt_names": ["Ministère de la Santé et de la Protection sociale"],
+      "domain": "government-policy",
+      "summary": "Ministry that signed a May 2026 convention with DeepEcho for the dissemination, adoption and clinical evaluation of AI prenatal-ultrasound solutions in public health facilities.",
+      "evidence": ["MAI-EV-0033"]
+    },
+    {
+      "id": "swam",
+      "type": "company",
+      "name": "Switch Al Maghrib (SWAM)",
+      "alt_names": ["SWAM"],
+      "domain": "companies-deployments",
+      "summary": "Operator of Morocco's national card-payment switch, which describes itself as one of the country's five financial market infrastructures, licensed and supervised by Bank Al-Maghrib. In March 2026 it announced it will integrate an AI-based fraud scoring solution from Visa.",
+      "origin": "self-described-moroccan",
+      "origin_evidence": ["MAI-EV-0037"],
+      "evidence": ["MAI-EV-0036", "MAI-EV-0037"]
+    },
+    {
+      "id": "deepecho-public-health-evaluation",
+      "type": "project",
+      "name": "DeepEcho AI prenatal ultrasound evaluation in public health facilities",
+      "alt_names": [],
+      "domain": "companies-deployments",
+      "summary": "Planned progressive deployment, within an evaluative scientific study, of DeepEcho's AI prenatal-ultrasound solution in Moroccan primary-care establishments and local hospitals, under a May 2026 convention with the Ministry of Health and Social Protection.",
+      "status": "Announced (convention signed May 2026). No source shows that the study or any facility deployment has started.",
+      "project_kind": "ai-application",
+      "lifecycle": "announced",
+      "lifecycle_evidence": ["MAI-EV-0033"],
+      "attributes": [
+        {"name": "Operator (planned)", "value": "Ministry of Health and Social Protection, public health facilities", "evidence": "MAI-EV-0033"},
+        {"name": "Provider", "value": "DeepEcho", "evidence": "MAI-EV-0033"},
+        {"name": "Scope (planned)", "value": "Primary-care establishments and local hospitals, within an evaluative study", "evidence": "MAI-EV-0033"}
+      ],
+      "evidence": ["MAI-EV-0033"]
+    },
+    {
+      "id": "swam-fraud-scoring",
+      "type": "project",
+      "name": "AI-based real-time fraud scoring on Morocco's national card switch",
+      "alt_names": ["Visa Advanced Authorization at SWAM"],
+      "domain": "companies-deployments",
+      "summary": "Announced integration by Switch Al Maghrib of Visa Advanced Authorization, an AI-based real-time fraud risk scoring applied at authorisation, for domestic card transactions processed through the national switch.",
+      "status": "Announced (March 2026, future tense). No source shows the integration is live.",
+      "project_kind": "ai-application",
+      "lifecycle": "announced",
+      "lifecycle_evidence": ["MAI-EV-0036"],
+      "attributes": [
+        {"name": "Operator", "value": "Switch Al Maghrib (SWAM)", "evidence": "MAI-EV-0036"},
+        {"name": "Provider", "value": "Visa (Visa Advanced Authorization, Network Agnostic VAA)", "evidence": "MAI-EV-0036"},
+        {"name": "Scope", "value": "Domestic card transactions processed through the national switch", "evidence": "MAI-EV-0036"}
+      ],
+      "evidence": ["MAI-EV-0036"]
+    },
+    {"id": "financial-services", "type": "sector", "name": "Financial services and payments", "alt_names": [], "summary": "Banking, card payments and financial market infrastructure.", "evidence": ["MAI-EV-0036"]}
   ],
   "relationships": [
     {"subject": "ministry-digital-transition", "predicate": "launched", "object": "digital-morocco-2030", "evidence": ["MAI-EV-0001"], "classification": "VERIFIED FACT"},
@@ -634,8 +704,8 @@
     {"subject": "um6p-data-centre-partnership", "predicate": "applies", "object": "data-centres", "evidence": ["MAI-EV-0007"], "classification": "ANNOUNCED PLAN"},
     {"subject": "morocco-ai-2030", "predicate": "includes", "object": "sovereign-ai-marketplace", "evidence": ["MAI-EV-0013"], "classification": "ANNOUNCED PLAN"},
     {"subject": "morocco-ai-2030", "predicate": "includes", "object": "idarati-ai", "evidence": ["MAI-EV-0013"], "classification": "ANNOUNCED PLAN"},
-    {"subject": "idarati-ai", "predicate": "applies", "object": "agentic-ai", "evidence": ["MAI-EV-0013"], "classification": "ANNOUNCED PLAN"},
-    {"subject": "idarati-ai", "predicate": "targets", "object": "public-administration", "evidence": ["MAI-EV-0013"], "classification": "ANNOUNCED PLAN"},
+    {"subject": "idarati-ai", "predicate": "applies", "object": "agentic-ai", "evidence": ["MAI-EV-0034", "MAI-EV-0013"], "classification": "VERIFIED FACT"},
+    {"subject": "idarati-ai", "predicate": "targets", "object": "public-administration", "evidence": ["MAI-EV-0034", "MAI-EV-0013"], "classification": "VERIFIED FACT"},
     {"subject": "um6p", "predicate": "created", "object": "ai-movement", "evidence": ["MAI-EV-0016"], "classification": "VERIFIED FACT"},
     {"subject": "unesco", "predicate": "designated", "object": "ai-movement", "evidence": ["MAI-EV-0015"], "classification": "VERIFIED FACT", "note": "Designation as a UNESCO Category 2 Centre."},
     {"subject": "cndp", "predicate": "lists_in_framework", "object": "law-09-08", "evidence": ["MAI-EV-0017"], "classification": "VERIFIED FACT"},
@@ -657,6 +727,17 @@
     {"subject": "insea", "predicate": "develops", "object": "darijabert", "evidence": ["MAI-EV-0024"], "classification": "VERIFIED FACT", "note": "Through its SI2M laboratory."},
     {"subject": "darijabert", "predicate": "applies", "object": "natural-language-processing", "evidence": ["MAI-EV-0024"], "classification": "VERIFIED FACT"},
     {"subject": "atlasia", "predicate": "develops", "object": "al-atlas", "evidence": ["MAI-EV-0025", "MAI-EV-0026"], "classification": "VERIFIED FACT", "note": "Attribution via AtlasIA's link to the atlasia Hugging Face organisation."},
-    {"subject": "al-atlas", "predicate": "applies", "object": "large-language-models", "evidence": ["MAI-EV-0025"], "classification": "VERIFIED FACT"}
+    {"subject": "al-atlas", "predicate": "applies", "object": "large-language-models", "evidence": ["MAI-EV-0025"], "classification": "VERIFIED FACT"},
+    {"subject": "ministry-digital-transition", "predicate": "operates", "object": "idarati-ai", "evidence": ["MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"], "classification": "VERIFIED FACT", "note": "Published and run under the ministry's name on its own services; how many people use it is not documented."},
+    {"subject": "ministry-digital-transition", "predicate": "operates", "object": "sovereign-ai-marketplace", "evidence": ["MAI-EV-0034"], "classification": "VERIFIED FACT"},
+    {"subject": "ministry-health", "predicate": "signatory_of", "object": "deepecho-public-health-evaluation", "evidence": ["MAI-EV-0033"], "classification": "VERIFIED FACT"},
+    {"subject": "deepecho", "predicate": "signatory_of", "object": "deepecho-public-health-evaluation", "evidence": ["MAI-EV-0033"], "classification": "VERIFIED FACT"},
+    {"subject": "ministry-health", "predicate": "operates", "object": "deepecho-public-health-evaluation", "evidence": ["MAI-EV-0033"], "classification": "ANNOUNCED PLAN", "note": "Planned deployment in public health facilities; not documented as started."},
+    {"subject": "deepecho-public-health-evaluation", "predicate": "applies", "object": "medical-imaging-ai", "evidence": ["MAI-EV-0033"], "classification": "ANNOUNCED PLAN"},
+    {"subject": "deepecho-public-health-evaluation", "predicate": "targets", "object": "health", "evidence": ["MAI-EV-0033"], "classification": "ANNOUNCED PLAN"},
+    {"subject": "deepecho-public-health-evaluation", "predicate": "related_to", "object": "deepecho-ultrasound-software", "evidence": ["MAI-EV-0033", "MAI-EV-0029"], "classification": "INDEPENDENT ANALYSIS", "note": "The convention concerns a Moroccan DeepEcho solution that the article says has FDA \"approbation\"; that it is the software described on DeepEcho's website, and the device cleared under 510(k) K242594, is the registry's reading. The article names neither the device nor the clearance."},
+    {"subject": "swam", "predicate": "operates", "object": "swam-fraud-scoring", "evidence": ["MAI-EV-0036"], "classification": "ANNOUNCED PLAN", "note": "Integration announced in the future tense."},
+    {"subject": "swam-fraud-scoring", "predicate": "applies", "object": "artificial-intelligence", "evidence": ["MAI-EV-0036"], "classification": "ANNOUNCED PLAN"},
+    {"subject": "swam-fraud-scoring", "predicate": "targets", "object": "financial-services", "evidence": ["MAI-EV-0036"], "classification": "ANNOUNCED PLAN"}
   ]
 }
