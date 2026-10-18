@@ -52,6 +52,19 @@ class RepositoryData(unittest.TestCase):
         self.assertEqual(kinds["toubkal-supercomputer"], "compute-infrastructure")
         self.assertEqual(kinds["nexus-ai-factory"], "compute-infrastructure")
 
+    def test_outdated_self_description_no_longer_sets_status(self):
+        # Regression: DeepEcho's website disclaimer was contradicted by the FDA record (MAI-EV-0032).
+        evidence, ontology = registry.load_all()
+        rec = next(r for r in evidence["records"] if r["evidence_id"] == "MAI-EV-0029")
+        self.assertNotIn("status_evidence", rec)
+        sw = next(e for e in ontology["entities"] if e["id"] == "deepecho-ultrasound-software")
+        self.assertEqual(sw["lifecycle"], "unresolved")
+
+    def test_digital_platform_is_not_an_ai_application(self):
+        _, ontology = registry.load_all()
+        e = next(e for e in ontology["entities"] if e["id"] == "sovereign-ai-marketplace")
+        self.assertEqual(e["project_kind"], "digital-platform")
+
     def test_targets_are_never_classified_as_facts(self):
         evidence, _ = registry.load_all()
         for r in evidence["records"]:
@@ -135,7 +148,7 @@ class ValidatorRejects(unittest.TestCase):
 
     def test_operational_needs_an_independent_source(self):
         self.record("MAI-EV-0020")["source_type"] = "organization_website"
-        self.assertError("'operational' needs a verified record from a source other than")
+        self.assertError("an independent basis cannot rest on a self-published or press source")
 
     def test_operational_cannot_rest_on_an_announcement(self):
         nexus = self.entity("nexus-ai-factory")
@@ -196,7 +209,7 @@ class ValidatorRejects(unittest.TestCase):
 
     def test_operational_status_cannot_come_from_own_website(self):
         self.record("MAI-EV-0029")["status_evidence"] = "operational"
-        self.assertError("'operational' cannot be evidenced by the actor's own website or press")
+        self.assertError("'operational' needs a status_basis")
 
     def test_released_must_come_from_the_repository(self):
         self.record("MAI-EV-0021")["status_evidence"] = "released"
@@ -222,6 +235,62 @@ class ValidatorRejects(unittest.TestCase):
     def test_verified_operations_cannot_rest_on_press(self):
         self.entity("nexus-core-systems")["origin"] = "foreign-moroccan-operations-verified"
         self.assertError("needs origin_evidence from a source independent of the company")
+
+    # ── Sprint 03: deployment evidence ──
+
+    def test_announcement_cannot_become_operational(self):
+        e = self.entity("swam-fraud-scoring")
+        e["lifecycle"], e["lifecycle_evidence"] = "operational", ["MAI-EV-0036"]
+        self.assertError("lifecycle 'operational' is not supported by a VERIFIED FACT record")
+
+    def test_procurement_cannot_prove_operational_use(self):
+        r = self.record("MAI-EV-0034")
+        r["evidence_type"] = "procurement_notice"
+        self.assertError("a procurement notice cannot evidence a lifecycle status")
+
+    def test_vendor_availability_cannot_prove_customer_deployment(self):
+        r = self.record("MAI-EV-0029")
+        r.update(status_evidence="operational", status_basis="public-availability-observed", source_entity="deepecho")
+        e = self.entity("deepecho-ultrasound-software")
+        e["lifecycle"], e["lifecycle_evidence"] = "operational", ["MAI-EV-0029"]
+        del e["note"]
+        self.assertError("needs a status record published by a verified operator of the project")
+
+    def test_operator_basis_needs_the_publishing_operator(self):
+        del self.record("MAI-EV-0034")["source_entity"]
+        self.assertError("needs source_entity naming the operator that published it")
+
+    def test_infrastructure_cannot_count_as_an_ai_application(self):
+        self.entity("toubkal-supercomputer")["project_kind"] = "ai-application"
+        self.assertError("needs a VERIFIED FACT 'operates' relationship naming its operator")
+
+    def test_developer_is_not_an_operator(self):
+        rels = self.ontology["relationships"]
+        self.ontology["relationships"] = [r for r in rels if not (r["predicate"] == "operates" and r["object"] == "idarati-ai")]
+        self.ontology["relationships"].append({"subject": "ministry-digital-transition", "predicate": "develops",
+                                               "object": "idarati-ai", "evidence": ["MAI-EV-0034"], "classification": "VERIFIED FACT"})
+        self.assertError("needs a status record published by a verified operator of the project")
+
+    def test_unsupported_performance_claims_are_rejected(self):
+        self.record("MAI-EV-0034")["claim"] += " It reduced processing times by 40%."
+        self.assertError("asserts performance or outcomes")
+
+    def test_status_basis_is_required_for_operational(self):
+        del self.record("MAI-EV-0020")["status_basis"]
+        self.assertError("'operational' needs a status_basis")
+
+    def test_secondary_press_cannot_evidence_operation(self):
+        r = self.record("MAI-EV-0020")
+        r["source_type"] = "secondary_press"
+        self.assertError("'operational' cannot be evidenced by secondary press")
+
+    def test_unresolved_needs_an_explanation(self):
+        del self.entity("deepecho-ultrasound-software")["note"]
+        self.assertError("lifecycle 'unresolved' needs a note explaining why")
+
+    def test_source_entity_must_resolve(self):
+        self.record("MAI-EV-0035")["source_entity"] = "ministry-of-nowhere"
+        self.assertError("source_entity 'ministry-of-nowhere' must be an existing entity")
 
     def test_unknown_classification(self):
         self.record()["classification"] = "PROBABLY TRUE"

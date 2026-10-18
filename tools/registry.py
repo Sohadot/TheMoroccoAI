@@ -51,6 +51,9 @@ EVIDENCE_TYPES = (
     "case_study",
     "ranking_entry",
     "press_article",
+    "regulatory_record",
+    "live_service_observation",
+    "procurement_notice",
 )
 REQUIRED_EVIDENCE_FIELDS = (
     "evidence_id", "title", "source_organization", "source_type", "source_url",
@@ -63,13 +66,23 @@ DOCUMENTED_TYPES = ("institution", "company", "initiative", "event", "project", 
 LIFECYCLE_TYPES = ("project", "model", "dataset")
 # Which lifecycle stages each type may take, and which record classes can support each stage.
 LIFECYCLE_ALLOWED = {
-    "project": ("announced", "in-development", "pilot", "operational", "discontinued"),
-    "model": ("announced", "in-development", "released", "discontinued"),
-    "dataset": ("announced", "in-development", "released", "discontinued"),
+    "project": ("announced", "in-development", "pilot", "operational", "discontinued", "unresolved"),
+    "model": ("announced", "in-development", "released", "discontinued", "unresolved"),
+    "dataset": ("announced", "in-development", "released", "discontinued", "unresolved"),
 }
 # Stages that need a record explicitly declaring that status (status_evidence); a signature,
 # presentation or announcement record never declares one, so it cannot establish delivery.
 STATUS_STAGES = ("in-development", "pilot", "operational", "released", "discontinued")
+# What an operational/pilot record rests on. Operator bases need the record to be published by a
+# verified operator of the project; independent bases need a source that is neither the operator,
+# nor the developer, nor self-published, nor press. A vendor's page can satisfy neither.
+OPERATOR_BASES = ("public-availability-observed", "operator-report-of-use")
+INDEPENDENT_BASES = ("independent-listing", "independent-report-of-use")
+STATUS_BASES = OPERATOR_BASES + INDEPENDENT_BASES
+# Outcome or performance wording: use is not evidence of results, so verified facts may not assert them.
+PERFORMANCE = re.compile(
+    r"\b(accura(?:te|cy)|improv(?:e|ed|es|ement)|reduc(?:e|ed|es|tion)|effective(?:ness)?|outperform\w*|"
+    r"successful(?:ly)?|faster|cut fraud)\b|\d+(?:\.\d+)?\s?%", re.IGNORECASE)
 PROJECT_KINDS_REQUIRED = ("project",)
 # Origins that need a source independent of the company itself.
 INDEPENDENT_ORIGINS = ("based-in-morocco", "foreign-moroccan-operations-verified")
@@ -215,8 +228,23 @@ def validate_evidence(evidence, today=None):
                 errors.append(f"{where} status_evidence requires a VERIFIED FACT record")
             if status == "released" and r.get("source_type") != "technical_repository":
                 errors.append(f"{where} 'released' must be evidenced by the technical repository itself")
-            if status in ("operational", "pilot") and r.get("source_type") in NON_INDEPENDENT_SOURCES:
-                errors.append(f"{where} '{status}' cannot be evidenced by the actor's own website or press")
+            if status in ("operational", "pilot"):
+                basis = r.get("status_basis")
+                if basis not in STATUS_BASES:
+                    errors.append(f"{where} '{status}' needs a status_basis from {', '.join(STATUS_BASES)}")
+                if r.get("source_type") == "secondary_press":
+                    errors.append(f"{where} '{status}' cannot be evidenced by secondary press")
+                if basis in INDEPENDENT_BASES and r.get("source_type") in NON_INDEPENDENT_SOURCES:
+                    errors.append(f"{where} an independent basis cannot rest on a self-published or press source")
+                if basis in OPERATOR_BASES and not r.get("source_entity"):
+                    errors.append(f"{where} basis '{basis}' needs source_entity naming the operator that published it")
+            if r.get("evidence_type") == "procurement_notice":
+                errors.append(f"{where} a procurement notice cannot evidence a lifecycle status")
+        elif r.get("status_basis") is not None:
+            errors.append(f"{where} status_basis is only meaningful with status_evidence")
+        if cls == "VERIFIED FACT" and PERFORMANCE.search(claim):
+            errors.append(f"{where} VERIFIED FACT claim asserts performance or outcomes "
+                          f"({PERFORMANCE.search(claim).group(0)!r}); record use and results separately")
         if r.get("source_type") == "secondary_press" and cls not in ("ANNOUNCED PLAN", "UNVERIFIED CLAIM"):
             errors.append(f"{where} secondary press can support only ANNOUNCED PLAN or UNVERIFIED CLAIM, not {cls}")
         if cls == "UNVERIFIED CLAIM" and not str(r.get("verification_note", "")).strip():
@@ -242,9 +270,8 @@ def _check_entity_facets(e, where, ev, records, stages, origins, kinds=None):
             errors.append(f"{where} lifecycle '{stage}' is not supported by a {' or '.join(sorted(LIFECYCLE_SUPPORT[stage]))} record")
         if stage in STATUS_STAGES and not any(r.get("status_evidence") == stage for r in cited):
             errors.append(f"{where} lifecycle '{stage}' needs a lifecycle_evidence record whose status_evidence is '{stage}'")
-        if stage == "operational" and not any(
-                r.get("classification") == "VERIFIED FACT" and r.get("source_type") not in NON_INDEPENDENT_SOURCES for r in cited):
-            errors.append(f"{where} 'operational' needs a verified record from a source other than the actor's own website or press")
+        if stage == "unresolved" and not str(e.get("note", "")).strip():
+            errors.append(f"{where} lifecycle 'unresolved' needs a note explaining why")
     elif "lifecycle" in e or "lifecycle_evidence" in e:
         errors.append(f"{where} {etype} entities take no lifecycle")
     kinds = kinds or {}
@@ -275,6 +302,38 @@ def _check_entity_facets(e, where, ev, records, stages, origins, kinds=None):
             errors.append(f"{where} attribute needs a name and a value")
         if a.get("evidence") not in ev:
             errors.append(f"{where} attribute '{a.get('name')}' must cite one of the entity's own records")
+    return errors
+
+
+def _check_deployments(by_id, records, relationships):
+    """Operational/pilot projects: the status record must come from a verified operator or a genuinely
+    independent source, and an AI application must name its operator separately from its developer."""
+    errors = []
+    for pid, e in by_id.items():
+        stage = e.get("lifecycle")
+        if e.get("type") != "project" or stage not in ("operational", "pilot"):
+            continue
+        where = f"entity {pid}:"
+        verified = [r for r in relationships if r.get("object") == pid and r.get("classification") == "VERIFIED FACT"]
+        operators = {r["subject"] for r in verified if r.get("predicate") == "operates"}
+        builders = {r["subject"] for r in relationships if r.get("object") == pid and r.get("predicate") in ("develops", "signatory_of")}
+        status_records = [records[x] for x in e.get("lifecycle_evidence") or []
+                          if x in records and records[x].get("status_evidence") == stage]
+
+        def acceptable(r):
+            basis, src = r.get("status_basis"), r.get("source_entity")
+            if basis in OPERATOR_BASES:
+                return src in operators
+            if basis in INDEPENDENT_BASES:
+                return src not in operators | builders and r.get("source_type") not in NON_INDEPENDENT_SOURCES
+            return False
+
+        if not any(acceptable(r) for r in status_records):
+            errors.append(f"{where} '{stage}' needs a status record published by a verified operator of the project "
+                          f"or by an independent source (a developer's or vendor's page does not qualify)")
+        if e.get("project_kind") == "ai-application" and not operators:
+            errors.append(f"{where} an {stage} AI application needs a VERIFIED FACT 'operates' relationship naming its operator, "
+                          f"distinct from its developer or provider")
     return errors
 
 
@@ -326,6 +385,9 @@ def validate_ontology(ontology, evidence):
                 errors.append(f"{where} cites {x}, but {x} does not list it in related_entities")
 
     for rid, r in records.items():
+        src = r.get("source_entity")
+        if src is not None and (src not in by_id or src not in (r.get("related_entities") or [])):
+            errors.append(f"{rid}: source_entity '{src}' must be an existing entity listed in related_entities")
         for x in r.get("related_entities") or []:
             if x not in by_id:
                 errors.append(f"{rid}: related entity '{x}' does not exist in ontology.json")
@@ -367,6 +429,7 @@ def validate_ontology(ontology, evidence):
         elif cls in RELATION_SUPPORT and not cited & RELATION_SUPPORT[cls]:
             errors.append(f"{where} classified {cls} but no cited record supports that class "
                           f"(cited: {', '.join(sorted(c for c in cited if c))})")
+    errors += _check_deployments(by_id, records, ontology.get("relationships") or [])
     return errors
 
 
