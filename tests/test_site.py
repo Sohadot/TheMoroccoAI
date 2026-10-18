@@ -57,7 +57,41 @@ class PublishedSite(unittest.TestCase):
         def mutate(o):
             o["relationships"].append({"subject": "toubkal-supercomputer", "predicate": "targets", "object": "health",
                                        "evidence": ["MAI-EV-0020"], "classification": "VERIFIED FACT"})
-        self.assertIn("No qualifying deployment has yet been documented", self._questions_with(mutate))
+        html = self._questions_with(mutate)
+        q4 = html[html.index('id="q4-h"'):html.index("<table", html.index('id="q4-h"'))]
+        self.assertNotIn('href="/registry/health/"', q4)
+
+    def test_historical_evidence_is_not_presented_as_current(self):
+        def mutate(o):
+            pass
+        evidence, ontology = registry.load_all()
+        for r in evidence["records"]:
+            if r["evidence_id"] in ("MAI-EV-0034", "MAI-EV-0035"):
+                r["publication_date"] = "2024-01-15"
+        html = build.render_questions(build.Model(evidence, ontology))
+        q6 = html[html.index('id="q6-h"'):html.index('id="q7-h"')]
+        q7 = html[html.index('id="q7-h"'):html.index('id="q5-h"')]
+        self.assertIn("Historical: latest evidence 15 January 2024; continued operation not documented", q6)
+        self.assertIn('href="/registry/idarati-ai/"', q7)
+
+    def test_deployments_show_operator_separately_from_provider(self):
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        q6 = html[html.index('id="q6-h"'):html.index('id="q7-h"')]
+        row = q6[q6.index('href="/registry/idarati-ai/"'):]
+        row = row[:row.index("</tr>")]
+        self.assertIn('href="/registry/ministry-digital-transition/"', row)
+        self.assertIn("Berexia", row)
+        self.assertIn("usage not documented", row)
+
+    def test_questions_reflect_admitted_records(self):
+        _, ontology = registry.load_all()
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        q6 = html[html.index('id="q6-h"'):html.index('id="q7-h"')]
+        for e in ontology["entities"]:
+            if e.get("project_kind") == "ai-application":
+                self.assertIn(f'href="/registry/{e["id"]}/"', q6, e["id"])
+            if e.get("project_kind") in ("compute-infrastructure", "digital-platform"):
+                self.assertNotIn(f'href="/registry/{e["id"]}/"', q6, e["id"])
 
     def test_operational_ai_application_does_count(self):
         def mutate(o):
