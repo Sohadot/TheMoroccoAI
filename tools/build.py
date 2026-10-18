@@ -81,8 +81,10 @@ STATUS_BASIS_LABELS = {
     "independent-listing": "independent listing",
     "independent-report-of-use": "independent report of use",
 }
-# Operational evidence older than this, relative to the registry's as-of date, is shown as historical.
-CURRENT_EVIDENCE_DAYS = 365
+# Evidence-recency convention, not a lifecycle rule: operational or pilot evidence whose latest record is
+# more than this many calendar months before the registry's as-of date is flagged as not reconfirmed.
+# Elapsed time never changes a lifecycle stage; only a record declaring a new status can.
+RECENCY_MONTHS = 12
 
 
 def slug(classification):
@@ -213,6 +215,13 @@ def evidence_card(model, r, *, heading="h3", show_entities=True):
         )
         entities = f"<dt>Related</dt><dd>{links}</dd>"
     note = f'<p class="evidence-note">{escape(r["verification_note"])}</p>' if r["verification_note"] else ""
+    caveats = ""
+    if r.get("superseded_by"):
+        later = ", ".join(f'<a href="/registry/evidence/#{x}">{x}</a>' for x in r["superseded_by"])
+        caveats += f"<dt>Superseded</dt><dd>The quotation still matches its source, but the claim is no longer current; see {later}.</dd>"
+    if r.get("associated_entities"):
+        names = ", ".join(f'<a href="{entity_url(e)}">{escape(model.entities[e]["name"])}</a>' for e in r["associated_entities"])
+        caveats += f"<dt>Identity</dt><dd>Associated with {names} by name and other indicators; not established as the same legal entity.</dd>"
     return f"""<li class="evidence-card" id="{rid}">
   <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#{rid}">{rid}</a>{badge(r["classification"])}</div>
   <{heading}>{escape(r["title"])}</{heading}>
@@ -222,7 +231,7 @@ def evidence_card(model, r, *, heading="h3", show_entities=True):
     <dt>Source</dt><dd><a href="{escape(r["source_url"])}" rel="noopener">{escape(r["source_organization"])}</a> · {escape(SOURCE_TYPE_LABELS[r["source_type"]])}</dd>
     <dt>Published</dt><dd>{escape(human_date(r["publication_date"]))}</dd>
     <dt>Retrieved</dt><dd>{escape(human_date(r["retrieval_date"]))}</dd>{target}
-    <dt>Verification</dt><dd>{status_html}</dd>{entities}
+    <dt>Verification</dt><dd>{status_html}</dd>{entities}{caveats}
   </dl>
   {note}
 </li>"""
@@ -262,7 +271,7 @@ def render_entity(model, e):
     if e.get("project_kind"):
         facts.append(("Kind", escape(KIND_LABELS[e["project_kind"]])))
     if e.get("lifecycle"):
-        facts.append(("Lifecycle", f'{escape(LIFECYCLE_LABELS[e["lifecycle"]])} · {cite(e["lifecycle_evidence"])}'))
+        facts.append(("Lifecycle", f'{escape(stage_label(model, e))} · {cite(e["lifecycle_evidence"])}'))
     if e.get("origin"):
         basis = f' · {cite(e["origin_evidence"])}' if e.get("origin_evidence") else ""
         facts.append(("Origin", f'{escape(ORIGIN_LABELS[e["origin"]])}{basis}'))
@@ -454,7 +463,8 @@ def _table(label, headers, rows, empty):
         return f'<p class="prose">{escape(empty)}</p>'
     head = "".join(f'<th scope="col">{escape(h)}</th>' for h in headers)
     body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
-    return (f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
+    return (f'<p class="table-hint">Scroll the table sideways to see all {len(headers)} columns.</p>'
+            f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
             f'<table class="qtable"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
 
 
@@ -465,6 +475,25 @@ def _evidence_date(r):
     return datetime.date(parts[0], parts[1], parts[2] if len(parts) > 2 else 1), value, not r["publication_date"]
 
 
+def _months_before(day, months):
+    """The same calendar day `months` earlier (clamped to the month's last day, e.g. 29 Feb -> 28 Feb)."""
+    y, m = divmod(day.year * 12 + day.month - 1 - months, 12)
+    m += 1
+    last = (datetime.date(y + m // 12, m % 12 + 1, 1) - datetime.timedelta(days=1)).day
+    return datetime.date(y, m, min(day.day, last))
+
+
+def stage_label(model, e):
+    """Lifecycle label; an operational or pilot stage resting only on observed availability says so."""
+    label = LIFECYCLE_LABELS[e["lifecycle"]]
+    if e.get("lifecycle") in ("operational", "pilot"):
+        bases = {model.records[x].get("status_basis") for x in e.get("lifecycle_evidence") or []
+                 if model.records[x].get("status_evidence") == e["lifecycle"]}
+        if bases == {"public-availability-observed"}:
+            label += " (public availability; use not documented)"
+    return label
+
+
 def deployment_facts(model, e):
     """Operator, provider, sectors, basis and evidence currency for a project, computed from the registry."""
     rels = model.relationships
@@ -473,15 +502,17 @@ def deployment_facts(model, e):
     provider = next((a["value"] for a in e.get("attributes") or [] if a["name"].startswith("Provider")), "")
     status = [model.records[x] for x in e.get("lifecycle_evidence") or [] if model.records[x].get("status_evidence") == e.get("lifecycle")]
     latest = max((_evidence_date(r) for r in status), default=None)
-    currency = ""
-    if latest:
+    currency, stale = "", False
+    if latest and e.get("lifecycle") in ("operational", "pilot"):
         as_of = datetime.date(*[int(x) for x in model.as_of.split("-")])
         label = f"{human_date(latest[1])}{' (observed)' if latest[2] else ''}"
-        currency = (f"Current: latest evidence {label}" if (as_of - latest[0]).days <= CURRENT_EVIDENCE_DAYS
-                    else f"Historical: latest evidence {label}; continued operation not documented")
+        stale = latest[0] < _months_before(as_of, RECENCY_MONTHS)
+        currency = (f"Latest supporting evidence {label} is more than {RECENCY_MONTHS} months old; current operation has not been reconfirmed"
+                    if stale else
+                    f"Latest supporting evidence {label}, within {RECENCY_MONTHS} months; operation after that date not reconfirmed")
     bases = sorted({STATUS_BASIS_LABELS[r["status_basis"]] for r in status if r.get("status_basis")})
     return {"operators": operators, "sectors": sectors, "provider": provider, "bases": bases, "currency": currency,
-            "status_ids": [r["evidence_id"] for r in status]}
+            "stale": stale, "status_ids": [r["evidence_id"] for r in status]}
 
 
 def render_questions(model):
@@ -513,16 +544,23 @@ def render_questions(model):
     order = ["operational", "pilot", "in-development", "unresolved", "announced", "discontinued"]
     projects = sorted((e for e in ents.values() if e["type"] == "project"),
                       key=lambda e: (order.index(e["lifecycle"]), e["name"].lower()))
-    q2 = [[_ent_link(model, e["id"]), escape(KIND_LABELS[e["project_kind"]]), escape(LIFECYCLE_LABELS[e["lifecycle"]]),
+    q2 = [[_ent_link(model, e["id"]), escape(KIND_LABELS[e["project_kind"]]), escape(stage_label(model, e)),
            " ".join(badge(model.records[x]["classification"]) + " " + _ev_links([x]) for x in e["lifecycle_evidence"]),
            escape(e.get("status", ""))] for e in projects]
     counts = {st: sum(1 for e in projects if e["lifecycle"] == st) for st in order}
     stage_line = " · ".join(f"{LIFECYCLE_LABELS[st]}: {n}" for st, n in counts.items() if n)
     ai_running = [e for e in projects if e["project_kind"] == "ai-application" and e["lifecycle"] in ("operational", "pilot")]
-    ai_line = ("AI applications documented as operational or in pilot: " + "; ".join(
-                   f"{e['name']} ({LIFECYCLE_LABELS[e['lifecycle']].lower()}, basis: {', '.join(deployment_facts(model, e)['bases'])})"
-                   for e in ai_running) + "." if ai_running else
-               "No AI application recorded here is yet documented as operational or in pilot. This reflects the registry's current coverage, not the state of AI use in Morocco.")
+    listed = "; ".join(f"{e['name']} ({LIFECYCLE_LABELS[e['lifecycle']].lower()}, basis: {', '.join(deployment_facts(model, e)['bases'])})"
+                       for e in ai_running)
+    if len(ai_running) == 1:
+        ai_line = (f"One AI application recorded here is documented as operational or in pilot: {listed}. It is the only one "
+                   "currently documented in this registry, not necessarily the only one in Morocco.")
+    elif ai_running:
+        ai_line = (f"AI applications documented as operational or in pilot: {listed}. These are the ones currently documented "
+                   "in this registry, not necessarily all those in Morocco.")
+    else:
+        ai_line = ("No AI application recorded here is yet documented as operational or in pilot. This reflects the registry's "
+                   "current coverage, not the state of AI use in Morocco.")
 
     # Q3: models and datasets.
     q3 = []
@@ -544,7 +582,7 @@ def render_questions(model):
         cells = []
         for r in links:
             src = ents[r["subject"]]
-            stage = LIFECYCLE_LABELS.get(src.get("lifecycle"), TYPE_SINGULAR[src["type"]])
+            stage = stage_label(model, src) if src.get("lifecycle") else TYPE_SINGULAR[src["type"]]
             cells.append(f'{_ent_link(model, src["id"])} ({escape(stage)})')
             if (src.get("project_kind") == "ai-application" and src.get("lifecycle") in ("operational", "pilot")
                     and r["classification"] == "VERIFIED FACT"):
@@ -568,17 +606,18 @@ def render_questions(model):
         f = deployment_facts(model, e)
         ops = ", ".join(f'{_ent_link(model, o)}{"" if c == "VERIFIED FACT" else " (planned)"}' for o, c in f["operators"]) or "Not documented"
         q6.append([_ent_link(model, e["id"]), ", ".join(_ent_link(model, x) for x in f["sectors"]) or "Not recorded", ops,
-                   escape(f["provider"]) or "Not recorded", escape(LIFECYCLE_LABELS[e["lifecycle"]]),
+                   escape(f["provider"]) or "Not documented", escape(stage_label(model, e)),
                    escape("; ".join(f["bases"])) or "—", (escape(f["currency"]) + " · " + _ev_links(f["status_ids"])) if f["status_ids"] else "—"])
 
-    # Q7: unresolved stages and historical-only operation.
+    # Q7: unresolved stages, and operation whose latest evidence is past the recency convention.
     q7 = []
     for e in sorted((e for e in ents.values() if e.get("lifecycle") == "unresolved"), key=lambda e: e["name"].lower()):
         q7.append([_ent_link(model, e["id"]), "Unresolved", escape(e.get("note", "")) + " " + _ev_links(e["lifecycle_evidence"])])
     for e in projects:
         f = deployment_facts(model, e)
-        if f["currency"].startswith("Historical"):
-            q7.append([_ent_link(model, e["id"]), "Historical only", escape(f["currency"]) + " " + _ev_links(f["status_ids"])])
+        if f["stale"]:
+            q7.append([_ent_link(model, e["id"]), f"Not reconfirmed in {RECENCY_MONTHS} months",
+                       escape(f["currency"]) + " " + _ev_links(f["status_ids"])])
 
     # Q5: relationships between organisations and what they sign, build, host or fund, by classification.
     q5 = []
@@ -619,13 +658,13 @@ def render_questions(model):
 </section>
 <section aria-labelledby="q6-h">
   <h2 id="q6-h"><span class="section-number">Q6</span>Which AI applications are deployed, who operates them, and how current is the evidence?</h2>
-  <p class="prose">Every AI application in the registry, with its operator (distinct from any provider or developer), sector, lifecycle stage, the basis of that stage, and the date of the latest status evidence. Evidence older than twelve months before the registry date is shown as historical. Deployment is not evidence of performance or outcomes, and none are recorded here.</p>
-  {_table("AI applications and their deployment evidence", ["Application", "Sector", "Operator", "Provider", "Lifecycle", "Basis", "Latest status evidence"], q6, "No AI application recorded.")}
+  <p class="prose">Every AI application in the registry, with its operator (distinct from any provider or developer), sector, lifecycle stage, the basis of that stage, and the date of the latest status evidence. Public availability shows that a service is offered, not how many people use it. The recency column is a convention, not a finding: when the latest supporting evidence is more than twelve months before the registry date, it says that current operation has not been reconfirmed. Elapsed time never changes a lifecycle stage, old evidence does not show that a system stopped, and recent evidence does not show that it is still running. Deployment is not evidence of performance or outcomes, and none are recorded here.</p>
+  {_table("AI applications and their deployment evidence", ["Application", "Sector", "Operator", "Provider", "Lifecycle", "Basis", "Evidence recency"], q6, "No AI application recorded.")}
 </section>
 <section aria-labelledby="q7-h">
-  <h2 id="q7-h"><span class="section-number">Q7</span>Which claims remain unresolved, and which deployments are documented only historically?</h2>
-  <p class="prose">Entities whose evidence conflicts or is insufficient to establish a stage, and projects whose latest operational evidence is older than twelve months. Candidates still under review are not published until they pass the registry's evidence rules.</p>
-  {_table("Unresolved and historical-only entries", ["Entity", "Status", "Why"], q7, "No unresolved or historical-only entry is recorded.")}
+  <h2 id="q7-h"><span class="section-number">Q7</span>Which claims remain unresolved, and which deployments have not been reconfirmed recently?</h2>
+  <p class="prose">Entities whose evidence conflicts or is insufficient to establish a stage, and operational or pilot projects whose latest supporting evidence is more than twelve months before the registry date. Such a project keeps its stage: the registry records a discontinuation only when a source documents one. Candidates still under review are not published until they pass the registry's evidence rules.</p>
+  {_table("Unresolved and not recently reconfirmed entries", ["Entity", "Status", "Why"], q7, "No unresolved or not recently reconfirmed entry is recorded.")}
 </section>
 <section aria-labelledby="q5-h">
   <h2 id="q5-h"><span class="section-number">Q5</span>Which institutional relationships are supported by evidence?</h2>

@@ -1,4 +1,6 @@
 """Tests for generated output and the site quality gates.  Run: python3 -m unittest discover -s tests"""
+import datetime
+import re
 import shutil
 import sys
 import tempfile
@@ -61,18 +63,61 @@ class PublishedSite(unittest.TestCase):
         q4 = html[html.index('id="q4-h"'):html.index("<table", html.index('id="q4-h"'))]
         self.assertNotIn('href="/registry/health/"', q4)
 
-    def test_historical_evidence_is_not_presented_as_current(self):
-        def mutate(o):
-            pass
+    def _questions_with_dates(self, date, as_of=None, ids=("MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038")):
         evidence, ontology = registry.load_all()
+        if as_of:
+            evidence["as_of"] = as_of
         for r in evidence["records"]:
-            if r["evidence_id"] in ("MAI-EV-0034", "MAI-EV-0035"):
-                r["publication_date"] = "2024-01-15"
+            if r["evidence_id"] in ids:
+                r["publication_date"] = date
         html = build.render_questions(build.Model(evidence, ontology))
-        q6 = html[html.index('id="q6-h"'):html.index('id="q7-h"')]
-        q7 = html[html.index('id="q7-h"'):html.index('id="q5-h"')]
-        self.assertIn("Historical: latest evidence 15 January 2024; continued operation not documented", q6)
+        return html[html.index('id="q6-h"'):html.index('id="q7-h"')], html[html.index('id="q7-h"'):html.index('id="q5-h"')]
+
+    def test_old_evidence_is_flagged_but_never_changes_the_stage(self):
+        q6, q7 = self._questions_with_dates("2024-01-15")
+        row = q6[q6.index('href="/registry/idarati-ai/"'):]
+        row = row[:row.index("</tr>")]
+        self.assertIn("Latest supporting evidence 15 January 2024 is more than 12 months old; current operation has not been reconfirmed", row)
+        self.assertIn("Operational (public availability; use not documented)", row)
+        self.assertNotIn("Discontinued", row)
         self.assertIn('href="/registry/idarati-ai/"', q7)
+        self.assertIn("Not reconfirmed in 12 months", q7)
+
+    def test_recent_evidence_is_not_presented_as_continued_operation(self):
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn("Current:", html)
+        self.assertIn("operation after that date not reconfirmed", html)
+
+    def test_recency_boundary_is_twelve_calendar_months(self):
+        cases = [("2025-10-18", None, False), ("2025-10-17", None, True),        # exactly 12 months / one day more
+                 ("2025-10", None, True),                                          # month-only date counts from its 1st
+                 ("2027-02-28", "2028-02-29", False), ("2027-02-27", "2028-02-29", True)]  # leap-day as_of
+        for date, as_of, stale in cases:
+            with self.subTest(date=date, as_of=as_of):
+                q6, q7 = self._questions_with_dates(date, as_of)
+                self.assertEqual("more than 12 months old" in q6, stale)
+                self.assertEqual('href="/registry/idarati-ai/"' in q7, stale)
+
+    def test_months_before_clamps_to_month_end(self):
+        self.assertEqual(build._months_before(datetime.date(2028, 2, 29), 12), datetime.date(2027, 2, 28))
+        self.assertEqual(build._months_before(datetime.date(2026, 3, 31), 1), datetime.date(2026, 2, 28))
+        self.assertEqual(build._months_before(datetime.date(2026, 1, 15), 12), datetime.date(2025, 1, 15))
+
+    def test_undated_observation_uses_its_retrieval_date(self):
+        q6, _ = self._questions_with_dates(None)
+        self.assertIn("Latest supporting evidence 18 October 2026 (observed)", q6)
+
+    def test_discontinued_project_gets_no_recency_wording(self):
+        def mutate(o):
+            next(e for e in o["entities"] if e["id"] == "toubkal-supercomputer")["lifecycle"] = "discontinued"
+        evidence, ontology = registry.load_all()
+        mutate(ontology)
+        rec = next(r for r in evidence["records"] if r["evidence_id"] == "MAI-EV-0020")
+        rec["status_evidence"] = "discontinued"
+        del rec["status_basis"]
+        model = build.Model(evidence, ontology)
+        facts = build.deployment_facts(model, model.entities["toubkal-supercomputer"])
+        self.assertEqual((facts["currency"], facts["stale"]), ("", False))
 
     def test_deployments_show_operator_separately_from_provider(self):
         html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
@@ -80,8 +125,33 @@ class PublishedSite(unittest.TestCase):
         row = q6[q6.index('href="/registry/idarati-ai/"'):]
         row = row[:row.index("</tr>")]
         self.assertIn('href="/registry/ministry-digital-transition/"', row)
-        self.assertIn("Berexia", row)
-        self.assertIn("usage not documented", row)
+        # An interface label not shown on the assistant establishes no provider role.
+        self.assertNotIn("Berexia", row)
+        self.assertIn("<td>Not documented</td>", row)
+        self.assertIn("use not documented", row)
+
+    def test_availability_is_labelled_wherever_the_stage_appears(self):
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        page = (REPO / "registry" / "idarati-ai" / "index.html").read_text(encoding="utf-8")
+        rows = re.findall(r'<tr>(?:(?!</tr>).)*?href="/registry/idarati-ai/"(?:(?!</tr>).)*</tr>', html)
+        self.assertGreaterEqual(len(rows), 3)
+        for row in rows + [page]:
+            with self.subTest(row=row[:80]):
+                self.assertNotIn(">Operational<", row)
+                self.assertNotIn("Idarati AI</a> (Operational)", row)
+        self.assertIn("Operational (public availability; use not documented)", page)
+
+    def test_single_deployment_is_not_presented_as_national(self):
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("It is the only one currently documented in this registry, not necessarily the only one in Morocco.", html)
+
+    def test_regulatory_caveats_are_shown_on_records(self):
+        html = (REPO / "registry" / "evidence" / "index.html").read_text(encoding="utf-8")
+        card = html[html.index('id="MAI-EV-0029"'):]
+        self.assertIn("The quotation still matches its source, but the claim is no longer current", card[:card.index("</li>")])
+        card = html[html.index('id="MAI-EV-0032"'):]
+        self.assertIn("not established as the same legal entity", card[:card.index("</li>")])
+        self.assertNotIn("FDA-approved", html)
 
     def test_questions_reflect_admitted_records(self):
         _, ontology = registry.load_all()

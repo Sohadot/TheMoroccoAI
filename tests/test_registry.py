@@ -60,6 +60,22 @@ class RepositoryData(unittest.TestCase):
         sw = next(e for e in ontology["entities"] if e["id"] == "deepecho-ultrasound-software")
         self.assertEqual(sw["lifecycle"], "unresolved")
 
+    def test_fda_link_is_a_qualified_association(self):
+        # Regression: the FDA applicant (Delaware) is associated with the Morocco-based DeepEcho, not identified with it.
+        evidence, ontology = registry.load_all()
+        recs = {r["evidence_id"]: r for r in evidence["records"]}
+        for rid in ("MAI-EV-0032", "MAI-EV-0039"):
+            self.assertIn("deepecho", recs[rid]["associated_entities"])
+            self.assertIsNone(recs[rid].get("status_evidence"))
+        self.assertEqual(recs["MAI-EV-0029"]["superseded_by"], ["MAI-EV-0032", "MAI-EV-0039"])
+
+    def test_provider_label_is_not_recorded_as_a_role(self):
+        # Regression: "Powered by Berexia" is interface text not shown on the assistant; it establishes no role.
+        _, ontology = registry.load_all()
+        e = next(e for e in ontology["entities"] if e["id"] == "idarati-ai")
+        self.assertFalse(any("Berexia" in a["value"] for a in e.get("attributes") or []))
+        self.assertFalse(any(r["object"] == "idarati-ai" and "berexia" in r["subject"] for r in ontology["relationships"]))
+
     def test_digital_platform_is_not_an_ai_application(self):
         _, ontology = registry.load_all()
         e = next(e for e in ontology["entities"] if e["id"] == "sovereign-ai-marketplace")
@@ -270,6 +286,77 @@ class ValidatorRejects(unittest.TestCase):
         self.ontology["relationships"].append({"subject": "ministry-digital-transition", "predicate": "develops",
                                                "object": "idarati-ai", "evidence": ["MAI-EV-0034"], "classification": "VERIFIED FACT"})
         self.assertError("needs a status record published by a verified operator of the project")
+
+    # ── Sprint 03 review: availability, identity, regulatory status, recency ──
+
+    def test_public_interface_is_not_proof_of_adoption(self):
+        self.record("MAI-EV-0038")["claim"] += " The assistant is used by 1.2 million users."
+        self.assertError("an availability observation cannot assert use or continuity")
+
+    def test_availability_observation_cannot_claim_continuity(self):
+        self.record("MAI-EV-0038")["claim"] += " It has been available continuously since 2024."
+        self.assertError("an availability observation cannot assert use or continuity")
+
+    def test_provider_label_does_not_make_an_operator(self):
+        # MAI-EV-0035 carries a provider label but was published by the ministry, not by the would-be operator.
+        self.ontology["relationships"].append({"subject": "aiox-labs", "predicate": "operates", "object": "idarati-ai",
+                                               "evidence": ["MAI-EV-0035"], "classification": "VERIFIED FACT"})
+        self.assertError("a verified operator must be documented by a record the operator published")
+
+    def test_market_clearance_is_not_use_in_morocco(self):
+        self.record("MAI-EV-0032").update(status_evidence="operational", status_basis="independent-listing")
+        e = self.entity("deepecho-ultrasound-software")
+        e["lifecycle"], e["lifecycle_evidence"] = "operational", ["MAI-EV-0032"]
+        self.ontology["relationships"].append({"subject": "ministry-health", "predicate": "operates",
+                                               "object": "deepecho-ultrasound-software", "evidence": ["MAI-EV-0032"],
+                                               "classification": "VERIFIED FACT"})
+        self.assertError("a regulatory_record cannot evidence 'operational'")
+        self.assertError("a verified operator must be documented by a record the operator published")
+
+    def test_clearance_is_not_called_approval(self):
+        self.entity("deepecho-ultrasound-software")["summary"] += " The software is FDA-approved."
+        self.assertError("calls a device approved")
+
+    def test_approval_wording_is_allowed_only_as_a_quotation(self):
+        self.record("MAI-EV-0032")["claim"] += " The device was approved by the U.S. FDA."
+        self.assertError("claim calls a device approved")
+        self.setUp()
+        self.record("MAI-EV-0032")["claim"] += ' The government calls it "approved by the FDA".'
+        self.assertEqual(self.errors(), [])
+
+    def test_similar_names_are_not_one_legal_entity(self):
+        self.entity("deepecho")["origin_evidence"] = ["MAI-EV-0032", "MAI-EV-0028"]
+        self.assertError("names an entity only associated with this company")
+
+    def test_association_cannot_alone_support_a_verified_relationship(self):
+        self.ontology["relationships"].append({"subject": "deepecho", "predicate": "develops", "object": "deepecho-ultrasound-software",
+                                               "evidence": ["MAI-EV-0039"], "classification": "VERIFIED FACT"})
+        self.ontology["relationships"] = [r for r in self.ontology["relationships"]
+                                          if not (r["predicate"] == "develops" and r["object"] == "deepecho-ultrasound-software"
+                                                  and r["evidence"] != ["MAI-EV-0039"])]
+        self.assertError("cannot rest only on records that associate")
+
+    def test_associated_record_attribute_must_say_so(self):
+        attr = next(a for a in self.entity("deepecho-ultrasound-software")["attributes"] if a["evidence"] == "MAI-EV-0032")
+        attr["name"] = "US FDA 510(k)"
+        self.assertError("cites a record only associated with this entity")
+
+    def test_matching_but_superseded_quote_cannot_set_status(self):
+        self.record("MAI-EV-0029")["status_evidence"] = "in-development"
+        e = self.entity("deepecho-ultrasound-software")
+        e["lifecycle"], e["lifecycle_evidence"] = "in-development", ["MAI-EV-0029"]
+        self.assertError("a superseded record cannot evidence a lifecycle status")
+
+    def test_superseded_by_must_point_to_other_records(self):
+        self.record("MAI-EV-0029")["superseded_by"] = ["MAI-EV-0029"]
+        self.assertError("superseded_by must list other existing records")
+
+    def test_old_evidence_is_not_discontinuation(self):
+        e = self.entity("idarati-ai")
+        e["lifecycle"] = "discontinued"
+        for rid in ("MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"):
+            self.record(rid)["publication_date"] = "2024-01-15"
+        self.assertError("lifecycle 'discontinued' needs a lifecycle_evidence record whose status_evidence is 'discontinued'")
 
     def test_unsupported_performance_claims_are_rejected(self):
         self.record("MAI-EV-0034")["claim"] += " It reduced processing times by 40%."

@@ -246,6 +246,8 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
 .qtable tr:last-child td { border-bottom: none; }
 .qtable td a[href^="/registry/evidence/"] { font-family: 'DM Mono', monospace; font-size: 10px; white-space: nowrap; }
 .qtable .badge { margin-right: 4px; }
+.table-hint { display: none; }
 @media (max-width: 700px) {
   .qtable { min-width: 560px; }
+  .table-hint { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--text-sub); margin: 0 0 6px; }
 }

@@ -88,7 +88,7 @@
       "summary": "The government department that launched Digital Morocco 2030 in September 2024, organised the First National AI Conference in July 2025 and presented the Morocco AI 2030 roadmap in September 2026.",
       "status": "Named in sources up to September 2026. See the note on the October 2026 government.",
       "note": "The government appointed on 16 October 2026 includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform. The registry has not yet verified whether that ministry takes over this department's portfolio.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"]
     },
     {
       "id": "ministry-ai-digital-transformation",
@@ -371,18 +371,17 @@
       "name": "Idarati AI",
       "alt_names": [],
       "domain": "government-policy",
-      "summary": "Agentic AI assistant for administrative procedures, presented by the Ministry of Digital Transition in September 2026. On 18 October 2026 it was publicly available on the ministry's own portals: listed on its AI Marketplace and embedded as \"Assistant Idarati\" on the national procedures portal idarati.ma.",
-      "status": "Operational, on the basis of public availability observed on the operator's own portals on 2026-10-18. Usage volume, accuracy and outcomes are not documented.",
+      "summary": "Agentic AI assistant for administrative procedures, presented by the Ministry of Digital Transition in September 2026. On 18 October 2026 it was publicly available on the ministry's own services: listed on its AI Marketplace, opened from an \"Assistant Idarati\" button on the national procedures portal idarati.ma, and answering a test question at chatbot.idarati.ma.",
+      "status": "Operational on the basis of public availability: the operator's own services showed it live and responding on 2026-10-18. How many people use it, its accuracy and its outcomes are not documented, and operation after that date has not been reconfirmed.",
       "project_kind": "ai-application",
       "lifecycle": "operational",
-      "lifecycle_evidence": ["MAI-EV-0034", "MAI-EV-0035"],
+      "lifecycle_evidence": ["MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"],
       "attributes": [
-        {"name": "Operator", "value": "Ministry of Digital Transition and Administration Reform (as named on its portals)", "evidence": "MAI-EV-0035"},
-        {"name": "Provider (as labelled)", "value": "Berexia", "evidence": "MAI-EV-0035"},
-        {"name": "Access points", "value": "chatbot.idarati.ma; embedded on idarati.ma", "evidence": "MAI-EV-0034"},
+        {"name": "Operator", "value": "Ministry of Digital Transition and Administration Reform (as named on its services)", "evidence": "MAI-EV-0038"},
+        {"name": "Access points", "value": "chatbot.idarati.ma, opened from idarati.ma", "evidence": "MAI-EV-0038"},
         {"name": "Scope", "value": "National public-service portal", "evidence": "MAI-EV-0035"}
       ],
-      "evidence": ["MAI-EV-0013", "MAI-EV-0034", "MAI-EV-0035"]
+      "evidence": ["MAI-EV-0013", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"]
     },
     {
       "id": "law-09-08",
@@ -453,7 +452,7 @@
       "summary": "Startup that its investor UM6P Ventures describes as Morocco-based and as having emerged from the AIOX Labs studio, developing AI software for prenatal ultrasound diagnosis. UM6P Ventures states it invested in its pre-seed round. Registration and headquarters are not documented here.",
       "origin": "based-in-morocco",
       "origin_evidence": ["MAI-EV-0028"],
-      "evidence": ["MAI-EV-0027", "MAI-EV-0028", "MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033"]
+      "evidence": ["MAI-EV-0027", "MAI-EV-0028", "MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033", "MAI-EV-0039"]
     },
     {
       "id": "um6p-ventures",
@@ -515,16 +514,17 @@
       "name": "DeepEcho AI ultrasound software",
       "alt_names": [],
       "domain": "companies-deployments",
-      "summary": "Software that uses deep learning to assist ultrasound video diagnosis in prenatal care. The FDA 510(k) database lists a DEEPECHO device cleared on 23 May 2025, and the Moroccan government describes DeepEcho's solution as FDA-approved; the company's own website still carries an older disclaimer saying its claims are not FDA-validated. A Moroccan public-sector evaluation is planned under a May 2026 convention.",
-      "status": "Unresolved: US 510(k) clearance is documented (May 2025), but no clinical or commercial use in Morocco is documented, and the developer's own site gives an outdated regulatory status.",
-      "note": "Unresolved because the sources conflict and use is undocumented: the FDA database lists 510(k) clearance for a DEEPECHO device (May 2025) while the developer's website still says its claims are not FDA-validated, and no clinical or commercial use in Morocco is documented. Regulatory clearance is not deployment and is not evidence of clinical outcomes. The planned Moroccan public-sector evaluation is recorded separately as an announced project.",
+      "summary": "Software that uses deep learning to assist ultrasound video diagnosis in prenatal care. On 23 May 2025 the FDA cleared a device named DEEPECHO under 510(k) K242594, for an applicant named DeepEcho with a Delaware address; the registry associates that record with this software by name, device type, web domain and Moroccan data sites, not by a documented legal identity. The Moroccan government says DeepEcho's solution obtained FDA \"approbation\"; the company's own website still carries an older disclaimer saying its claims are not FDA-validated. A Moroccan public-sector evaluation is planned under a May 2026 convention.",
+      "status": "Unresolved: an associated US 510(k) clearance is documented (May 2025), but no clinical or commercial use in Morocco is documented, and the developer's own site gives an outdated regulatory status.",
+      "note": "Unresolved because the sources conflict and use is undocumented: the FDA database lists 510(k) clearance for a DEEPECHO device (May 2025) while the developer's website still says its claims are not FDA-validated, and no clinical or commercial use in Morocco is documented. A 510(k) clearance permits marketing in the United States; it is not deployment, not authorisation in Morocco and not evidence of clinical outcomes. The applicant's legal relationship to the Morocco-based company is not documented. The planned Moroccan public-sector evaluation is recorded separately as an announced project.",
       "project_kind": "ai-application",
       "lifecycle": "unresolved",
       "lifecycle_evidence": ["MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033"],
       "attributes": [
-        {"name": "US FDA 510(k)", "value": "K242594, Substantially Equivalent, 23 May 2025 (applicant Deepecho, Dover, Delaware)", "evidence": "MAI-EV-0032"}
+        {"name": "US FDA 510(k) (associated record)", "value": "K242594, Substantially Equivalent (clearance), 23 May 2025; applicant DeepEcho, Dover, Delaware. Legal identity with the Morocco-based company not documented", "evidence": "MAI-EV-0032"},
+        {"name": "Cleared indication (US; associated record)", "value": "Machine-learning detection of standard fetal biometry views and assistance in computing fetal biometric measurements, for trained healthcare professionals", "evidence": "MAI-EV-0039"}
       ],
-      "evidence": ["MAI-EV-0028", "MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033"]
+      "evidence": ["MAI-EV-0028", "MAI-EV-0029", "MAI-EV-0032", "MAI-EV-0033", "MAI-EV-0039"]
     },
     {
       "id": "atlas-chat",
@@ -728,14 +728,14 @@
     {"subject": "darijabert", "predicate": "applies", "object": "natural-language-processing", "evidence": ["MAI-EV-0024"], "classification": "VERIFIED FACT"},
     {"subject": "atlasia", "predicate": "develops", "object": "al-atlas", "evidence": ["MAI-EV-0025", "MAI-EV-0026"], "classification": "VERIFIED FACT", "note": "Attribution via AtlasIA's link to the atlasia Hugging Face organisation."},
     {"subject": "al-atlas", "predicate": "applies", "object": "large-language-models", "evidence": ["MAI-EV-0025"], "classification": "VERIFIED FACT"},
-    {"subject": "ministry-digital-transition", "predicate": "operates", "object": "idarati-ai", "evidence": ["MAI-EV-0034", "MAI-EV-0035"], "classification": "VERIFIED FACT", "note": "Public availability on the ministry's own portals; usage not documented."},
+    {"subject": "ministry-digital-transition", "predicate": "operates", "object": "idarati-ai", "evidence": ["MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"], "classification": "VERIFIED FACT", "note": "Published and run under the ministry's name on its own services; how many people use it is not documented."},
     {"subject": "ministry-digital-transition", "predicate": "operates", "object": "sovereign-ai-marketplace", "evidence": ["MAI-EV-0034"], "classification": "VERIFIED FACT"},
     {"subject": "ministry-health", "predicate": "signatory_of", "object": "deepecho-public-health-evaluation", "evidence": ["MAI-EV-0033"], "classification": "VERIFIED FACT"},
     {"subject": "deepecho", "predicate": "signatory_of", "object": "deepecho-public-health-evaluation", "evidence": ["MAI-EV-0033"], "classification": "VERIFIED FACT"},
     {"subject": "ministry-health", "predicate": "operates", "object": "deepecho-public-health-evaluation", "evidence": ["MAI-EV-0033"], "classification": "ANNOUNCED PLAN", "note": "Planned deployment in public health facilities; not documented as started."},
     {"subject": "deepecho-public-health-evaluation", "predicate": "applies", "object": "medical-imaging-ai", "evidence": ["MAI-EV-0033"], "classification": "ANNOUNCED PLAN"},
     {"subject": "deepecho-public-health-evaluation", "predicate": "targets", "object": "health", "evidence": ["MAI-EV-0033"], "classification": "ANNOUNCED PLAN"},
-    {"subject": "deepecho-public-health-evaluation", "predicate": "related_to", "object": "deepecho-ultrasound-software", "evidence": ["MAI-EV-0033", "MAI-EV-0029"], "classification": "INDEPENDENT ANALYSIS", "note": "The convention concerns DeepEcho's FDA-approved solution; that it is the same software described on DeepEcho's website is the registry's reading."},
+    {"subject": "deepecho-public-health-evaluation", "predicate": "related_to", "object": "deepecho-ultrasound-software", "evidence": ["MAI-EV-0033", "MAI-EV-0029"], "classification": "INDEPENDENT ANALYSIS", "note": "The convention concerns a Moroccan DeepEcho solution that the article says has FDA \"approbation\"; that it is the software described on DeepEcho's website, and the device cleared under 510(k) K242594, is the registry's reading. The article names neither the device nor the clearance."},
     {"subject": "swam", "predicate": "operates", "object": "swam-fraud-scoring", "evidence": ["MAI-EV-0036"], "classification": "ANNOUNCED PLAN", "note": "Integration announced in the future tense."},
     {"subject": "swam-fraud-scoring", "predicate": "applies", "object": "artificial-intelligence", "evidence": ["MAI-EV-0036"], "classification": "ANNOUNCED PLAN"},
     {"subject": "swam-fraud-scoring", "predicate": "targets", "object": "financial-services", "evidence": ["MAI-EV-0036"], "classification": "ANNOUNCED PLAN"}

@@ -83,6 +83,21 @@ STATUS_BASES = OPERATOR_BASES + INDEPENDENT_BASES
 PERFORMANCE = re.compile(
     r"\b(accura(?:te|cy)|improv(?:e|ed|es|ement)|reduc(?:e|ed|es|tion)|effective(?:ness)?|outperform\w*|"
     r"successful(?:ly)?|faster|cut fraud)\b|\d+(?:\.\d+)?\s?%", re.IGNORECASE)
+# Usage, adoption or continuity wording: an observation that a service is available on one date says
+# nothing about its use or about its operation before or after that date.
+USAGE = re.compile(
+    r"\b(users?|usage|sessions?|visits?|visitors?|adoption|adopted|used by|in use|utilisateurs?|usagers|"
+    r"continuous(?:ly)?|uninterrupted|since (?:19|20)\d\d|still (?:running|operating|available|in service))\b",
+    re.IGNORECASE)
+# FDA 510(k) clearance is not approval. Registry wording may not call a device FDA-approved except
+# inside a quotation of the source's own words.
+REGULATORY_APPROVAL = re.compile(
+    r"\bFDA[- ]approv\w*|\bapprov\w*\b(?:\W+\w+){0,5}?\W+(?:FDA|Food and Drug Administration)\b", re.IGNORECASE)
+QUOTED = re.compile(r'"[^"]*"|\u201c[^\u201d]*\u201d|\u00ab[^\u00bb]*\u00bb')
+# Record types that can never establish a lifecycle status, or that a project is operated: a
+# procurement notice shows intent to buy, and a market clearance shows permission to sell.
+NO_STATUS_TYPES = ("procurement_notice",)
+NO_USE_TYPES = ("procurement_notice", "regulatory_record")
 PROJECT_KINDS_REQUIRED = ("project",)
 # Origins that need a source independent of the company itself.
 INDEPENDENT_ORIGINS = ("based-in-morocco", "foreign-moroccan-operations-verified")
@@ -133,6 +148,12 @@ def _parse_date(value):
         return datetime.date(parts[0], parts[1], parts[2] if len(parts) > 2 else 1)
     except ValueError:
         return None
+
+
+def _approval_wording(text):
+    """Return approval wording used in the registry's own voice (quotations of a source are exempt)."""
+    m = REGULATORY_APPROVAL.search(QUOTED.sub("", str(text or "")))
+    return m.group(0) if m else None
 
 
 def _check_url(url):
@@ -238,7 +259,13 @@ def validate_evidence(evidence, today=None):
                     errors.append(f"{where} an independent basis cannot rest on a self-published or press source")
                 if basis in OPERATOR_BASES and not r.get("source_entity"):
                     errors.append(f"{where} basis '{basis}' needs source_entity naming the operator that published it")
-            if r.get("evidence_type") == "procurement_notice":
+                if r.get("evidence_type") in NO_USE_TYPES:
+                    errors.append(f"{where} a {r.get('evidence_type')} cannot evidence '{status}': "
+                                  f"permission to market or intent to buy is not use")
+                if basis == "public-availability-observed" and USAGE.search(claim):
+                    errors.append(f"{where} an availability observation cannot assert use or continuity "
+                                  f"({USAGE.search(claim).group(0)!r}); use needs a report of use")
+            if r.get("evidence_type") in NO_STATUS_TYPES:
                 errors.append(f"{where} a procurement notice cannot evidence a lifecycle status")
         elif r.get("status_basis") is not None:
             errors.append(f"{where} status_basis is only meaningful with status_evidence")
@@ -247,6 +274,22 @@ def validate_evidence(evidence, today=None):
                           f"({PERFORMANCE.search(claim).group(0)!r}); record use and results separately")
         if r.get("source_type") == "secondary_press" and cls not in ("ANNOUNCED PLAN", "UNVERIFIED CLAIM"):
             errors.append(f"{where} secondary press can support only ANNOUNCED PLAN or UNVERIFIED CLAIM, not {cls}")
+        superseded = r.get("superseded_by")
+        if superseded is not None:
+            ids = {x.get("evidence_id") for x in records}
+            if not isinstance(superseded, list) or not superseded or rid in superseded or any(x not in ids for x in superseded):
+                errors.append(f"{where} superseded_by must list other existing records")
+            if r.get("status_evidence") is not None:
+                errors.append(f"{where} a superseded record cannot evidence a lifecycle status: "
+                              f"its quotation may still match, but its claim is no longer current")
+        assoc = r.get("associated_entities")
+        if assoc is not None and (not isinstance(assoc, list) or not assoc
+                                  or any(x not in (r.get("related_entities") or []) for x in assoc)):
+            errors.append(f"{where} associated_entities must be a non-empty subset of related_entities")
+        for field in ("claim", "verification_note"):
+            if _approval_wording(r.get(field)):
+                errors.append(f"{where} {field} calls a device approved ({_approval_wording(r.get(field))!r}); "
+                              f"a 510(k) is a clearance; quote the source if it says otherwise")
         if cls == "UNVERIFIED CLAIM" and not str(r.get("verification_note", "")).strip():
             errors.append(f"{where} UNVERIFIED CLAIM needs a verification_note saying what was not checked")
     return errors
@@ -289,6 +332,12 @@ def _check_entity_facets(e, where, ev, records, stages, origins, kinds=None):
             errors.append(f"{where} origin '{origin}' needs origin_evidence")
         if any(x not in ev for x in basis):
             errors.append(f"{where} origin_evidence must be a subset of the entity's evidence")
+        for x in basis:
+            if e.get("id") in (records.get(x, {}).get("associated_entities") or []):
+                errors.append(f"{where} origin_evidence {x} names an entity only associated with this company, "
+                              f"not established as the same legal entity")
+            if records.get(x, {}).get("superseded_by"):
+                errors.append(f"{where} origin_evidence {x} is superseded")
         name = str(e.get("name", "")).casefold()
         independent = [r for r in (records.get(x, {}) for x in basis)
                        if r.get("source_type") not in NON_INDEPENDENT_SOURCES
@@ -297,11 +346,18 @@ def _check_entity_facets(e, where, ev, records, stages, origins, kinds=None):
             errors.append(f"{where} origin '{origin}' needs origin_evidence from a source independent of the company")
     elif "origin" in e or "origin_evidence" in e:
         errors.append(f"{where} only company entities take an origin")
+    texts = [e.get("summary"), e.get("status"), e.get("note")] + [a.get("value") for a in e.get("attributes") or []]
+    if any(_approval_wording(t) for t in texts):
+        errors.append(f"{where} calls a device approved; a 510(k) is a clearance (quote the source if it says otherwise)")
     for a in e.get("attributes") or []:
         if not str(a.get("name", "")).strip() or not str(a.get("value", "")).strip():
             errors.append(f"{where} attribute needs a name and a value")
         if a.get("evidence") not in ev:
             errors.append(f"{where} attribute '{a.get('name')}' must cite one of the entity's own records")
+        elif (e.get("id") in (records.get(a.get("evidence"), {}).get("associated_entities") or [])
+              and "associated" not in str(a.get("name", "")).casefold()):
+            errors.append(f"{where} attribute '{a.get('name')}' cites a record only associated with this entity; "
+                          f"label it as associated")
     return errors
 
 
@@ -423,6 +479,22 @@ def validate_ontology(ontology, evidence):
             elif not {s, o} & set(records[x].get("related_entities", [])):
                 errors.append(f"{where} cites {x}, which documents neither end of the relationship")
         cited = {records[x].get("classification") for x in ev if x in records}
+        if cls == "VERIFIED FACT" and ev:
+            for end in (s, o):
+                if all(end in (records.get(x, {}).get("associated_entities") or []) for x in ev):
+                    errors.append(f"{where} a VERIFIED FACT cannot rest only on records that associate '{end}' "
+                                  f"without establishing its identity")
+        if _approval_wording(rel.get("note")):
+            errors.append(f"{where} note calls a device approved; a 510(k) is a clearance")
+        if p == "operates" and cls == "VERIFIED FACT" and not any(
+                x in records and records[x].get("evidence_type") not in NO_USE_TYPES
+                and (records[x].get("source_entity") == s
+                     or (records[x].get("source_entity") is None
+                         and records[x].get("source_type") not in NON_INDEPENDENT_SOURCES))
+                for x in ev):
+            errors.append(f"{where} a verified operator must be documented by a record the operator published "
+                          f"(source_entity) or by an independent source; a provider label, a vendor's page, "
+                          f"a market clearance or a procurement notice does not show who operates a service")
         if cls == "INDEPENDENT ANALYSIS":
             if len(ev) < 2 or not str(rel.get("note", "")).strip():
                 errors.append(f"{where} INDEPENDENT ANALYSIS needs a note and at least two records")

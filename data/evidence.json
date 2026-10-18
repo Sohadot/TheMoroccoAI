@@ -588,16 +588,17 @@
       "publication_date": "2023-05",
       "retrieval_date": "2026-10-18",
       "evidence_type": "case_study",
-      "claim": "UM6P Ventures' case study states that DeepEcho, a Morocco-based startup applying machine learning to prenatal ultrasound diagnosis, emerged from the AIOX Labs startup studio, and that UM6P Ventures invested in its pre-seed round.",
+      "claim": "UM6P Ventures' case study states that DeepEcho, a Morocco-based startup applying machine learning to prenatal ultrasound diagnosis, emerged from the AIOX Labs startup studio, that UM6P Ventures invested in its pre-seed round, and that the startup was then in the process of an FDA submission.",
       "source_excerpts": [
         "DeepEcho emerged from the startup studio \"AIOX Labs\"",
         "DeepEcho, a Moroccan based startup",
         "DeepEcho uses Machine Learning to improve outcomes for preventive and predictive diagnosis detection of prenatal complications.",
-        "UM6P Ventures’ investment in the pre-seed round allowed the startup to reinforce and structure the core team"
+        "UM6P Ventures’ investment in the pre-seed round allowed the startup to reinforce and structure the core team",
+        "The startup is also in the process of a FDA approval submission"
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "verified",
-      "verification_note": "Investor's own publication; the PDF metadata gives a creation date of 8 May 2023. It is independent of DeepEcho but not of the investment it describes. Its accuracy figure and its statement about agreements with health centres are not recorded, as they were not independently checked. Company registration and headquarters address are not documented.",
+      "verification_note": "Investor's own publication; the PDF metadata gives a creation date of 8 May 2023. It is independent of DeepEcho but not of the investment it describes. Its accuracy figure and its statement about agreements with health centres are not recorded, as they were not independently checked. Company registration and headquarters address are not documented. Its 2023 statement about an FDA submission is consistent with, but does not by itself identify, the applicant of FDA 510(k) K242594 (MAI-EV-0032).",
       "related_entities": ["deepecho", "aiox-labs", "um6p-ventures", "deepecho-ultrasound-software"]
     },
     {
@@ -617,8 +618,9 @@
         "Metrics comes from our own clinical studies (currently under scientific & regulatory review)"
       ],
       "classification": "VERIFIED FACT",
+      "superseded_by": ["MAI-EV-0032", "MAI-EV-0039"],
       "verification_status": "verified",
-      "verification_note": "The disclaimer is quoted as the site showed it on the retrieval date, but it appears outdated: the FDA database lists 510(k) clearance K242594 for a DEEPECHO device on 23 May 2025 (MAI-EV-0032), and the Moroccan government describes DeepEcho's solution as FDA-approved (MAI-EV-0033). It is therefore no longer used to establish a lifecycle stage. Accuracy and speed figures on the site are self-reported and not recorded.",
+      "verification_note": "The disclaimer is quoted as the site showed it on the retrieval date, but it appears outdated: the FDA database lists 510(k) clearance K242594 for a DEEPECHO device on 23 May 2025 (MAI-EV-0032, MAI-EV-0039), and the Moroccan government says DeepEcho's solution obtained FDA \"approbation\" (MAI-EV-0033). It is therefore no longer used to establish a lifecycle stage: a quotation that still matches its source can support a claim that is no longer current. Accuracy and speed figures on the site are self-reported and not recorded.",
       "related_entities": ["deepecho", "deepecho-ultrasound-software", "medical-imaging-ai", "health"]
     },
     {
@@ -673,7 +675,7 @@
       "publication_date": "2025-05-23",
       "retrieval_date": "2026-10-18",
       "evidence_type": "regulatory_record",
-      "claim": "The FDA 510(k) database lists premarket notification K242594 for a device named DEEPECHO, applicant Deepecho (Dover, Delaware, USA), classified as a pulsed Doppler ultrasonic imaging system, with a decision of \"Substantially Equivalent\" dated 23 May 2025.",
+      "claim": "The FDA 510(k) database lists premarket notification K242594 for a device named DEEPECHO, with Deepecho as applicant and correspondent at an address in Dover, Delaware, USA, classified as a pulsed Doppler ultrasonic imaging system, with a decision of \"Substantially Equivalent\" dated 23 May 2025.",
       "source_excerpts": [
         "510(k) Number K242594",
         "Device Name DEEPECHO",
@@ -683,8 +685,9 @@
         "Decision Substantially Equivalent (SESE)"
       ],
       "classification": "VERIFIED FACT",
+      "associated_entities": ["deepecho", "deepecho-ultrasound-software"],
       "verification_status": "verified",
-      "verification_note": "A 510(k) \"substantially equivalent\" decision is US market clearance; it is not a clinical-outcome finding and says nothing about use in Morocco. The applicant's Delaware address is a corporate-registration address. Linking this record to the Morocco-based DeepEcho rests on the matching name and device type, corroborated by the Moroccan government's statement that DeepEcho's solution obtained FDA approval (MAI-EV-0033). Excerpts match the page's visible text.",
+      "verification_note": "A 510(k) \"substantially equivalent\" decision is a US market clearance, which the FDA distinguishes from premarket approval (PMA). It is not a clinical-outcome finding and says nothing about authorisation or use in Morocco. The record names no Moroccan entity: its association with the Morocco-based DeepEcho rests on the matching name and device type, the deepecho.io e-mail domain and Moroccan data sites in the 510(k) summary (MAI-EV-0039), UM6P Ventures' 2023 statement that the startup was preparing an FDA submission (MAI-EV-0028) and the Moroccan government's statement (MAI-EV-0033). No source establishes the legal relationship between the applicant and a Moroccan company. Excerpts match the page's visible text.",
       "related_entities": ["deepecho-ultrasound-software", "deepecho"]
     },
     {
@@ -697,14 +700,14 @@
       "publication_date": "2026-05-06",
       "retrieval_date": "2026-10-18",
       "evidence_type": "news_dispatch",
-      "claim": "At GITEX Future Health Africa Morocco in May 2026, the Ministry of Health and Social Protection signed a partnership convention with DeepEcho setting up an institutional and research framework for the dissemination, adoption and clinical evaluation of AI solutions for pregnancy-monitoring ultrasound in public health facilities. The source describes a progressive deployment, within an evaluative scientific study, of a Moroccan solution that obtained FDA approval, in primary-care establishments and local hospitals.",
+      "claim": "At GITEX Future Health Africa Morocco in May 2026, the Ministry of Health and Social Protection signed a partnership convention with DeepEcho setting up an institutional and research framework for the dissemination, adoption and clinical evaluation of AI solutions for pregnancy-monitoring ultrasound in public health facilities. The source describes a progressive deployment, within an evaluative scientific study, in primary-care establishments and local hospitals, of a Moroccan solution that it says obtained the \"approbation\" of the US Food and Drug Administration.",
       "source_excerpts": [
         "le ministère a signé une convention de partenariat avec la société \"DeepEcho\", visant la mise en place d’un cadre institutionnel et de recherche pour la diffusion, l’adoption et l’évaluation clinique de solutions d’IA dans le domaine de l’échographie de suivi de la grossesse au sein des établissements de santé publics",
         "à travers le déploiement progressif, dans le cadre d’une étude scientifique évaluative, d’une solution numérique marocaine innovante, ayant obtenu l’approbation de la Food and Drug Administration Américaine (FDA), au niveau des établissements de soins de santé primaires et des hôpitaux de proximité"
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "verified",
-      "verification_note": "The verified fact is the signature and the stated framework. The progressive deployment is described as the convention's purpose; no source retrieved shows that the evaluative study or any deployment in a public facility has started. \"Approbation\" is the article's word; the FDA record (MAI-EV-0032) is a 510(k) clearance.",
+      "verification_note": "The verified fact is the signature and the stated framework. The progressive deployment is described as the convention's purpose; no source retrieved shows that the evaluative study or any deployment in a public facility has started. The article's \"approbation\" is inaccurate as regulatory terminology: the FDA record (MAI-EV-0032, MAI-EV-0039) is a 510(k) clearance, and a US clearance does not authorise clinical use in Morocco. The article does not name the device.",
       "related_entities": ["deepecho-public-health-evaluation", "ministry-health", "deepecho", "deepecho-ultrasound-software", "health"]
     },
     {
@@ -730,7 +733,7 @@
       "status_basis": "public-availability-observed",
       "source_entity": "ministry-digital-transition",
       "verification_status": "verified",
-      "verification_note": "Observation of the operator's own live portal, not a usage report: it shows the service is published to the public by the ministry, not how many people use it or with what results. Three excerpts are taken from the page's embedded product data rather than its visible text. chatbot.idarati.ma also returned HTTP 200 on the retrieval date (page title \"Assistant Citoyen — Royaume du Maroc\"). The page is not dated. The marketplace lists other AI products whose use is not recorded here.",
+      "verification_note": "Observation of the operator's own live portal, not a usage report: it shows the service is published to the public by the ministry, not how many people use it or with what results. Three excerpts are taken from the page's embedded product data rather than its visible text. The assistant itself is recorded separately (MAI-EV-0038). The page is not dated. The marketplace lists other AI products whose use is not recorded here.",
       "related_entities": ["idarati-ai", "sovereign-ai-marketplace", "ministry-digital-transition", "agentic-ai", "public-administration"]
     },
     {
@@ -743,7 +746,7 @@
       "publication_date": null,
       "retrieval_date": "2026-10-18",
       "evidence_type": "live_service_observation",
-      "claim": "The national portal of administrative procedures (idarati.ma), whose copyright line names the Ministry of Digital Transition and Administration Reform, embedded a chatbot titled \"Assistant Idarati\" on the retrieval date, labelled \"Powered by Berexia\" and carrying a disclaimer that its answers are for information only.",
+      "claim": "The national portal of administrative procedures (idarati.ma), whose copyright line names the Ministry of Digital Transition and Administration Reform, carried a chatbot component titled \"Assistant Idarati\" on the retrieval date. The portal's interface text for that component includes the label \"Powered by Berexia\" and a disclaimer that the chatbot's answers are for information only.",
       "source_excerpts": [
         "Votre portail national des procédures et formalités administratives",
         "[A]ssistant [I]darati",
@@ -756,7 +759,7 @@
       "status_basis": "public-availability-observed",
       "source_entity": "ministry-digital-transition",
       "verification_status": "verified",
-      "verification_note": "Observation of the operator's own live portal. The chatbot strings are taken from the page's embedded interface data. The page does not itself describe the chatbot as AI; that it is the agentic AI assistant \"Idarati AI\" is stated by the ministry's AI Marketplace (MAI-EV-0034). \"Powered by Berexia\" names a provider; Berexia's own role is not otherwise documented here. Usage, accuracy and outcomes are not documented.",
+      "verification_note": "Observation of the operator's own live portal. The chatbot strings are taken from the page's embedded interface data. Rendered in a browser on the retrieval date, the portal showed an \"Assistant Idarati\" button that opened the assistant at chatbot.idarati.ma (MAI-EV-0038); the \"Powered by Berexia\" label was not displayed there, and chatbot.idarati.ma does not name Berexia. Berexia's role (developer, provider, host or earlier supplier) is therefore not established and is not recorded as a relationship or attribute. The page does not itself describe the chatbot as AI; that it is the agentic AI assistant \"Idarati AI\" is stated by the ministry's AI Marketplace (MAI-EV-0034). Usage, accuracy and outcomes are not documented.",
       "related_entities": ["idarati-ai", "ministry-digital-transition"]
     },
     {
@@ -799,6 +802,57 @@
       "verification_status": "verified",
       "verification_note": "Self-description. The licence itself was not checked against a Bank Al-Maghrib publication.",
       "related_entities": ["swam"]
+    },
+    {
+      "evidence_id": "MAI-EV-0038",
+      "title": "Assistant Citoyen at chatbot.idarati.ma: live service observation",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (chatbot.idarati.ma)",
+      "source_type": "government_portal",
+      "source_url": "https://chatbot.idarati.ma/",
+      "source_language": "fr",
+      "publication_date": null,
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "live_service_observation",
+      "claim": "The citizen assistant at chatbot.idarati.ma, titled \"Assistant Citoyen — Royaume du Maroc\" and headed with the name of the Ministry of Digital Transition and Administration Reform, was publicly accessible without an account on the retrieval date. It presents itself as an automated assistant giving official administrative information and warns that its answers may contain errors.",
+      "source_excerpts": [
+        "Assistant Citoyen — Royaume du Maroc",
+        "Ministère de la Transition Numérique",
+        "Information administrative officielle",
+        "Assistant automatisé. Les réponses peuvent contenir des erreurs — vérifiez les informations essentielles auprès des services concernés"
+      ],
+      "classification": "VERIFIED FACT",
+      "status_evidence": "operational",
+      "status_basis": "public-availability-observed",
+      "source_entity": "ministry-digital-transition",
+      "verification_status": "verified",
+      "verification_note": "Observation of the operator's own live service, opened from the \"Assistant Idarati\" button on idarati.ma. The page title is in the HTML; the other excerpts are interface strings in the page's own script bundle. Functional check: on 18 October 2026 at 20:04 UTC the registry submitted one of the assistant's own suggested questions (\"Comment obtenir un extrait d'acte de naissance ?\") through the public interface, with no personal data, and received a generated answer describing the procedure; the answer's accuracy was not evaluated. Direct requests to the service's API without the interface's session proof were refused (HTTP 403) and were not pursued. This shows the service responded on that date. It is not evidence of how many people use it, of its accuracy or of operation after that date. The page names no developer or provider.",
+      "related_entities": ["idarati-ai", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0039",
+      "title": "FDA 510(k) K242594: clearance letter and 510(k) summary for DEEPECHO",
+      "source_organization": "U.S. Food and Drug Administration (FDA)",
+      "source_type": "regulator",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf24/K242594.pdf",
+      "source_language": "en",
+      "publication_date": "2025-05-23",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "regulatory_record",
+      "claim": "The FDA's letter of 23 May 2025, addressed to DeepEcho at a Dover, Delaware address, determines that the DEEPECHO device is substantially equivalent to legally marketed predicate devices for the stated indications for use, so that the company may market it subject to general controls. The 510(k) summary describes DEEPECHO as cloud-based software that uses machine learning to detect standard fetal biometry views and assist in computing fetal biometric measurements, for trained healthcare professionals; gives a contact e-mail address on the deepecho.io domain; and states that training data came in part from sites in Morocco and test data in part from Casablanca.",
+      "source_excerpts": [
+        "have determined the device is substantially equivalent (for the indications for use stated in the enclosure)",
+        "that do not require approval of a premarket approval application (PMA). You may, therefore, market the device, subject to the general controls",
+        "DEEPECHO is intended to analyze fetal ultrasound images and clips using machine learning techniques to detect standard biometry views.",
+        "DEEPECHO is a cloud-based standalone software as a medical device (SaMD)",
+        "deepecho.io",
+        "Training data were obtained from two Roshan MFM clinics in New York City and selected sites in Morocco.",
+        "Casablanca (Morocco)"
+      ],
+      "classification": "VERIFIED FACT",
+      "associated_entities": ["deepecho", "deepecho-ultrasound-software"],
+      "verification_status": "verified",
+      "verification_note": "Primary regulatory document. A 510(k) clearance permits marketing in the United States; the FDA distinguishes it from premarket approval (PMA). It is not a finding of clinical outcomes and does not authorise or show use in Morocco. The summary's performance figures are not recorded, and the contact person's name, e-mail address and telephone number are not reproduced. The shared web domain and Moroccan data sites associate the applicant with the deepecho.io developer that UM6P Ventures describes as Morocco-based (MAI-EV-0028), but no source establishes their legal relationship.",
+      "related_entities": ["deepecho-ultrasound-software", "deepecho"]
     }
   ]
 }
