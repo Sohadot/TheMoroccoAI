@@ -119,9 +119,9 @@ canonical missing · og:url missing · unlabelled <svg> · no independence discl
 
 ### B1. Evidence registry v0.1 — `data/evidence.json` (VERIFIED)
 
-There are 18 records. Each source was retrieved on 2026-10-18. Every excerpt was matched against
-the retrieved text by script (whitespace, quote style and PDF hyphenation normalised), except
-MAI-EV-0015 (below).
+There are 18 records. Each source was retrieved on 2026-10-18, and every excerpt was matched
+against the retrieved text by script (whitespace, quote style and PDF hyphenation normalised).
+The independent review (Part C) re-fetched all 11 source URLs and re-matched all 39 excerpts.
 
 | Classification | Records |
 | --- | --- |
@@ -140,13 +140,13 @@ MAI-EV-0015 (below).
 - MAP Express (state news agency): 2024-09-25 Digital Morocco 2030 launch; 2024-06-03 AI Movement.
 - CGEM: 2026-01-13 Jazari ROOT constitutive convention.
 - UNESCO: 2024-07-04 AI Movement as a Category 2 Centre.
-- CNDP: Law 09-08 page.
+- CNDP: Law 09-08 page and site menu (regulatory framework listing).
 
 ### B2. Ontology v0.1 — `data/ontology.json` (VERIFIED)
 
 The ontology has 41 entities across 7 types (institution, initiative, event, project,
 legal_instrument, technology, sector) and 7 domains matching the Phase 1 distinctions. There are 48
-typed relationships over 15 predicates, each with subject and object type constraints, a
+typed relationships over 16 predicates, each with subject and object type constraints, a
 classification and cited evidence. Identifiers are stable kebab-case strings that are also the URL
 slugs. `tools/registry.py` enforces referential integrity in both directions (entity ↔ record), as
 well as type constraints and classification support.
@@ -200,12 +200,12 @@ robotics, industrial data analytics) → sectors. Every hop shows its evidence a
 | `python3 tools/registry.py` | `0 problem(s)` |
 | `python3 tools/build.py --check` | `45 generated files checked, 0 stale` |
 | `python3 tools/check_site.py --network` | `44 pages checked, 0 problem(s)` (includes the MX lookup for `sohadot.com`) |
-| `python3 -m unittest discover -s tests -v` | `Ran 50 tests … OK` |
+| `python3 -m unittest discover -s tests -v` | `Ran 55 tests … OK` (after the Part C corrections) |
 | axe-core 4.10.2 via Playwright: `/`, `/registry/`, `/registry/evidence/` and 4 entity pages, desktop and mobile | 0 violations on all 14 runs. 0 external requests. No horizontal overflow at 375px. |
 
 The axe/Playwright run is a one-off audit run from a scratch environment. It is **not** part of CI,
-which runs only standard-library Python. CI is defined in `.github/workflows/quality.yml` and had
-not run at the time of writing.
+which runs only standard-library Python. CI (`.github/workflows/quality.yml`) passed on
+`02b5422`; see Part C for later runs.
 
 ### B7. Remaining limitations and blockers
 
@@ -213,12 +213,40 @@ not run at the time of writing.
 | --- | --- | --- |
 | Acquisition mailbox delivery | **BLOCKED** | The MX record resolves and the gate checks it, but no message was sent, so delivery and monitoring are unverified. The owner should send a test from an external account. |
 | mmsp.gov.ma news pages | **BLOCKED** | They return HTTP 403 ("Accès refusé") to the verification environment, so the ministry's own press releases could not be cited. The ministry PDF did download. |
-| JAZARI approval decisions in the Bulletin Officiel | **BLOCKED** | Not located. Press reports (TelQuel) mention an August 2026 publication; BO n° 7522 was checked and does not contain them. |
-| Law 09-08 promulgation references | **BLOCKED** | The official full-text hosts (sgg.gov.ma, adala.justice.gov.ma) were unreachable or returned 404, so MAI-EV-0017 is `partial` and has no publication date. |
-| UNESCO page | PARTIAL | A bot challenge blocks command-line retrieval; it was read through a web-fetch tool. |
+| JAZARI approval decisions in the Bulletin Officiel | **BLOCKED** | Not located. Press reports (TelQuel, Barlamane, Al3omk) describe an August 2026 publication. French translation edition issues 7522, 7526, 7532, 7536, 7540 and 7544 do not contain them, and Arabic edition URLs could not be resolved. Jazari ROOT's legal constitution is therefore not recorded as verified. |
+| Law 09-08 promulgation references | **BLOCKED** | The official full-text hosts (sgg.gov.ma, adala.justice.gov.ma) were unreachable or returned 404, so MAI-EV-0017 is `partial`, has no publication date, and claims only the CNDP's framework listing. |
 | New AI ministry (16 Oct 2026) | PARTIAL | The appointment is verified. Its attributions, and any succession from the Ministry of Digital Transition, are not, and the registry states this. |
 | Companies, models and datasets domains | MISSING | Shown as empty. |
 | Arabic, French and Tamazight editions | MISSING | Marked "planned" everywhere. |
 | Data and content licence | MISSING | An owner decision. It matters for transferability and reuse. |
 | `Background.png`, `TheMoroccoailogo.png` (7.2 MB, unused) | Unchanged | Left in place as owner assets. Recommend moving them to a brand-assets location or deleting them, and generating a 1200×630 social image from the logo. |
 | Source link rot | Open | Records keep verbatim excerpts, but no archive snapshots (e.g. the Wayback Machine) are stored yet. |
+
+---
+
+## Part C — Independent review of PR #1 (reviewed HEAD `02b5422`)
+
+The review re-fetched every source, re-matched every excerpt with a fresh HTML/PDF text extractor,
+re-read every claim, entity summary and relationship against its excerpts, and probed the validator
+for logical gaps. CI on `02b5422` passed: GitHub Actions check run `checks`, all five steps.
+
+| # | Severity | File | Finding | Correction |
+| --- | --- | --- | --- | --- |
+| 1 | MAJOR | `data/evidence.json` MAI-EV-0017, `data/ontology.json` | The excerpt was the page `<title>`, whose second half is the site name. It did not support "publishes Law 09-08 as the reference text of its mandate", the `cndp administers law-09-08` relationship, or the entity status "In force". | Claim limited to the CNDP's "Cadre règlementaire" menu listing, with a verbatim menu excerpt added. Predicate `administers` replaced by `lists_in_framework`. "In force" removed. A draft overhaul of the law is disclosed in the note. |
+| 2 | MAJOR | `data/ontology.json` `jazari-root`, `jazari-industrie-x0`; MAI-EV-0009 | The summaries stated that Jazari ROOT *is* a constituted GIP and that Industrie X.0 was "created". The sources document signatures of conventions "for the creation", and the Gazette approval is unverified. | Reworded as planned or "for its creation". Statuses now say legal constitution and operational status are not verified. The MAI-EV-0008 note records the Gazette search. |
+| 3 | MINOR | `data/ontology.json` | `ministry-higher-education signatory_of jazari-institute-nador`: the source says the ministry was "involved", not that it signed. | New predicate `involved_in`. |
+| 4 | MINOR | `data/ontology.json` | `jazari-network includes jazari-smart-city / jazari-edutech` was classified VERIFIED FACT, but both components are named only. | Reclassified as ANNOUNCED PLAN, with a note. |
+| 5 | MINOR | `data/ontology.json` | The new AI ministry's summary carried a qualified superlative ("first … in this registry's sources"). | Replaced with neutral wording. |
+| 6 | MINOR | MAI-EV-0015 | The note said the UNESCO page could be read only through a web-fetch tool. It now serves HTML directly, and both excerpts match. | Note updated. |
+| 7 | MINOR | `tools/registry.py` | A calendar-invalid date (e.g. `2026-02-30`) crashed the validator with `ValueError` instead of reporting it. | Dates parsed safely and reported. Regression tests added. |
+| 8 | MINOR | `tools/registry.py` | A `retrieval_date` later than the registry `as_of` date was accepted. | Rejected. Test added. |
+| 9 | MINOR | `tools/registry.py` | Domain, type and predicate keys were not validated, yet the generator writes domain keys unescaped into `id` and `href`. | Keys must be safe slugs. Test added. |
+| 10 | INFO | `.github/workflows/quality.yml` | GitHub warns that `actions/checkout@v4` and `actions/setup-python@v5` target the deprecated Node 20 runtime; they currently run forced on Node 24. | No change; upgrade when convenient. |
+| 11 | INFO | `tools/build.py` | `strftime("%-d")` is glibc/BSD-specific and fails on Windows. Builds are otherwise deterministic: identical output under a French locale and UTC+14. | No change. |
+| 12 | INFO | Repository root | GitHub Pages also serves `README.md`, `AUDIT_REPORT.md`, `tools/` and `tests/`. The repository is public, so this adds no exposure; neither file contains confidential data. The two unused PNGs (7.2 MB) remain published. | No change; owner decision. |
+| 13 | INFO | Validator scope | The validator checks structure, referential integrity and classification consistency. It cannot check that a claim is entailed by its excerpt, or that entity summaries stay within their evidence; findings 1–5 were of that kind and passed validation. | Documented. Human review of claim wording remains necessary. |
+
+After the corrections, 18 records remain: 13 VERIFIED FACT (MAI-EV-0017 `partial`), 2 OFFICIAL
+TARGET, 2 ANNOUNCED PLAN and 1 UNVERIFIED CLAIM. Relationships: 48 (27 VERIFIED FACT, 17 ANNOUNCED
+PLAN, 2 OFFICIAL TARGET, 2 INDEPENDENT ANALYSIS). No record was removed, and no new evidence was
+introduced beyond the CNDP menu excerpt.

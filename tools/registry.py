@@ -48,6 +48,7 @@ DOCUMENTED_TYPES = ("institution", "initiative", "event", "project", "legal_inst
 
 EVIDENCE_ID = re.compile(r"^MAI-EV-\d{4}$")
 ENTITY_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+KEY = re.compile(r"^[a-z0-9]+(?:[-_][a-z0-9]+)*$")
 DATE = re.compile(r"^\d{4}-\d{2}(?:-\d{2})?$")
 # Wording that describes something not yet true; a VERIFIED FACT must not use it.
 FORWARD_LOOKING = re.compile(
@@ -75,8 +76,14 @@ def load_all():
 
 
 def _parse_date(value):
+    """Return a date for YYYY-MM-DD or YYYY-MM (first of month), or None if not a real calendar date."""
+    if not isinstance(value, str) or not DATE.match(value):
+        return None
     parts = [int(p) for p in value.split("-")]
-    return datetime.date(parts[0], parts[1], parts[2] if len(parts) > 2 else 1)
+    try:
+        return datetime.date(parts[0], parts[1], parts[2] if len(parts) > 2 else 1)
+    except ValueError:
+        return None
 
 
 def _check_url(url):
@@ -95,9 +102,9 @@ def _check_url(url):
 def validate_evidence(evidence, today=None):
     errors = []
     today = today or datetime.date.today()
-    as_of = evidence.get("as_of")
-    if not as_of or not DATE.match(as_of):
-        errors.append("evidence.json: as_of missing or malformed")
+    as_of = _parse_date(evidence.get("as_of"))
+    if not as_of or len(evidence.get("as_of")) != 10:
+        errors.append("evidence.json: as_of missing or not a valid YYYY-MM-DD date")
     records = evidence.get("records") or []
     if not records:
         errors.append("evidence.json: registry has no records")
@@ -123,17 +130,20 @@ def validate_evidence(evidence, today=None):
             errors.append(f"{where} unknown source_type {r.get('source_type')!r}")
         if r.get("evidence_type") not in EVIDENCE_TYPES:
             errors.append(f"{where} unknown evidence_type {r.get('evidence_type')!r}")
-        retrieval = r.get("retrieval_date")
-        if not isinstance(retrieval, str) or not DATE.match(retrieval) or len(retrieval) != 10:
-            errors.append(f"{where} retrieval_date must be YYYY-MM-DD")
+        retrieval = _parse_date(r.get("retrieval_date"))
+        if not retrieval or len(r.get("retrieval_date")) != 10:
+            errors.append(f"{where} retrieval_date must be a valid YYYY-MM-DD date")
             retrieval = None
-        elif _parse_date(retrieval) > today:
+        elif retrieval > today:
             errors.append(f"{where} retrieval_date is in the future")
+        elif as_of and retrieval > as_of:
+            errors.append(f"{where} retrieval_date is after the registry as_of date")
         pub = r.get("publication_date")
         if pub is not None:
-            if not isinstance(pub, str) or not DATE.match(pub):
-                errors.append(f"{where} publication_date must be YYYY-MM-DD, YYYY-MM or null")
-            elif retrieval and _parse_date(pub) > _parse_date(retrieval):
+            pub_date = _parse_date(pub)
+            if not pub_date:
+                errors.append(f"{where} publication_date must be a valid YYYY-MM-DD, YYYY-MM or null")
+            elif retrieval and pub_date > retrieval:
                 errors.append(f"{where} publication_date is after retrieval_date")
         elif not str(r.get("verification_note", "")).strip():
             errors.append(f"{where} null publication_date needs a verification_note")
@@ -175,6 +185,11 @@ def validate_ontology(ontology, evidence):
     entities = ontology.get("entities") or []
     if not entities:
         errors.append("ontology.json: no entities")
+    # Keys are written into HTML ids and URLs by the generator, so they must be plain slugs.
+    for kind, keys in (("domain", domains), ("entity type", types), ("predicate", predicates)):
+        for k in keys:
+            if not KEY.match(str(k)):
+                errors.append(f"ontology.json: {kind} key {k!r} must be a lowercase slug")
 
     by_id = {}
     for i, e in enumerate(entities):

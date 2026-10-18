@@ -27,6 +27,14 @@ class RepositoryData(unittest.TestCase):
         evidence, _ = registry.load_all()
         self.assertEqual(set(evidence["classifications"]), set(registry.CLASSIFICATIONS))
 
+    def test_institutions_are_not_linked_beyond_what_sources_state(self):
+        # Regression: the CNDP page supports a framework listing, not "administers";
+        # the Nador memorandum says the higher-education ministry was "involved", not that it signed.
+        _, ontology = registry.load_all()
+        predicates = {(r["subject"], r["object"]): r["predicate"] for r in ontology["relationships"]}
+        self.assertEqual(predicates[("cndp", "law-09-08")], "lists_in_framework")
+        self.assertEqual(predicates[("ministry-higher-education", "jazari-institute-nador")], "involved_in")
+
     def test_targets_are_never_classified_as_facts(self):
         evidence, _ = registry.load_all()
         for r in evidence["records"]:
@@ -85,6 +93,22 @@ class ValidatorRejects(unittest.TestCase):
         self.record()["publication_date"] = "2026-10-19"
         self.record()["retrieval_date"] = "2026-10-18"
         self.assertError("publication_date is after retrieval_date")
+
+    def test_impossible_calendar_date_is_reported_not_crashed(self):
+        self.record()["publication_date"] = "2026-02-30"
+        self.assertError("publication_date must be a valid")
+
+    def test_invalid_month_is_reported_not_crashed(self):
+        self.record()["retrieval_date"] = "2026-13-01"
+        self.assertError("retrieval_date must be a valid")
+
+    def test_retrieval_after_registry_as_of(self):
+        self.evidence["as_of"] = "2026-10-17"
+        self.assertError("retrieval_date is after the registry as_of date")
+
+    def test_unsafe_domain_key(self):
+        self.ontology["domains"]['bad" onmouseover="x'] = "Bad"
+        self.assertError("domain key")
 
     def test_unknown_classification(self):
         self.record()["classification"] = "PROBABLY TRUE"

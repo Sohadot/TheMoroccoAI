@@ -42,7 +42,8 @@
     "concluded_at": {"label": "concluded at", "inverse": "venue of", "subject": ["project"], "object": ["event"]},
     "created": {"label": "created", "inverse": "created by", "subject": ["institution"], "object": ["institution"]},
     "designated": {"label": "designated", "inverse": "designated by", "subject": ["institution"], "object": ["institution"]},
-    "administers": {"label": "administers", "inverse": "administered by", "subject": ["institution"], "object": ["legal_instrument"]},
+    "lists_in_framework": {"label": "lists in its regulatory framework", "inverse": "listed in the regulatory framework of", "subject": ["institution"], "object": ["legal_instrument"]},
+    "involved_in": {"label": "involved in", "inverse": "involves", "subject": ["institution"], "object": ["project"]},
     "applies": {"label": "applies", "inverse": "applied in", "subject": ["project"], "object": ["technology"]},
     "targets": {"label": "targets", "inverse": "targeted by", "subject": ["initiative", "project"], "object": ["sector"]},
     "related_to": {"label": "related to", "inverse": "related to", "subject": ["initiative", "project"], "object": ["initiative", "project"]}
@@ -65,7 +66,7 @@
       "name": "Ministry of Artificial Intelligence, Digital Transformation and Administration Reform",
       "alt_names": [],
       "domain": "government-policy",
-      "summary": "A ministerial portfolio created with the government appointed on 16 October 2026. It is the first Moroccan ministry with artificial intelligence in its title in this registry's sources.",
+      "summary": "A ministerial portfolio in the government appointed on 16 October 2026, with a Minister and a Minister Delegate in charge of Administration Reform.",
       "status": "Minister appointed 16 October 2026.",
       "note": "Its legal attributions had not been published in a source retrieved by the registry as of the as-of date.",
       "evidence": ["MAI-EV-0014"]
@@ -184,7 +185,7 @@
       "name": "National Commission for the Control of Personal Data Protection (CNDP)",
       "alt_names": ["Commission Nationale de contrôle de la protection des Données à caractère Personnel"],
       "domain": "regulation-governance",
-      "summary": "Morocco's personal-data protection authority, which publishes Law 09-08 as the reference text of its mandate.",
+      "summary": "Morocco's national commission for the control of personal data protection. Its website lists Law 09-08 in its regulatory framework.",
       "evidence": ["MAI-EV-0017"]
     },
     {
@@ -236,8 +237,8 @@
       "name": "Institut Jazari ROOT",
       "alt_names": ["JAZARI ROOT"],
       "domain": "research-academia",
-      "summary": "Public-interest group (GIP) that is the technical and strategic core of the JAZARI network. Its themes are e-government, smart rural and mountain zones, and major sporting events. CGEM and several ministerial departments signed its constitutive convention on 12 January 2026.",
-      "status": "Constitutive convention signed 2026-01-12.",
+      "summary": "Institute planned as a public-interest group (GIP) and described by the ministry as the technical and strategic core of the JAZARI network, around e-government, smart rural and mountain zones, and major sporting events. CGEM and several ministerial departments signed its constitutive convention on 12 January 2026.",
+      "status": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
       "evidence": ["MAI-EV-0008", "MAI-EV-0010", "MAI-EV-0012"]
     },
     {
@@ -246,8 +247,8 @@
       "name": "JAZARI Industrie X.0",
       "alt_names": ["Institut Al-Jazari pour l'Industrie"],
       "domain": "research-academia",
-      "summary": "Al-Jazari institute for smart industry, created by a convention signed in Fès on 10 March 2026 by three ministries and the four universities of the Fès-Meknès region. Its stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
-      "status": "Founding convention signed 2026-03-10.",
+      "summary": "Al-Jazari institute for smart industry. A convention for its creation was signed in Fès on 10 March 2026 by three ministries and the four universities of the Fès-Meknès region. Its stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
+      "status": "Founding convention signed 2026-03-10. Operational status not verified.",
       "evidence": ["MAI-EV-0009", "MAI-EV-0012"]
     },
     {
@@ -323,11 +324,11 @@
     {
       "id": "law-09-08",
       "type": "legal_instrument",
-      "name": "Law 09-08 on personal data protection",
+      "name": "Law 09-08",
       "alt_names": ["Loi 09-08"],
       "domain": "regulation-governance",
-      "summary": "Morocco's personal data protection law, published by the CNDP as the reference text of its mandate.",
-      "status": "In force. Promulgation references not yet recorded (see evidence note).",
+      "summary": "Moroccan law listed by the national personal-data protection commission (CNDP) in its regulatory framework.",
+      "status": "Full title, promulgation references and amendment status not yet recorded (see evidence note).",
       "evidence": ["MAI-EV-0017"]
     },
     {"id": "artificial-intelligence", "type": "technology", "name": "Artificial intelligence", "alt_names": [], "summary": "General AI research, development and application.", "evidence": ["MAI-EV-0009"]},
@@ -354,8 +355,8 @@
     {"subject": "morocco-ai-2030", "predicate": "implemented_through", "object": "jazari-network", "evidence": ["MAI-EV-0012"], "classification": "VERIFIED FACT"},
     {"subject": "jazari-network", "predicate": "includes", "object": "jazari-root", "evidence": ["MAI-EV-0010", "MAI-EV-0012"], "classification": "VERIFIED FACT"},
     {"subject": "jazari-network", "predicate": "includes", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0012"], "classification": "VERIFIED FACT"},
-    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-smart-city", "evidence": ["MAI-EV-0012"], "classification": "VERIFIED FACT"},
-    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-edutech", "evidence": ["MAI-EV-0012"], "classification": "VERIFIED FACT"},
+    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-smart-city", "evidence": ["MAI-EV-0012"], "classification": "ANNOUNCED PLAN", "note": "Named as a component by the ministry; no founding instrument is documented."},
+    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-edutech", "evidence": ["MAI-EV-0012"], "classification": "ANNOUNCED PLAN", "note": "Named as a component by the ministry; no founding instrument is documented."},
     {"subject": "jazari-institute-nador", "predicate": "related_to", "object": "jazari-network", "evidence": ["MAI-EV-0005", "MAI-EV-0012"], "classification": "INDEPENDENT ANALYSIS", "note": "The Nador institute carries the Al Jazari name and predates the network announcement. The September 2026 list of network components does not mention it, so membership in the network is not established."},
     {"subject": "cgem", "predicate": "signatory_of", "object": "jazari-root", "evidence": ["MAI-EV-0008"], "classification": "VERIFIED FACT"},
     {"subject": "jazari-root", "predicate": "targets", "object": "public-administration", "evidence": ["MAI-EV-0010"], "classification": "ANNOUNCED PLAN"},
@@ -374,7 +375,7 @@
     {"subject": "jazari-industrie-x0", "predicate": "applies", "object": "industrial-data-analytics", "evidence": ["MAI-EV-0009"], "classification": "ANNOUNCED PLAN"},
     {"subject": "jazari-industrie-x0", "predicate": "targets", "object": "industry", "evidence": ["MAI-EV-0009"], "classification": "ANNOUNCED PLAN"},
     {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "jazari-institute-nador", "evidence": ["MAI-EV-0005"], "classification": "VERIFIED FACT"},
-    {"subject": "ministry-higher-education", "predicate": "signatory_of", "object": "jazari-institute-nador", "evidence": ["MAI-EV-0005"], "classification": "VERIFIED FACT", "note": "The source says the memorandum \"also involv[es]\" this ministry; the exact signatory role is not detailed."},
+    {"subject": "ministry-higher-education", "predicate": "involved_in", "object": "jazari-institute-nador", "evidence": ["MAI-EV-0005"], "classification": "VERIFIED FACT", "note": "The source says the memorandum \"also involv[es]\" this ministry; whether it signed is not stated."},
     {"subject": "jazari-institute-nador", "predicate": "concluded_at", "object": "first-national-ai-conference-2025", "evidence": ["MAI-EV-0005"], "classification": "VERIFIED FACT"},
     {"subject": "jazari-institute-nador", "predicate": "targets", "object": "education-research", "evidence": ["MAI-EV-0005"], "classification": "ANNOUNCED PLAN"},
     {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "green-data-centres-agreement", "evidence": ["MAI-EV-0006"], "classification": "VERIFIED FACT"},
@@ -391,6 +392,6 @@
     {"subject": "idarati-ai", "predicate": "targets", "object": "public-administration", "evidence": ["MAI-EV-0013"], "classification": "ANNOUNCED PLAN"},
     {"subject": "um6p", "predicate": "created", "object": "ai-movement", "evidence": ["MAI-EV-0016"], "classification": "VERIFIED FACT"},
     {"subject": "unesco", "predicate": "designated", "object": "ai-movement", "evidence": ["MAI-EV-0015"], "classification": "VERIFIED FACT", "note": "Designation as a UNESCO Category 2 Centre."},
-    {"subject": "cndp", "predicate": "administers", "object": "law-09-08", "evidence": ["MAI-EV-0017"], "classification": "VERIFIED FACT"}
+    {"subject": "cndp", "predicate": "lists_in_framework", "object": "law-09-08", "evidence": ["MAI-EV-0017"], "classification": "VERIFIED FACT"}
   ]
 }

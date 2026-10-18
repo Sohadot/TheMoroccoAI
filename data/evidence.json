@@ -174,7 +174,7 @@
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "verified",
-      "verification_note": "Source is a signatory's own publication. Publication of the approval decision in the Bulletin Officiel was not located during this sprint.",
+      "verification_note": "Source is a signatory's own publication; it documents the signature, not the group's legal constitution. Press reports from August 2026 say approval decisions for four Jazari institutes were published in the Bulletin Officiel, but the Gazette text was not located (French translation edition issues 7522, 7526, 7532, 7536, 7540 and 7544 checked), so legal constitution is not recorded as verified.",
       "related_entities": ["jazari-root", "cgem", "ministry-digital-transition", "morocco-ai-2030"]
     },
     {
@@ -187,7 +187,7 @@
       "publication_date": "2026-03-11",
       "retrieval_date": "2026-10-18",
       "evidence_type": "news_dispatch",
-      "claim": "On 10 March 2026 in Fès, the Ministry of Industry and Commerce, the Ministry Delegate for Digital Transition and Administration Reform and the Ministry of Economy and Finance signed, with the four universities of the Fès-Meknès region, a convention creating the Al-Jazari Institute for Industry \"JAZARI Industrie X.0\", whose stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
+      "claim": "On 10 March 2026 in Fès, the Ministry of Industry and Commerce, the Ministry Delegate for Digital Transition and Administration Reform and the Ministry of Economy and Finance signed, with the four universities of the Fès-Meknès region, a convention for the creation of the Al-Jazari Institute for Industry \"JAZARI Industrie X.0\", whose stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
       "source_excerpts": [
         "Une convention a été signée, mardi 10 Mars à Fès, pour la création de l’Institut Al-Jazari pour l’Industrie \"JAZARI Industrie X.0\"",
         "La convention a été signée par le ministère de l’Industrie et du Commerce, le ministère délégué chargé de la Transition numérique et de la Réforme de l’administration et le ministère de l’Economie et des Finances, d’une part, et les quatre université que compte la région Fès-Meknès. Il s’agit de l’Université Euro-Méditerranéenne de Fès, l’Université Sidi Mohammed Ben Abdellah de Fès, l’Université Moulay Ismail de Meknès et l’Université Al Akhawayn d’Ifrane",
@@ -318,7 +318,7 @@
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "verified",
-      "verification_note": "unesco.org serves a bot challenge to command-line clients, so the page was read through a web-fetch tool and the excerpts come from that rendering.",
+      "verification_note": "Both excerpts were matched against the page HTML on the retrieval date. The page places the establishment at the High-Level Forum on AI in Africa held at UM6P in Rabat on 3–5 June 2024.",
       "related_entities": ["ai-movement", "unesco"]
     },
     {
@@ -342,7 +342,7 @@
     },
     {
       "evidence_id": "MAI-EV-0017",
-      "title": "CNDP reference page for Law 09-08",
+      "title": "CNDP lists Law 09-08 in its regulatory framework",
       "source_organization": "CNDP (Commission Nationale de contrôle de la protection des Données à caractère Personnel)",
       "source_type": "regulator",
       "source_url": "https://www.cndp.ma/loi-09-08/",
@@ -350,13 +350,14 @@
       "publication_date": null,
       "retrieval_date": "2026-10-18",
       "evidence_type": "regulatory_page",
-      "claim": "The CNDP, Morocco's national commission for the control of personal data protection, publishes Law 09-08 as the reference legal text of its mandate.",
+      "claim": "The website of the CNDP (cndp.ma), Morocco's national commission for the control of personal data protection, lists Law 09-08 under \"Cadre règlementaire\" (regulatory framework) in its \"À propos de la CNDP\" section, alongside the Constitution and Decree No. 2-09-165, and has a dedicated page for the law.",
       "source_excerpts": [
+        "À propos de la CNDP Qui sommes-nous ? Mot du Président Organigramme Missions Cadre règlementaire Constitution du Royaume du Maroc Loi 09-08 Décret n° 2-09-165",
         "Loi 09-08 - Commission Nationale de Contrôle de Protection des Données à Caractère Personnel"
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "partial",
-      "verification_note": "Only the page title could be read; the body is rendered client-side. The law's promulgation and Bulletin Officiel references are not recorded because the official full-text hosts (sgg.gov.ma, adala.justice.gov.ma) were unreachable from the verification environment.",
+      "verification_note": "Only the site menu and the page title could be read; the page body is rendered client-side. The first excerpt is the site's navigation menu and the second is the page title. The law's full title, promulgation and Bulletin Officiel references, and current amendment status are not recorded: the official full-text hosts (sgg.gov.ma, adala.justice.gov.ma) were unreachable from the verification environment, and the CNDP site also links to an item about a draft overhaul (\"projet de refonte\") of the law.",
       "related_entities": ["law-09-08", "cndp"]
     },
     {
