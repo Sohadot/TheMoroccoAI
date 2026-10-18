@@ -8,6 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import build  # noqa: E402
 import check_site  # noqa: E402
+import registry  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -23,6 +24,27 @@ class PublishedSite(unittest.TestCase):
         sitemap = (REPO / "sitemap.xml").read_text()
         for page in (REPO / "registry").glob("*/index.html"):
             self.assertIn(f"/registry/{page.parent.name}/", sitemap)
+
+    def test_questions_page_reports_every_project_with_its_lifecycle(self):
+        _, ontology = registry.load_all()
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        for e in ontology["entities"]:
+            if e["type"] in ("project", "model", "dataset"):
+                self.assertIn(f'href="/registry/{e["id"]}/"', html, e["id"])
+        # An announced project must never appear in the operational row form.
+        for e in ontology["entities"]:
+            if e["type"] == "project" and e["lifecycle"] != "operational":
+                self.assertNotIn(f'>{e["name"]}</a></td><td>Operational<', html, e["id"])
+
+    def test_questions_page_does_not_overstate_sector_deployments(self):
+        _, ontology = registry.load_all()
+        ents = {e["id"]: e for e in ontology["entities"]}
+        verified = [r for r in ontology["relationships"] if r["predicate"] == "targets"
+                    and r["classification"] == "VERIFIED FACT"
+                    and ents[r["subject"]].get("lifecycle") in ("operational", "pilot")]
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        if not verified:
+            self.assertIn("No sector yet has a verified operational or pilot AI deployment", html)
 
     def test_homepage_acquisition_path(self):
         html = (REPO / "index.html").read_text(encoding="utf-8")
