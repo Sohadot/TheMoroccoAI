@@ -67,6 +67,12 @@ LIFECYCLE_ALLOWED = {
     "model": ("announced", "in-development", "released", "discontinued"),
     "dataset": ("announced", "in-development", "released", "discontinued"),
 }
+# Stages that need a record explicitly declaring that status (status_evidence); a signature,
+# presentation or announcement record never declares one, so it cannot establish delivery.
+STATUS_STAGES = ("in-development", "pilot", "operational", "released", "discontinued")
+PROJECT_KINDS_REQUIRED = ("project",)
+# Origins that need a source independent of the company itself.
+INDEPENDENT_ORIGINS = ("based-in-morocco", "foreign-moroccan-operations-verified")
 LIFECYCLE_SUPPORT = {
     "announced": {"ANNOUNCED PLAN", "VERIFIED FACT"},
     "in-development": {"VERIFIED FACT"},
@@ -201,6 +207,16 @@ def validate_evidence(evidence, today=None):
             errors.append(f"{where} {cls} claim presents an outcome as achieved")
         if cls == "OFFICIAL TARGET" and not isinstance(r.get("target_year"), int):
             errors.append(f"{where} OFFICIAL TARGET needs an integer target_year")
+        status = r.get("status_evidence")
+        if status is not None:
+            if status not in STATUS_STAGES:
+                errors.append(f"{where} unknown status_evidence {status!r}")
+            if cls != "VERIFIED FACT":
+                errors.append(f"{where} status_evidence requires a VERIFIED FACT record")
+            if status == "released" and r.get("source_type") != "technical_repository":
+                errors.append(f"{where} 'released' must be evidenced by the technical repository itself")
+            if status in ("operational", "pilot") and r.get("source_type") in NON_INDEPENDENT_SOURCES:
+                errors.append(f"{where} '{status}' cannot be evidenced by the actor's own website or press")
         if r.get("source_type") == "secondary_press" and cls not in ("ANNOUNCED PLAN", "UNVERIFIED CLAIM"):
             errors.append(f"{where} secondary press can support only ANNOUNCED PLAN or UNVERIFIED CLAIM, not {cls}")
         if cls == "UNVERIFIED CLAIM" and not str(r.get("verification_note", "")).strip():
@@ -208,7 +224,7 @@ def validate_evidence(evidence, today=None):
     return errors
 
 
-def _check_entity_facets(e, where, ev, records, stages, origins):
+def _check_entity_facets(e, where, ev, records, stages, origins, kinds=None):
     """Lifecycle, origin and attributes: each must be allowed for the type and backed by the entity's own evidence."""
     errors = []
     etype = e.get("type")
@@ -224,11 +240,19 @@ def _check_entity_facets(e, where, ev, records, stages, origins):
         cited = [records[x] for x in basis if x in records]
         if stage in LIFECYCLE_SUPPORT and not any(r.get("classification") in LIFECYCLE_SUPPORT[stage] for r in cited):
             errors.append(f"{where} lifecycle '{stage}' is not supported by a {' or '.join(sorted(LIFECYCLE_SUPPORT[stage]))} record")
+        if stage in STATUS_STAGES and not any(r.get("status_evidence") == stage for r in cited):
+            errors.append(f"{where} lifecycle '{stage}' needs a lifecycle_evidence record whose status_evidence is '{stage}'")
         if stage == "operational" and not any(
                 r.get("classification") == "VERIFIED FACT" and r.get("source_type") not in NON_INDEPENDENT_SOURCES for r in cited):
             errors.append(f"{where} 'operational' needs a verified record from a source other than the actor's own website or press")
     elif "lifecycle" in e or "lifecycle_evidence" in e:
         errors.append(f"{where} {etype} entities take no lifecycle")
+    kinds = kinds or {}
+    if etype in PROJECT_KINDS_REQUIRED:
+        if e.get("project_kind") not in kinds:
+            errors.append(f"{where} project needs a project_kind from {', '.join(kinds)} (got {e.get('project_kind')!r})")
+    elif "project_kind" in e:
+        errors.append(f"{where} only projects take a project_kind")
     origin = e.get("origin")
     if etype == "company":
         if origin not in origins:
@@ -238,6 +262,12 @@ def _check_entity_facets(e, where, ev, records, stages, origins):
             errors.append(f"{where} origin '{origin}' needs origin_evidence")
         if any(x not in ev for x in basis):
             errors.append(f"{where} origin_evidence must be a subset of the entity's evidence")
+        name = str(e.get("name", "")).casefold()
+        independent = [r for r in (records.get(x, {}) for x in basis)
+                       if r.get("source_type") not in NON_INDEPENDENT_SOURCES
+                       and not str(r.get("source_organization", "")).casefold().startswith(name)]
+        if origin in INDEPENDENT_ORIGINS and not independent:
+            errors.append(f"{where} origin '{origin}' needs origin_evidence from a source independent of the company")
     elif "origin" in e or "origin_evidence" in e:
         errors.append(f"{where} only company entities take an origin")
     for a in e.get("attributes") or []:
@@ -261,7 +291,8 @@ def validate_ontology(ontology, evidence):
     stages = ontology.get("lifecycle_stages") or {}
     origins = ontology.get("origins") or {}
     for kind, keys in (("domain", domains), ("entity type", types), ("predicate", predicates),
-                       ("lifecycle stage", stages), ("origin", origins)):
+                       ("lifecycle stage", stages), ("origin", origins),
+                       ("project kind", ontology.get("project_kinds") or {})):
         for k in keys:
             if not KEY.match(str(k)):
                 errors.append(f"ontology.json: {kind} key {k!r} must be a lowercase slug")
@@ -287,7 +318,7 @@ def validate_ontology(ontology, evidence):
         ev = e.get("evidence") or []
         if not ev:
             errors.append(f"{where} has no supporting evidence")
-        errors += _check_entity_facets(e, where, ev, records, stages, origins)
+        errors += _check_entity_facets(e, where, ev, records, stages, origins, ontology.get("project_kinds"))
         for x in ev:
             if x not in records:
                 errors.append(f"{where} cites missing evidence {x}")

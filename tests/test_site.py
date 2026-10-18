@@ -44,7 +44,34 @@ class PublishedSite(unittest.TestCase):
                     and ents[r["subject"]].get("lifecycle") in ("operational", "pilot")]
         html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
         if not verified:
-            self.assertIn("No sector yet has a verified operational or pilot AI deployment", html)
+            self.assertIn("No qualifying deployment has yet been documented in this registry", html)
+        # Absence in the registry must never be stated as absence in Morocco.
+        self.assertIn("not the state of AI use in Morocco", html)
+
+    def _questions_with(self, mutate):
+        evidence, ontology = registry.load_all()
+        mutate(ontology)
+        return build.render_questions(build.Model(evidence, ontology))
+
+    def test_operational_infrastructure_does_not_count_as_a_sector_deployment(self):
+        def mutate(o):
+            o["relationships"].append({"subject": "toubkal-supercomputer", "predicate": "targets", "object": "health",
+                                       "evidence": ["MAI-EV-0020"], "classification": "VERIFIED FACT"})
+        self.assertIn("No qualifying deployment has yet been documented", self._questions_with(mutate))
+
+    def test_operational_ai_application_does_count(self):
+        def mutate(o):
+            next(e for e in o["entities"] if e["id"] == "deepecho-ultrasound-software")["lifecycle"] = "operational"
+        html = self._questions_with(mutate)
+        self.assertIn("Sectors with a documented operational or pilot AI application in this registry", html)
+
+    def test_inferred_developer_is_not_listed_as_verified(self):
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        q3 = html[html.index('id="q3-h"'):html.index('id="q4-h"')]
+        row = q3[q3.index('href="/registry/darijabert/"'):]
+        row = row[:row.index("</tr>")]
+        self.assertNotIn("/registry/aiox-labs/", row)
+        self.assertIn("/registry/insea/", row)
 
     def test_homepage_acquisition_path(self):
         html = (REPO / "index.html").read_text(encoding="utf-8")

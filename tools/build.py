@@ -44,8 +44,15 @@ LIFECYCLE_LABELS = {
     "operational": "Operational", "released": "Released", "discontinued": "Discontinued",
 }
 ORIGIN_LABELS = {
-    "moroccan": "Moroccan", "foreign-with-moroccan-presence": "Foreign, with a Moroccan presence",
+    "based-in-morocco": "Based in Morocco (independent source)",
+    "self-described-moroccan": "Self-described Moroccan",
+    "foreign-moroccan-subsidiary-reported": "Moroccan subsidiary reported (secondary press)",
+    "foreign-moroccan-operations-verified": "Foreign, Moroccan operations verified",
     "unresolved": "Unresolved",
+}
+KIND_LABELS = {
+    "ai-application": "AI application", "compute-infrastructure": "Compute infrastructure",
+    "institute": "Institute", "agreement": "Agreement",
 }
 SOURCE_TYPE_LABELS = {
     "government_portal": "Government portal",
@@ -241,6 +248,8 @@ def render_entity(model, e):
     facts = [("Type", escape(TYPE_SINGULAR[e["type"]]))]
     if e.get("domain"):
         facts.append(("Domain", escape(model.domains[e["domain"]])))
+    if e.get("project_kind"):
+        facts.append(("Kind", escape(KIND_LABELS[e["project_kind"]])))
     if e.get("lifecycle"):
         facts.append(("Lifecycle", f'{escape(LIFECYCLE_LABELS[e["lifecycle"]])} · {cite(e["lifecycle_evidence"])}'))
     if e.get("origin"):
@@ -459,7 +468,7 @@ def render_questions(model):
         if e.get("origin"):
             kind += f" · {ORIGIN_LABELS[e['origin']]}"
         acts = "; ".join(f'{escape(model.predicates[r["predicate"]]["label"])} {_ent_link(model, r["object"])}'
-                         for r in orgs[eid]) or "No verified activity relationship yet; see entity page."
+                         for r in orgs[eid]) or "No verified role yet; see entity page."
         ev = sorted({x for r in orgs[eid] for x in r["evidence"]} | set(e.get("origin_evidence") or []))
         q1.append([_ent_link(model, eid), escape(kind), acts, _ev_links(ev)])
 
@@ -467,19 +476,24 @@ def render_questions(model):
     order = ["operational", "pilot", "in-development", "announced", "discontinued"]
     projects = sorted((e for e in ents.values() if e["type"] == "project"),
                       key=lambda e: (order.index(e["lifecycle"]), e["name"].lower()))
-    q2 = [[_ent_link(model, e["id"]), escape(LIFECYCLE_LABELS[e["lifecycle"]]),
+    q2 = [[_ent_link(model, e["id"]), escape(KIND_LABELS[e["project_kind"]]), escape(LIFECYCLE_LABELS[e["lifecycle"]]),
            " ".join(badge(model.records[x]["classification"]) + " " + _ev_links([x]) for x in e["lifecycle_evidence"]),
            escape(e.get("status", ""))] for e in projects]
     counts = {st: sum(1 for e in projects if e["lifecycle"] == st) for st in order}
     stage_line = " · ".join(f"{LIFECYCLE_LABELS[st]}: {n}" for st, n in counts.items() if n)
+    ai_running = [e for e in projects if e["project_kind"] == "ai-application" and e["lifecycle"] in ("operational", "pilot")]
+    ai_line = (f"AI applications documented as operational or in pilot: {', '.join(e['name'] for e in ai_running)}." if ai_running else
+               "No AI application recorded here is yet documented as operational or in pilot. This reflects the registry's current coverage, not the state of AI use in Morocco.")
 
     # Q3: models and datasets.
     q3 = []
     for e in sorted((e for e in ents.values() if e["type"] in ("model", "dataset")), key=lambda e: e["name"].lower()):
-        devs = [r["subject"] for r in rels if r["predicate"] == "develops" and r["object"] == e["id"]]
-        attrs = "; ".join(f'{escape(a["name"])}: {escape(a["value"])}' for a in e.get("attributes") or [])
+        devs = [r["subject"] for r in rels if r["predicate"] == "develops" and r["object"] == e["id"] and r["classification"] == "VERIFIED FACT"]
+        conn = [a for a in e.get("attributes") or [] if a["name"] == "Connection to Morocco"]
+        attrs = "; ".join(f'{escape(a["name"])}: {escape(a["value"])}' for a in e.get("attributes") or [] if a not in conn)
         q3.append([_ent_link(model, e["id"]), escape(TYPE_SINGULAR[e["type"]]),
-                   ", ".join(_ent_link(model, d) for d in devs) or "Not recorded", attrs,
+                   ", ".join(_ent_link(model, d) for d in devs) or "Not recorded",
+                   escape(conn[0]["value"]) if conn else "Not recorded", attrs,
                    f'{escape(LIFECYCLE_LABELS[e["lifecycle"]])} · {_ev_links(e["lifecycle_evidence"])}'])
 
     # Q4: sectors, and whether any targeting project is verified as running.
@@ -493,15 +507,18 @@ def render_questions(model):
             src = ents[r["subject"]]
             stage = LIFECYCLE_LABELS.get(src.get("lifecycle"), TYPE_SINGULAR[src["type"]])
             cells.append(f'{_ent_link(model, src["id"])} ({escape(stage)})')
-            if src.get("lifecycle") in ("operational", "pilot") and r["classification"] == "VERIFIED FACT":
+            if (src.get("project_kind") == "ai-application" and src.get("lifecycle") in ("operational", "pilot")
+                    and r["classification"] == "VERIFIED FACT"):
                 verified_sectors.append(e["id"])
         q4.append([_ent_link(model, e["id"]), "; ".join(cells)])
     if verified_sectors:
-        sector_line = "Sectors with a verified operational or pilot deployment: " + ", ".join(
+        sector_line = "Sectors with a documented operational or pilot AI application in this registry: " + ", ".join(
             _ent_link(model, x) for x in dict.fromkeys(verified_sectors)) + "."
     else:
-        sector_line = ("No sector yet has a verified operational or pilot AI deployment in this registry. "
-                       "The sectors below are targeted only by announced or in-development projects, or by initiatives.")
+        sector_line = ("No qualifying deployment has yet been documented in this registry: no AI application recorded here "
+                       "has a verified operational or pilot status in a sector. This reflects the registry's current coverage, "
+                       "not the state of AI use in Morocco. The sectors below are targeted only by announced or "
+                       "in-development projects, or by initiatives.")
 
     # Q5: relationships between organisations and what they sign, build, host or fund, by classification.
     q5 = []
@@ -520,19 +537,20 @@ def render_questions(model):
   <p class="lede">Each answer is computed from <a href="/data/ontology.json">ontology.json</a> and <a href="/data/evidence.json">evidence.json</a> and links to the records behind it. Where the evidence does not support an answer, the page says so.</p>
 </header>
 <section aria-labelledby="q1-h">
-  <h2 id="q1-h"><span class="section-number">Q1</span>Which organisations have documented AI activity in Morocco?</h2>
-  <p class="prose">Organisations that verified records show developing, hosting, creating, funding or signing for an AI project, model or company, plus every company in the registry. Origin is shown for companies.</p>
-  {_table("Organisations with documented AI activity", ["Organisation", "Kind", "Verified activity", "Evidence"], q1, "No organisation recorded.")}
+  <h2 id="q1-h"><span class="section-number">Q1</span>Which organisations have a verified role in Morocco-related AI work?</h2>
+  <p class="prose">Organisations that verified records show developing, hosting, creating, funding or signing for a project, model or company recorded here, plus every company in the registry. Inclusion means a documented connection to Morocco-related AI work, not that an organisation is Moroccan or operates in Morocco: MBZUAI France Lab, for example, is in Paris. Origin is shown for companies as the evidence states it. This list is limited to the registry's current coverage.</p>
+  {_table("Organisations with a verified role", ["Organisation", "Kind", "Verified role", "Evidence"], q1, "No organisation recorded.")}
 </section>
 <section aria-labelledby="q2-h">
   <h2 id="q2-h"><span class="section-number">Q2</span>Which projects are operational, and which are only announced?</h2>
-  <p class="prose">{escape(stage_line)}. "Operational" requires a verified record from a source other than the actor's own website or press; an announcement or signed agreement is never treated as delivery.</p>
-  {_table("Projects by lifecycle stage", ["Project", "Lifecycle", "Basis", "Status"], q2, "No project recorded.")}
+  <p class="prose">{escape(stage_line)}. A stage other than "announced" requires a verified record that explicitly documents that stage, and "operational" requires one from a source other than the actor's own website or press; a signature, presentation or announcement is never treated as delivery. The kind column separates AI applications from compute infrastructure: operational infrastructure is not an operational AI application.</p>
+  <p class="prose">{escape(ai_line)}</p>
+  {_table("Projects by lifecycle stage", ["Project", "Kind", "Lifecycle", "Basis", "Status"], q2, "No project recorded.")}
 </section>
 <section aria-labelledby="q3-h">
   <h2 id="q3-h"><span class="section-number">Q3</span>What AI models and datasets are publicly documented?</h2>
-  <p class="prose">Models and datasets with a verified link to Morocco, recorded from their own repositories and papers. Technical details are listed only where the source states them; self-reported benchmark results are not recorded.</p>
-  {_table("Models and datasets", ["Name", "Type", "Developed by", "Documented characteristics", "Availability"], q3, "No model or dataset recorded.")}
+  <p class="prose">Models and datasets with a documented connection to Morocco, recorded from their own repositories and papers. For most, the connection is the language (Moroccan Darija), not a Moroccan developer; the "Connection to Morocco" column says which. "Developed by" lists only developers a source names; a relationship the registry infers is shown on the entity page as independent analysis. Technical details are listed only where the source states them; self-reported benchmark results are not recorded.</p>
+  {_table("Models and datasets", ["Name", "Type", "Developed by", "Connection to Morocco", "Documented characteristics", "Availability"], q3, "No model or dataset recorded.")}
 </section>
 <section aria-labelledby="q4-h">
   <h2 id="q4-h"><span class="section-number">Q4</span>Which sectors have verified AI deployments?</h2>

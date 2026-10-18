@@ -421,8 +421,9 @@
         "06/2026 409 PowerEdge C6420"
       ],
       "classification": "VERIFIED FACT",
+      "status_evidence": "operational",
       "verification_status": "verified",
-      "verification_note": "A TOP500 listing requires a submitted Linpack run, so appearance in the June 2026 list is the basis for recording the system as operational. Earlier ranks on the same page (e.g. 356 in June 2025) show it has been listed continuously; its current utilisation is not documented.",
+      "verification_note": "The page shows the same Linpack result (Rmax 3.16 PFlop/s) in every list from June 2021 to June 2026, so the benchmark itself dates from 2021; continued inclusion in the June 2026 list is the basis for recording the system as operational. TOP500 documents general-purpose computing capacity only: it does not document current utilisation, users, or any AI workload or application.",
       "related_entities": ["toubkal-supercomputer", "um6p", "high-performance-computing"]
     },
     {
@@ -464,6 +465,7 @@
         "Base model google/gemma-2-9b Finetuned google/gemma-2-9b-it"
       ],
       "classification": "VERIFIED FACT",
+      "status_evidence": "released",
       "verification_status": "verified",
       "verification_note": "The publication date is the repository creation date reported by the Hugging Face API. The card's benchmark tables are self-reported and not recorded.",
       "related_entities": ["atlas-chat", "mbzuai-france-lab", "darija-sft-mixture", "large-language-models"]
@@ -484,6 +486,7 @@
         "Note the ODC-BY license , indicating that different licenses apply to subsets of the data. This means that some portions of the dataset are non-commercial."
       ],
       "classification": "VERIFIED FACT",
+      "status_evidence": "released",
       "verification_status": "verified",
       "verification_note": "The publication date is the repository creation date reported by the Hugging Face API. The Atlas-Chat model cards list this dataset as their training data (MAI-EV-0022).",
       "related_entities": ["darija-sft-mixture", "atlas-chat", "mbzuai-france-lab"]
@@ -505,6 +508,7 @@
         "This model was trained on a total of ~3 Million sequences of Darija dialect representing 691MB of text or a total of ~100M tokens."
       ],
       "classification": "VERIFIED FACT",
+      "status_evidence": "released",
       "verification_status": "verified",
       "verification_note": "Publication date left blank: the Hugging Face API reports 2022-03-02, the placeholder it assigns to repositories created before that date. The card's priority claim (\"first BERT model\") is not recorded. The card cites a 2023 paper by Gaanoun et al. that was not retrieved.",
       "related_entities": ["darijabert", "aiox-labs", "insea", "natural-language-processing"]
@@ -526,6 +530,7 @@
         "Base model Qwen/Qwen2.5-0.5B"
       ],
       "classification": "VERIFIED FACT",
+      "status_evidence": "released",
       "verification_status": "verified",
       "verification_note": "The publication date is the repository creation date reported by the Hugging Face API. The card's priority claim (\"first dedicated foundation model\") is not recorded. Its training dataset (atlasia/Atlaset) is gated and was not inspected.",
       "related_entities": ["al-atlas", "atlasia", "large-language-models"]
@@ -591,7 +596,7 @@
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "verified",
-      "verification_note": "Investor's own publication; the PDF metadata gives a creation date of 8 May 2023. Its accuracy figure and its statement about agreements with health centres are not recorded, as they were not independently checked.",
+      "verification_note": "Investor's own publication; the PDF metadata gives a creation date of 8 May 2023. It is independent of DeepEcho but not of the investment it describes. Its accuracy figure and its statement about agreements with health centres are not recorded, as they were not independently checked. Company registration and headquarters address are not documented.",
       "related_entities": ["deepecho", "aiox-labs", "um6p-ventures", "deepecho-ultrasound-software"]
     },
     {
@@ -611,8 +616,9 @@
         "Metrics comes from our own clinical studies (currently under scientific & regulatory review)"
       ],
       "classification": "VERIFIED FACT",
+      "status_evidence": "in-development",
       "verification_status": "verified",
-      "verification_note": "The company's own regulatory disclaimer is the basis for recording the software as in development. Accuracy and speed figures on the site are self-reported and not recorded.",
+      "verification_note": "The company's own disclaimer is the basis for recording the software as in development: it states that clinical studies are under scientific and regulatory review and that claims are not FDA-validated. No regulatory clearance (FDA, Moroccan or other) and no clinical or commercial deployment is documented in the registry. Accuracy and speed figures on the site are self-reported and not recorded.",
       "related_entities": ["deepecho", "deepecho-ultrasound-software", "medical-imaging-ai", "health"]
     },
     {

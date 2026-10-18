@@ -35,11 +35,18 @@ and relationships classified beyond what their evidence supports.
 
 - **Lifecycle** (projects, models, datasets): `announced`, `in-development`, `pilot`, `operational`,
   `released` (models and datasets only) or `discontinued`. Each value must cite `lifecycle_evidence`
-  from the entity's own records. `operational` and `pilot` need a VERIFIED FACT record, and
-  `operational` needs one from a source other than the actor's own website or press. A signed
-  agreement or announcement is recorded as `announced`, never as delivery.
-- **Origin** (companies): `moroccan`, `foreign-with-moroccan-presence` or `unresolved`, with
-  `origin_evidence`.
+  from the entity's own records. Any stage other than `announced` needs a VERIFIED FACT record whose
+  `status_evidence` field explicitly declares that stage. `operational` and `pilot` cannot be
+  declared by the actor's own website or press, and `released` only by the technical repository
+  itself. A signature, presentation or announcement record declares no status, so it can never
+  establish delivery.
+- **Project kind** (projects): `ai-application`, `compute-infrastructure`, `institute` or
+  `agreement`. Operational infrastructure is not an operational AI application: only
+  `ai-application` projects count as sector deployments on the questions page.
+- **Origin** (companies): `based-in-morocco` (independent source required),
+  `self-described-moroccan`, `foreign-moroccan-subsidiary-reported`,
+  `foreign-moroccan-operations-verified` (independent primary source required) or `unresolved`,
+  with `origin_evidence`. None of these verifies registration or headquarters.
 - **Attributes**: technical or descriptive values (parameters, licence, Rmax…). Each cites one of
   the entity's own records. Self-reported benchmark results are not recorded.
 - **Secondary press** (`source_type: secondary_press`) can support only ANNOUNCED PLAN or

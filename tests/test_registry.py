@@ -39,6 +39,19 @@ class RepositoryData(unittest.TestCase):
         self.assertEqual(rel["predicate"], "signatory_of")
         self.assertIn("MAI-EV-0019", rel["evidence"])
 
+    def test_name_based_identification_is_not_a_verified_fact(self):
+        # Regression: the DarijaBERT card names "AIOX Lab"; equating it with AIOX Labs is an inference.
+        _, ontology = registry.load_all()
+        rel = next(r for r in ontology["relationships"]
+                   if (r["subject"], r["predicate"], r["object"]) == ("aiox-labs", "develops", "darijabert"))
+        self.assertEqual(rel["classification"], "INDEPENDENT ANALYSIS")
+
+    def test_compute_infrastructure_is_not_an_ai_application(self):
+        _, ontology = registry.load_all()
+        kinds = {e["id"]: e.get("project_kind") for e in ontology["entities"]}
+        self.assertEqual(kinds["toubkal-supercomputer"], "compute-infrastructure")
+        self.assertEqual(kinds["nexus-ai-factory"], "compute-infrastructure")
+
     def test_targets_are_never_classified_as_facts(self):
         evidence, _ = registry.load_all()
         for r in evidence["records"]:
@@ -151,7 +164,7 @@ class ValidatorRejects(unittest.TestCase):
 
     def test_origin_needs_evidence(self):
         self.entity("deepecho")["origin_evidence"] = []
-        self.assertError("origin 'moroccan' needs origin_evidence")
+        self.assertError("origin 'based-in-morocco' needs origin_evidence")
 
     def test_origin_only_on_companies(self):
         self.entity("um6p")["origin"] = "moroccan"
@@ -160,6 +173,55 @@ class ValidatorRejects(unittest.TestCase):
     def test_attribute_must_cite_the_entitys_own_record(self):
         self.entity("al-atlas")["attributes"][0]["evidence"] = "MAI-EV-0001"
         self.assertError("must cite one of the entity's own records")
+
+    # ── Sprint 02 review: delivery must be evidenced explicitly ──
+
+    def test_signature_or_announcement_cannot_establish_delivery(self):
+        # Regression: before the review, each of these passed because the cited record was a
+        # VERIFIED FACT from an independent source, although it documented only a signature.
+        cases = [("jazari-root", "operational", ["MAI-EV-0008"]),
+                 ("jazari-institute-nador", "operational", ["MAI-EV-0019"]),
+                 ("jazari-industrie-x0", "pilot", ["MAI-EV-0009"]),
+                 ("deepecho-ultrasound-software", "operational", ["MAI-EV-0028"])]
+        for eid, stage, basis in cases:
+            with self.subTest(eid=eid):
+                self.setUp()
+                e = self.entity(eid)
+                e["lifecycle"], e["lifecycle_evidence"] = stage, basis
+                self.assertError(f"lifecycle '{stage}' needs a lifecycle_evidence record whose status_evidence is '{stage}'")
+
+    def test_status_evidence_requires_a_verified_record(self):
+        self.record("MAI-EV-0030")["status_evidence"] = "operational"
+        self.assertError("status_evidence requires a VERIFIED FACT record")
+
+    def test_operational_status_cannot_come_from_own_website(self):
+        self.record("MAI-EV-0029")["status_evidence"] = "operational"
+        self.assertError("'operational' cannot be evidenced by the actor's own website or press")
+
+    def test_released_must_come_from_the_repository(self):
+        self.record("MAI-EV-0021")["status_evidence"] = "released"
+        self.assertError("'released' must be evidenced by the technical repository itself")
+
+    def test_unknown_status_evidence(self):
+        self.record("MAI-EV-0020")["status_evidence"] = "live"
+        self.assertError("unknown status_evidence")
+
+    def test_project_needs_a_known_kind(self):
+        self.entity("toubkal-supercomputer")["project_kind"] = "supercomputer"
+        self.assertError("project needs a project_kind")
+
+    def test_kind_only_on_projects(self):
+        self.entity("atlas-chat")["project_kind"] = "ai-application"
+        self.assertError("only projects take a project_kind")
+
+    def test_independent_origin_cannot_rest_on_self_description(self):
+        e = self.entity("aiox-labs")  # origin rests on its own website ("roots in Morocco")
+        e["origin"] = "based-in-morocco"
+        self.assertError("needs origin_evidence from a source independent of the company")
+
+    def test_verified_operations_cannot_rest_on_press(self):
+        self.entity("nexus-core-systems")["origin"] = "foreign-moroccan-operations-verified"
+        self.assertError("needs origin_evidence from a source independent of the company")
 
     def test_unknown_classification(self):
         self.record()["classification"] = "PROBABLY TRUE"

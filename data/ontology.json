@@ -23,9 +23,17 @@
     "released": "A model or dataset that is publicly downloadable from its stated repository.",
     "discontinued": "Documented as stopped or withdrawn."
   },
+  "project_kinds": {
+    "ai-application": "An AI system, product or platform meant to be used by people or organisations.",
+    "compute-infrastructure": "Computing or data-centre capacity. Operational infrastructure is not, by itself, an operational AI application.",
+    "institute": "A research, training or innovation institute being created.",
+    "agreement": "A partnership or framework agreement without a separately documented deliverable."
+  },
   "origins": {
-    "moroccan": "Founded in, or described by its own or an investor's publication as based in, Morocco.",
-    "foreign-with-moroccan-presence": "Based outside Morocco, with a documented Moroccan subsidiary, office or operation.",
+    "based-in-morocco": "Stated to be based in Morocco by a source independent of the company. Registration and headquarters are not thereby verified.",
+    "self-described-moroccan": "Describes itself as based in, or rooted in, Morocco; not confirmed by an independent source.",
+    "foreign-moroccan-subsidiary-reported": "Origin outside Morocco or unstated, with a Moroccan subsidiary reported only by secondary sources.",
+    "foreign-moroccan-operations-verified": "Based outside Morocco, with Moroccan operations documented by a primary source independent of the company.",
     "unresolved": "Origin not established by the evidence recorded."
   },
   "domains": {
@@ -258,6 +266,7 @@
       "domain": "research-academia",
       "summary": "Institute planned as a public-interest group (GIP) and described by the ministry as the technical and strategic core of the JAZARI network, around e-government, smart rural and mountain zones, and major sporting events. CGEM and several ministerial departments signed its constitutive convention on 12 January 2026.",
       "status": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
+      "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0008", "MAI-EV-0010"],
       "evidence": ["MAI-EV-0008", "MAI-EV-0010", "MAI-EV-0012"]
@@ -270,6 +279,7 @@
       "domain": "research-academia",
       "summary": "Al-Jazari institute for smart industry. A convention for its creation was signed in Fès on 10 March 2026 by three ministries and the four universities of the Fès-Meknès region. Its stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
       "status": "Founding convention signed 2026-03-10. Operational status not verified.",
+      "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0009"],
       "evidence": ["MAI-EV-0009", "MAI-EV-0012"]
@@ -282,6 +292,7 @@
       "domain": "research-academia",
       "summary": "Named by the ministry in September 2026 as one of the components of the JAZARI Institutes network.",
       "status": "Named only. No founding instrument documented in the registry.",
+      "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0012"],
       "evidence": ["MAI-EV-0012"]
@@ -294,6 +305,7 @@
       "domain": "research-academia",
       "summary": "Named by the ministry in September 2026 as one of the components of the JAZARI Institutes network.",
       "status": "Named only. No founding instrument documented in the registry.",
+      "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0012"],
       "evidence": ["MAI-EV-0012"]
@@ -306,6 +318,7 @@
       "domain": "research-academia",
       "summary": "Institute dedicated to AI research, training and innovation in the Province of Nador. A memorandum of understanding for it was co-signed at the July 2025 National AI Conference.",
       "status": "Memorandum of understanding signed 2 July 2025. Operational status not verified.",
+      "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0005", "MAI-EV-0019"],
       "evidence": ["MAI-EV-0005", "MAI-EV-0019"]
@@ -318,6 +331,7 @@
       "domain": "infrastructure-sovereignty",
       "summary": "Agreement signed at the July 2025 National AI Conference with the Ministry of Energy Transition and Sustainable Development, on sustainable, high-performing and sovereign digital infrastructure (green data centres).",
       "status": "Agreement signed July 2025. No facility documented.",
+      "project_kind": "agreement",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0006", "MAI-EV-0019"],
       "evidence": ["MAI-EV-0006", "MAI-EV-0019"]
@@ -330,6 +344,7 @@
       "domain": "infrastructure-sovereignty",
       "summary": "Convention signed with UM6P at the July 2025 National AI Conference to formalise a strategic partnership on data centres, research, innovation, training and digital sovereignty.",
       "status": "Convention signed July 2025.",
+      "project_kind": "agreement",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0007", "MAI-EV-0019"],
       "evidence": ["MAI-EV-0007", "MAI-EV-0019"]
@@ -342,6 +357,7 @@
       "domain": "infrastructure-sovereignty",
       "summary": "Platform unveiled by the ministry in September 2026, intended to give access to secure and trusted AI solutions with data protection and infrastructure control in Morocco.",
       "status": "Presented September 2026. Public availability not verified.",
+      "project_kind": "ai-application",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0013"],
       "evidence": ["MAI-EV-0013"]
@@ -354,6 +370,7 @@
       "domain": "government-policy",
       "summary": "Agentic AI assistant presented in September 2026, intended to inform, guide and assist users with administrative procedures.",
       "status": "Presented September 2026. Public availability not verified.",
+      "project_kind": "ai-application",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0013"],
       "evidence": ["MAI-EV-0013"]
@@ -413,8 +430,8 @@
       "name": "AIOX Labs",
       "alt_names": ["AIOX Lab", "AIOX LABS"],
       "domain": "companies-deployments",
-      "summary": "AI studio and venture builder that describes itself as having roots in Morocco and a footprint in the EU and US. It created the medical-imaging startup DeepEcho and co-released the DarijaBERT model.",
-      "origin": "moroccan",
+      "summary": "AI studio and venture builder that describes itself as having roots in Morocco and a footprint in the EU and US. Its investor UM6P Ventures states that DeepEcho emerged from it. The DarijaBERT model card names an \"AIOX Lab\" as co-releaser; linking that name to this company is an inference.",
+      "origin": "self-described-moroccan",
       "origin_evidence": ["MAI-EV-0027"],
       "evidence": ["MAI-EV-0024", "MAI-EV-0027", "MAI-EV-0028"]
     },
@@ -424,8 +441,8 @@
       "name": "DeepEcho",
       "alt_names": ["Deepecho"],
       "domain": "companies-deployments",
-      "summary": "Morocco-based startup, created in the AIOX Labs studio, developing AI software for prenatal ultrasound diagnosis. UM6P Ventures invested in its pre-seed round.",
-      "origin": "moroccan",
+      "summary": "Startup that its investor UM6P Ventures describes as Morocco-based and as having emerged from the AIOX Labs studio, developing AI software for prenatal ultrasound diagnosis. UM6P Ventures states it invested in its pre-seed round. Registration and headquarters are not documented here.",
+      "origin": "based-in-morocco",
       "origin_evidence": ["MAI-EV-0028"],
       "evidence": ["MAI-EV-0027", "MAI-EV-0028", "MAI-EV-0029"]
     },
@@ -435,9 +452,8 @@
       "name": "UM6P Ventures",
       "alt_names": [],
       "domain": "funding-partnerships",
-      "summary": "Morocco-based investor in deep-tech startups that states it invested in DeepEcho's pre-seed round. Its legal relationship to UM6P is not documented in the recorded sources.",
-      "origin": "moroccan",
-      "origin_evidence": ["MAI-EV-0028"],
+      "summary": "Deep-tech investor whose own case study states that it invested in DeepEcho's pre-seed round. Its location and its legal relationship to UM6P are not documented in the recorded excerpts.",
+      "origin": "unresolved",
       "evidence": ["MAI-EV-0028"]
     },
     {
@@ -446,9 +462,9 @@
       "name": "Nexus Core Systems",
       "alt_names": [],
       "domain": "companies-deployments",
-      "summary": "Company reported to have signed a memorandum with Moroccan authorities at GITEX Africa 2026 for an AI factory platform, and to operate a Moroccan subsidiary. Only secondary press sources are recorded.",
+      "summary": "Company reported to have signed a memorandum with Moroccan authorities at GITEX Africa 2026 for an AI factory platform, and to have installed a managing director for a Moroccan subsidiary. Only secondary press sources are recorded; the subsidiary's registration and operations are not verified.",
       "note": "Origin is recorded from the press report's reference to the company's \"filiale marocaine\" (Moroccan subsidiary). The parent company's country of incorporation is not stated in the recorded source.",
-      "origin": "foreign-with-moroccan-presence",
+      "origin": "foreign-moroccan-subsidiary-reported",
       "origin_evidence": ["MAI-EV-0030"],
       "evidence": ["MAI-EV-0030"]
     },
@@ -458,8 +474,9 @@
       "name": "Toubkal supercomputer",
       "alt_names": ["Toubkal"],
       "domain": "infrastructure-sovereignty",
-      "summary": "Supercomputer at the African Supercomputing Centre of Mohammed VI Polytechnic University, installed in 2020 and listed in the June 2026 TOP500 at rank 409, with 71,232 cores and 3.16 PFlop/s Linpack performance.",
-      "status": "Operational: listed in the June 2026 TOP500.",
+      "summary": "High-performance computing system at the African Supercomputing Centre of Mohammed VI Polytechnic University, installed in 2020 and listed in the June 2026 TOP500 at rank 409, with 71,232 cores and a 3.16 PFlop/s Linpack result. It is general-purpose computing infrastructure; no specific AI application running on it is documented in this registry.",
+      "status": "Operational compute infrastructure, as listed in the June 2026 TOP500 (benchmark result unchanged since June 2021). Current utilisation not documented.",
+      "project_kind": "compute-infrastructure",
       "lifecycle": "operational",
       "lifecycle_evidence": ["MAI-EV-0020"],
       "attributes": [
@@ -478,6 +495,7 @@
       "domain": "infrastructure-sovereignty",
       "summary": "Planned AI and high-performance computing platform covered by a memorandum signed at GITEX Africa 2026, with a first phase at Nouaceur (MAD 5 billion, 16 MW initial capacity) according to press reports.",
       "status": "Announced (memorandum, April 2026). Nothing built according to the recorded sources.",
+      "project_kind": "compute-infrastructure",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0030"],
       "evidence": ["MAI-EV-0030"]
@@ -489,7 +507,8 @@
       "alt_names": [],
       "domain": "companies-deployments",
       "summary": "Software that uses deep learning to assist ultrasound video diagnosis in prenatal care, including automated fetal measurements. Its developer states that its claims are not yet validated by the FDA and that its clinical studies are under scientific and regulatory review.",
-      "status": "In development: under regulatory review according to its developer.",
+      "status": "In development: clinical studies under scientific and regulatory review according to its developer. No regulatory clearance or deployment documented.",
+      "project_kind": "ai-application",
       "lifecycle": "in-development",
       "lifecycle_evidence": ["MAI-EV-0029"],
       "evidence": ["MAI-EV-0028", "MAI-EV-0029"]
@@ -500,11 +519,12 @@
       "name": "Atlas-Chat",
       "alt_names": ["Atlas-Chat-2B", "Atlas-Chat-9B", "Atlas-Chat-27B"],
       "domain": "models-datasets",
-      "summary": "Family of open large language models instruction-tuned for Moroccan Arabic (Darija), in 2B, 9B and 27B sizes, developed by MBZUAI France Lab and described in a 2024 preprint.",
+      "summary": "Family of open large language models instruction-tuned for Moroccan Arabic (Darija), in 2B, 9B and 27B sizes, described in a 2024 preprint. The model card names MBZUAI France Lab, a Paris research centre affiliated with MBZUAI in Abu Dhabi, as developer: its connection to Morocco is the language, not a Moroccan developer.",
       "status": "Released on Hugging Face.",
       "lifecycle": "released",
       "lifecycle_evidence": ["MAI-EV-0022"],
       "attributes": [
+        {"name": "Connection to Morocco", "value": "Language only: Moroccan Darija; developer based in Paris (MBZUAI France Lab)", "evidence": "MAI-EV-0022"},
         {"name": "Language", "value": "Moroccan Arabic (Darija), ISO 639-3 ary", "evidence": "MAI-EV-0022"},
         {"name": "Sizes", "value": "2B, 9B, 27B parameters", "evidence": "MAI-EV-0021"},
         {"name": "Fine-tuned from (9B)", "value": "google/gemma-2-9b-it", "evidence": "MAI-EV-0022"},
@@ -523,6 +543,7 @@
       "lifecycle": "released",
       "lifecycle_evidence": ["MAI-EV-0023"],
       "attributes": [
+        {"name": "Connection to Morocco", "value": "Language only: Darija instruction data, published under the MBZUAI-Paris Hugging Face organisation", "evidence": "MAI-EV-0023"},
         {"name": "Size", "value": "458K instruction samples", "evidence": "MAI-EV-0023"},
         {"name": "Licence", "value": "ODC-BY (some subsets non-commercial)", "evidence": "MAI-EV-0023"}
       ],
@@ -539,6 +560,7 @@
       "lifecycle": "released",
       "lifecycle_evidence": ["MAI-EV-0024"],
       "attributes": [
+        {"name": "Connection to Morocco", "value": "Language, and co-release by the SI2M Lab of INSEA with \"AIOX Lab\"", "evidence": "MAI-EV-0024"},
         {"name": "Architecture", "value": "BERT-base without next-sentence prediction", "evidence": "MAI-EV-0024"},
         {"name": "Training data", "value": "~3M sequences, 691MB, ~100M tokens", "evidence": "MAI-EV-0024"}
       ],
@@ -555,6 +577,7 @@
       "lifecycle": "released",
       "lifecycle_evidence": ["MAI-EV-0025"],
       "attributes": [
+        {"name": "Connection to Morocco", "value": "Language: Moroccan Darija; published by the atlasia Hugging Face organisation, which AtlasIA's website links to. AtlasIA's legal identity and location are not documented.", "evidence": "MAI-EV-0026"},
         {"name": "Parameters", "value": "0.5B", "evidence": "MAI-EV-0025"},
         {"name": "Fine-tuned from", "value": "Qwen/Qwen2.5-0.5B", "evidence": "MAI-EV-0025"},
         {"name": "Training corpus", "value": "155M Darija tokens", "evidence": "MAI-EV-0025"}
@@ -630,7 +653,7 @@
     {"subject": "mbzuai-france-lab", "predicate": "develops", "object": "atlas-chat", "evidence": ["MAI-EV-0022"], "classification": "VERIFIED FACT"},
     {"subject": "atlas-chat", "predicate": "trained_on", "object": "darija-sft-mixture", "evidence": ["MAI-EV-0022", "MAI-EV-0021"], "classification": "VERIFIED FACT"},
     {"subject": "atlas-chat", "predicate": "applies", "object": "large-language-models", "evidence": ["MAI-EV-0021"], "classification": "VERIFIED FACT"},
-    {"subject": "aiox-labs", "predicate": "develops", "object": "darijabert", "evidence": ["MAI-EV-0024"], "classification": "VERIFIED FACT"},
+    {"subject": "aiox-labs", "predicate": "develops", "object": "darijabert", "evidence": ["MAI-EV-0024", "MAI-EV-0027"], "classification": "INDEPENDENT ANALYSIS", "note": "The DarijaBERT card names \"AIOX Lab\" and links to the AIOXLABS GitHub organisation; identifying it with AIOX Labs (aiox-labs.com) is by name, not stated by a source."},
     {"subject": "insea", "predicate": "develops", "object": "darijabert", "evidence": ["MAI-EV-0024"], "classification": "VERIFIED FACT", "note": "Through its SI2M laboratory."},
     {"subject": "darijabert", "predicate": "applies", "object": "natural-language-processing", "evidence": ["MAI-EV-0024"], "classification": "VERIFIED FACT"},
     {"subject": "atlasia", "predicate": "develops", "object": "al-atlas", "evidence": ["MAI-EV-0025", "MAI-EV-0026"], "classification": "VERIFIED FACT", "note": "Attribution via AtlasIA's link to the atlasia Hugging Face organisation."},
