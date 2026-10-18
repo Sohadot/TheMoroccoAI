@@ -1,6 +1,6 @@
 {
   "registry": "TheMoroccoAI Evidence Registry",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "as_of": "2026-10-18",
   "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
   "classifications": {
@@ -379,6 +379,283 @@
       "verification_status": "verified",
       "verification_note": "The fact recorded is what the report states. The report does not use the name \"Morocco AI 2030\"; linking the two is an independent analysis recorded on the relationship.",
       "related_entities": ["first-national-ai-conference-2025", "digital-morocco-2030", "morocco-ai-2030"]
+    },
+    {
+      "evidence_id": "MAI-EV-0019",
+      "title": "Agreements signed in Salé on the sidelines of the First National AI Conference",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/en/news/morocco-seals-several-agreements-promote-ai",
+      "source_language": "en",
+      "publication_date": "2025-07-03",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "news_dispatch",
+      "claim": "On 2 July 2025 in Salé, on the sidelines of the First National AI Conference, the Ministry of Digital Transition signed: a memorandum for an Al Jazari Institute centre of excellence in Nador with the Minister of Higher Education, Scientific Research and Innovation and Oriental Region authorities; a data-centre partnership memorandum with the President of UM6P; and an agreement with the Minister of Energy Transition and Sustainable Development.",
+      "source_excerpts": [
+        "Several agreements were signed, on Wednesday in Salé, during a ceremony held on the sidelines of the First National Conference on AI.",
+        "A MoU for the creation of an \"Al Jazari Institute\" Center of Excellence in the province of Nador was also signed between Seghrouchni and the Minister of Higher Education, Scientific Research and Innovation, Azzedine El Midaoui, the Wali of the Oriental Region, Khatib El Hebil, the governor of the province of Nador, Jamal Chaarani and the President of the Regional Council, Mohamed Bouarourou.",
+        "a MoU marking the launch of a strategic partnership in the field of data centers was signed between Seghrouchni and the President of Mohammed VI Polytechnic University (UM6P), Hicham El Habti.",
+        "An agreement was also signed between the Minister in charge of Digital Transition and Administrative Reform and the Minister of Energy Transition and Sustainable Development, Leila Benali."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Page dated Thursday 3 July 2025; \"Wednesday\" is 2 July 2025. This source names the signatories that the ministry's synthesis report (MAI-EV-0005 to MAI-EV-0007) describes only in general terms. The conference itself is reported as held in Rabat (MAI-EV-0004); the signing ceremony is reported in Salé.",
+      "related_entities": ["jazari-institute-nador", "ministry-higher-education", "ministry-digital-transition", "um6p-data-centre-partnership", "um6p", "green-data-centres-agreement", "ministry-energy-transition", "first-national-ai-conference-2025"]
+    },
+    {
+      "evidence_id": "MAI-EV-0020",
+      "title": "Toubkal supercomputer in the June 2026 TOP500 list",
+      "source_organization": "TOP500",
+      "source_type": "independent_list",
+      "source_url": "https://top500.org/system/179908/",
+      "source_language": "en",
+      "publication_date": "2026-06",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "ranking_entry",
+      "claim": "The TOP500 system entry for Toubkal lists its site as the African Supercomputing Centre of Mohammed VI Polytechnic University, an installation year of 2020, 71,232 cores, a Linpack performance (Rmax) of 3.16 PFlop/s, and rank 409 in the June 2026 TOP500 list.",
+      "source_excerpts": [
+        "Site: Mohammed VI Polytechnic University - African Supercomputing Centre",
+        "Installation Year: 2020",
+        "Cores: 71,232",
+        "Linpack Performance (Rmax) 3.16 PFlop/s",
+        "06/2026 409 PowerEdge C6420"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "A TOP500 listing requires a submitted Linpack run, so appearance in the June 2026 list is the basis for recording the system as operational. Earlier ranks on the same page (e.g. 356 in June 2025) show it has been listed continuously; its current utilisation is not documented.",
+      "related_entities": ["toubkal-supercomputer", "um6p", "high-performance-computing"]
+    },
+    {
+      "evidence_id": "MAI-EV-0021",
+      "title": "Atlas-Chat: Adapting Large Language Models for Low-Resource Moroccan Arabic Dialect (arXiv:2409.17912)",
+      "source_organization": "arXiv (Shang et al.)",
+      "source_type": "academic_preprint",
+      "source_url": "https://arxiv.org/abs/2409.17912",
+      "source_language": "en",
+      "publication_date": "2024-09-26",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "preprint",
+      "claim": "A preprint first submitted on 26 September 2024 introduces Atlas-Chat, large language models for Moroccan Arabic (Darija) in 2B, 9B and 27B sizes, fine-tuned on an instruction dataset built by consolidating existing Darija resources, creating new manual and synthetic data, and translating English instructions.",
+      "source_excerpts": [
+        "Atlas-Chat: Adapting Large Language Models for Low-Resource Moroccan Arabic Dialect",
+        "Focusing on Moroccan Arabic, also known as Darija, we construct our instruction dataset by consolidating existing Darija language resources, creating novel datasets both manually and synthetically, and translating English instructions with stringent quality control.",
+        "Atlas-Chat-2B, 9B, and 27B models, fine-tuned on the dataset"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "A preprint, not peer-reviewed in this record. The abstract's priority claim (\"first-ever\") and benchmark comparisons are the authors' own and are not recorded as facts.",
+      "related_entities": ["atlas-chat", "darija-sft-mixture", "large-language-models"]
+    },
+    {
+      "evidence_id": "MAI-EV-0022",
+      "title": "Atlas-Chat-9B model card",
+      "source_organization": "Hugging Face (MBZUAI-Paris organisation)",
+      "source_type": "technical_repository",
+      "source_url": "https://huggingface.co/MBZUAI-Paris/Atlas-Chat-9B",
+      "source_language": "en",
+      "publication_date": "2024-09-13",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "model_card",
+      "claim": "Atlas-Chat is published on Hugging Face as a family of open models instruction-tuned for Darija. The 9B model card names MBZUAI France Lab, a Paris research centre affiliated with MBZUAI in Abu Dhabi, as developer; lists the Gemma licence; and gives google/gemma-2-9b-it as the model it was fine-tuned from.",
+      "source_excerpts": [
+        "Atlas-Chat is a family of open models instruction-tuned for Darija, the colloquial Arabic of Morocco",
+        "The model is developed by MBZUAI France Lab, an AI research center in Paris affiliated with the Mohamed bin Zayed University of Artificial Intelligence (MBZUAI) headquartered in Abu Dhabi.",
+        "License: gemma",
+        "Base model google/gemma-2-9b Finetuned google/gemma-2-9b-it"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The publication date is the repository creation date reported by the Hugging Face API. The card's benchmark tables are self-reported and not recorded.",
+      "related_entities": ["atlas-chat", "mbzuai-france-lab", "darija-sft-mixture", "large-language-models"]
+    },
+    {
+      "evidence_id": "MAI-EV-0023",
+      "title": "Darija-SFT-Mixture dataset card",
+      "source_organization": "Hugging Face (MBZUAI-Paris organisation)",
+      "source_type": "technical_repository",
+      "source_url": "https://huggingface.co/datasets/MBZUAI-Paris/Darija-SFT-Mixture",
+      "source_language": "en",
+      "publication_date": "2024-09-18",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "dataset_card",
+      "claim": "Darija-SFT-Mixture is published on Hugging Face as an instruction dataset of 458K samples in Darija, released under the ODC-BY licence with the note that some subsets carry non-commercial terms.",
+      "source_excerpts": [
+        "Darija-SFT-Mixture is a dataset consisting of 458K instruction samples",
+        "Note the ODC-BY license , indicating that different licenses apply to subsets of the data. This means that some portions of the dataset are non-commercial."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The publication date is the repository creation date reported by the Hugging Face API. The Atlas-Chat model cards list this dataset as their training data (MAI-EV-0022).",
+      "related_entities": ["darija-sft-mixture", "atlas-chat", "mbzuai-france-lab"]
+    },
+    {
+      "evidence_id": "MAI-EV-0024",
+      "title": "DarijaBERT model card",
+      "source_organization": "Hugging Face (SI2M-Lab organisation)",
+      "source_type": "technical_repository",
+      "source_url": "https://huggingface.co/SI2M-Lab/DarijaBERT",
+      "source_language": "en",
+      "publication_date": null,
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "model_card",
+      "claim": "DarijaBERT is published on Hugging Face as a joint release of AIOX Lab and the SI2M Lab of INSEA: a model for written Moroccan Darija based on the BERT-base architecture without next-sentence-prediction pre-training, trained on about 3 million Darija sequences (691MB of text, about 100M tokens).",
+      "source_excerpts": [
+        "AIOX Lab and SI2M Lab INSEA have joined forces",
+        "It is based on the same architecture as BERT-base, but without the Next Sentence Prediction (NSP) objective.",
+        "This model was trained on a total of ~3 Million sequences of Darija dialect representing 691MB of text or a total of ~100M tokens."
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Publication date left blank: the Hugging Face API reports 2022-03-02, the placeholder it assigns to repositories created before that date. The card's priority claim (\"first BERT model\") is not recorded. The card cites a 2023 paper by Gaanoun et al. that was not retrieved.",
+      "related_entities": ["darijabert", "aiox-labs", "insea", "natural-language-processing"]
+    },
+    {
+      "evidence_id": "MAI-EV-0025",
+      "title": "Al-Atlas-0.5B model card",
+      "source_organization": "Hugging Face (atlasia organisation)",
+      "source_type": "technical_repository",
+      "source_url": "https://huggingface.co/atlasia/Al-Atlas-0.5B",
+      "source_language": "en",
+      "publication_date": "2025-03-05",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "model_card",
+      "claim": "Al-Atlas-0.5B is published on Hugging Face by the atlasia organisation as a 0.5B-parameter language model trained on Moroccan Darija, fine-tuned from Qwen2.5-0.5B on a curated 155M-token Darija corpus.",
+      "source_excerpts": [
+        "Al-Atlas is a 0.5B parameter language model specifically trained on Moroccan Darija",
+        "The model was finetuned from Qwen-2.5 and trained on a carefully curated dataset of 155M tokens, focusing exclusively on authentic Moroccan Darija content.",
+        "Base model Qwen/Qwen2.5-0.5B"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The publication date is the repository creation date reported by the Hugging Face API. The card's priority claim (\"first dedicated foundation model\") is not recorded. Its training dataset (atlasia/Atlaset) is gated and was not inspected.",
+      "related_entities": ["al-atlas", "atlasia", "large-language-models"]
+    },
+    {
+      "evidence_id": "MAI-EV-0026",
+      "title": "AtlasIA website: self-description",
+      "source_organization": "AtlasIA",
+      "source_type": "organization_website",
+      "source_url": "https://www.atlasia.ma/",
+      "source_language": "en",
+      "publication_date": null,
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "organization_page",
+      "claim": "AtlasIA describes itself as an open-source initiative developing AI models for Darija that reflect Moroccan identity, collecting language data through a public contribution platform, and links to its models on Hugging Face (huggingface.co/atlasia).",
+      "source_excerpts": [
+        "ATLASIA is an open-source initiative committed to developing AI models that resonate with Moroccan values, identity, and culture.",
+        "Join our community to help build language datasets and improve AI models for Darija.",
+        "Explore our models on Huggingface"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Self-description. The site links to https://huggingface.co/atlasia, which is how the Hugging Face organisation is attributed to AtlasIA. Its legal form is not stated.",
+      "related_entities": ["atlasia", "al-atlas"]
+    },
+    {
+      "evidence_id": "MAI-EV-0027",
+      "title": "AIOX Labs website: self-description and portfolio",
+      "source_organization": "AIOX Labs",
+      "source_type": "organization_website",
+      "source_url": "https://www.aiox-labs.com/",
+      "source_language": "en",
+      "publication_date": null,
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "organization_page",
+      "claim": "AIOX Labs describes itself as an AI studio and venture builder with roots in Morocco and a footprint in the EU and US, and lists DeepEcho (2021) among the startups it created.",
+      "source_excerpts": [
+        "AIOX LABS is an AI Studio & Venture Builder, birthplace of:",
+        "With roots in Morocco and a footprint in the EU and US",
+        "DEEPECHO - AX2021"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Self-description. Its legal registration and headcount are not recorded. Other portfolio entries are not recorded in this version.",
+      "related_entities": ["aiox-labs", "deepecho"]
+    },
+    {
+      "evidence_id": "MAI-EV-0028",
+      "title": "UM6P Ventures case study: DeepEcho",
+      "source_organization": "UM6P Ventures",
+      "source_type": "investor_publication",
+      "source_url": "https://www.um6pventures.com/_assets/DeepEchoCaseStudy.pdf",
+      "source_language": "en",
+      "publication_date": "2023-05",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "case_study",
+      "claim": "UM6P Ventures' case study states that DeepEcho, a Morocco-based startup applying machine learning to prenatal ultrasound diagnosis, emerged from the AIOX Labs startup studio, and that UM6P Ventures invested in its pre-seed round.",
+      "source_excerpts": [
+        "DeepEcho emerged from the startup studio \"AIOX Labs\"",
+        "DeepEcho, a Moroccan based startup",
+        "DeepEcho uses Machine Learning to improve outcomes for preventive and predictive diagnosis detection of prenatal complications.",
+        "UM6P Ventures’ investment in the pre-seed round allowed the startup to reinforce and structure the core team"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Investor's own publication; the PDF metadata gives a creation date of 8 May 2023. Its accuracy figure and its statement about agreements with health centres are not recorded, as they were not independently checked.",
+      "related_entities": ["deepecho", "aiox-labs", "um6p-ventures", "deepecho-ultrasound-software"]
+    },
+    {
+      "evidence_id": "MAI-EV-0029",
+      "title": "DeepEcho website: product description and regulatory disclaimer",
+      "source_organization": "DeepEcho",
+      "source_type": "organization_website",
+      "source_url": "https://deepecho.io/",
+      "source_language": "en",
+      "publication_date": null,
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "organization_page",
+      "claim": "DeepEcho describes its software as using AI and deep learning to help radiologists and minimally trained clinicians with ultrasound video diagnosis, and states on its website that its claims and metrics are not yet validated by the FDA and come from its own clinical studies under scientific and regulatory review.",
+      "source_excerpts": [
+        "Deepecho uses Artificial Intelligence and Deep Learning to mimic what a trained sonographer would do and help radiologists and minimally trained clinicians with ultrasound video diagnosis.",
+        "Claims, figures, metrics & any kind of scientific and / or marketing materials listed in the current website are not validated yet by the FDA.",
+        "Metrics comes from our own clinical studies (currently under scientific & regulatory review)"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The company's own regulatory disclaimer is the basis for recording the software as in development. Accuracy and speed figures on the site are self-reported and not recorded.",
+      "related_entities": ["deepecho", "deepecho-ultrasound-software", "medical-imaging-ai", "health"]
+    },
+    {
+      "evidence_id": "MAI-EV-0030",
+      "title": "Nexus AI Factory memorandum signed at GITEX Africa 2026 (press report)",
+      "source_organization": "L'Observateur du Maroc et d'Afrique",
+      "source_type": "secondary_press",
+      "source_url": "https://lobservateur.info/article/117888/economie/gitex-2026-nexus-ai-factory-un-mega-projet-a-12-mmdh-pour-lia-et-le-calcul-intensif",
+      "source_language": "fr",
+      "publication_date": "2026-04-09",
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "press_article",
+      "claim": "A press report says that at GITEX Africa 2026, Nexus Core Systems signed a memorandum with the Ministry of Digital Transition, the Ministry of Investment and AMDIE to launch a \"Nexus AI Factory\" platform, with a first phase planned at Nouaceur (MAD 5 billion, 16 MW initial capacity), and that the managing director of the company's Moroccan subsidiary took office.",
+      "source_excerpts": [
+        "un protocole d’accord a été signé entre Nexus Core Systems, le ministère de la Transition numérique et de la Réforme de l’administration, le ministère de l’Investissement ainsi que l’Agence Marocaine de Développement des Investissements et des Exportations",
+        "La première phase sera lancée à Nouaceur, avec un investissement de 5 milliards de dirhams pour une capacité initiale de 16 mégawatts.",
+        "officialiser la prise de fonction de Azeddine Zroura en tant que nouveau Directeur Général de la filiale marocaine"
+      ],
+      "classification": "ANNOUNCED PLAN",
+      "verification_status": "verified",
+      "verification_note": "Secondary press. The ministry's own release (mmsp.gov.ma) returned HTTP 403 to the verification environment. La Nouvelle Tribune (lnt.ma, 9 April 2026) reports the same signatories and phase figures. Consortium and partner names in promotional passages are not recorded. Nothing has been built according to these sources.",
+      "related_entities": ["nexus-ai-factory", "nexus-core-systems", "ministry-digital-transition", "high-performance-computing", "data-centres"]
+    },
+    {
+      "evidence_id": "MAI-EV-0031",
+      "title": "INSEA website: institutional identity",
+      "source_organization": "INSEA (Institut National de Statistique et d'Économie Appliquée)",
+      "source_type": "organization_website",
+      "source_url": "https://www.insea.ac.ma/",
+      "source_language": "fr",
+      "publication_date": null,
+      "retrieval_date": "2026-10-18",
+      "evidence_type": "organization_page",
+      "claim": "INSEA, the Institut National de Statistique et d'Économie Appliquée, is a state engineering school in Rabat, operating since 1961, in statistics, applied economics, actuarial science and data science.",
+      "source_excerpts": [
+        "Institut National de Statistique et d’Économie Appliquée",
+        "Rabat · depuis 1961",
+        "École d’ingénieurs d’État en statistique, économie appliquée, actuariat et science des données"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The site states it is a temporary version.",
+      "related_entities": ["insea"]
     }
   ]
 }
