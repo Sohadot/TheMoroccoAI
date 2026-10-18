@@ -8,6 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import build  # noqa: E402
 import check_site  # noqa: E402
+import registry  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -23,6 +24,54 @@ class PublishedSite(unittest.TestCase):
         sitemap = (REPO / "sitemap.xml").read_text()
         for page in (REPO / "registry").glob("*/index.html"):
             self.assertIn(f"/registry/{page.parent.name}/", sitemap)
+
+    def test_questions_page_reports_every_project_with_its_lifecycle(self):
+        _, ontology = registry.load_all()
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        for e in ontology["entities"]:
+            if e["type"] in ("project", "model", "dataset"):
+                self.assertIn(f'href="/registry/{e["id"]}/"', html, e["id"])
+        # An announced project must never appear in the operational row form.
+        for e in ontology["entities"]:
+            if e["type"] == "project" and e["lifecycle"] != "operational":
+                self.assertNotIn(f'>{e["name"]}</a></td><td>Operational<', html, e["id"])
+
+    def test_questions_page_does_not_overstate_sector_deployments(self):
+        _, ontology = registry.load_all()
+        ents = {e["id"]: e for e in ontology["entities"]}
+        verified = [r for r in ontology["relationships"] if r["predicate"] == "targets"
+                    and r["classification"] == "VERIFIED FACT"
+                    and ents[r["subject"]].get("lifecycle") in ("operational", "pilot")]
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        if not verified:
+            self.assertIn("No qualifying deployment has yet been documented in this registry", html)
+        # Absence in the registry must never be stated as absence in Morocco.
+        self.assertIn("not the state of AI use in Morocco", html)
+
+    def _questions_with(self, mutate):
+        evidence, ontology = registry.load_all()
+        mutate(ontology)
+        return build.render_questions(build.Model(evidence, ontology))
+
+    def test_operational_infrastructure_does_not_count_as_a_sector_deployment(self):
+        def mutate(o):
+            o["relationships"].append({"subject": "toubkal-supercomputer", "predicate": "targets", "object": "health",
+                                       "evidence": ["MAI-EV-0020"], "classification": "VERIFIED FACT"})
+        self.assertIn("No qualifying deployment has yet been documented", self._questions_with(mutate))
+
+    def test_operational_ai_application_does_count(self):
+        def mutate(o):
+            next(e for e in o["entities"] if e["id"] == "deepecho-ultrasound-software")["lifecycle"] = "operational"
+        html = self._questions_with(mutate)
+        self.assertIn("Sectors with a documented operational or pilot AI application in this registry", html)
+
+    def test_inferred_developer_is_not_listed_as_verified(self):
+        html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")
+        q3 = html[html.index('id="q3-h"'):html.index('id="q4-h"')]
+        row = q3[q3.index('href="/registry/darijabert/"'):]
+        row = row[:row.index("</tr>")]
+        self.assertNotIn("/registry/aiox-labs/", row)
+        self.assertIn("/registry/insea/", row)
 
     def test_homepage_acquisition_path(self):
         html = (REPO / "index.html").read_text(encoding="utf-8")

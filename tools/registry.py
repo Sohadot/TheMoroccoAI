@@ -28,7 +28,15 @@ SOURCE_TYPES = (
     "signatory_organization",
     "intergovernmental_organization",
     "regulator",
+    "organization_website",
+    "technical_repository",
+    "academic_preprint",
+    "investor_publication",
+    "independent_list",
+    "secondary_press",
 )
+# Self-published or secondary sources: they cannot alone establish that something is operational.
+NON_INDEPENDENT_SOURCES = ("organization_website", "secondary_press")
 EVIDENCE_TYPES = (
     "news_dispatch",
     "official_report",
@@ -36,6 +44,13 @@ EVIDENCE_TYPES = (
     "official_announcement",
     "press_release",
     "regulatory_page",
+    "model_card",
+    "dataset_card",
+    "preprint",
+    "organization_page",
+    "case_study",
+    "ranking_entry",
+    "press_article",
 )
 REQUIRED_EVIDENCE_FIELDS = (
     "evidence_id", "title", "source_organization", "source_type", "source_url",
@@ -44,7 +59,28 @@ REQUIRED_EVIDENCE_FIELDS = (
     "verification_note", "related_entities",
 )
 # Entity types that must be backed by at least one record and carry a domain.
-DOCUMENTED_TYPES = ("institution", "initiative", "event", "project", "legal_instrument")
+DOCUMENTED_TYPES = ("institution", "company", "initiative", "event", "project", "legal_instrument", "model", "dataset")
+LIFECYCLE_TYPES = ("project", "model", "dataset")
+# Which lifecycle stages each type may take, and which record classes can support each stage.
+LIFECYCLE_ALLOWED = {
+    "project": ("announced", "in-development", "pilot", "operational", "discontinued"),
+    "model": ("announced", "in-development", "released", "discontinued"),
+    "dataset": ("announced", "in-development", "released", "discontinued"),
+}
+# Stages that need a record explicitly declaring that status (status_evidence); a signature,
+# presentation or announcement record never declares one, so it cannot establish delivery.
+STATUS_STAGES = ("in-development", "pilot", "operational", "released", "discontinued")
+PROJECT_KINDS_REQUIRED = ("project",)
+# Origins that need a source independent of the company itself.
+INDEPENDENT_ORIGINS = ("based-in-morocco", "foreign-moroccan-operations-verified")
+LIFECYCLE_SUPPORT = {
+    "announced": {"ANNOUNCED PLAN", "VERIFIED FACT"},
+    "in-development": {"VERIFIED FACT"},
+    "pilot": {"VERIFIED FACT"},
+    "operational": {"VERIFIED FACT"},
+    "released": {"VERIFIED FACT"},
+    "discontinued": {"VERIFIED FACT"},
+}
 
 EVIDENCE_ID = re.compile(r"^MAI-EV-\d{4}$")
 ENTITY_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -171,8 +207,74 @@ def validate_evidence(evidence, today=None):
             errors.append(f"{where} {cls} claim presents an outcome as achieved")
         if cls == "OFFICIAL TARGET" and not isinstance(r.get("target_year"), int):
             errors.append(f"{where} OFFICIAL TARGET needs an integer target_year")
+        status = r.get("status_evidence")
+        if status is not None:
+            if status not in STATUS_STAGES:
+                errors.append(f"{where} unknown status_evidence {status!r}")
+            if cls != "VERIFIED FACT":
+                errors.append(f"{where} status_evidence requires a VERIFIED FACT record")
+            if status == "released" and r.get("source_type") != "technical_repository":
+                errors.append(f"{where} 'released' must be evidenced by the technical repository itself")
+            if status in ("operational", "pilot") and r.get("source_type") in NON_INDEPENDENT_SOURCES:
+                errors.append(f"{where} '{status}' cannot be evidenced by the actor's own website or press")
+        if r.get("source_type") == "secondary_press" and cls not in ("ANNOUNCED PLAN", "UNVERIFIED CLAIM"):
+            errors.append(f"{where} secondary press can support only ANNOUNCED PLAN or UNVERIFIED CLAIM, not {cls}")
         if cls == "UNVERIFIED CLAIM" and not str(r.get("verification_note", "")).strip():
             errors.append(f"{where} UNVERIFIED CLAIM needs a verification_note saying what was not checked")
+    return errors
+
+
+def _check_entity_facets(e, where, ev, records, stages, origins, kinds=None):
+    """Lifecycle, origin and attributes: each must be allowed for the type and backed by the entity's own evidence."""
+    errors = []
+    etype = e.get("type")
+    stage = e.get("lifecycle")
+    if etype in LIFECYCLE_TYPES:
+        if stage not in stages or stage not in LIFECYCLE_ALLOWED[etype]:
+            errors.append(f"{where} {etype} needs a lifecycle from {', '.join(LIFECYCLE_ALLOWED[etype])} (got {stage!r})")
+        basis = e.get("lifecycle_evidence") or []
+        if not basis:
+            errors.append(f"{where} lifecycle needs lifecycle_evidence")
+        if any(x not in ev for x in basis):
+            errors.append(f"{where} lifecycle_evidence must be a subset of the entity's evidence")
+        cited = [records[x] for x in basis if x in records]
+        if stage in LIFECYCLE_SUPPORT and not any(r.get("classification") in LIFECYCLE_SUPPORT[stage] for r in cited):
+            errors.append(f"{where} lifecycle '{stage}' is not supported by a {' or '.join(sorted(LIFECYCLE_SUPPORT[stage]))} record")
+        if stage in STATUS_STAGES and not any(r.get("status_evidence") == stage for r in cited):
+            errors.append(f"{where} lifecycle '{stage}' needs a lifecycle_evidence record whose status_evidence is '{stage}'")
+        if stage == "operational" and not any(
+                r.get("classification") == "VERIFIED FACT" and r.get("source_type") not in NON_INDEPENDENT_SOURCES for r in cited):
+            errors.append(f"{where} 'operational' needs a verified record from a source other than the actor's own website or press")
+    elif "lifecycle" in e or "lifecycle_evidence" in e:
+        errors.append(f"{where} {etype} entities take no lifecycle")
+    kinds = kinds or {}
+    if etype in PROJECT_KINDS_REQUIRED:
+        if e.get("project_kind") not in kinds:
+            errors.append(f"{where} project needs a project_kind from {', '.join(kinds)} (got {e.get('project_kind')!r})")
+    elif "project_kind" in e:
+        errors.append(f"{where} only projects take a project_kind")
+    origin = e.get("origin")
+    if etype == "company":
+        if origin not in origins:
+            errors.append(f"{where} company needs an origin from {', '.join(origins)} (got {origin!r})")
+        basis = e.get("origin_evidence") or []
+        if origin != "unresolved" and not basis:
+            errors.append(f"{where} origin '{origin}' needs origin_evidence")
+        if any(x not in ev for x in basis):
+            errors.append(f"{where} origin_evidence must be a subset of the entity's evidence")
+        name = str(e.get("name", "")).casefold()
+        independent = [r for r in (records.get(x, {}) for x in basis)
+                       if r.get("source_type") not in NON_INDEPENDENT_SOURCES
+                       and not str(r.get("source_organization", "")).casefold().startswith(name)]
+        if origin in INDEPENDENT_ORIGINS and not independent:
+            errors.append(f"{where} origin '{origin}' needs origin_evidence from a source independent of the company")
+    elif "origin" in e or "origin_evidence" in e:
+        errors.append(f"{where} only company entities take an origin")
+    for a in e.get("attributes") or []:
+        if not str(a.get("name", "")).strip() or not str(a.get("value", "")).strip():
+            errors.append(f"{where} attribute needs a name and a value")
+        if a.get("evidence") not in ev:
+            errors.append(f"{where} attribute '{a.get('name')}' must cite one of the entity's own records")
     return errors
 
 
@@ -186,7 +288,11 @@ def validate_ontology(ontology, evidence):
     if not entities:
         errors.append("ontology.json: no entities")
     # Keys are written into HTML ids and URLs by the generator, so they must be plain slugs.
-    for kind, keys in (("domain", domains), ("entity type", types), ("predicate", predicates)):
+    stages = ontology.get("lifecycle_stages") or {}
+    origins = ontology.get("origins") or {}
+    for kind, keys in (("domain", domains), ("entity type", types), ("predicate", predicates),
+                       ("lifecycle stage", stages), ("origin", origins),
+                       ("project kind", ontology.get("project_kinds") or {})):
         for k in keys:
             if not KEY.match(str(k)):
                 errors.append(f"ontology.json: {kind} key {k!r} must be a lowercase slug")
@@ -212,6 +318,7 @@ def validate_ontology(ontology, evidence):
         ev = e.get("evidence") or []
         if not ev:
             errors.append(f"{where} has no supporting evidence")
+        errors += _check_entity_facets(e, where, ev, records, stages, origins, ontology.get("project_kinds"))
         for x in ev:
             if x not in records:
                 errors.append(f"{where} cites missing evidence {x}")

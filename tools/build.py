@@ -24,16 +24,35 @@ SITE = "https://themoroccoai.com"
 CONTACT = "agent@sohadot.com"
 TYPE_LABELS = {
     "institution": "Institutions",
+    "company": "Companies",
     "initiative": "Initiatives",
     "event": "Events",
     "project": "Projects",
     "legal_instrument": "Legal instruments",
+    "model": "Models",
+    "dataset": "Datasets",
     "technology": "Technologies",
     "sector": "Sectors",
 }
 TYPE_SINGULAR = {
     "institution": "Institution", "initiative": "Initiative", "event": "Event", "project": "Project",
     "legal_instrument": "Legal instrument", "technology": "Technology", "sector": "Sector",
+    "company": "Company", "model": "Model", "dataset": "Dataset",
+}
+LIFECYCLE_LABELS = {
+    "announced": "Announced", "in-development": "In development", "pilot": "Pilot",
+    "operational": "Operational", "released": "Released", "discontinued": "Discontinued",
+}
+ORIGIN_LABELS = {
+    "based-in-morocco": "Based in Morocco (independent source)",
+    "self-described-moroccan": "Self-described Moroccan",
+    "foreign-moroccan-subsidiary-reported": "Moroccan subsidiary reported (secondary press)",
+    "foreign-moroccan-operations-verified": "Foreign, Moroccan operations verified",
+    "unresolved": "Unresolved",
+}
+KIND_LABELS = {
+    "ai-application": "AI application", "compute-infrastructure": "Compute infrastructure",
+    "institute": "Institute", "agreement": "Agreement",
 }
 SOURCE_TYPE_LABELS = {
     "government_portal": "Government portal",
@@ -42,6 +61,12 @@ SOURCE_TYPE_LABELS = {
     "signatory_organization": "Signatory organisation",
     "intergovernmental_organization": "Intergovernmental organisation",
     "regulator": "Regulator",
+    "organization_website": "Organisation's own website",
+    "technical_repository": "Technical repository",
+    "academic_preprint": "Academic preprint",
+    "investor_publication": "Investor publication",
+    "independent_list": "Independent list",
+    "secondary_press": "Secondary press",
 }
 SIGIL = ('<svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">'
          '<polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/>'
@@ -141,6 +166,7 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
   <a class="nav-mark" href="/">{SIGIL}<span class="nav-name">TheMoroccoAI</span></a>
   <ul class="nav-links">
     {nav_link("/registry/", "Registry", "registry")}
+    {nav_link("/registry/questions/", "Questions", "questions", "nav-optional")}
     {nav_link("/registry/evidence/", "Evidence", "evidence", "nav-optional")}
     {nav_link("/#acquire", "Acquire", "acquire", "nav-acquire")}
   </ul>
@@ -215,16 +241,27 @@ def render_entity(model, e):
                      key=lambda r: (r["publication_date"] or "", r["evidence_id"]), reverse=True)
     cards = "\n".join(evidence_card(model, r) for r in records)
 
-    facts = [("Type", TYPE_SINGULAR[e["type"]])]
+    def cite(ids):
+        return " ".join(f'<a class="rel-evidence" href="#{x}">{x}</a>' for x in ids)
+
+    # Values are pre-escaped HTML.
+    facts = [("Type", escape(TYPE_SINGULAR[e["type"]]))]
     if e.get("domain"):
-        facts.append(("Domain", model.domains[e["domain"]]))
+        facts.append(("Domain", escape(model.domains[e["domain"]])))
+    if e.get("project_kind"):
+        facts.append(("Kind", escape(KIND_LABELS[e["project_kind"]])))
+    if e.get("lifecycle"):
+        facts.append(("Lifecycle", f'{escape(LIFECYCLE_LABELS[e["lifecycle"]])} · {cite(e["lifecycle_evidence"])}'))
+    if e.get("origin"):
+        basis = f' · {cite(e["origin_evidence"])}' if e.get("origin_evidence") else ""
+        facts.append(("Origin", f'{escape(ORIGIN_LABELS[e["origin"]])}{basis}'))
     if e.get("status"):
-        facts.append(("Status", e["status"]))
+        facts.append(("Status", escape(e["status"])))
+    for a in e.get("attributes") or []:
+        facts.append((escape(a["name"]), f'{escape(a["value"])} · {cite([a["evidence"]])}'))
     facts.append(("Identifier", f"<code>{escape(eid)}</code>"))
     facts.append(("Records", str(len(e["evidence"]))))
-    facts_html = "".join(
-        f"<dt>{k}</dt><dd>{v if k == 'Identifier' else escape(v)}</dd>" for k, v in facts
-    )
+    facts_html = "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in facts)
     alt = f'<p class="alt-names">{escape(" · ".join(e["alt_names"]))}</p>' if e.get("alt_names") else ""
     note = f'<p class="notice"><strong>Note.</strong> {escape(e["note"])}</p>' if e.get("note") else ""
 
@@ -253,7 +290,8 @@ def render_entity(model, e):
 </section>"""
 
     schema_type = {
-        "institution": "Organization", "initiative": "Project", "project": "Project", "event": "Event",
+        "institution": "Organization", "company": "Organization", "initiative": "Project", "project": "Project",
+        "event": "Event", "model": "SoftwareApplication", "dataset": "Dataset",
         "legal_instrument": "Legislation", "technology": "DefinedTerm", "sector": "DefinedTerm",
     }[e["type"]]
     jsonld = {
@@ -334,6 +372,7 @@ def render_registry_index(model):
 
 <section aria-labelledby="start-h">
   <h2 id="start-h"><span class="section-number">01</span>Start here</h2>
+  <p class="prose"><a href="/registry/questions/">Questions the registry answers</a> lists which organisations have documented AI activity, which projects are operational or only announced, which models and datasets are public, and which relationships are verified. Each answer links to its evidence.</p>
   <p class="prose">The fullest chain in this version runs from <a href="{entity_url("morocco-ai-2030")}">Morocco AI 2030</a> to the <a href="{entity_url("jazari-network")}">JAZARI Institutes network</a>, its core institute <a href="{entity_url("jazari-root")}">Institut Jazari ROOT</a> and the <a href="{entity_url("jazari-industrie-x0")}">JAZARI Industrie X.0</a> convention signed in Fès. It then goes on to the signatories, the stated technologies and the targeted sectors. Each page shows the source excerpt, the publication and retrieval dates, and the classification of every claim.</p>
 </section>
 
@@ -389,6 +428,144 @@ def render_registry_index(model):
                 title="Reference Registry — TheMoroccoAI",
                 description="Independent, evidence-backed registry of Morocco's AI ecosystem: institutions, initiatives and projects tied to primary sources, with facts, targets and plans labelled separately.",
                 body=body, jsonld=jsonld)
+
+
+def _ev_links(ids):
+    return " ".join(f'<a href="/registry/evidence/#{x}">{x}</a>' for x in ids)
+
+
+def _ent_link(model, eid):
+    return f'<a href="{entity_url(eid)}">{escape(model.entities[eid]["name"])}</a>'
+
+
+def _table(label, headers, rows, empty):
+    if not rows:
+        return f'<p class="prose">{escape(empty)}</p>'
+    head = "".join(f'<th scope="col">{escape(h)}</th>' for h in headers)
+    body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
+    return (f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
+            f'<table class="qtable"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
+
+
+def render_questions(model):
+    rels = model.relationships
+    ents = model.entities
+    org_types = ("institution", "company")
+    activity_preds = ("develops", "hosts", "created", "invested_in", "signatory_of")
+
+    # Q1: organisations with documented AI activity (verified relationships only, plus every company).
+    orgs = {}
+    for r in rels:
+        if r["predicate"] in activity_preds and r["classification"] == "VERIFIED FACT" and ents[r["subject"]]["type"] in org_types:
+            orgs.setdefault(r["subject"], []).append(r)
+    for eid, e in ents.items():
+        if e["type"] == "company":
+            orgs.setdefault(eid, [])
+    q1 = []
+    for eid in sorted(orgs, key=lambda x: (ents[x]["type"] != "company", ents[x]["name"].lower())):
+        e = ents[eid]
+        kind = TYPE_SINGULAR[e["type"]]
+        if e.get("origin"):
+            kind += f" · {ORIGIN_LABELS[e['origin']]}"
+        acts = "; ".join(f'{escape(model.predicates[r["predicate"]]["label"])} {_ent_link(model, r["object"])}'
+                         for r in orgs[eid]) or "No verified role yet; see entity page."
+        ev = sorted({x for r in orgs[eid] for x in r["evidence"]} | set(e.get("origin_evidence") or []))
+        q1.append([_ent_link(model, eid), escape(kind), acts, _ev_links(ev)])
+
+    # Q2: projects by lifecycle stage.
+    order = ["operational", "pilot", "in-development", "announced", "discontinued"]
+    projects = sorted((e for e in ents.values() if e["type"] == "project"),
+                      key=lambda e: (order.index(e["lifecycle"]), e["name"].lower()))
+    q2 = [[_ent_link(model, e["id"]), escape(KIND_LABELS[e["project_kind"]]), escape(LIFECYCLE_LABELS[e["lifecycle"]]),
+           " ".join(badge(model.records[x]["classification"]) + " " + _ev_links([x]) for x in e["lifecycle_evidence"]),
+           escape(e.get("status", ""))] for e in projects]
+    counts = {st: sum(1 for e in projects if e["lifecycle"] == st) for st in order}
+    stage_line = " · ".join(f"{LIFECYCLE_LABELS[st]}: {n}" for st, n in counts.items() if n)
+    ai_running = [e for e in projects if e["project_kind"] == "ai-application" and e["lifecycle"] in ("operational", "pilot")]
+    ai_line = (f"AI applications documented as operational or in pilot: {', '.join(e['name'] for e in ai_running)}." if ai_running else
+               "No AI application recorded here is yet documented as operational or in pilot. This reflects the registry's current coverage, not the state of AI use in Morocco.")
+
+    # Q3: models and datasets.
+    q3 = []
+    for e in sorted((e for e in ents.values() if e["type"] in ("model", "dataset")), key=lambda e: e["name"].lower()):
+        devs = [r["subject"] for r in rels if r["predicate"] == "develops" and r["object"] == e["id"] and r["classification"] == "VERIFIED FACT"]
+        conn = [a for a in e.get("attributes") or [] if a["name"] == "Connection to Morocco"]
+        attrs = "; ".join(f'{escape(a["name"])}: {escape(a["value"])}' for a in e.get("attributes") or [] if a not in conn)
+        q3.append([_ent_link(model, e["id"]), escape(TYPE_SINGULAR[e["type"]]),
+                   ", ".join(_ent_link(model, d) for d in devs) or "Not recorded",
+                   escape(conn[0]["value"]) if conn else "Not recorded", attrs,
+                   f'{escape(LIFECYCLE_LABELS[e["lifecycle"]])} · {_ev_links(e["lifecycle_evidence"])}'])
+
+    # Q4: sectors, and whether any targeting project is verified as running.
+    q4, verified_sectors = [], []
+    for e in sorted((e for e in ents.values() if e["type"] == "sector"), key=lambda e: e["name"].lower()):
+        links = [r for r in rels if r["predicate"] == "targets" and r["object"] == e["id"]]
+        if not links:
+            continue
+        cells = []
+        for r in links:
+            src = ents[r["subject"]]
+            stage = LIFECYCLE_LABELS.get(src.get("lifecycle"), TYPE_SINGULAR[src["type"]])
+            cells.append(f'{_ent_link(model, src["id"])} ({escape(stage)})')
+            if (src.get("project_kind") == "ai-application" and src.get("lifecycle") in ("operational", "pilot")
+                    and r["classification"] == "VERIFIED FACT"):
+                verified_sectors.append(e["id"])
+        q4.append([_ent_link(model, e["id"]), "; ".join(cells)])
+    if verified_sectors:
+        sector_line = "Sectors with a documented operational or pilot AI application in this registry: " + ", ".join(
+            _ent_link(model, x) for x in dict.fromkeys(verified_sectors)) + "."
+    else:
+        sector_line = ("No qualifying deployment has yet been documented in this registry: no AI application recorded here "
+                       "has a verified operational or pilot status in a sector. This reflects the registry's current coverage, "
+                       "not the state of AI use in Morocco. The sectors below are targeted only by announced or "
+                       "in-development projects, or by initiatives.")
+
+    # Q5: relationships between organisations and what they sign, build, host or fund, by classification.
+    q5 = []
+    for cls in registry.CLASSIFICATIONS:
+        for r in rels:
+            if r["classification"] == cls and ents[r["subject"]]["type"] in org_types and r["predicate"] in activity_preds + ("launched", "presented", "organized", "designated", "lists_in_framework"):
+                q5.append([badge(cls), f'{_ent_link(model, r["subject"])} <span class="rel-type">{escape(model.predicates[r["predicate"]]["label"])}</span> {_ent_link(model, r["object"])}',
+                           _ev_links(r["evidence"])])
+    by_cls = {c: sum(1 for r in rels if r["classification"] == c) for c in registry.CLASSIFICATIONS}
+    cls_line = " · ".join(f"{c.title()}: {n}" for c, n in by_cls.items() if n)
+
+    body = f"""<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Questions</p>
+  <p class="label">MAI-Q — Generated from the registry data</p>
+  <h1>Questions the registry answers</h1>
+  <p class="lede">Each answer is computed from <a href="/data/ontology.json">ontology.json</a> and <a href="/data/evidence.json">evidence.json</a> and links to the records behind it. Where the evidence does not support an answer, the page says so.</p>
+</header>
+<section aria-labelledby="q1-h">
+  <h2 id="q1-h"><span class="section-number">Q1</span>Which organisations have a verified role in Morocco-related AI work?</h2>
+  <p class="prose">Organisations that verified records show developing, hosting, creating, funding or signing for a project, model or company recorded here, plus every company in the registry. Inclusion means a documented connection to Morocco-related AI work, not that an organisation is Moroccan or operates in Morocco: MBZUAI France Lab, for example, is in Paris. Origin is shown for companies as the evidence states it. This list is limited to the registry's current coverage.</p>
+  {_table("Organisations with a verified role", ["Organisation", "Kind", "Verified role", "Evidence"], q1, "No organisation recorded.")}
+</section>
+<section aria-labelledby="q2-h">
+  <h2 id="q2-h"><span class="section-number">Q2</span>Which projects are operational, and which are only announced?</h2>
+  <p class="prose">{escape(stage_line)}. A stage other than "announced" requires a verified record that explicitly documents that stage, and "operational" requires one from a source other than the actor's own website or press; a signature, presentation or announcement is never treated as delivery. The kind column separates AI applications from compute infrastructure: operational infrastructure is not an operational AI application.</p>
+  <p class="prose">{escape(ai_line)}</p>
+  {_table("Projects by lifecycle stage", ["Project", "Kind", "Lifecycle", "Basis", "Status"], q2, "No project recorded.")}
+</section>
+<section aria-labelledby="q3-h">
+  <h2 id="q3-h"><span class="section-number">Q3</span>What AI models and datasets are publicly documented?</h2>
+  <p class="prose">Models and datasets with a documented connection to Morocco, recorded from their own repositories and papers. For most, the connection is the language (Moroccan Darija), not a Moroccan developer; the "Connection to Morocco" column says which. "Developed by" lists only developers a source names; a relationship the registry infers is shown on the entity page as independent analysis. Technical details are listed only where the source states them; self-reported benchmark results are not recorded.</p>
+  {_table("Models and datasets", ["Name", "Type", "Developed by", "Connection to Morocco", "Documented characteristics", "Availability"], q3, "No model or dataset recorded.")}
+</section>
+<section aria-labelledby="q4-h">
+  <h2 id="q4-h"><span class="section-number">Q4</span>Which sectors have verified AI deployments?</h2>
+  <p class="prose">{sector_line}</p>
+  {_table("Sectors and the projects that target them", ["Sector", "Targeted by"], q4, "No sector is targeted by a recorded project.")}
+</section>
+<section aria-labelledby="q5-h">
+  <h2 id="q5-h"><span class="section-number">Q5</span>Which institutional relationships are supported by evidence?</h2>
+  <p class="prose">All relationships by classification: {escape(cls_line)}. The table lists those between organisations and what they launch, sign, build, host or fund.</p>
+  {_table("Institutional relationships by classification", ["Classification", "Relationship", "Evidence"], q5, "No relationship recorded.")}
+</section>"""
+    return page(model, path="/registry/questions/", current="questions",
+                title="Questions the Registry Answers — TheMoroccoAI",
+                description="Evidence-linked answers about Morocco's AI ecosystem: organisations with documented AI activity, operational versus announced projects, public models and datasets, sectors and verified relationships.",
+                body=body)
 
 
 def render_evidence_index(model):
@@ -456,7 +633,7 @@ def inject(html_text, blocks):
 
 
 def sitemap(model):
-    paths = ["/", "/registry/", "/registry/evidence/"] + [entity_url(e) for e in sorted(model.entities)]
+    paths = ["/", "/registry/", "/registry/questions/", "/registry/evidence/"] + [entity_url(e) for e in sorted(model.entities)]
     urls = "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{model.as_of}</lastmod></url>\n" for p in paths)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
 
@@ -465,6 +642,7 @@ def outputs(model):
     files = {
         "registry/index.html": render_registry_index(model),
         "registry/evidence/index.html": render_evidence_index(model),
+        "registry/questions/index.html": render_questions(model),
         "sitemap.xml": sitemap(model),
     }
     for eid, e in model.entities.items():

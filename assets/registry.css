@@ -233,3 +233,19 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* ─── QUESTIONS TABLES ─── */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); }
+.qtable { width: 100%; border-collapse: collapse; font-size: 15px; }
+.qtable th {
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-sub); text-align: left; padding: 10px 14px;
+  border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.35);
+}
+.qtable td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text-main); }
+.qtable tr:last-child td { border-bottom: none; }
+.qtable td a[href^="/registry/evidence/"] { font-family: 'DM Mono', monospace; font-size: 10px; white-space: nowrap; }
+.qtable .badge { margin-right: 4px; }
+@media (max-width: 700px) {
+  .qtable { min-width: 560px; }
+}

@@ -15,7 +15,7 @@ pages are committed.
 | `index.html` | Homepage: thesis, landscape, vocabulary, editorial doctrine, acquisition. Blocks between `<!--r:…-->` markers are generated. |
 | `data/evidence.json` | Evidence registry: one record per sourced claim, with source URL, publication and retrieval dates, verbatim excerpts, classification and verification status. |
 | `data/ontology.json` | Ontology: entity types, domains, predicates, entities and typed relationships, each citing evidence. |
-| `registry/` | Generated pages: registry index, all evidence, one page per entity. |
+| `registry/` | Generated pages: registry index, questions page, all evidence, one page per entity. |
 | `tools/registry.py` | Validator for referential integrity and claim-classification rules. |
 | `tools/build.py` | Static generator: registry pages, homepage blocks, `sitemap.xml`. |
 | `tools/check_site.py` | Site gates: links, anchors, metadata, canonicals, third-party resources, accessibility basics, sitemap, contact path, confidential terms, credentials. |
@@ -30,6 +30,31 @@ Every record carries exactly one classification: **VERIFIED FACT**, **OFFICIAL T
 the registry infers from two or more records, and it must carry a note. The validator rejects
 forward-looking wording in facts, "achieved" wording in targets and plans, targets without a year,
 and relationships classified beyond what their evidence supports.
+
+## Lifecycle, origin and attributes
+
+- **Lifecycle** (projects, models, datasets): `announced`, `in-development`, `pilot`, `operational`,
+  `released` (models and datasets only) or `discontinued`. Each value must cite `lifecycle_evidence`
+  from the entity's own records. Any stage other than `announced` needs a VERIFIED FACT record whose
+  `status_evidence` field explicitly declares that stage. `operational` and `pilot` cannot be
+  declared by the actor's own website or press, and `released` only by the technical repository
+  itself. A signature, presentation or announcement record declares no status, so it can never
+  establish delivery.
+- **Project kind** (projects): `ai-application`, `compute-infrastructure`, `institute` or
+  `agreement`. Operational infrastructure is not an operational AI application: only
+  `ai-application` projects count as sector deployments on the questions page.
+- **Origin** (companies): `based-in-morocco` (independent source required),
+  `self-described-moroccan`, `foreign-moroccan-subsidiary-reported`,
+  `foreign-moroccan-operations-verified` (independent primary source required) or `unresolved`,
+  with `origin_evidence`. None of these verifies registration or headquarters.
+- **Attributes**: technical or descriptive values (parameters, licence, Rmax…). Each cites one of
+  the entity's own records. Self-reported benchmark results are not recorded.
+- **Secondary press** (`source_type: secondary_press`) can support only ANNOUNCED PLAN or
+  UNVERIFIED CLAIM.
+
+`/registry/questions/` is generated from these fields. It answers which organisations have
+documented AI activity, which projects are operational or announced, which models and datasets are
+public, which sectors have verified deployments, and which relationships are verified.
 
 ## Adding or changing a record
 
