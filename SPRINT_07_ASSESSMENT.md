@@ -47,8 +47,8 @@ Priority is based on how likely primary, freely readable evidence was to exist. 
 
 | Record | Source (publisher, date) | Type, standing | Where the support is | Affects | Limits |
 |---|---|---|---|---|---|
-| MAI-EV-0047 | [BO 7534, Arabic edition](https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf), SGG, 13 Aug 2026 | official_gazette, primary | pp. 5224–5229: joint orders 1535.26 (16 Jul 2026, ROOT), 1618.26 (EduTech), 1619.26 (Industrie X.0), 1620.26 (Smart City) (22 Jul 2026) | 8 JAZARI signatures; JAZARI entity status | Publishes summaries, not the signed texts, and no signing dates. It is legal establishment, not operation. It names further founding members, which are not recorded. There is no act for Nador. Excerpts were transcribed from page images. |
-| MAI-EV-0044 | [Ministry release](https://www.mmsp.gov.ma/fr/actualites/nexus-core-systems-lance-au-maroc-une-%C2%AB-ai-factory-plateform%C2%BB), 8 Apr 2026 | official_announcement, primary (party to the MoU) | the release body: four signatories | Nexus signatures (ANNOUNCED PLAN → VERIFIED FACT); GAP-04 | The MoU text is not published. The investment and capacity figures are future-tense commitments. |
+| MAI-EV-0047 | [BO 7534, Arabic edition](https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf), SGG, 13 Aug 2026 | official_gazette, primary | pp. 5224–5229: joint orders 1535.26 (16 Jul 2026, ROOT), 1618.26 (EduTech), 1619.26 (Industrie X.0), 1620.26 (Smart City) (22 Jul 2026) | 8 JAZARI signatures; JAZARI entity status | Publishes only a summary of each convention (article 2 of each order), not the signed texts, which this registry has not obtained; no signing dates. It is legal establishment, not operation. It names further founding members, which are not recorded. There is no act for Nador. Excerpts were transcribed from page images. |
+| MAI-EV-0044 | [Ministry release](https://www.mmsp.gov.ma/fr/actualites/nexus-core-systems-lance-au-maroc-une-%C2%AB-ai-factory-plateform%C2%BB), 8 Apr 2026 | official_announcement, primary (party to the MoU) | the release body: four signatories | Nexus signatures (ANNOUNCED PLAN → VERIFIED FACT); GAP-04 | The release does not reproduce the MoU, and this registry has not obtained its text. The phase figures are future-tense commitments; the MAD 12 billion is described as "mobilisé sur deux phases", which does not establish any expenditure. |
 | MAI-EV-0045 | [Ministry release](https://www.mmsp.gov.ma/fr/actualites/signature-d%E2%80%99une-convention-pour-l%E2%80%99op%C3%A9rationnalisation-du-campus-datacenter-vert-%C2%AB-igoudar-num%C3%A9rique-%C2%BB-%C3%A0-dakhla), 14 Apr 2026 | official_announcement, primary | the release body | Green data-centre agreement; GAP-04 | It launches studies; it is not construction. The release dates the parent agreement "1er juillet 2025"; the registry keeps 2 July, its other sources' date. |
 | MAI-EV-0046 | [UN egovkb, Morocco](https://publicadministration.un.org/egovkb/en-us/Data/Country-Information/id/115-Morocco), UN DESA, undated | ranking_entry, independent | the rank-history table | Digital Morocco 2030; GAP-06; the 113 baseline | The 2024 edition (90th, EGDI 0.6841) measures the starting position. No 2026 edition had been published. No edition shows 113th. |
 | MAI-EV-0042 | [arXiv 2505.17082v1](https://arxiv.org/pdf/2505.17082v1), Skiredj et al., 20 May 2025 | preprint, operator-affiliated (3 of 5 authors are UM6P) | §4 Hardware and cost; footnote 1 | Toubkal; GAP-03; correction of "Belkasmi" | Not peer-reviewed. Does not say where the runs were made. The cost uses a Runpod public rate. |
@@ -116,7 +116,7 @@ Priority is based on how likely primary, freely readable evidence was to exist. 
   - MAI-EV-0002 note: 113th is the source's figure.
 - **Relationships.**
   - cgem → jazari-root and the 7 Industrie X.0 signatures now also cite MAI-EV-0047.
-  - The signatures of nexus-core-systems and ministry-digital-transition on nexus-ai-factory change from ANNOUNCED PLAN to VERIFIED FACT, on MAI-EV-0030 and MAI-EV-0044, with the note "the memorandum's text is not published".
+  - The signatures of nexus-core-systems and ministry-digital-transition on nexus-ai-factory change from ANNOUNCED PLAN to VERIFIED FACT, on MAI-EV-0030 and MAI-EV-0044, with the note that the release does not reproduce the memorandum and this registry has not obtained its text.
   - No relationship was added or removed.
 - **Entities.**
   - Status text updated for:
@@ -139,8 +139,8 @@ Priority is based on how likely primary, freely readable evidence was to exist. 
 | GAP-01 | — | unchanged; no usage evidence found | open |
 | GAP-02 | — | unchanged; Bilan outputs held for review | open |
 | GAP-03 | 0020, 0041 | + 0042, 0043. Operator-affiliated runs are documented with sizes. Independent documentation is still missing, and the GemMaroc location is unstated. | open |
-| GAP-04 | 0006, 0007, 0019, 0030 | + 0044, 0045. The Nexus signing is confirmed by the ministry; the Dakhla studies were launched. Still no construction. | open |
-| GAP-05 | 19 of 33 | **11 of 33**. The 8 JAZARI signatures now cite the gazette. | open |
+| GAP-04 | 0006, 0007, 0019, 0030 | + 0044, 0045. The Nexus signing is confirmed by the ministry; the Dakhla studies were launched. Still no construction. Re-assessed again in the final review (fingerprint `eb7e3a0314ac921e`). | open |
+| GAP-05 | 19 of 33 | **11 of 33**. The 8 JAZARI signatures now also cite the gazette's approval, which is neither the signed text nor a report of the signing. | open |
 | GAP-06 | 0001–0003, 0018 | + 0046. Independent starting position (2024); no post-launch edition yet. | open |
 
 Signed matrix rows rise from 16 to 18 (the Nexus signatures). None is documented by its signed text.
@@ -184,3 +184,47 @@ Source-check exceptions:
 3. **Nador.** No gazette act concerns the Al Jazari institute in Nador. Should the registry record that absence, as it stands, or wait?
 4. **Self-reported outputs (Bilan 2024/2025) and conflicting official targets (PLF 2023/2024).** Should they be recorded? If so, record them as UNVERIFIED CLAIM or as a distinct "reported output" kind, and never as progress?
 5. **Outreach.** Should the owner contact the GemMaroc authors and the African Supercomputing Center about where the runs were made and about usage reports? Not done: this needs explicit owner approval.
+
+## Final evidence admission review and corrections (owner request)
+
+The owner asked for a read-only review of the six admitted records. I re-read the sources they cite: the gazette page images (pp. 5224–5229; the file hash is unchanged since admission), the ministry's Nexus release, the GemMaroc preprint, the open-access copy of the Toubkal article and the UN page. The review confirmed:
+- the eight gazette signatures;
+- GAP-05 at 11 of 33, recomputed independently from the published rule;
+- the Nexus signing;
+- the operator-affiliated framing of the Toubkal evidence;
+- the attribution of the 113 baseline.
+
+It found the defects below. They were corrected on this branch, with no new sources, relationships, entities or gaps.
+
+| # | Defect | Correction |
+|---|---|---|
+| D1 | GAP-03 gave the preprint "about 58 GPU-hours on A100 and H100 GPUs". 58 is the total of the Toubkal article's Table 25. The preprint reports about 48 GPU-hours, for its longest run (the 27B model, 6 h on 8 H100 GPUs). | GAP-03 now gives the preprint's hardware and "about 48 GPU-hours for that longest run". The Table 25 total is not attributed to anyone, because no recorded excerpt supports it. The GAP-06 statement on the 113th starting point also cites MAI-EV-0002, the record the figure comes from. |
+| D2 | Unsupported global claims that texts are "not published": the Nexus relationship notes, MAI-EV-0044, and the jazari-network status. | Each now states what the cited source reproduces and what this registry has obtained. For example: "the release does not reproduce the memorandum; this registry has not obtained its text"; "the Bulletin Officiel publishes only summaries … not their signed texts, which this registry has not obtained". |
+| D3 | MAI-EV-0044 called every figure future-tense. | A verbatim excerpt now quotes the MAD 12 billion "investissement initial … mobilisé sur deux phases". The note says that the wording does not establish any expenditure, and that the release documents none. |
+| D4 | GAP-05, Q8 and the matrix line said every signature rests on a report of the signing, without distinguishing the gazette. The matrix line even listed "official gazette" among the types of report. The definition of `includes-non-announcement-record` omitted gazette texts. | GAP-05 now names the eight gazette signatures and the six that rest on official reports. Q8 and the matrix line count the gazette rows separately. The definition and methodology say a gazette text records a legal act, such as an approval, and is not the signed text. A new published qualification marks Signed rows that cite an official gazette record. |
+| D5 | MAI-EV-0047 said "the other two groups". | It now names JAZARI EduTech and JAZARI Smart City, and states that the Industrie X.0 summary names no further members. |
+| D6 | MAI-EV-0030 still said the ministry release returned HTTP 403. | It now says the release was later retrieved and is recorded as MAI-EV-0044. |
+
+**Re-assessment.** GAP-04 was re-assessed because the Nexus relationship notes it tracks changed. Its Nexus statement now matches D2 and D3. New fingerprint: `eb7e3a0314ac921e`. It stays open. The other fingerprints are unchanged, and all six gaps remain open.
+
+**Regression tests (`tests/test_precision.py::FinalEvidenceCorrections`).**
+- **Provenance of numerals:**
+  - every numeral in a gap statement must appear in the claim, excerpts or dates of the records that statement cites;
+  - every numeral in an entity attribute must appear in its cited record (the ISO 639-3 identifier is exempt).
+
+  This checks provenance only. A numeral that does appear may still be misread or misattributed, numbers written in words are not checked, and no general test can establish that a statement is correct.
+- **Other checks:**
+  - no registry text asserts that a text "is/are not published";
+  - the "mobilisé" excerpt and its caveat;
+  - the gazette and official-report split, checked against the data;
+  - the new qualification on exactly the Signed rows citing a gazette record;
+  - the Q8 and matrix wording;
+  - the definition;
+  - D5 and D6.
+
+**Mutations.** 13 of 13 targeted reversions of these corrections were caught, as were the 9 earlier Sprint 07 validator mutations.
+
+**MAI-EV-0044 source check.** All four excerpts, including the new one, match the live page.
+
+
+**Final run.** 290 tests OK; validator 0 problems; 78 generated files, 0 stale; `check_site --network` 74 pages, 0 problems; the consumer verifies OK on 0.6.0; two rebuilds after the commit change no file.

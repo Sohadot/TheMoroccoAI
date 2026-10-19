@@ -125,7 +125,7 @@ class SignedRelationships(unittest.TestCase):
         n = sum(1 for r in self.rows if r["documented_as"] == "Signed")
         self.assertIn(f'For none of the {n} "Signed" rows is the signed text recorded', visible("registry/matrix/index.html"))
         gap05 = next(g for g in json.loads((REPO / "data" / "gaps.json").read_text(encoding="utf-8"))["gaps"] if g["id"] == "GAP-05")
-        self.assertIn("not the signed text", gap05["unestablished"])
+        self.assertIn("Neither is the signed text", gap05["unestablished"])
 
 
 class Q8Scope(unittest.TestCase):
@@ -360,7 +360,8 @@ class EvidenceAcquisition(unittest.TestCase):
                      if (r["subject"], r["predicate"], r["object"]) == (s, "signatory_of", "nexus-ai-factory"))
             self.assertEqual(r["classification"], "VERIFIED FACT")
             self.assertIn("MAI-EV-0044", r["evidence"])
-            self.assertIn("not published", r["note"])
+            self.assertIn("does not reproduce the memorandum", r["note"])
+            self.assertIn("has not obtained its text", r["note"])
         nexus = next(e for e in self.ontology["entities"] if e["id"] == "nexus-ai-factory")
         self.assertEqual(nexus["lifecycle"], "announced")
         for t in (nexus["summary"], nexus.get("status", ""), self.records["MAI-EV-0045"]["verification_note"]):
@@ -401,6 +402,114 @@ class EvidenceAcquisition(unittest.TestCase):
     def test_no_gap_closed_by_this_sprint(self):
         self.assertEqual({g["state"] for g in self.gaps["gaps"]}, {"open"})
         self.assertFalse(any(r["evidence_type"] == "signed_instrument" for r in self.evidence["records"]))
+
+
+NUMBER = re.compile(r"\d[\d,\u202f\u00a0]*(?:\.\d+)?")
+
+
+def numbers(text):
+    return {re.sub(r"[,\u202f\u00a0]", "", m.group(0)) for m in NUMBER.finditer(text)}
+
+
+def unsupported_numbers(text, records):
+    """Numerals in a statement that appear in none of its cited records' claim, excerpts or dates.
+    This checks provenance only: a numeral that does appear may still be misattributed or misread,
+    and numbers written in words are not checked. It cannot establish that a statement is correct."""
+    have = set()
+    for r in records:
+        have |= numbers(" ".join([r["claim"], *r["source_excerpts"]]))
+        for d in (r.get("publication_date"), r.get("retrieval_date")):
+            if d:
+                have |= {x.lstrip("0") or "0" for x in d.split("-")} | set(d.split("-"))
+    return sorted(numbers(text) - have)
+
+
+class FinalEvidenceCorrections(unittest.TestCase):
+    """Sprint 07 review corrections D1-D6."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.evidence, cls.ontology = registry.load_all()
+        cls.records = {r["evidence_id"]: r for r in cls.evidence["records"]}
+        cls.gaps = {g["id"]: g for g in json.loads((REPO / "data" / "gaps.json").read_text(encoding="utf-8"))["gaps"]}
+        cls.rows = build.matrix_rows(build.Model(cls.evidence, cls.ontology))
+
+    def test_every_numeral_in_a_gap_statement_is_in_its_cited_records(self):
+        for g in self.gaps.values():
+            for st in g["established"]:
+                self.assertEqual(unsupported_numbers(st["text"], [self.records[x] for x in st["evidence"]]), [],
+                                 f"{g['id']}: {st['text']}")
+
+    def test_every_numeral_in_an_attribute_is_in_its_cited_record(self):
+        # Identifiers are not measurements: "ISO 639-3" names a standard.
+        for e in self.ontology["entities"]:
+            for a in e.get("attributes", []):
+                value = a["value"].replace("ISO 639-3", "")
+                self.assertEqual(unsupported_numbers(value, [self.records[a["evidence"]]]), [], f"{e['id']}: {a['name']}")
+
+    def test_the_provenance_check_catches_a_misattributed_total(self):
+        st = next(s for s in self.gaps["GAP-03"]["established"] if s["evidence"] == ["MAI-EV-0042"])
+        self.assertEqual(unsupported_numbers(st["text"].replace("about 48", "about 58"), [self.records["MAI-EV-0042"]]), ["58"])
+        self.assertEqual(unsupported_numbers("moving from 113th", [self.records["MAI-EV-0046"]]), ["113"])
+
+    def test_gap_03_gives_the_preprints_figure_for_its_longest_run(self):
+        st = next(s for s in self.gaps["GAP-03"]["established"] if s["evidence"] == ["MAI-EV-0042"])
+        self.assertIn("about 48 GPU-hours for that longest run", st["text"])
+        self.assertNotIn("58", json.dumps(self.gaps["GAP-03"]))
+        self.assertTrue(any("approximately 48 GPU-hours" in x for x in self.records["MAI-EV-0042"]["source_excerpts"]))
+
+    def test_the_strategy_figure_cites_the_strategy(self):
+        st = next(s for s in self.gaps["GAP-06"]["established"] if "MAI-EV-0046" in s["evidence"])
+        self.assertIn("MAI-EV-0002", st["evidence"])
+        self.assertIn("113th", self.records["MAI-EV-0002"]["claim"])
+        self.assertNotIn("113", " ".join([self.records["MAI-EV-0046"]["claim"], *self.records["MAI-EV-0046"]["source_excerpts"]]))
+
+    def test_no_registry_text_asserts_that_a_text_is_not_published(self):
+        texts = [r["verification_note"] for r in self.evidence["records"]]
+        texts += [e.get(k, "") for e in self.ontology["entities"] for k in ("summary", "status", "note")]
+        texts += [r.get("note", "") for r in self.ontology["relationships"]]
+        texts += [json.dumps(g) for g in self.gaps.values()]
+        for t in texts:
+            self.assertNotRegex(t, r"(?i)\b(?:is|are) not published\b", t)
+
+    def test_the_mobilised_figure_is_quoted_and_not_read_as_spending(self):
+        r = self.records["MAI-EV-0044"]
+        self.assertTrue(any("12 milliards de dirhams mobilisé sur deux phases" in x for x in r["source_excerpts"]))
+        self.assertIn('"mobilisé sur deux phases"', r["verification_note"])
+        self.assertIn("does not establish that any amount has been spent", r["verification_note"])
+        self.assertNotRegex(r["verification_note"], r"(?i)all of the .* future tense|figures are stated in the future tense and are")
+
+    def test_gazette_rows_are_distinguished_from_signing_reports(self):
+        listed = {(r["subject"], r["predicate"], r["object"]) for r in registry.announcement_only(self.ontology, self.evidence)}
+        unlisted = [r for r in self.ontology["relationships"] if r["predicate"] == "signatory_of"
+                    and (r["subject"], r["predicate"], r["object"]) not in listed]
+        gazette = [r for r in unlisted if any(self.records[x]["evidence_type"] == "official_gazette" for x in r["evidence"])]
+        others = [r for r in unlisted if r not in gazette]
+        self.assertEqual(len(gazette), 8)
+        self.assertTrue(all(any(self.records[x]["evidence_type"] == "official_report" for x in r["evidence"]) for r in others))
+        gap05 = self.gaps["GAP-05"]["unestablished"]
+        self.assertIn("For eight signatures of the JAZARI ROOT and JAZARI Industrie X.0 conventions", gap05)
+        self.assertIn("the other signatures not listed rest on an official report of the signing", gap05)
+        for row in self.rows:
+            cites = any(e["evidence_type"] == "official_gazette" for e in row["evidence"])
+            self.assertEqual(build.SIGNED_GAZETTE_APPROVAL in row["qualifications"], cites and row["documented_as"] == "Signed", row["id"])
+        q8 = visible("registry/questions/index.html")
+        self.assertIn(f"for {len(gazette)}, an official gazette record (MAI-EV-0047) also documents the legal approval of the instrument", q8)
+        matrix = visible("registry/matrix/index.html")
+        line = matrix[matrix.index('For none of the'):][:600]
+        self.assertNotIn("official gazette, ", line.split(")")[0])
+        self.assertIn(f"{len(gazette)} rows also cite an official gazette record", line)
+        definition = json.loads((REPO / "registry" / "matrix" / "matrix.json").read_text(encoding="utf-8"))
+        value = definition["derivation"]["documentation_basis"]["values"]["includes-non-announcement-record"]
+        self.assertIn("a regulatory record, an official gazette text, a technical repository", value)
+        self.assertIn("an official gazette text records a legal act about it, such as its approval", value)
+        self.assertIn(build.SIGNED_GAZETTE_APPROVAL, [q["text"] for q in definition["derivation"]["qualifications"]["rules"]])
+
+    def test_gazette_note_names_the_groups_and_the_earlier_block_is_resolved(self):
+        note = self.records["MAI-EV-0047"]["verification_note"]
+        self.assertIn("for JAZARI EduTech and JAZARI Smart City, further ministries and public bodies", note)
+        self.assertNotIn("the other two groups", note)
+        self.assertIn("later retrieved and is recorded as MAI-EV-0044", self.records["MAI-EV-0030"]["verification_note"])
 
 
 if __name__ == "__main__":

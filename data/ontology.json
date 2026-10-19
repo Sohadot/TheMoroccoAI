@@ -245,7 +245,7 @@
       "alt_names": ["Réseau des instituts Jazari", "Al Jazari Institutes"],
       "domain": "research-academia",
       "summary": "Announced network of AI institutes of excellence that the ministry describes as the operational arm of Morocco AI 2030 for research and innovation. It was announced as covering the twelve regions, with JAZARI ROOT as its core.",
-      "status": "Announced in January 2026. The founding conventions of JAZARI ROOT, JAZARI Industrie X.0, JAZARI Smart City and JAZARI EduTech were approved by joint orders in July 2026 (Bulletin Officiel 7534); their signed texts are not published, and no institute is documented as operating.",
+      "status": "Announced in January 2026. The founding conventions of JAZARI ROOT, JAZARI Industrie X.0, JAZARI Smart City and JAZARI EduTech were approved by joint orders in July 2026 (Bulletin Officiel 7534); the Bulletin Officiel publishes only summaries of the conventions, not their signed texts, which this registry has not obtained; no institute is documented as operating.",
       "evidence": ["MAI-EV-0010", "MAI-EV-0012"]
     },
     {
@@ -714,8 +714,8 @@
     {"subject": "cndp", "predicate": "lists_in_framework", "object": "law-09-08", "evidence": ["MAI-EV-0017"], "classification": "VERIFIED FACT"},
     {"subject": "um6p", "predicate": "hosts", "object": "toubkal-supercomputer", "evidence": ["MAI-EV-0020"], "classification": "VERIFIED FACT"},
     {"subject": "toubkal-supercomputer", "predicate": "applies", "object": "high-performance-computing", "evidence": ["MAI-EV-0020"], "classification": "VERIFIED FACT"},
-    {"subject": "nexus-core-systems", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030", "MAI-EV-0044"], "classification": "VERIFIED FACT", "note": "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published."},
-    {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030", "MAI-EV-0044"], "classification": "VERIFIED FACT", "note": "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published."},
+    {"subject": "nexus-core-systems", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030", "MAI-EV-0044"], "classification": "VERIFIED FACT", "note": "Signature stated by the ministry's own release (MAI-EV-0044), which does not reproduce the memorandum; this registry has not obtained its text."},
+    {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030", "MAI-EV-0044"], "classification": "VERIFIED FACT", "note": "Signature stated by the ministry's own release (MAI-EV-0044), which does not reproduce the memorandum; this registry has not obtained its text."},
     {"subject": "nexus-ai-factory", "predicate": "applies", "object": "high-performance-computing", "evidence": ["MAI-EV-0030"], "classification": "ANNOUNCED PLAN"},
     {"subject": "nexus-ai-factory", "predicate": "applies", "object": "data-centres", "evidence": ["MAI-EV-0030"], "classification": "ANNOUNCED PLAN"},
     {"subject": "aiox-labs", "predicate": "created", "object": "deepecho", "evidence": ["MAI-EV-0028", "MAI-EV-0027"], "classification": "VERIFIED FACT"},

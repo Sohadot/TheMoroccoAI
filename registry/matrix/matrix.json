@@ -30,7 +30,7 @@
    "values": {
     "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
     "declaration-or-event": "Any other relationship: declarations, public events and a programme's stated composition, whose primary record is an announcement. Not measured this way.",
-    "includes-non-announcement-record": "A formal-act relationship that cites at least one record of another type: an official report, a regulatory record, a technical repository, a publication, a ranking or a direct observation. Such a record is not the instrument itself; a signed text would have evidence_type signed_instrument."
+    "includes-non-announcement-record": "A formal-act relationship that cites at least one record of another type: an official report, a regulatory record, an official gazette text, a technical repository, a publication, a ranking or a direct observation. Such a record is not the instrument itself: an official gazette text records a legal act about it, such as its approval, and a signed text would have evidence_type signed_instrument."
    }
   },
   "documented_as": {
@@ -74,6 +74,10 @@
     {
      "text": "The signing is documented by a report of it; the signed text is not recorded in this registry.",
      "when": "documented_as is Signed and no cited record is a signed_instrument whose instrument.signatories include the subject"
+    },
+    {
+     "text": "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
+     "when": "documented_as is Signed and a cited record has evidence_type official_gazette"
     },
     {
      "text": "A signature is recorded as a signature; delivery is not documented.",
@@ -236,6 +240,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -321,6 +326,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -895,6 +901,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -980,7 +987,7 @@
     "type": "project"
    },
    "qualifications": [
-    "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published.",
+    "Signature stated by the ministry's own release (MAI-EV-0044), which does not reproduce the memorandum; this registry has not obtained its text.",
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
     "Documented here only by announcements, news reports or descriptions (GAP-05)."
@@ -1061,6 +1068,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1262,6 +1270,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1292,7 +1301,7 @@
     "lifecycle": null,
     "name": "JAZARI Institutes network",
     "stage": null,
-    "status_as_recorded": "Announced in January 2026. The founding conventions of JAZARI ROOT, JAZARI Industrie X.0, JAZARI Smart City and JAZARI EduTech were approved by joint orders in July 2026 (Bulletin Officiel 7534); their signed texts are not published, and no institute is documented as operating.",
+    "status_as_recorded": "Announced in January 2026. The founding conventions of JAZARI ROOT, JAZARI Industrie X.0, JAZARI Smart City and JAZARI EduTech were approved by joint orders in July 2026 (Bulletin Officiel 7534); the Bulletin Officiel publishes only summaries of the conventions, not their signed texts, which this registry has not obtained; no institute is documented as operating.",
     "type": "initiative"
    },
    "qualifications": [
@@ -1406,7 +1415,7 @@
     "type": "project"
    },
    "qualifications": [
-    "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published.",
+    "Signature stated by the ministry's own release (MAI-EV-0044), which does not reproduce the memorandum; this registry has not obtained its text.",
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
     "Documented here only by announcements, news reports or descriptions (GAP-05)."
@@ -1488,6 +1497,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1675,6 +1685,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1753,6 +1764,7 @@
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A cited official gazette record documents the legal approval of the instrument, not its signed text, and is not a report of the signing.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",

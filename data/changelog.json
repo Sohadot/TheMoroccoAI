@@ -22,6 +22,13 @@
         "The registry attributed the GemMaroc fine-tuning runs to \"Belkasmi et al.\", copying the Toubkal article; that article's own reference is the GemMaroc preprint by Skiredj et al., and the preprint does not say where the runs were made. The Toubkal attribute, MAI-EV-0041 and GAP-03 now say so.",
         "The Digital Morocco 2030 ranking objective's starting point of 113th is now noted as the source's figure: no United Nations edition ranks Morocco 113th; it ranked 101st in 2022 and 90th in 2024.",
         "The status of JAZARI Smart City and JAZARI EduTech said that no founding convention was documented; their founding conventions were approved in July 2026."
+      ],
+      "review_fixes": [
+        "GAP-03 attributed to the GemMaroc preprint a total of about 58 GPU-hours, which is the Toubkal article's table of the runs; the preprint reports about 48 GPU-hours for its longest run, which GAP-03 now gives.",
+        "Statements that signed texts are \"not published\" replaced by what the cited sources reproduce and what this registry has obtained; GAP-04 re-assessed for the Nexus relationship notes, and still open.",
+        "MAI-EV-0044 quotes the release's MAD 12 billion \"investissement initial … mobilisé sur deux phases\" and notes that it does not establish any expenditure.",
+        "GAP-05, the Q8 answer, the matrix and the definition of includes-non-announcement-record distinguish the eight signatures that also cite the gazette's approval from those resting on official reports; a qualification marks matrix rows citing an official gazette record.",
+        "The GAP-06 statement on the 113th starting point also cites the strategy record it comes from (MAI-EV-0002); MAI-EV-0047 names JAZARI EduTech and JAZARI Smart City; MAI-EV-0030 notes that the ministry release it could not retrieve is now MAI-EV-0044."
       ]
     },
     {

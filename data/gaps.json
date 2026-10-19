@@ -118,7 +118,7 @@
           ]
         },
         {
-          "text": "The GemMaroc preprint that the article cites (Skiredj et al.; three of its five authors are from the host university) reports the size of those runs, about 58 GPU-hours on A100 and H100 GPUs, but does not say where they were made, and expresses their cost at a commercial cloud provider's public rate.",
+          "text": "The GemMaroc preprint that the article cites (Skiredj et al.; three of its five authors are from the host university) reports the hardware used, A100 GPUs and, for its largest model, eight H100 GPUs, and about 48 GPU-hours for that longest run, but does not say where the runs were made, and expresses their cost at a commercial cloud provider's public rate.",
           "evidence": [
             "MAI-EV-0042"
           ]
@@ -170,7 +170,7 @@
           ]
         },
         {
-          "text": "The Nexus AI Factory memorandum was signed at GITEX Africa 2026 by Nexus Core Systems, the Ministry of Digital Transition and two other public bodies, according to the ministry's own release, which states its investment and capacity figures as commitments.",
+          "text": "The Nexus AI Factory memorandum was signed at GITEX Africa 2026 by Nexus Core Systems, the Ministry of Digital Transition and two other public bodies, according to the ministry's own release, which states its phase investment and capacity figures as commitments and documents no expenditure; the release does not reproduce the memorandum, and this registry has not obtained its text.",
           "evidence": [
             "MAI-EV-0030",
             "MAI-EV-0044"
@@ -209,7 +209,7 @@
         "MAI-EV-0044",
         "MAI-EV-0045"
       ],
-      "assessed_fingerprint": "b1ad64a681fbb53b",
+      "assessed_fingerprint": "eb7e3a0314ac921e",
       "assessed": "2026-10-19",
       "state": "open"
     },
@@ -218,7 +218,7 @@
       "question": "Which relationships asserting a formal act (a signature, creation, designation, investment, development or operation) rest only on announcements, news reports or descriptions in this registry?",
       "entities": [],
       "established": [],
-      "unestablished": "Any record other than an announcement, news report or description for each relationship listed below. Relationships not listed cite at least one other kind of record, such as an official report; for a signature that is still a report of the signing, not the signed text, which this registry does not record for any signature. This measures how each relationship is documented in this registry, not whether it is true.",
+      "unestablished": "Any record other than an announcement, news report or description for each relationship listed below. Relationships not listed cite at least one other kind of record, such as an official report or a technical repository. For eight signatures of the JAZARI ROOT and JAZARI Industrie X.0 conventions, that record is the Bulletin Officiel's publication of the conventions' approval by joint order, with a summary naming their parties; the other signatures not listed rest on an official report of the signing. Neither is the signed text, which this registry does not record for any signature. This measures how each relationship is documented in this registry, not whether it is true.",
       "evidence_needed": [
         "Published texts of the conventions and memoranda",
         "Official Bulletin publications where applicable"
@@ -267,7 +267,8 @@
         {
           "text": "The United Nations ranked Morocco 101st in the e-government development index in 2022 and 90th in 2024; no edition shows the 113th place given as the strategy's starting point. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy.",
           "evidence": [
-            "MAI-EV-0046"
+            "MAI-EV-0046",
+            "MAI-EV-0002"
           ]
         }
       ],
