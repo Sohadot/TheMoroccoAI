@@ -1,5 +1,17 @@
 {
  "as_of": "2026-10-19",
+ "breaking_changes": [
+  {
+   "consumer_effect": "A consumer that compares this field with the old value fails: the v0.4.1 example consumer exits with status 1 and reports, for each row, \"has documentation_basis 'includes-non-announcement-record'; the published data gives 'includes-formal-record'\".",
+   "field": "rows[].documentation_basis",
+   "file": "/registry/matrix/matrix.json",
+   "migration": "Replace the old value with the new one, or read the names from derivation.documentation_basis.assignment in matrix.json, as the v0.5.0 example consumer does.",
+   "new": "includes-non-announcement-record",
+   "old": "includes-formal-record",
+   "reason": "The value marks a formal-act relationship that cites at least one record other than an announcement: an official report, a regulatory record, a repository, a publication, a ranking or a direct observation. The old name described these as formal records of the act, which for signatures read as the signed text; no such text is recorded for any signature. The rows it applies to are unchanged; only the name changed.",
+   "version": "0.5.0"
+  }
+ ],
  "classification_support": {
   "lifecycle": {
    "announced": [
@@ -58,39 +70,39 @@
  "registry_version": "0.5.0",
  "resources": [
   {
-   "bytes": 74780,
+   "bytes": 74856,
    "path": "/data/evidence.json",
    "purpose": "Evidence records: source URL and organisation, publication and retrieval dates, verbatim excerpts, classification, verification status and note. Defines the classifications and verification statuses it uses.",
    "role": "canonical",
-   "sha256": "ad344e6cb49b6d5cb16316a891a779a276d4996bdb9cec1f09e060850d0845f4"
+   "sha256": "29b7aa1744e0ece3ce8622d40703e1e453ca0a5490694c5bd5d386814791dcd1"
   },
   {
-   "bytes": 59626,
+   "bytes": 59975,
    "path": "/data/ontology.json",
    "purpose": "Entity types, lifecycle stages, project kinds, origins, domains and predicates (each defined), then entities and typed relationships, each citing records in evidence.json.",
    "role": "canonical",
-   "sha256": "ebe06bf5b61ec0a31cf9ca2ba955d8043f94a8d46977b197272e9a15ed5c7ba0"
+   "sha256": "c710587de31f40ef51ab307d2076a8751f8edae972d5bf32b37876f1e39ebd7c"
   },
   {
    "bytes": 11110,
    "path": "/data/gaps.json",
    "purpose": "Evidence gaps: what is established (with records), what is not, what would resolve each, the records and data digest each assessment rests on, and the data checks re-run on every build.",
    "role": "canonical",
-   "sha256": "1c70ac9f80c8571c09bc8268a196de4a987096818264f7632452ec3a4fd86e8a"
+   "sha256": "af50ef2716796b60d8be6626c56407e421bd2611a62d5a67b8b9509dd28f11fe"
   },
   {
-   "bytes": 9572,
+   "bytes": 10759,
    "path": "/data/changelog.json",
    "purpose": "Published registry versions, corrections, and the commit or pull request behind each.",
    "role": "canonical",
-   "sha256": "678812265962d8aa197a717763c960fae006c1ee13eb805434edd0a37d52dc5e"
+   "sha256": "a64d126816de26f752f5dfb52d4a73a1f170f934c63d32c3e8a252f26f70ab08"
   },
   {
-   "bytes": 59436,
+   "bytes": 59714,
    "path": "/registry/matrix/matrix.json",
    "purpose": "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row.",
    "role": "derived",
-   "sha256": "451263a5712950227a5af6275dc50eb62e721a6d501c7e2c930bf15713adb285"
+   "sha256": "7e4f18da4285d555b879aaa63299ffa011c0819131ed9bcb30dbc82a7c2150b2"
   },
   {
    "bytes": 19811,

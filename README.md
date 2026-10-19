@@ -81,6 +81,13 @@ and relationships classified beyond what their evidence supports.
   act (signing, creating, designating, investing, developing, operating) whose every record is an
   announcement, news report or description are listed in GAP-05; that measures documentation here, not
   truth. Declarations and public events are not measured this way.
+- **Signed texts** (`evidence_type: signed_instrument`): admitted only when the registry has read the signed
+  agreement, convention or memorandum in full, from a party to it or an official publisher of it. A report, summary,
+  press release or news item about a signing never qualifies, even from a signatory or the government. The record
+  must be a verified VERIFIED FACT from a party or official publisher and carry `instrument` (`title`, `signed_on`,
+  `signatories` among its related entities, `access: full-text-read`); a `signatory_of` relationship citing it must
+  name one of those signatories. The validator checks these; that the text was actually read is the editor's
+  responsibility. Until such a record is cited, every Signed row says the signed text is not recorded.
 - **Regulatory wording**: a 510(k) is a clearance; registry text may not call a device FDA-approved
   except inside a quotation.
 - **Versions**: `evidence.json` and `ontology.json` carry the same `version` and `as_of`; the validator rejects a

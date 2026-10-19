@@ -51,16 +51,51 @@ class SignedRelationships(unittest.TestCase):
             self.assertNotIn(build.GAP05_CAVEAT, r["qualifications"])
             self.assertTrue(any(e["evidence_type"] == "official_report" for e in r["evidence"]), r["id"])
 
-    def test_a_signed_text_would_lift_the_caveat(self):
-        ev = copy.deepcopy(self.evidence)
+    @staticmethod
+    def instrument_record(ev, signatories):
+        """MAI-EV-0009 turned into a record of the convention's text, as a hypothetical."""
         rec = next(r for r in ev["records"] if r["evidence_id"] == "MAI-EV-0009")
-        rec["evidence_type"] = "signed_instrument"
+        rec.update(evidence_type="signed_instrument", source_type="government_publication",
+                   instrument={"title": "Convention pour la création de l'Institut Al-Jazari pour l'Industrie", "signed_on": "2026-03-10",
+                               "signatories": signatories, "access": "full-text-read"})
+        return rec
+
+    def test_a_signed_text_lifts_the_caveat_only_for_its_signatories(self):
+        ev = copy.deepcopy(self.evidence)
+        self.instrument_record(ev, ["ministry-industry-commerce", "uemf"])
         rows = build.matrix_rows(build.Model(ev, self.ontology))
-        x0 = [r for r in rows if r["object"]["id"] == "jazari-industrie-x0" and r["documented_as"] == "Signed"]
+        x0 = {r["subject"]["id"]: r for r in rows if r["object"]["id"] == "jazari-industrie-x0" and r["documented_as"] == "Signed"}
         self.assertEqual(len(x0), 7)
-        for r in x0:
-            self.assertNotIn(build.SIGNED_TEXT_NOT_RECORDED, r["qualifications"])
+        for sid, r in x0.items():
+            self.assertEqual(build.SIGNED_TEXT_NOT_RECORDED in r["qualifications"], sid not in ("ministry-industry-commerce", "uemf"), sid)
             self.assertEqual(r["documentation_basis"], "includes-non-announcement-record")
+
+    def test_signed_instrument_admission_rules(self):
+        def problems(change):
+            ev = copy.deepcopy(self.evidence)
+            rec = self.instrument_record(ev, ["ministry-industry-commerce", "ministry-digital-transition", "ministry-economy-finance",
+                                              "uemf", "usmba", "umi", "al-akhawayn-university"])
+            change(rec)
+            return [e for e in registry.validate_evidence(ev) + registry.validate_ontology(self.ontology, ev) if "MAI-EV-0009" in e or "signed text" in e]
+        self.assertEqual(problems(lambda r: None), [])
+        cases = {
+            "a report of the signing": (lambda r: r.update(source_type="state_news_agency"), "must come from a party or an official publisher"),
+            "the press": (lambda r: r.update(source_type="secondary_press"), "must come from a party or an official publisher"),
+            "partial reading": (lambda r: r.update(verification_status="partial"), "full text read"),
+            "not a fact": (lambda r: r.update(classification="ANNOUNCED PLAN"), "must be a VERIFIED FACT"),
+            "no instrument": (lambda r: r.pop("instrument"), "needs an instrument field"),
+            "access not declared": (lambda r: r["instrument"].update(access="summary"), "must have read the signed text itself"),
+            "no date": (lambda r: r["instrument"].pop("signed_on"), "needs signed_on"),
+            "one party": (lambda r: r["instrument"].update(signatories=["uemf"]), "at least two parties"),
+            "signatory not related": (lambda r: r["instrument"]["signatories"].append("cgem"), "each among related_entities"),
+            "relationship outside the signatories": (lambda r: r["instrument"].update(signatories=["uemf", "usmba"]), "whose signatories do not include"),
+        }
+        for name, (change, msg) in cases.items():
+            with self.subTest(name):
+                self.assertTrue(any(msg in e for e in problems(change)), problems(change))
+        ev = copy.deepcopy(self.evidence)
+        ev["records"][0]["instrument"] = {"title": "x"}
+        self.assertTrue(any("only a signed_instrument record may carry an instrument field" in e for e in registry.validate_evidence(ev)))
 
     def test_classifications_and_stages_are_unchanged(self):
         # Sprint 06 corrects presentation only: the signatures stay VERIFIED FACT on the same records.
@@ -73,6 +108,9 @@ class SignedRelationships(unittest.TestCase):
     def test_no_published_text_implies_the_instrument_is_recorded(self):
         for path in ("registry/matrix/index.html", "registry/gaps/index.html", "data/index.html", "registry/questions/index.html"):
             text = visible(path)
+            if path == "data/index.html":
+                # The old value may appear only in the migration note.
+                text = text[:text.index("09 Changes to the data contract")] + text[text.index("10 Corrections"):]
             self.assertNotIn("includes-formal-record", text, path)
             self.assertNotRegex(text, r"(?i)the instrument behind them is not recorded", path)
         for path in ("registry/matrix/matrix.json", "registry/gaps/gaps.json"):
@@ -160,6 +198,61 @@ class TargetsAndProgress(unittest.TestCase):
         new["evidence_id"] = "MAI-EV-0099"
         ev["records"].append(new)
         self.assertTrue(any(e.startswith("GAP-06: new evidence MAI-EV-0099") for e in registry.validate_gaps(self.gaps, ev, self.ontology)))
+
+
+class BreakingChangeNotice(unittest.TestCase):
+    def test_rename_is_documented_as_breaking_everywhere_and_without_alias(self):
+        manifest = json.loads((REPO / "data" / "manifest.json").read_text(encoding="utf-8"))
+        bc = manifest["breaking_changes"]
+        self.assertEqual([(c["version"], c["old"], c["new"]) for c in bc],
+                         [("0.5.0", "includes-formal-record", "includes-non-announcement-record")])
+        for key in ("file", "field", "reason", "consumer_effect", "migration"):
+            self.assertTrue(bc[0][key].strip(), key)
+        self.assertIn("only the name changed", bc[0]["reason"])
+        self.assertIn("exits with status 1", bc[0]["consumer_effect"])
+        page = visible("data/index.html")
+        note = page[page.index("09 Changes to the data contract"):page.index("10 Corrections")]
+        for x in ("includes-formal-record", "includes-non-announcement-record", "not accepted as aliases", "In v0.5.0 it applies to 14 rows"):
+            self.assertIn(x, note)
+        log = json.loads((REPO / "data" / "changelog.json").read_text(encoding="utf-8"))["entries"][0]
+        self.assertEqual(log["version"], "0.5.0")
+        self.assertTrue(any("includes-formal-record" in x and "No alias" in x for x in log["breaking_changes"]))
+        self.assertIn("Breaking changes to the data contract", visible("methodology/index.html"))
+        # No alias: no published JSON value and no consumer path accepts the old name.
+        matrix = (REPO / "registry" / "matrix" / "matrix.json").read_text(encoding="utf-8")
+        self.assertNotIn("includes-formal-record", matrix)
+        self.assertNotIn("includes-formal-record", (REPO / "examples" / "registry_consumer.py").read_text(encoding="utf-8"))
+
+    def test_v041_consumer_fails_closed_as_documented(self):
+        import subprocess
+        old = subprocess.run(["git", "show", "c6211538caa4285b446644d3cf38cd2e55ae7f7f:examples/registry_consumer.py"],
+                             cwd=REPO, capture_output=True, text=True)
+        if old.returncode:
+            self.skipTest("repository history not available")
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "consumer_v041.py"
+            path.write_text(old.stdout, encoding="utf-8")
+            p = subprocess.run([sys.executable, "-I", str(path), "--source", str(REPO), "verify"], capture_output=True, text=True, timeout=120)
+        self.assertEqual(p.returncode, 1)
+        self.assertIn("has documentation_basis 'includes-non-announcement-record'; the published data gives 'includes-formal-record'", p.stderr)
+
+
+class JazariWording(unittest.TestCase):
+    def test_no_jazari_text_implies_a_recorded_instrument_or_delivery(self):
+        ev, on = registry.load_all()
+        texts = [e.get(k, "") for e in on["entities"] if "jazari" in e["id"] for k in ("summary", "status", "note")]
+        texts += [r.get("note", "") for r in on["relationships"] if "jazari" in r["subject"] + r["object"]]
+        texts += [r["verification_note"] for r in ev["records"] if any("jazari" in x for x in r["related_entities"])]
+        for t in texts:
+            self.assertNotRegex(t, r"(?i)(signed|founding) instruments? (is|are) documented|documents signed instruments", t)
+            self.assertNotRegex(t, r"(?i)\b(is|are|was|were) (operational|constituted|established|running)\b", t)
+        for e in on["entities"]:
+            if "jazari" in e["id"] and e.get("lifecycle"):
+                self.assertEqual(e["lifecycle"], "announced", e["id"])
+        rel = next(r for r in on["relationships"] if (r["subject"], r["predicate"]) == ("morocco-ai-2030", "implemented_through"))
+        self.assertIn("implementation through the network is not documented", rel["note"])
+        self.assertIn("its planned core institute", visible("registry/index.html"))
 
 
 class ConsumerCompatibility(unittest.TestCase):

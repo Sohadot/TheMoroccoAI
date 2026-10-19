@@ -57,8 +57,9 @@ EVIDENCE_TYPES = (
     "regulatory_record",
     "live_service_observation",
     "procurement_notice",
-    # The text of a signed agreement, convention or memorandum, read by the registry. No record has this type yet:
-    # every signature recorded so far is documented by a report of it.
+    # The text of a signed agreement, convention or memorandum, which the registry has read in full (see
+    # INSTRUMENT_SOURCES and _check_instrument). A report of a signing never has this type, whoever publishes it.
+    # No record has this type yet: every signature recorded so far is documented by a report of it.
     "signed_instrument",
 )
 REQUIRED_EVIDENCE_FIELDS = (
@@ -298,6 +299,43 @@ def validate_evidence(evidence, today=None):
                               f"a 510(k) is a clearance; quote the source if it says otherwise")
         if cls == "UNVERIFIED CLAIM" and not str(r.get("verification_note", "")).strip():
             errors.append(f"{where} UNVERIFIED CLAIM needs a verification_note saying what was not checked")
+        errors += _check_instrument(r, where)
+    return errors
+
+
+# A signed text can only come from a party to it or an official publisher of it; news agencies, the press,
+# repositories and lists report or describe instruments rather than publish them.
+INSTRUMENT_SOURCES = ("government_publication", "government_portal", "signatory_organization", "regulator",
+                      "intergovernmental_organization")
+INSTRUMENT_ACCESS = ("full-text-read",)
+
+
+def _check_instrument(r, where):
+    """What can be checked mechanically about a record of a signed text. Whether the registry actually read the
+    instrument, rather than a report of its signing, is an editorial admission requirement (see the README)."""
+    errors = []
+    inst = r.get("instrument")
+    if r.get("evidence_type") != "signed_instrument":
+        if inst is not None:
+            errors.append(f"{where} only a signed_instrument record may carry an instrument field")
+        return errors
+    if r.get("classification") != "VERIFIED FACT" or r.get("verification_status") != "verified":
+        errors.append(f"{where} a signed_instrument record must be a VERIFIED FACT with verification_status verified (the full text read)")
+    if r.get("source_type") not in INSTRUMENT_SOURCES:
+        errors.append(f"{where} a signed instrument must come from a party or an official publisher ({', '.join(INSTRUMENT_SOURCES)}), "
+                      f"not {r.get('source_type')!r}")
+    if not isinstance(inst, dict):
+        errors.append(f"{where} a signed_instrument record needs an instrument field (title, signed_on, signatories, access)")
+        return errors
+    if not str(inst.get("title", "")).strip():
+        errors.append(f"{where} instrument needs the title the signed text gives itself")
+    if not _parse_date(inst.get("signed_on")):
+        errors.append(f"{where} instrument needs signed_on, the date on the signed text")
+    sig = inst.get("signatories")
+    if not isinstance(sig, list) or len(sig) < 2 or any(x not in (r.get("related_entities") or []) for x in sig):
+        errors.append(f"{where} instrument signatories must list at least two parties named in the text, each among related_entities")
+    if inst.get("access") not in INSTRUMENT_ACCESS:
+        errors.append(f"{where} instrument access must be {' or '.join(INSTRUMENT_ACCESS)}: the registry must have read the signed text itself")
     return errors
 
 
@@ -513,6 +551,12 @@ def validate_ontology(ontology, evidence):
             errors.append(f"{where} classified {cls} but no cited record supports that class "
                           f"(cited: {', '.join(sorted(c for c in cited if c))})")
     errors += _check_deployments(by_id, records, ontology.get("relationships") or [])
+    for rel in ontology.get("relationships") or []:
+        for x in rel.get("evidence") or []:
+            inst = records.get(x, {}).get("instrument") if records.get(x, {}).get("evidence_type") == "signed_instrument" else None
+            if inst and rel.get("predicate") == "signatory_of" and rel.get("subject") not in (inst.get("signatories") or []):
+                errors.append(f"{rel.get('subject')} signatory_of {rel.get('object')}: cites the signed text {x}, "
+                              f"whose signatories do not include {rel.get('subject')}")
     return errors
 
 

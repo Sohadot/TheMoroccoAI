@@ -12,13 +12,18 @@
       "relationships": 78,
       "changes": [
         "Evidence gap GAP-06: measured progress towards the official targets of Digital Morocco 2030, assessed against its four existing records. Every strategy with an official target now has a gap on its progress, which the build checks; Q9 no longer reports a target as not assessed.",
-        "Every relationship shown as Signed now states that the signing is documented by a report of it and that the signed text is not recorded in this registry; a new evidence type, signed_instrument, is reserved for a record of a signed text. No record has that type.",
+        "Every relationship shown as Signed now states that the signing is documented by a report of it and that the signed text is not recorded in this registry; a new evidence type, signed_instrument, is reserved for a record of a signed text that the registry has read in full, from a party or an official publisher, with the instrument's title, date and signatories; a report of a signing never qualifies. No record has that type.",
         "Q8 states the kinds and stages of the projects it counts.",
         "The consumer example reads the documentation-basis names from matrix.json instead of fixing them in its code.",
+        "The relationship from Morocco AI 2030 to the JAZARI network now notes that it records the ministry's description of how the roadmap is to be implemented, not documented implementation; GAP-02 was re-assessed against it, with no change to its text.",
         "No record, entity or relationship was added or changed, and no classification or stage changed."
+      ],
+      "breaking_changes": [
+        "matrix.json rows[].documentation_basis: the value includes-formal-record is renamed includes-non-announcement-record, for the same rows. A consumer comparing with the old value fails, as the v0.4.1 example consumer does (exit status 1). No alias is provided. Migration notes are on /data/ and in the manifest (breaking_changes)."
       ],
       "corrections": [
         "The documentation basis includes-formal-record (matrix.json, v0.4.1) is renamed includes-non-announcement-record: the records it covers are official reports, repositories, rankings and observations, none of which is a signed text, so for signatures the name suggested an instrument that is not recorded. The matrix page and the GAP-05 text no longer imply that the instrument is recorded for relationships outside GAP-05.",
+        "The JAZARI network's status said that signed founding instruments are documented for JAZARI ROOT and JAZARI Industrie X.0, and two record notes said the same; the registry records reported signings, not the signed texts. The registry index called JAZARI ROOT the network's core institute without saying it is planned. No JAZARI institute's stage changed: all remain announced.",
         "The Q8 question said \"documented AI or computing projects\"; it now says \"the AI-related and computing projects recorded in this registry\", since 8 of its 12 projects are announced and one is a catalogue platform rather than an AI system."
       ]
     },

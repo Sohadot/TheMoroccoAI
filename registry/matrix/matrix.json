@@ -26,9 +26,6 @@
     "hosts",
     "lists_in_framework"
    ],
-   "renamed": {
-    "includes-formal-record": "includes-non-announcement-record (v0.5.0)"
-   },
    "rule": "For a relationship whose type is in formal_act_relationships: announcement-or-description when every record it cites has an evidence_type in announcement_evidence_types, otherwise includes-non-announcement-record. For any other relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. documented_as and documentation_basis are independent: a row can read Signed while resting only on an announcement.",
    "values": {
     "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
@@ -76,7 +73,7 @@
     },
     {
      "text": "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-     "when": "documented_as is Signed and no cited record has evidence_type signed_instrument"
+     "when": "documented_as is Signed and no cited record is a signed_instrument whose instrument.signatories include the subject"
     },
     {
      "text": "A signature is recorded as a signature; delivery is not documented.",
@@ -484,11 +481,11 @@
     "lifecycle": "announced",
     "name": "JAZARI EduTech",
     "stage": "Announced",
-    "status_as_recorded": "Named only. No founding instrument documented in the registry.",
+    "status_as_recorded": "Named only. No founding convention, nor any signing of one, is documented in the registry.",
     "type": "project"
    },
    "qualifications": [
-    "Named as a component by the ministry; no founding instrument is documented.",
+    "Named as a component by the ministry; no founding convention, nor any signing of one, is documented.",
     "Not verified as delivered."
    ],
    "relationship": "includes",
@@ -591,11 +588,11 @@
     "lifecycle": "announced",
     "name": "JAZARI Smart City",
     "stage": "Announced",
-    "status_as_recorded": "Named only. No founding instrument documented in the registry.",
+    "status_as_recorded": "Named only. No founding convention, nor any signing of one, is documented in the registry.",
     "type": "project"
    },
    "qualifications": [
-    "Named as a component by the ministry; no founding instrument is documented.",
+    "Named as a component by the ministry; no founding convention, nor any signing of one, is documented.",
     "Not verified as delivered."
    ],
    "relationship": "includes",
@@ -1251,10 +1248,12 @@
     "lifecycle": null,
     "name": "JAZARI Institutes network",
     "stage": null,
-    "status_as_recorded": "Announced in January 2026. Signed founding instruments are documented for JAZARI ROOT and JAZARI Industrie X.0.",
+    "status_as_recorded": "Announced in January 2026. Signings of founding conventions are reported for JAZARI ROOT and JAZARI Industrie X.0; their signed texts are not recorded, and no institute is documented as constituted or operating.",
     "type": "initiative"
    },
-   "qualifications": [],
+   "qualifications": [
+    "The ministry's description of how the roadmap is to be implemented; implementation through the network is not documented."
+   ],
    "relationship": "implemented_through",
    "relationship_label": "implemented through",
    "subject": {

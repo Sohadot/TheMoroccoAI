@@ -404,7 +404,7 @@ def render_registry_index(model):
   <h2 id="start-h"><span class="section-number">01</span>Start here</h2>
   <p class="prose"><a href="/registry/questions/">Questions the registry answers</a> lists which organisations have documented AI activity, which projects are operational or only announced, which models and datasets are public, and which relationships are verified. Each answer links to its evidence.</p>
   <p class="prose">The <a href="/registry/matrix/">institutional matrix</a> shows which organisations are documented as connected to which projects and initiatives, and on what evidence. The <a href="/registry/gaps/">evidence gap register</a> lists what the registry cannot yet establish.</p>
-  <p class="prose">The fullest chain in this version runs from <a href="{entity_url("morocco-ai-2030")}">Morocco AI 2030</a> to the <a href="{entity_url("jazari-network")}">JAZARI Institutes network</a>, its core institute <a href="{entity_url("jazari-root")}">Institut Jazari ROOT</a> and the <a href="{entity_url("jazari-industrie-x0")}">JAZARI Industrie X.0</a> convention signed in Fès. It then goes on to the signatories, the stated technologies and the targeted sectors. Each page shows the source excerpt, the publication and retrieval dates, and the classification of every claim.</p>
+  <p class="prose">The fullest chain in this version runs from <a href="{entity_url("morocco-ai-2030")}">Morocco AI 2030</a> to the announced <a href="{entity_url("jazari-network")}">JAZARI Institutes network</a>, its planned core institute <a href="{entity_url("jazari-root")}">Institut Jazari ROOT</a> and the <a href="{entity_url("jazari-industrie-x0")}">JAZARI Industrie X.0</a> convention signed in Fès. It then goes on to the signatories, the stated technologies and the targeted sectors. Each page shows the source excerpt, the publication and retrieval dates, and the classification of every claim.</p>
 </section>
 
 <section aria-labelledby="legend-h">
@@ -763,7 +763,7 @@ PLAN_NOT_DELIVERED = "Not verified as delivered."
 GAP05_CAVEAT = "Documented here only by announcements, news reports or descriptions (GAP-05)."
 QUALIFICATION_RULES = [
     {"when": "The relationship has a note in ontology.json", "text": "the note"},
-    {"when": "documented_as is Signed and no cited record has evidence_type signed_instrument", "text": SIGNED_TEXT_NOT_RECORDED},
+    {"when": "documented_as is Signed and no cited record is a signed_instrument whose instrument.signatories include the subject", "text": SIGNED_TEXT_NOT_RECORDED},
     {"when": "documented_as is Signed and object.lifecycle is announced", "text": SIGNED_NOT_DELIVERED},
     {"when": "documented_as is Announced or planned", "text": PLAN_NOT_DELIVERED},
     {"when": "documentation_basis is announcement-or-description", "text": GAP05_CAVEAT},
@@ -802,7 +802,6 @@ def matrix_derivation():
                                 "values": DOCUMENTATION_BASIS,
                                 "assignment": {"not_a_formal_act": "declaration-or-event", "every_record_an_announcement": "announcement-or-description",
                                                "otherwise": "includes-non-announcement-record"},
-                                "renamed": {"includes-formal-record": "includes-non-announcement-record (v0.5.0)"},
                                 "rule": ("For a relationship whose type is in formal_act_relationships: announcement-or-description when every record it "
                                          "cites has an evidence_type in announcement_evidence_types, otherwise includes-non-announcement-record. For any other "
                                          "relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. "
@@ -837,7 +836,8 @@ def matrix_rows(model):
         quals = []
         if rel.get("note"):
             quals.append(rel["note"])
-        if level == "Signed" and not any(model.records[x]["evidence_type"] == "signed_instrument" for x in rel["evidence"]):
+        if level == "Signed" and not any(model.records[x]["evidence_type"] == "signed_instrument"
+                                         and rel["subject"] in model.records[x]["instrument"]["signatories"] for x in rel["evidence"]):
             quals.append(SIGNED_TEXT_NOT_RECORDED)
         if level == "Signed" and obj.get("lifecycle") == "announced":
             quals.append(SIGNED_NOT_DELIVERED)
@@ -1076,6 +1076,21 @@ RESOURCES = (
     ("registry/gaps/gaps.json", "derived", "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json."),
 )
 CONSUMER = "examples/registry_consumer.py"
+# Changes that make data valid under one version invalid under another. Each is listed in the manifest, on /data/
+# and in the changelog. The old value is not accepted anywhere: there is no alias.
+BREAKING_CHANGES = [
+    {"version": "0.5.0", "file": "/registry/matrix/matrix.json", "field": "rows[].documentation_basis",
+     "old": "includes-formal-record", "new": "includes-non-announcement-record",
+     "reason": ("The value marks a formal-act relationship that cites at least one record other than an announcement: an "
+                "official report, a regulatory record, a repository, a publication, a ranking or a direct observation. The old "
+                "name described these as formal records of the act, which for signatures read as the signed text; no such "
+                "text is recorded for any signature. The rows it applies to are unchanged; only the name changed."),
+     "consumer_effect": ("A consumer that compares this field with the old value fails: the v0.4.1 example consumer exits with "
+                         "status 1 and reports, for each row, \"has documentation_basis 'includes-non-announcement-record'; the "
+                         "published data gives 'includes-formal-record'\"."),
+     "migration": ("Replace the old value with the new one, or read the names from derivation.documentation_basis.assignment in "
+                   "matrix.json, as the v0.5.0 example consumer does.")},
+]
 
 
 def manifest(model, files):
@@ -1108,6 +1123,7 @@ def manifest(model, files):
             "evidence_type": list(registry.EVIDENCE_TYPES),
             "status_basis": {k: STATUS_BASIS_LABELS[k] for k in registry.STATUS_BASES},
         },
+        "breaking_changes": BREAKING_CHANGES,
         "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
         "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
         "resources": resources,
@@ -1166,7 +1182,7 @@ def render_data_reference(model, gaps, man):
     <li>Every record gives the <code>source_url</code>, <code>source_organization</code>, <code>source_type</code>, <code>publication_date</code>, <code>retrieval_date</code>, verbatim <code>source_excerpts</code> in <code>source_language</code>, and a <code>verification_status</code> with a <code>verification_note</code> that states the record's limits.</li>
     <li><code>claim</code> is the registry's summary of what the source documents; the excerpts are the source's own words.</li>
     <li>A record's classification describes what its source documents, not whether a plan was delivered or a target met.</li>
-    <li>A signature is documented by a report of it unless a record of the signed text itself is cited (evidence_type <code>signed_instrument</code>). {"No such record exists yet: every signature in the registry rests on a report of the signing." if not any(r["evidence_type"] == "signed_instrument" for r in model.records.values()) else "Rows citing one say so in matrix.json."}</li>
+    <li>A signature is documented by a report of it unless a record of the signed text itself is cited (evidence_type <code>signed_instrument</code>). Such a record is admitted only when the registry has read the signed text in full, from a party to it or an official publisher of it; a report, summary, press release or news item about the signing never qualifies, even from a signatory or the government. The validator checks what it can (classification, verification, source type, the instrument's title, date, signatories and declared access, and that each signatory_of relationship citing it names one of its signatories); that the text was in fact read is an editorial requirement. {"No such record exists yet: every signature in the registry rests on a report of the signing." if not any(r["evidence_type"] == "signed_instrument" for r in model.records.values()) else "Rows citing one say so in matrix.json."}</li>
   </ul>
 </section>
 <section aria-labelledby="d4-h">
@@ -1216,7 +1232,16 @@ def render_data_reference(model, gaps, man):
   <p class="prose">By default it reads {SITE}. Use <code>--source</code> with another address or a local copy of the site.</p>
 </section>
 <section aria-labelledby="d9-h">
-  <h2 id="d9-h"><span class="section-number">09</span>Corrections</h2>
+  <h2 id="d9-h"><span class="section-number">09</span>Changes to the data contract</h2>
+  <p class="prose">A breaking change makes data that a consumer accepted under one version fail under the next. Each is listed here, in the manifest (<code>breaking_changes</code>) and in the <a href="/methodology/#m6-h">changelog</a>. Old values are not accepted as aliases, so a consumer built for an earlier version fails rather than misreads the data.</p>
+  {_table("Breaking changes to the published data", ["Version", "Field", "Old value", "New value", "Why", "Effect on an earlier consumer", "Migration"],
+          [[escape(c["version"]), f'<code>{escape(c["file"])}</code> <code>{escape(c["field"])}</code>', f'<code>{escape(c["old"])}</code>',
+            f'<code>{escape(c["new"])}</code>', escape(c["reason"]) + f" In v{escape(c['version'])} it applies to {sum(1 for r in matrix_rows(model) if r['documentation_basis'] == c['new'])} rows.",
+            escape(c["consumer_effect"]), escape(c["migration"])] for c in BREAKING_CHANGES], "")}
+  <p class="prose">Other changes in v0.5.0 add to the data without changing what existing values mean: a sentence in the qualifications of every Signed row, a sixth gap (GAP-06), and the evidence type <code>signed_instrument</code> in the manifest's vocabularies. A consumer that compares qualifications or gap lists exactly will see the additions.</p>
+</section>
+<section aria-labelledby="d10-h">
+  <h2 id="d10-h"><span class="section-number">10</span>Corrections</h2>
   <p class="prose">Send corrections, with the record or entity identifier and a source, to <a href="mailto:{CONTACT}?subject=TheMoroccoAI.com%20%E2%80%94%20data%20correction">{CONTACT}</a>. Corrections are made in the canonical files and re-validated, then published as a new version, with the change listed in the changelog.</p>
 </section>"""
     return page(model, path="/data/", title="Using the Registry Data — TheMoroccoAI",
@@ -1248,6 +1273,8 @@ def render_methodology(model, changelog):
         fixes = f'<p class="change-sub">Corrections to previously published content</p><ul>{fixes}</ul>' if fixes else ""
         review = "".join(f"<li>{escape(x)}</li>" for x in c.get("review_fixes", []))
         fixes += f'<p class="change-sub">Found in pre-release review (never published)</p><ul>{review}</ul>' if review else ""
+        breaking = "".join(f"<li>{escape(x)}</li>" for x in c.get("breaking_changes", []))
+        fixes += f'<p class="change-sub">Breaking changes to the data contract</p><ul>{breaking}</ul>' if breaking else ""
         entries.append(f"""<li class="change">
   <p class="change-meta"><time datetime="{c["date"]}">{escape(human_date(c["date"]))}</time> · {ref}{figures}</p>
   <h3>{escape(c["title"])}</h3>
