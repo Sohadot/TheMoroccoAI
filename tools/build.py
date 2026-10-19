@@ -921,7 +921,7 @@ def gap_derivation():
                      "[evidence_id] followed by the record's record_fields (null when absent), sorted by evidence_id. entities: for "
                      "each of the gap's entities, [id] followed by its entity_fields (null when absent), sorted by id. relationships: "
                      "for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, "
-                     "classification, evidence, note], the list sorted. A gap without entities has no digest."),
+                     "classification, evidence, note] (note null when absent), the list sorted. A gap without entities has no digest."),
         },
     }
 
@@ -1016,7 +1016,7 @@ def manifest(model, files):
         "publisher": model.evidence["publisher"], "site": SITE, "documentation": "/data/",
         "consumer_example": "/" + CONSUMER,
         "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
-        "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered.",
+        "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
         "resources": resources,
     }
 
@@ -1062,7 +1062,8 @@ def render_data_reference(model, gaps, man):
     <li><strong>Gaps:</strong> <code>GAP-NN</code>, readable at <code>/registry/gaps/#gap-nn</code>.</li>
     <li><strong>Defined values:</strong> classifications, verification statuses, entity types, lifecycle stages, project kinds, origins, domains, predicates and gap states are keys of dictionaries that define them in the same file.</li>
   </ul>
-  <p class="prose">Since v0.1.0 no evidence or entity identifier has been removed, renamed or reused. A record whose claim later evidence contradicts is kept and marked <code>superseded_by</code>. One relationship has been replaced as a correction (v0.2.0), and the <a href="/methodology/#m6-h">changelog</a> lists it.</p>
+  <p class="prose">Published identifiers are not reused. A record, entity or relationship may be corrected or withdrawn; each such change is listed in the <a href="/methodology/#m6-h">changelog</a>, and a withdrawn identifier is never assigned to anything else. A record whose claim later evidence contradicts is kept and marked <code>superseded_by</code>.</p>
+  <p class="prose">Since v0.1.0, no evidence or entity identifier has been removed or reused: every identifier published in any version is still present, with the same source address for records and the same type for entities. A test checks this against every published version of the data on each build. One relationship has been replaced as a correction (v0.2.0).</p>
 </section>
 <section aria-labelledby="d3-h">
   <h2 id="d3-h"><span class="section-number">03</span>Provenance</h2>
@@ -1089,8 +1090,9 @@ def render_data_reference(model, gaps, man):
   <h2 id="d5-h"><span class="section-number">05</span>Versions and updates</h2>
   <ul class="prose">
     <li>evidence.json and ontology.json carry the same <code>version</code> and <code>as_of</code> date, which the validator enforces; derived files carry them as <code>registry_version</code> and <code>as_of</code>. <code>as_of</code> is the date the registry's sources were last checked.</li>
-    <li>Each change to evidence.json, ontology.json or gaps.json is published under a new registry version with a <a href="/methodology/#m6-h">changelog</a> entry. Every change is a commit in the <a href="{repo}" rel="noopener">public repository</a>.</li>
+    <li>The registry version changes, with a <a href="/methodology/#m6-h">changelog</a> entry, whenever the published reference data or its meaning changes: records, entities, relationships, gap assessments or the definitions they use. An editorial change that affects neither, such as a typo in a note, may be published without a new version. Every change is a commit in the <a href="{repo}" rel="noopener">public repository</a>.</li>
     <li>Fetch the manifest first and compare each file's SHA-256. A mismatch means the file came from a different build, for example while a new version propagates through caches; fetch again later.</li>
+    <li>The hashes are published by the same site as the files. They show that the files you fetched belong to one build and were not changed after it; they are not a signature, and they do not show who published the files or that their content is accurate. Accuracy rests on the cited sources, which each record links to.</li>
     <li>When the data a gap rests on changes, the build fails until the gap is re-assessed. Each gap in data/gaps.json stores the records it was assessed against and a digest of that data (<code>assessed_fingerprint</code>), which a consumer can recompute.</li>
   </ul>
 </section>

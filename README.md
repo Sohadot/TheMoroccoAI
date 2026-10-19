@@ -84,8 +84,12 @@ and relationships classified beyond what their evidence supports.
 - **Regulatory wording**: a 510(k) is a clearance; registry text may not call a device FDA-approved
   except inside a quotation.
 - **Versions**: `evidence.json` and `ontology.json` carry the same `version` and `as_of`; the validator rejects a
-  mismatch. Any change to `evidence.json`, `ontology.json` or `gaps.json` is published under a new version with a
-  changelog entry.
+  mismatch. The version changes, with a changelog entry, whenever published reference data or its meaning changes
+  (records, entities, relationships, gap assessments, definitions); an editorial change that affects neither may be
+  published without one.
+- **Identifiers**: published identifiers are never reused. A record, entity or relationship may be corrected or
+  withdrawn, with the change in the changelog; a withdrawn identifier stays retired. `tests/test_consumer.py` checks
+  every published version on `main` (CI fetches full history); list a withdrawal in `WITHDRAWN` there.
 - **Origin** (companies): `based-in-morocco` (independent source required),
   `self-described-moroccan`, `foreign-moroccan-subsidiary-reported`,
   `foreign-moroccan-operations-verified` (independent primary source required) or `unresolved`,

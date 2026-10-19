@@ -25,6 +25,32 @@ sys.path.insert(0, str(REPO / "tools"))
 import build  # noqa: E402
 import registry  # noqa: E402
 
+# Identifiers withdrawn by a correction: identifier -> the version whose changelog entry records it. None so far.
+WITHDRAWN = {}
+BASELINE_V040 = "a0dedadc1188d15807cabd30dd7490b67dbb0052"  # registry v0.4.0 on main
+
+
+def git_show(commit, path):
+    p = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=REPO, capture_output=True, text=True)
+    return p.stdout if p.returncode == 0 else None
+
+
+def need_history(test):
+    """Skip without repository history locally; in CI (which fetches full history) its absence is a failure."""
+    shallow = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=REPO, capture_output=True, text=True)
+    if shallow.returncode or shallow.stdout.strip() != "false" or git_show(BASELINE_V040, "data/evidence.json") is None:
+        if os.environ.get("CI"):
+            test.fail("repository history is required in CI (actions/checkout fetch-depth: 0)")
+        test.skipTest("repository history not available")
+
+
+def published_states():
+    log = subprocess.run(["git", "log", "--first-parent", "--reverse", "--format=%H", "HEAD", "--",
+                          "data/evidence.json", "data/ontology.json"], cwd=REPO, capture_output=True, text=True, check=True)
+    return [(c, json.loads(git_show(c, "data/evidence.json")), json.loads(git_show(c, "data/ontology.json")))
+            for c in log.stdout.split()]
+
+
 CONSUMER_PATH = REPO / "examples" / "registry_consumer.py"
 _spec = importlib.util.spec_from_file_location("registry_consumer", CONSUMER_PATH)
 consumer = importlib.util.module_from_spec(_spec)
@@ -257,6 +283,27 @@ class DefectsAreDetected(unittest.TestCase):
         self.copy.edit("/data/evidence.json", lambda d: d["records"][0].update(title="Edited"), resign=False)
         self.assertRejected("/data/evidence.json: SHA-256 differs from the manifest")
 
+    def test_files_from_two_real_versions(self):
+        # The v0.4.0 evidence.json from main, served next to the current manifest and ontology.
+        need_history(self)
+        (self.copy.root / "data" / "evidence.json").write_text(git_show(BASELINE_V040, "data/evidence.json"), encoding="utf-8")
+        self.assertRejected("/data/evidence.json: SHA-256 differs from the manifest")
+        self.assertRejected("evidence.json: version 0.4.0 as of 2026-10-19, but the manifest is version")
+
+    def test_real_older_ontology_even_when_re_signed(self):
+        need_history(self)
+        self.copy.save("/data/ontology.json", json.loads(git_show(BASELINE_V040, "data/ontology.json")))
+        self.assertRejected("ontology.json: version 0.3.0 as of 2026-10-18")
+
+    def test_hashes_are_not_a_signature(self):
+        # The limit, stated on /data/ and by the consumer: whoever can rewrite the files can re-sign the manifest.
+        # A consistent edit with a re-signed manifest passes; only the cited sources establish accuracy.
+        self.copy.edit("/data/evidence.json", lambda d: d["records"][0].update(title="Altered and re-signed"))
+        code, out, err = self.copy.verify()
+        self.assertEqual(code, 0, err)
+        self.assertIn("the hashes are not a signature", out)
+        self.assertIn("the sources were not re-fetched", out)
+
     def test_mismatched_versions(self):
         self.copy.edit("/data/ontology.json", lambda d: d.update(version="0.3.0"))
         self.assertRejected("ontology.json: version 0.3.0")
@@ -430,7 +477,8 @@ class DataReference(unittest.TestCase):
         text = html.unescape(re.sub(r"<[^>]+>", " ", self.page))
         for phrase in ("No content or data licence has been declared", "remain subject to their publishers' rights",
                        "publication_date: null", "YYYY-MM", "An absent optional field means", "is an error",
-                       "the validator enforces", "SHA-256", "Since v0.1.0 no evidence or entity identifier",
+                       "the validator enforces", "SHA-256", "Since v0.1.0, no evidence or entity identifier has been removed or reused",
+                       "Published identifiers are not reused", "they are not a signature", "may be published without a new version",
                        "not a complete map", "is not measured", "registry_consumer.py verify", "Corrections"):
             self.assertIn(phrase, text)
         self.assertIn(f'href="/{build.CONSUMER}"', self.page)
@@ -442,18 +490,31 @@ class DataReference(unittest.TestCase):
         self.assertNotRegex(text, r"(?i)\b(CC[- ]BY|creative commons|open data licen[cs]e|ODbL|public domain|freely (re)?usable)\b")
         self.assertNotRegex(self.manifest["rights"], r"(?i)licensed under|you may")
 
-    def test_identifier_history_statement_is_true(self):
-        # The page says no evidence or entity id has been removed since v0.1.0; check the first release's ids still exist.
-        first = subprocess.run(["git", "show", "6bc8d9a2fe1b76b87d35131d117368b4712b8dd0:data/ontology.json"], cwd=REPO,
-                               capture_output=True, text=True)
-        first_ev = subprocess.run(["git", "show", "6bc8d9a2fe1b76b87d35131d117368b4712b8dd0:data/evidence.json"], cwd=REPO,
-                                  capture_output=True, text=True)
-        if first.returncode or first_ev.returncode:
-            self.skipTest("repository history not available (shallow clone)")
-        ids = {e["id"] for e in self.ontology["entities"]}
-        rec = {r["evidence_id"] for r in self.evidence["records"]}
-        self.assertLessEqual({e["id"] for e in json.loads(first.stdout)["entities"]}, ids)
-        self.assertLessEqual({r["evidence_id"] for r in json.loads(first_ev.stdout)["records"]}, rec)
+    def test_published_identifiers_are_never_removed_or_reused(self):
+        need_history(self)
+        # /data/ states that no evidence or entity identifier has been removed or reused since v0.1.0. Every version of
+        # the data on the first-parent line of HEAD (main's published states) is checked against the current files.
+        states = published_states()
+        current_ev = {r["evidence_id"]: r["source_url"] for r in self.evidence["records"]}
+        current_ent = {e["id"]: e["type"] for e in self.ontology["entities"]}
+        log = json.dumps(registry.load(REPO / "data" / "changelog.json"))
+        self.assertGreaterEqual(len(states), 4)
+        for commit, ev, ont in states:
+            for rid, url in ((r["evidence_id"], r["source_url"]) for r in ev["records"]):
+                if rid in WITHDRAWN:
+                    self.assertIn(rid, log, f"{rid} is withdrawn but the changelog does not say so")
+                    continue
+                self.assertIn(rid, current_ev, f"{rid}, published at {commit[:7]}, has been removed")
+                self.assertEqual(current_ev[rid], url, f"{rid} now names another source than at {commit[:7]}")
+            for eid, etype in ((e["id"], e["type"]) for e in ont["entities"]):
+                if eid in WITHDRAWN:
+                    self.assertIn(eid, log, f"{eid} is withdrawn but the changelog does not say so")
+                    continue
+                self.assertIn(eid, current_ent, f"entity {eid}, published at {commit[:7]}, has been removed")
+                self.assertEqual(current_ent[eid], etype, f"entity {eid} now has another type than at {commit[:7]}")
+        for x in WITHDRAWN:
+            self.assertNotIn(x, current_ev)
+            self.assertNotIn(x, current_ent)
 
     def test_ontology_and_evidence_versions_must_agree(self):
         ont = json.loads(json.dumps(self.ontology))

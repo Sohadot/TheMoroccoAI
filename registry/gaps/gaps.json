@@ -24,7 +24,7 @@
     "verification_status",
     "related_entities"
    ],
-   "rule": "The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). The value has three keys. records: for each record whose related_entities include one of the gap's entities, [evidence_id] followed by the record's record_fields (null when absent), sorted by evidence_id. entities: for each of the gap's entities, [id] followed by its entity_fields (null when absent), sorted by id. relationships: for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, classification, evidence, note], the list sorted. A gap without entities has no digest."
+   "rule": "The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). The value has three keys. records: for each record whose related_entities include one of the gap's entities, [evidence_id] followed by the record's record_fields (null when absent), sorted by evidence_id. entities: for each of the gap's entities, [id] followed by its entity_fields (null when absent), sorted by id. relationships: for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, classification, evidence, note] (note null when absent), the list sorted. A gap without entities has no digest."
   },
   "checks": {
    "computed_relationships": "Triggered when the computed list is empty.",

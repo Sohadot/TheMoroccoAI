@@ -2,7 +2,7 @@
  "as_of": "2026-10-19",
  "consumer_example": "/examples/registry_consumer.py",
  "documentation": "/data/",
- "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered.",
+ "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
  "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
  "registry": "TheMoroccoAI Evidence Registry",
  "registry_version": "0.4.1",
@@ -43,11 +43,11 @@
    "sha256": "5c5168ca0d2fc7c49778d2a907d00e8e37616b3139d2b49783bb4cb4c8bc5c64"
   },
   {
-   "bytes": 15996,
+   "bytes": 16020,
    "path": "/registry/gaps/gaps.json",
    "purpose": "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json.",
    "role": "derived",
-   "sha256": "55db0e289c8c49dc7c4cdb115bb58e1cd2b0bddaaae30b4bdc4e735117378073"
+   "sha256": "755d6c626714f4f94180d3ce04003cc01103b8799e678f96ba8a5aa4bfe06eda"
   }
  ],
  "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",

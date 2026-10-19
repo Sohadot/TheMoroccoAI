@@ -509,6 +509,8 @@ def main(argv=None):
             print(f"OK: registry {reg.manifest['registry_version']} as of {reg.manifest['as_of']}: {len(reg.records)} records, "
                   f"{len(reg.entities)} entities, {len(reg.relationships)} relationships, {len(reg.matrix['rows'])} matrix rows and "
                   f"{len(reg.gaps['gaps'])} gaps checked against the manifest, their references and the published rules.")
+            print("This shows the files are consistent with each other and with the manifest. It does not show who published them "
+                  "(the hashes are not a signature) or that the records are accurate: the sources were not re-fetched.")
         elif args.command == "relationship":
             print(show_relationship(reg, args.subject, args.predicate, args.object))
         elif args.command == "gap":
