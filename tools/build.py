@@ -181,7 +181,8 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
     {nav_link("/registry/", "Registry", "registry")}
     {nav_link("/registry/questions/", "Questions", "questions", "nav-optional")}
     {nav_link("/registry/evidence/", "Evidence", "evidence", "nav-optional")}
-    {nav_link("/#acquire", "Acquire", "acquire", "nav-acquire")}
+    {nav_link("/methodology/", "Methodology", "methodology", "nav-optional")}
+    {nav_link("/acquisition/", "Acquisition", "acquisition", "nav-optional")}
   </ul>
 </nav>
 <main id="content">
@@ -191,8 +192,9 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
 </main>
 <footer>
   <div class="footer-inner">
-    <span class="footer-brand">TheMoroccoAI.com · Independent reference infrastructure</span>
+    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
     <span class="footer-note">Not affiliated with the Government of Morocco · Registry v{escape(model.evidence["version"])} · as of {escape(human_date(model.as_of))}</span>
+    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/evidence.json">Data</a> · <a href="/acquisition/">Acquisition</a></span>
   </div>
 </footer>
 </body>
@@ -379,7 +381,7 @@ def render_registry_index(model):
     body = f"""<header class="page-head">
   <p class="label">MAI-REG — Reference Registry v{escape(model.evidence["version"])}</p>
   <h1>Morocco’s AI ecosystem, <em>on the record.</em></h1>
-  <p class="lede">Institutions, initiatives and projects in Morocco’s artificial intelligence ecosystem. Every entry is tied to a primary or institutional source, and <strong>facts, official targets, announced plans and our own analysis are labelled separately</strong>.</p>
+  <p class="lede">Institutions, initiatives and projects in Morocco’s artificial intelligence ecosystem. Every entry cites its source, whose type is labelled, with a verbatim excerpt and dates, and <strong>facts, official targets, announced plans and our own analysis are labelled separately</strong>.</p>
   <p class="notice"><strong>Independent.</strong> TheMoroccoAI is an independent reference project. It is not affiliated with, endorsed by or operated by the Government of Morocco or any institution listed here. Records quote public sources and link to them; they are not official statements.</p>
   <div class="stats" role="group" aria-label="Registry status">
     <div class="stat"><div class="stat-key">Evidence records</div><div class="stat-val">{n_rec}</div></div>
@@ -697,6 +699,140 @@ def render_evidence_index(model):
 
 # ─── HOMEPAGE BLOCKS ──────────────────────────────────────────────────────
 
+def render_methodology(model, changelog):
+    n_rec, n_ent, n_rel = len(model.records), len(model.entities), len(model.relationships)
+    types = ", ".join(f"{TYPE_SINGULAR.get(t, t).lower()} ({sum(1 for e in model.entities.values() if e['type'] == t)})"
+                      for t in model.ontology["entity_types"])
+    classes = "".join(f'<div class="legend-row">{badge(c)}<span class="legend-def">{escape(model.evidence["classifications"][c])}</span></div>'
+                      for c in registry.CLASSIFICATIONS)
+    sources = {}
+    for r in model.records.values():
+        sources[r["source_type"]] = sources.get(r["source_type"], 0) + 1
+    source_line = "; ".join(f"{SOURCE_TYPE_LABELS[k].lower()}: {v}" for k, v in sorted(sources.items(), key=lambda kv: (-kv[1], kv[0])))
+    repo = changelog["repository"]
+    entries = []
+    for c in changelog["entries"]:
+        figures = (f' · v{escape(c["version"])} · {c["records"]} records, {c["entities"]} entities, {c["relationships"]} relationships'
+                   if c.get("version") else "")
+        changes = "".join(f"<li>{escape(x)}</li>" for x in c.get("changes", []))
+        fixes = "".join(f"<li>{escape(x)}</li>" for x in c.get("corrections", []))
+        fixes = f'<p class="change-sub">Corrections to previously published content</p><ul>{fixes}</ul>' if fixes else ""
+        review = "".join(f"<li>{escape(x)}</li>" for x in c.get("review_fixes", []))
+        fixes += f'<p class="change-sub">Found in pre-release review (never published)</p><ul>{review}</ul>' if review else ""
+        entries.append(f"""<li class="change">
+  <p class="change-meta"><time datetime="{c["date"]}">{escape(human_date(c["date"]))}</time> · <a href="{repo}/commit/{c["commit"]}" rel="noopener">{c["commit"][:7]}</a>{figures}</p>
+  <h3>{escape(c["title"])}</h3>
+  <ul>{changes}</ul>{fixes}
+</li>""")
+    body = f"""<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Methodology</p>
+  <p class="label">MAI-METHOD — How the registry works</p>
+  <h1>Methodology, limits and changelog</h1>
+  <p class="lede">What the registry documents, what it does not establish, how evidence is admitted, and how claims are corrected. The rules below are enforced by the validator and tests that run on every change.</p>
+  <p class="notice"><strong>Independent.</strong> TheMoroccoAI is not affiliated with, endorsed by or operated by the Government of Morocco or any institution it lists. No institution has adopted or designated it as a reference.</p>
+</header>
+<section aria-labelledby="m1-h">
+  <h2 id="m1-h"><span class="section-number">01</span>What the registry documents</h2>
+  <p class="prose">Version {escape(model.evidence["version"])}, sources checked {escape(human_date(model.as_of))}: {n_rec} evidence records, {n_ent} entities and {n_rel} typed relationships. Entity types: {escape(types)}. Each record carries the source URL, a verbatim excerpt, the publication and retrieval dates, and one classification:</p>
+  <div class="legend">{classes}</div>
+  <p class="prose">Sources by type: {escape(source_line)}. Primary sources are preferred; secondary press may support only an announced plan or an unverified claim.</p>
+</section>
+<section aria-labelledby="m2-h">
+  <h2 id="m2-h"><span class="section-number">02</span>What it does not establish</h2>
+  <ul class="prose">
+    <li><strong>Completeness.</strong> The registry covers what it has documented so far. An absent organisation, project or sector is a gap in coverage, not evidence of absence in Morocco.</li>
+    <li><strong>Use and outcomes.</strong> Public availability is not adoption. No usage, accuracy, performance or impact figure is recorded as fact.</li>
+    <li><strong>Delivery of targets and plans.</strong> Official targets and announced plans are shown as such, never as outcomes.</li>
+    <li><strong>Current operation.</strong> An operational stage rests on its latest evidence; operation after that date is not reconfirmed.</li>
+    <li><strong>Legal identity.</strong> A matching name does not make two organisations the same legal entity; such links are labelled as associations.</li>
+    <li><strong>Official status.</strong> Records quote public sources; they are not official statements, and the registry speaks for no institution.</li>
+  </ul>
+</section>
+<section aria-labelledby="m3-h">
+  <h2 id="m3-h"><span class="section-number">03</span>How evidence is admitted</h2>
+  <ul class="prose">
+    <li>A record is added only after the original source has been retrieved and the excerpt matched against it.</li>
+    <li>A lifecycle stage beyond "announced" needs a verified record that declares that stage. A signature, announcement, procurement notice or market clearance never establishes operation.</li>
+    <li>An operational or pilot claim states its basis (public availability, an operator's report of use, or an independent source) and names the operator separately from any developer or provider.</li>
+    <li>Inferences drawn by the registry are labelled independent analysis and need at least two records.</li>
+    <li>Candidates that do not meet these rules are not published.</li>
+  </ul>
+</section>
+<section aria-labelledby="m4-h">
+  <h2 id="m4-h"><span class="section-number">04</span>Unsupported, conflicting and outdated claims</h2>
+  <ul class="prose">
+    <li>Statements the registry could not check are kept only as unverified claims, with a note saying what was not checked.</li>
+    <li>Where sources conflict or are insufficient, the stage is "unresolved", with the reason stated.</li>
+    <li>A record whose quotation still matches its source but whose claim later evidence contradicts is marked superseded and can no longer set a stage. It stays visible.</li>
+    <li>When the latest evidence for an operational claim is more than 12 months old, the <a href="/registry/questions/#q7-h">questions page</a> says current operation has not been reconfirmed. Elapsed time never changes a stage by itself.</li>
+  </ul>
+</section>
+<section aria-labelledby="m5-h">
+  <h2 id="m5-h"><span class="section-number">05</span>Corrections and reuse</h2>
+  <p class="prose">Corrections are made in the data, re-validated and published as a new commit on the <a href="{repo}" rel="noopener">public repository</a>, so every change is visible in its history. The record's verification note says what changed and why. Corrections with a source can be sent to <a href="mailto:{CONTACT}?subject=TheMoroccoAI.com%20%E2%80%94%20correction">{CONTACT}</a>.</p>
+  <p class="prose">The data is published as <a href="/data/evidence.json">evidence.json</a> and <a href="/data/ontology.json">ontology.json</a>. No content or data licence has been declared yet; that is the owner's decision.</p>
+</section>
+<section aria-labelledby="m6-h">
+  <h2 id="m6-h"><span class="section-number">06</span>Changelog</h2>
+  <p class="prose">{escape(changelog["note"])}</p>
+  <ol class="changelog">{"".join(entries)}</ol>
+</section>"""
+    return page(model, path="/methodology/", current="methodology",
+                title="Methodology, Limits and Changelog — TheMoroccoAI",
+                description="How TheMoroccoAI's evidence registry admits, classifies and corrects claims, what it does not establish, and a changelog tied to its public repository.",
+                body=body)
+
+
+def render_acquisition(model):
+    n_rec, n_ent, n_rel = len(model.records), len(model.entities), len(model.relationships)
+    mail = f"mailto:{CONTACT}?subject=TheMoroccoAI.com%20%E2%80%94%20confidential%20acquisition%20enquiry"
+    body = f"""<header class="page-head">
+  <p class="label">MAI-ACQ — Acquisition</p>
+  <h1>Acquisition</h1>
+  <p class="lede">TheMoroccoAI.com and its reference assets are privately held and available for strategic acquisition. Confidential enquiries: <a href="{mail}">{CONTACT}</a>. This page separates what exists today, which can be inspected, from the owner's view of its potential, which is set out in the <a href="/#thesis">owner's thesis</a>.</p>
+  <p class="notice"><strong>Independent.</strong> The asset is not a government platform. It is not affiliated with, endorsed by or operated by the Government of Morocco or any institution it lists, and no institution has adopted or designated it.</p>
+</header>
+<section aria-labelledby="a1-h">
+  <h2 id="a1-h"><span class="section-number">01</span>What could be transferred</h2>
+  <ul class="prose">
+    <li>The TheMoroccoAI.com domain name.</li>
+    <li>The site source: pages, static generator, validator, source checker and tests.</li>
+    <li>The evidence registry and ontology data: version {escape(model.evidence["version"])}, {n_rec} records, {n_ent} entities, {n_rel} relationships.</li>
+    <li>The visual identity and logo.</li>
+  </ul>
+  <p class="prose">No content or data licence has been declared. Bundled fonts remain under the SIL Open Font License.</p>
+</section>
+<section aria-labelledby="a2-h">
+  <h2 id="a2-h"><span class="section-number">02</span>Existing assets and future potential</h2>
+  {_table("Existing assets compared with potential", ["Exists today, and can be inspected", "Owner's view of potential (not established)"], [
+      ["The exact-match domain TheMoroccoAI.com, serving this registry",
+       "A national category name for AI in Morocco that cannot be recreated, only acquired"],
+      [f'An evidence registry of {n_rec} sourced records and {n_ent} entities, each claim classified (<a href="/registry/">registry</a>)',
+       "A category-level reference on Morocco's AI ecosystem"],
+      ['Machine-readable data (<a href="/data/evidence.json">evidence.json</a>, <a href="/data/ontology.json">ontology.json</a>) and a <a href="/registry/questions/">questions page</a> generated from it',
+       "A data layer that organisations working on Moroccan AI could build on"],
+      ['Published rules enforced by a validator and automated tests on every change (<a href="/methodology/">methodology</a>)',
+       "A governed reference whose method can be audited"],
+      ['A public change history tied to each published version (<a href="/methodology/#m6-h">changelog</a>)',
+       "Provenance a successor can keep extending without a break in its record"],
+      ["An English edition", "Arabic, French and Tamazight editions (planned, not published)"],
+  ], "")}
+  <p class="prose">Nothing on this site indicates that any institution or company has expressed interest. No price, traffic or revenue figures are published.</p>
+</section>
+<section aria-labelledby="a3-h">
+  <h2 id="a3-h"><span class="section-number">03</span>Who it may suit, in the owner's view</h2>
+  <p class="prose">Organisations that need a neutral, inspectable reference layer on Moroccan AI: AI companies entering African markets, investors focused on MENA–Africa technology, research and policy institutions, and data or media businesses. This is the owner's assessment; no interest from any specific party is implied.</p>
+</section>
+<section aria-labelledby="a4-h">
+  <h2 id="a4-h"><span class="section-number">04</span>Confidential enquiry</h2>
+  <p class="prose">Enquiries are handled confidentially: <a href="{mail}">{CONTACT}</a>.</p>
+</section>"""
+    return page(model, path="/acquisition/", current="acquisition",
+                title="Acquisition — TheMoroccoAI",
+                description="TheMoroccoAI.com is privately held. What could be transferred, what exists today compared with the owner's view of its potential, and a confidential enquiry address.",
+                body=body)
+
+
 def homepage_blocks(model):
     nodes = []
     for i, (key, label) in enumerate(model.domains.items(), 1):
@@ -726,10 +862,102 @@ def homepage_blocks(model):
       </div>""")
     return {
         "landscape": "\n" + "\n".join(nodes) + "\n      ",
+        "version": escape(model.evidence["version"]),
         "records": str(len(model.records)),
         "entities": str(len(model.entities)),
+        "relationships": str(len(model.relationships)),
+        "domains": str(len(model.domains)),
+        "entity-types": str(len(model.ontology["entity_types"])),
         "as-of": human_date(model.as_of).split(" ", 1)[-1] if model.as_of else "",
+        "examples": "\n" + homepage_examples(model) + "\n    ",
     }
+
+
+KIND_PHRASES = {"compute-infrastructure": "compute infrastructure", "digital-platform": "digital platform, not an AI application",
+                "institute": "institute", "agreement": "agreement"}
+
+
+def _stage_with_kind(model, e):
+    kind = KIND_PHRASES.get(e.get("project_kind"), "")
+    return f"{kind}; {stage_label(model, e).lower()}" if kind else stage_label(model, e).lower()
+
+
+def _example(qid, question, answer, links):
+    link_html = " · ".join(f'<a href="{href}">{escape(label)}</a>' for href, label in links)
+    return f"""      <article class="example" aria-labelledby="{qid}">
+        <h3 class="example-q" id="{qid}">{escape(question)}</h3>
+        <div class="example-a">{answer}</div>
+        <p class="example-links">Evidence: {link_html}</p>
+      </article>"""
+
+
+def homepage_examples(model):
+    """Three questions answered entirely from the registry data, each linking to its supporting output."""
+    ents, rels = model.entities, model.relationships
+    out = []
+
+    # 1. The documented status of Idarati AI.
+    e = ents["idarati-ai"]
+    f = deployment_facts(model, e)
+    ops = ", ".join(_ent_link(model, o) for o, c in f["operators"] if c == "VERIFIED FACT") or "not documented"
+    use = (" Public availability is not evidence of use: no usage, accuracy or outcome evidence is recorded."
+           if set(model.records[x].get("status_basis") for x in f["status_ids"]) == {"public-availability-observed"} else "")
+    out.append(_example(
+        "ex-idarati", "What is the documented status of Idarati AI?",
+        f'<p>{_ent_link(model, e["id"])}: {escape(stage_label(model, e))}. Operator: {ops}. '
+        f'Basis: {escape("; ".join(f["bases"]))}. {escape(f["currency"])}.{escape(use)}</p>',
+        [(entity_url(e["id"]), "entity page"), ("/registry/questions/#q6-h", "Q6 deployments")]
+        + [(f"/registry/evidence/#{x}", x) for x in f["status_ids"]]))
+
+    # 2. Morocco AI 2030: official targets versus what is verified.
+    plan = ents["morocco-ai-2030"]
+    targets = [r for r in model.records.values() if r["classification"] == "OFFICIAL TARGET" and plan["id"] in r["related_entities"]]
+    included = [ents[r["object"]] for r in rels if r["subject"] == plan["id"] and r["predicate"] == "includes"]
+    target_text = " ".join(f'{escape(r["claim"])} {escape(r["verification_note"])}' for r in targets)
+    include_ids = sorted({x for r in rels if r["subject"] == plan["id"] and r["predicate"] == "includes" for x in r["evidence"]})
+    parts = "; ".join(f'{_ent_link(model, x["id"])} ({escape(_stage_with_kind(model, x))})' for x in included)
+    verified = [r for r in rels if r["subject"] == plan["id"] and r["classification"] == "VERIFIED FACT"]
+    via = ", ".join(f'{escape(model.predicates[r["predicate"]]["label"])} {_ent_link(model, r["object"])}' for r in verified)
+    via = f" Verified: it is {via}." if via else ""
+    out.append(_example(
+        "ex-2030", "What has Morocco AI 2030 set as targets, and what is verified so far?",
+        f'<p>{target_text} The registry shows targets as targets, never as outcomes, and records no target as achieved.</p>'
+        f'<p>The roadmap is recorded as including {len(included)} projects, on the basis of the ministry\'s presentation: {parts}.{via} '
+        f'A project\'s status is not a measure of progress toward the quantified targets.</p>',
+        [(entity_url(plan["id"]), "entity page")]
+        + [(f"/registry/evidence/#{x}", x) for x in [r["evidence_id"] for r in targets] + include_ids]
+        + [("/registry/questions/#q2-h", "Q2 projects by stage")]))
+
+    # 3. Institutions documented as connected to compute and data-centre infrastructure.
+    infra_tech = ("high-performance-computing", "data-centres")
+    infra = sorted((x for x in ents.values() if x["type"] == "project" and (
+        x.get("project_kind") == "compute-infrastructure"
+        or any(r["subject"] == x["id"] and r["predicate"] == "applies" and r["object"] in infra_tech for r in rels))),
+        key=lambda x: (x["lifecycle"] != "operational", x["name"].lower()))
+    rows = []
+    for x in infra:
+        links = [r for r in rels if r["object"] == x["id"] and ents[r["subject"]]["type"] in ("institution", "company")]
+        who = "; ".join(f'{_ent_link(model, r["subject"])}, {escape(model.predicates[r["predicate"]]["label"].removesuffix(" of"))} '
+                        f'<span class="example-cls">({escape(r["classification"].lower())})</span>' for r in links) or "no organisation recorded"
+        basis = ""
+        if x["lifecycle"] in ("operational", "pilot"):
+            f = deployment_facts(model, x)
+            basis = f' (basis: {escape("; ".join(f["bases"]))}; {escape(f["currency"][0].lower() + f["currency"][1:])})'
+        rows.append(f'<li>{_ent_link(model, x["id"])}, {escape(_stage_with_kind(model, x))}{basis}: {who}</li>')
+    announced = sum(1 for x in infra if x["lifecycle"] == "announced")
+    ids = {x["id"] for x in infra}
+    runs_ai = any({r["subject"], r["object"]} & ids and ents[r["subject"] if r["object"] in ids else r["object"]].get("project_kind") == "ai-application"
+                  for r in rels)
+    workload = ("Compute infrastructure is not an AI application: the registry documents capacity, not what runs on it, "
+                "and records no AI workload on these systems." if not runs_ai else
+                "Compute infrastructure is not an AI application; workloads are recorded only where a source documents them.")
+    out.append(_example(
+        "ex-infra", "Which institutions are documented as connected to computing and data-centre infrastructure?",
+        f'<ul>{"".join(rows)}</ul><p>{announced} of these {len(infra)} projects are only announced or signed: no record shows them built '
+        f'or running. A signature is recorded as a signature. {workload}</p>',
+        [(f"/registry/evidence/#{x}", x) for x in sorted({y for i in infra for y in i["lifecycle_evidence"]})]
+        + [("/registry/questions/#q5-h", "Q5 relationships"), ("/registry/questions/#q2-h", "Q2 projects by stage")]))
+    return "\n".join(out)
 
 
 def inject(html_text, blocks):
@@ -742,7 +970,8 @@ def inject(html_text, blocks):
 
 
 def sitemap(model):
-    paths = ["/", "/registry/", "/registry/questions/", "/registry/evidence/"] + [entity_url(e) for e in sorted(model.entities)]
+    paths = (["/", "/registry/", "/registry/questions/", "/registry/evidence/", "/methodology/", "/acquisition/"]
+             + [entity_url(e) for e in sorted(model.entities)])
     urls = "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{model.as_of}</lastmod></url>\n" for p in paths)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
 
@@ -752,6 +981,8 @@ def outputs(model):
         "registry/index.html": render_registry_index(model),
         "registry/evidence/index.html": render_evidence_index(model),
         "registry/questions/index.html": render_questions(model),
+        "methodology/index.html": render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json")),
+        "acquisition/index.html": render_acquisition(model),
         "sitemap.xml": sitemap(model),
     }
     for eid, e in model.entities.items():

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology, Limits and Changelog — TheMoroccoAI</title>
+<meta name="description" content="How TheMoroccoAI&#x27;s evidence registry admits, classifies and corrects claims, what it does not establish, and a changelog tied to its public repository.">
+<link rel="canonical" href="https://themoroccoai.com/methodology/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TheMoroccoAI">
+<meta property="og:title" content="Methodology, Limits and Changelog — TheMoroccoAI">
+<meta property="og:description" content="How TheMoroccoAI&#x27;s evidence registry admits, classifies and corrects claims, what it does not establish, and a changelog tied to its public repository.">
+<meta property="og:url" content="https://themoroccoai.com/methodology/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/registry.css">
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+<div class="zellige-bg" aria-hidden="true"></div>
+<nav class="site-nav" aria-label="Primary">
+  <a class="nav-mark" href="/"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/><polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/><circle cx="14" cy="14" r="2.5" fill="#b8892a"/></svg><span class="nav-name">TheMoroccoAI</span></a>
+  <ul class="nav-links">
+    <li><a href="/registry/">Registry</a></li>
+    <li><a href="/registry/questions/" class="nav-optional">Questions</a></li>
+    <li><a href="/registry/evidence/" class="nav-optional">Evidence</a></li>
+    <li><a href="/methodology/" class="nav-optional" aria-current="page">Methodology</a></li>
+    <li><a href="/acquisition/" class="nav-optional">Acquisition</a></li>
+  </ul>
+</nav>
+<main id="content">
+<div class="page">
+<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Methodology</p>
+  <p class="label">MAI-METHOD — How the registry works</p>
+  <h1>Methodology, limits and changelog</h1>
+  <p class="lede">What the registry documents, what it does not establish, how evidence is admitted, and how claims are corrected. The rules below are enforced by the validator and tests that run on every change.</p>
+  <p class="notice"><strong>Independent.</strong> TheMoroccoAI is not affiliated with, endorsed by or operated by the Government of Morocco or any institution it lists. No institution has adopted or designated it as a reference.</p>
+</header>
+<section aria-labelledby="m1-h">
+  <h2 id="m1-h"><span class="section-number">01</span>What the registry documents</h2>
+  <p class="prose">Version 0.3.0, sources checked 18 October 2026: 39 evidence records, 65 entities and 78 typed relationships. Entity types: institution (19), company (5), initiative (3), event (1), project (14), legal instrument (1), model (3), dataset (1), technology (10), sector (8). Each record carries the source URL, a verbatim excerpt, the publication and retrieval dates, and one classification:</p>
+  <div class="legend"><div class="legend-row"><span class="badge badge-verified-fact">VERIFIED FACT</span><span class="legend-def">An event, act or status that the cited source documents directly (for example, a signature, a launch or an appointment).</span></div><div class="legend-row"><span class="badge badge-official-target">OFFICIAL TARGET</span><span class="legend-def">A quantified goal set by an official body. It is not an outcome and must not be read as achieved.</span></div><div class="legend-row"><span class="badge badge-announced-plan">ANNOUNCED PLAN</span><span class="legend-def">A programme, institution or product an official body has announced or presented, whose operational delivery the registry has not verified.</span></div><div class="legend-row"><span class="badge badge-independent-analysis">INDEPENDENT ANALYSIS</span><span class="legend-def">An inference drawn by TheMoroccoAI from two or more records. It is labelled as interpretation, not as fact.</span></div><div class="legend-row"><span class="badge badge-unverified-claim">UNVERIFIED CLAIM</span><span class="legend-def">A statement attributed to a source whose underlying data the registry has not independently checked.</span></div></div>
+  <p class="prose">Sources by type: government portal: 13; organisation&#x27;s own website: 6; government publication: 4; technical repository: 4; regulator: 3; state news agency: 3; academic preprint: 1; independent list: 1; intergovernmental organisation: 1; investor publication: 1; secondary press: 1; signatory organisation: 1. Primary sources are preferred; secondary press may support only an announced plan or an unverified claim.</p>
+</section>
+<section aria-labelledby="m2-h">
+  <h2 id="m2-h"><span class="section-number">02</span>What it does not establish</h2>
+  <ul class="prose">
+    <li><strong>Completeness.</strong> The registry covers what it has documented so far. An absent organisation, project or sector is a gap in coverage, not evidence of absence in Morocco.</li>
+    <li><strong>Use and outcomes.</strong> Public availability is not adoption. No usage, accuracy, performance or impact figure is recorded as fact.</li>
+    <li><strong>Delivery of targets and plans.</strong> Official targets and announced plans are shown as such, never as outcomes.</li>
+    <li><strong>Current operation.</strong> An operational stage rests on its latest evidence; operation after that date is not reconfirmed.</li>
+    <li><strong>Legal identity.</strong> A matching name does not make two organisations the same legal entity; such links are labelled as associations.</li>
+    <li><strong>Official status.</strong> Records quote public sources; they are not official statements, and the registry speaks for no institution.</li>
+  </ul>
+</section>
+<section aria-labelledby="m3-h">
+  <h2 id="m3-h"><span class="section-number">03</span>How evidence is admitted</h2>
+  <ul class="prose">
+    <li>A record is added only after the original source has been retrieved and the excerpt matched against it.</li>
+    <li>A lifecycle stage beyond "announced" needs a verified record that declares that stage. A signature, announcement, procurement notice or market clearance never establishes operation.</li>
+    <li>An operational or pilot claim states its basis (public availability, an operator's report of use, or an independent source) and names the operator separately from any developer or provider.</li>
+    <li>Inferences drawn by the registry are labelled independent analysis and need at least two records.</li>
+    <li>Candidates that do not meet these rules are not published.</li>
+  </ul>
+</section>
+<section aria-labelledby="m4-h">
+  <h2 id="m4-h"><span class="section-number">04</span>Unsupported, conflicting and outdated claims</h2>
+  <ul class="prose">
+    <li>Statements the registry could not check are kept only as unverified claims, with a note saying what was not checked.</li>
+    <li>Where sources conflict or are insufficient, the stage is "unresolved", with the reason stated.</li>
+    <li>A record whose quotation still matches its source but whose claim later evidence contradicts is marked superseded and can no longer set a stage. It stays visible.</li>
+    <li>When the latest evidence for an operational claim is more than 12 months old, the <a href="/registry/questions/#q7-h">questions page</a> says current operation has not been reconfirmed. Elapsed time never changes a stage by itself.</li>
+  </ul>
+</section>
+<section aria-labelledby="m5-h">
+  <h2 id="m5-h"><span class="section-number">05</span>Corrections and reuse</h2>
+  <p class="prose">Corrections are made in the data, re-validated and published as a new commit on the <a href="https://github.com/Sohadot/TheMoroccoAI" rel="noopener">public repository</a>, so every change is visible in its history. The record's verification note says what changed and why. Corrections with a source can be sent to <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20correction">agent@sohadot.com</a>.</p>
+  <p class="prose">The data is published as <a href="/data/evidence.json">evidence.json</a> and <a href="/data/ontology.json">ontology.json</a>. No content or data licence has been declared yet; that is the owner's decision.</p>
+</section>
+<section aria-labelledby="m6-h">
+  <h2 id="m6-h"><span class="section-number">06</span>Changelog</h2>
+  <p class="prose">Compiled on 19 October 2026 from the public repository&#x27;s history; it was not published alongside each release. Each entry is a commit on main, and the commit and its message are the record. Counts are those of data/evidence.json and data/ontology.json at that commit. Corrections changed content that had already been published; pre-release review fixes were made before a version was merged and were never published.</p>
+  <ol class="changelog"><li class="change">
+  <p class="change-meta"><time datetime="2026-10-18">18 October 2026</time> · <a href="https://github.com/Sohadot/TheMoroccoAI/commit/391006a29e20a6554e7ab90f58734c12ac59404f" rel="noopener">391006a</a> · v0.3.0 · 39 records, 65 entities, 78 relationships</p>
+  <h3>Registry v0.3.0: AI deployment evidence</h3>
+  <ul><li>Rules for operational and pilot claims: the basis must be stated, the operator named separately from any provider or developer, and outcomes are never recorded as facts.</li><li>First AI application recorded as operational (Idarati AI), on the basis of public availability only; use is not documented.</li><li>Health and financial-services entries, recorded as announced.</li><li>Questions page: deployments, operators, evidence recency, unresolved entries.</li><li>A separate source checker that re-fetches sources without changing data.</li></ul><p class="change-sub">Corrections to previously published content</p><ul><li>DeepEcho software changed from in development (published in v0.2.0) to unresolved: the FDA record contradicts the company website&#x27;s disclaimer, which no longer sets a stage and is marked superseded.</li></ul><p class="change-sub">Found in pre-release review (never published)</p><ul><li>FDA wording limited to 510(k) clearance, and the applicant&#x27;s link to the Moroccan company recorded as an association, not a legal identity.</li><li>A provider attribution for Idarati AI (Berexia) removed: the label appears only in interface text and is not shown on the assistant.</li></ul>
+</li><li class="change">
+  <p class="change-meta"><time datetime="2026-10-18">18 October 2026</time> · <a href="https://github.com/Sohadot/TheMoroccoAI/commit/d35d0dfec09dd47b06dddbd56a41a00b0df8d72a" rel="noopener">d35d0df</a> · v0.2.0 · 31 records, 60 entities, 67 relationships</p>
+  <h3>Registry v0.2.0: companies, models, datasets and lifecycle stages</h3>
+  <ul><li>AI companies, open models and datasets, and compute infrastructure.</li><li>Lifecycle stages for projects, models and datasets, each backed by a record that declares the stage.</li><li>First version of the questions page.</li></ul><p class="change-sub">Corrections to previously published content</p><ul><li>The higher-education ministry, recorded in v0.1.0 as involved in the Nador memorandum, recorded as a signatory on a new source naming the signatories.</li></ul><p class="change-sub">Found in pre-release review (never published)</p><ul><li>The DarijaBERT developer link classified as independent analysis: the model card names &quot;AIOX Lab&quot;, and identification is by name.</li><li>UM6P Ventures&#x27; origin set to unresolved; Toubkal recorded as compute infrastructure, not as an AI application.</li></ul>
+</li><li class="change">
+  <p class="change-meta"><time datetime="2026-10-18">18 October 2026</time> · <a href="https://github.com/Sohadot/TheMoroccoAI/commit/6bc8d9a2fe1b76b87d35131d117368b4712b8dd0" rel="noopener">6bc8d9a</a> · v0.1.0 · 18 records, 41 entities, 48 relationships</p>
+  <h3>Registry v0.1.0: evidence registry, ontology and quality gates</h3>
+  <ul><li>Evidence registry and ontology with claim classifications, a validator and automated quality gates.</li><li>Generated registry pages, an independence statement on every page and self-hosted fonts.</li></ul><p class="change-sub">Corrections to previously published content</p><ul><li>Unsourced claims, rules that were not true of the site and placeholder links on the original homepage removed or corrected.</li></ul><p class="change-sub">Found in pre-release review (never published)</p><ul><li>The CNDP recorded as listing Law 09-08 in its regulatory framework, not as administering it.</li><li>Conventions signed for the creation of Jazari institutes not presented as constituted institutions.</li></ul>
+</li><li class="change">
+  <p class="change-meta"><time datetime="2026-02-13">13 February 2026</time> · <a href="https://github.com/Sohadot/TheMoroccoAI/commit/aa400cfa038c4899435886ee0e2f9d5cee4fe0a4" rel="noopener">aa400cf</a></p>
+  <h3>Site created</h3>
+  <ul><li>Initial single-page site committed; the CNAME for themoroccoai.com was added the same day (commit 9ac75fd).</li></ul>
+</li></ol>
+</section>
+</div>
+</main>
+<footer>
+  <div class="footer-inner">
+    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
+    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.3.0 · as of 18 October 2026</span>
+    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/evidence.json">Data</a> · <a href="/acquisition/">Acquisition</a></span>
+  </div>
+</footer>
+</body>
+</html>
