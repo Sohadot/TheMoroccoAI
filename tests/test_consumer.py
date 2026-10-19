@@ -408,6 +408,19 @@ class ReproducedAnswers(unittest.TestCase):
             self.assertEqual((a["documented_as"], a["documentation_basis"], a["classification"], a["evidence"]),
                              (b["documented_as"], b["documentation_basis"], b["classification"], [e["id"] for e in b["evidence"]]))
 
+    def test_stage_labels_agree_when_bases_are_mixed(self):
+        # The availability suffix applies only when every declaring record rests on public availability.
+        ev = json.loads(json.dumps(self.model.evidence))
+        next(r for r in ev["records"] if r["evidence_id"] == "MAI-EV-0038")["status_basis"] = "operator-report-of-use"
+        model = build.Model(ev, self.model.ontology)
+        self.reg.records = {r["evidence_id"]: r for r in ev["records"]}
+        try:
+            self.assertEqual(build.stage_label(model, model.entities["idarati-ai"]), "Operational")
+            self.assertEqual(self.reg.stage_label("idarati-ai"), "Operational")
+        finally:
+            self.reg.records = {r["evidence_id"]: r for r in self.reg.evidence["records"]}
+        self.assertEqual(self.reg.stage_label("idarati-ai"), build.stage_label(self.model, self.model.entities["idarati-ai"]))
+
     def test_gap_digests_and_list_recomputed_independently(self):
         for g in self.reg.gaps["gaps"]:
             self.assertEqual(self.reg.fingerprint(g), registry.gap_fingerprint(g, self.model.evidence, self.model.ontology), g["id"])
