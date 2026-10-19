@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using the Registry Data — TheMoroccoAI</title>
+<meta name="description" content="How to read, verify and reuse TheMoroccoAI&#x27;s published JSON: files, identifiers, provenance, null values, versions, coverage limits and which answers can be recomputed.">
+<link rel="canonical" href="https://themoroccoai.com/data/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TheMoroccoAI">
+<meta property="og:title" content="Using the Registry Data — TheMoroccoAI">
+<meta property="og:description" content="How to read, verify and reuse TheMoroccoAI&#x27;s published JSON: files, identifiers, provenance, null values, versions, coverage limits and which answers can be recomputed.">
+<meta property="og:url" content="https://themoroccoai.com/data/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/registry.css">
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+<div class="zellige-bg" aria-hidden="true"></div>
+<nav class="site-nav" aria-label="Primary">
+  <a class="nav-mark" href="/"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/><polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/><circle cx="14" cy="14" r="2.5" fill="#b8892a"/></svg><span class="nav-name">TheMoroccoAI</span></a>
+  <ul class="nav-links">
+    <li><a href="/registry/">Registry</a></li>
+    <li><a href="/registry/questions/" class="nav-optional">Questions</a></li>
+    <li><a href="/registry/matrix/" class="nav-optional">Matrix</a></li>
+    <li><a href="/registry/gaps/" class="nav-optional">Gaps</a></li>
+    <li><a href="/registry/evidence/" class="nav-optional">Evidence</a></li>
+    <li><a href="/methodology/" class="nav-optional">Methodology</a></li>
+    <li><a href="/acquisition/" class="nav-optional">Acquisition</a></li>
+  </ul>
+</nav>
+<main id="content">
+<div class="page">
+<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Data</p>
+  <p class="label">MAI-DATA — Registry v0.4.1 · as of 19 October 2026</p>
+  <h1>Using the registry data</h1>
+  <p class="lede">The registry is published as JSON files that can be read and checked without this site's code. This page describes the files and their identifiers, where each statement comes from, what null and absent values mean, how versions work, and which answers can be recomputed from the data.</p>
+  <p class="notice"><strong>Rights.</strong> No content or data licence has been declared for the registry. Each record quotes a third-party source, and those quotations remain subject to their publishers' rights: nothing here grants a right to republish source material. TheMoroccoAI is independent and is not affiliated with the Government of Morocco or any institution it lists.</p>
+</header>
+<section aria-labelledby="d1-h">
+  <h2 id="d1-h"><span class="section-number">01</span>Files</h2>
+  <p class="prose">Start with <a href="/data/manifest.json"><code>/data/manifest.json</code></a>. It lists each file with its role and the SHA-256 of the version published in the same build. Canonical files are maintained by hand and validated on every build; derived files are generated from them and say so in <code>derived_from</code>. Every file is plain UTF-8 JSON and needs no authentication.</p>
+  <p class="table-hint">Scroll the table sideways to see all 3 columns.</p><div class="table-wrap" role="region" aria-label="Published JSON files" tabindex="0"><table class="qtable"><thead><tr><th scope="col">File</th><th scope="col">Role</th><th scope="col">Contents</th></tr></thead><tbody><tr><td><a href="/data/evidence.json"><code>/data/evidence.json</code></a></td><td>canonical</td><td>Evidence records: source URL and organisation, publication and retrieval dates, verbatim excerpts, classification, verification status and note. Defines the classifications and verification statuses it uses.</td></tr><tr><td><a href="/data/ontology.json"><code>/data/ontology.json</code></a></td><td>canonical</td><td>Entity types, lifecycle stages, project kinds, origins, domains and predicates (each defined), then entities and typed relationships, each citing records in evidence.json.</td></tr><tr><td><a href="/data/gaps.json"><code>/data/gaps.json</code></a></td><td>canonical</td><td>Evidence gaps: what is established (with records), what is not, what would resolve each, the records and data digest each assessment rests on, and the data checks re-run on every build.</td></tr><tr><td><a href="/data/changelog.json"><code>/data/changelog.json</code></a></td><td>canonical</td><td>Published registry versions, corrections, and the commit or pull request behind each.</td></tr><tr><td><a href="/registry/matrix/matrix.json"><code>/registry/matrix/matrix.json</code></a></td><td>derived</td><td>One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row.</td></tr><tr><td><a href="/registry/gaps/gaps.json"><code>/registry/gaps/gaps.json</code></a></td><td>derived</td><td>The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json.</td></tr></tbody></table></div>
+  <p class="prose">The HTML pages are generated from the same files. Every entity page also embeds its entity as JSON-LD.</p>
+</section>
+<section aria-labelledby="d2-h">
+  <h2 id="d2-h"><span class="section-number">02</span>Identifiers</h2>
+  <ul class="prose">
+    <li><strong>Evidence records:</strong> <code>MAI-EV-NNNN</code> (<code>evidence_id</code> in evidence.json). Readable at <code>/registry/evidence/#MAI-EV-NNNN</code>.</li>
+    <li><strong>Entities:</strong> a lowercase slug (<code>id</code> in ontology.json), also the page address <code>/registry/&lt;id&gt;/</code>.</li>
+    <li><strong>Relationships:</strong> have no separate identifier. Each is the triple <code>subject</code>, <code>predicate</code>, <code>object</code>, which the validator keeps unique; matrix.json writes it as <code>subject|predicate|object</code>.</li>
+    <li><strong>Gaps:</strong> <code>GAP-NN</code>, readable at <code>/registry/gaps/#gap-nn</code>.</li>
+    <li><strong>Defined values:</strong> classifications, verification statuses, entity types, lifecycle stages, project kinds, origins, domains, predicates and gap states are keys of dictionaries that define them in the same file.</li>
+  </ul>
+  <p class="prose">Since v0.1.0 no evidence or entity identifier has been removed, renamed or reused. A record whose claim later evidence contradicts is kept and marked <code>superseded_by</code>. One relationship has been replaced as a correction (v0.2.0), and the <a href="/methodology/#m6-h">changelog</a> lists it.</p>
+</section>
+<section aria-labelledby="d3-h">
+  <h2 id="d3-h"><span class="section-number">03</span>Provenance</h2>
+  <ul class="prose">
+    <li>Every entity cites records in <code>evidence</code>; a lifecycle stage cites <code>lifecycle_evidence</code>, an origin <code>origin_evidence</code>, and each attribute its own record.</li>
+    <li>Every relationship cites records in <code>evidence</code> and carries one <code>classification</code>, which is never stronger than its records support.</li>
+    <li>Every record gives the <code>source_url</code>, <code>source_organization</code>, <code>source_type</code>, <code>publication_date</code>, <code>retrieval_date</code>, verbatim <code>source_excerpts</code> in <code>source_language</code>, and a <code>verification_status</code> with a <code>verification_note</code> that states the record's limits.</li>
+    <li><code>claim</code> is the registry's summary of what the source documents; the excerpts are the source's own words.</li>
+    <li>A record's classification describes what its source documents, not whether a plan was delivered or a target met.</li>
+  </ul>
+</section>
+<section aria-labelledby="d4-h">
+  <h2 id="d4-h"><span class="section-number">04</span>Null, absent and unknown values</h2>
+  <ul class="prose">
+    <li><code>publication_date: null</code> means the source is undated. Use <code>retrieval_date</code>, the day the source was read, which is always present. Dates are <code>YYYY-MM-DD</code>, or <code>YYYY-MM</code> where the source gives only a month.</li>
+    <li>An absent optional field means "not recorded", never "no" or "none". For example, an entity without <code>lifecycle</code> is of a type that has no stage, and a record without <code>status_evidence</code> declares no stage.</li>
+    <li>In matrix.json, <code>object.lifecycle</code> and <code>object.stage</code> are null for entity types without a stage.</li>
+    <li>An empty list means none is recorded here, not that none exists.</li>
+    <li>A defined value (classification, stage, predicate, gap state) that is not defined in its file is an error. A consumer should stop rather than guess its meaning; the example below does.</li>
+    <li>Free-text fields (<code>status</code>, <code>note</code>, <code>summary</code>, <code>qualifications</code>) are for readers and are not a controlled vocabulary.</li>
+  </ul>
+</section>
+<section aria-labelledby="d5-h">
+  <h2 id="d5-h"><span class="section-number">05</span>Versions and updates</h2>
+  <ul class="prose">
+    <li>evidence.json and ontology.json carry the same <code>version</code> and <code>as_of</code> date, which the validator enforces; derived files carry them as <code>registry_version</code> and <code>as_of</code>. <code>as_of</code> is the date the registry's sources were last checked.</li>
+    <li>Each change to evidence.json, ontology.json or gaps.json is published under a new registry version with a <a href="/methodology/#m6-h">changelog</a> entry. Every change is a commit in the <a href="https://github.com/Sohadot/TheMoroccoAI" rel="noopener">public repository</a>.</li>
+    <li>Fetch the manifest first and compare each file's SHA-256. A mismatch means the file came from a different build, for example while a new version propagates through caches; fetch again later.</li>
+    <li>When the data a gap rests on changes, the build fails until the gap is re-assessed. Each gap in data/gaps.json stores the records it was assessed against and a digest of that data (<code>assessed_fingerprint</code>), which a consumer can recompute.</li>
+  </ul>
+</section>
+<section aria-labelledby="d6-h">
+  <h2 id="d6-h"><span class="section-number">06</span>Coverage and limits</h2>
+  <p class="prose">The registry holds what it has documented so far: 41 records, 65 entities and 78 relationships. It is not a complete map of Morocco's AI ecosystem, and an absent organisation, relationship or record is a gap in coverage. Public availability is not use, a signature or an announcement is not delivery, and a target is not an outcome. The <a href="/methodology/">methodology</a> sets out what the registry does not establish, and the <a href="/registry/gaps/">gap register</a> lists 5 questions it cannot yet answer. Whether others use the data, and how, is not measured.</p>
+</section>
+<section aria-labelledby="d7-h">
+  <h2 id="d7-h"><span class="section-number">07</span>Which answers can be recomputed</h2>
+  <p class="prose">An answer is reproducible when it follows from the published data and published rules. Some parts rest on judgments that the data records but cannot derive; they are marked below. matrix.json publishes the rules for its derived fields under <code>derivation</code>.</p>
+  <h3 id="d7-q8">Q8: organisations and projects</h3>
+  <p class="table-hint">Scroll the table sideways to see all 3 columns.</p><div class="table-wrap" role="region" aria-label="Q8: what can be recomputed" tabindex="0"><table class="qtable"><thead><tr><th scope="col">Part of the answer</th><th scope="col">Status</th><th scope="col">From</th></tr></thead><tbody><tr><td>Which organisations (institutions and companies) are connected to which projects, through which relationships</td><td>Reproducible</td><td>Selection of matrix rows by subject and object type</td></tr><tr><td>How each connection is documented (signed, developed, announced or planned, and so on)</td><td>Reproducible</td><td>The published documented_as rule, from the relationship's classification</td></tr><tr><td>How many connections rest only on announcements, news reports or descriptions</td><td>Reproducible</td><td>The published documentation_basis rule, from the cited records' evidence types</td></tr><tr><td>The counts in the summary sentence</td><td>Reproducible</td><td>Counting the rows above</td></tr><tr><td>Each relationship's classification, and the records it cites</td><td>Recorded, not derivable</td><td>An editorial judgment, made under the evidence rules and recorded in ontology.json</td></tr><tr><td>Each project's lifecycle stage and its basis</td><td>Recorded, not derivable</td><td>An editorial admission of a record that declares the stage, checked by the validator</td></tr><tr><td>The caveats (a signature is not delivery; these are the connections recorded here)</td><td>Fixed wording</td><td>Part of the answer's text, not computed</td></tr></tbody></table></div>
+  <h3 id="d7-q9">Q9: official targets and recorded progress</h3>
+  <p class="table-hint">Scroll the table sideways to see all 3 columns.</p><div class="table-wrap" role="region" aria-label="Q9: what can be recomputed" tabindex="0"><table class="qtable"><thead><tr><th scope="col">Part of the answer</th><th scope="col">Status</th><th scope="col">From</th></tr></thead><tbody><tr><td>Which official targets are recorded, as their sources state them, and for which strategy</td><td>Reproducible</td><td>Records classified OFFICIAL TARGET and the initiatives among their related entities</td></tr><tr><td>Which projects each strategy is recorded as including, and their stages</td><td>Reproducible</td><td>includes relationships from the strategy to entities with a lifecycle</td></tr><tr><td>Which gap covers the strategy, and whether it is open</td><td>Reproducible</td><td>gaps.json: the gap whose entities include the strategy, and its state</td></tr><tr><td>That no recorded evidence measures progress towards the Morocco AI 2030 targets</td><td>Editorial assessment</td><td>GAP-02 is open because an editor judged that its assessed records, including the ministry's presentation of main advances (MAI-EV-0040), quantify no progress. No data check backs this judgment; a consumer can confirm that the data it rests on has not changed since (its digest) but cannot re-derive the judgment</td></tr><tr><td>That a strategy without a gap has not been assessed</td><td>Reproducible</td><td>No gap's entities include it</td></tr></tbody></table></div>
+</section>
+<section aria-labelledby="d8-h">
+  <h2 id="d8-h"><span class="section-number">08</span>Checking the data yourself</h2>
+  <p class="prose"><a href="/examples/registry_consumer.py"><code>/examples/registry_consumer.py</code></a> (also in the <a href="https://github.com/Sohadot/TheMoroccoAI/blob/main/examples/registry_consumer.py" rel="noopener">repository</a>) reads only the published JSON. It uses the Python 3.10+ standard library and does not import this site's code. It stops with an error if a reference is missing, a value is undefined or the files do not belong to the same build.</p>
+  <ul class="prose">
+    <li><code>python3 registry_consumer.py verify</code>: checks the manifest and every reference. It also recomputes the matrix, the GAP-05 list, each gap's data checks and digest, and compares them with the published files.</li>
+    <li><code>python3 registry_consumer.py relationship ministry-digital-transition operates idarati-ai</code>: a relationship, its classification, and each supporting record with its source, dates and limits.</li>
+    <li><code>python3 registry_consumer.py gap GAP-03</code>: what a gap establishes and does not, with the result of its data checks.</li>
+    <li><code>python3 registry_consumer.py q8</code> and <code>q9</code>: the reproducible parts of those answers.</li>
+  </ul>
+  <p class="prose">By default it reads https://themoroccoai.com. Use <code>--source</code> with another address or a local copy of the site.</p>
+</section>
+<section aria-labelledby="d9-h">
+  <h2 id="d9-h"><span class="section-number">09</span>Corrections</h2>
+  <p class="prose">Send corrections, with the record or entity identifier and a source, to <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20data%20correction">agent@sohadot.com</a>. Corrections are made in the canonical files and re-validated, then published as a new version, with the change listed in the changelog.</p>
+</section>
+</div>
+</main>
+<footer>
+  <div class="footer-inner">
+    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
+    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.4.1 · as of 19 October 2026</span>
+    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/">Data</a> · <a href="/acquisition/">Acquisition</a></span>
+  </div>
+</footer>
+</body>
+</html>

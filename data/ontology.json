@@ -1,7 +1,7 @@
 {
   "ontology": "TheMoroccoAI Ontology",
-  "version": "0.3.0",
-  "as_of": "2026-10-18",
+  "version": "0.4.1",
+  "as_of": "2026-10-19",
   "description": "Entities and relationships of Morocco's AI ecosystem, each tied to records in evidence.json. Chain: Institution → Initiative → Project → Evidence → Technology → Sector.",
   "entity_types": {
     "institution": "A public body, university, research centre, regulator, business association, open-source initiative or international organisation.",

@@ -1,5 +1,46 @@
 {
  "as_of": "2026-10-19",
+ "derivation": {
+  "assessed_fingerprint": {
+   "entity_fields": [
+    "type",
+    "lifecycle",
+    "lifecycle_evidence",
+    "project_kind",
+    "attributes",
+    "status",
+    "evidence"
+   ],
+   "record_fields": [
+    "claim",
+    "classification",
+    "status_evidence",
+    "status_basis",
+    "source_entity",
+    "superseded_by",
+    "associated_entities",
+    "source_url",
+    "publication_date",
+    "verification_status",
+    "related_entities"
+   ],
+   "rule": "The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). The value has three keys. records: for each record whose related_entities include one of the gap's entities, [evidence_id] followed by the record's record_fields (null when absent), sorted by evidence_id. entities: for each of the gap's entities, [id] followed by its entity_fields (null when absent), sorted by id. relationships: for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, classification, evidence, note], the list sorted. A gap without entities has no digest."
+  },
+  "checks": {
+   "computed_relationships": "Triggered when the computed list is empty.",
+   "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages.",
+   "no_ai_application_link": "Triggered when a relationship links the entity to an entity whose project_kind is ai-application.",
+   "no_status_basis": "Triggered when a record in the entity's lifecycle_evidence has a status_basis listed in the check's bases.",
+   "rule": "The checks and digests are in /data/gaps.json. An open gap whose check is triggered, whose digest no longer matches, or that a record about its entities postdates (a record not in assessed_records) must be re-assessed: the build refuses to publish it."
+  },
+  "computed_relationships": "A gap with a computed_relationships check lists the relationships whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis)."
+ },
+ "derived_from": [
+  "/data/gaps.json",
+  "/data/ontology.json",
+  "/data/evidence.json"
+ ],
+ "documentation": "/data/",
  "gaps": [
   {
    "assessed": "2026-10-19",
@@ -426,5 +467,9 @@
   }
  ],
  "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
- "registry_version": "0.4.0"
+ "registry_version": "0.4.1",
+ "states": {
+  "open": "The question cannot yet be answered from the records in this registry. It is a limit of coverage, not a finding that the evidence or the thing asked about does not exist.",
+  "resolved": "Records in this registry now answer the question; resolved_by lists them."
+ }
 }

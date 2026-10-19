@@ -1,6 +1,77 @@
 {
  "as_of": "2026-10-19",
- "registry_version": "0.4.0",
+ "derivation": {
+  "documentation_basis": {
+   "announcement_evidence_types": [
+    "news_dispatch",
+    "press_release",
+    "official_announcement",
+    "official_statement",
+    "organization_page",
+    "case_study",
+    "press_article"
+   ],
+   "formal_act_relationships": [
+    "signatory_of",
+    "created",
+    "designated",
+    "invested_in",
+    "develops",
+    "operates",
+    "hosts",
+    "lists_in_framework"
+   ],
+   "rule": "Describes how a relationship is documented in this registry, not whether it is true.",
+   "values": {
+    "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
+    "declaration-or-event": "Any other relationship: declarations, public events and a programme's stated composition, whose primary record is an announcement. Not measured this way.",
+    "includes-formal-record": "A formal-act relationship that cites at least one record of another type."
+   }
+  },
+  "documented_as": {
+   "by_classification": {
+    "ANNOUNCED PLAN": "Announced or planned",
+    "INDEPENDENT ANALYSIS": "Registry inference",
+    "OFFICIAL TARGET": "Target",
+    "UNVERIFIED CLAIM": "Unverified claim"
+   },
+   "rule": "Derived from the relationship's classification and, for VERIFIED FACT, its relationship type. It never upgrades a record.",
+   "verified_fact_by_relationship": {
+    "develops": "Developed",
+    "operates": "Operated",
+    "signatory_of": "Signed"
+   },
+   "verified_fact_otherwise": "Documented"
+  },
+  "object.lifecycle": "The related entity's lifecycle key from ontology.json (defined in its lifecycle_stages); null for entity types without a lifecycle.",
+  "object.stage": "A display label for object.lifecycle that also states the basis of an operational or pilot stage. Use object.lifecycle for machine processing.",
+  "qualifications": "Explanatory sentences for readers: the relationship's note in ontology.json, then fixed caveats added by rule. Not a controlled vocabulary.",
+  "row_id": "subject|relationship|object, joined with '|'. A relationship is identified by this triple, which is unique in ontology.json.",
+  "row_selection": {
+   "object_types": [
+    "project",
+    "initiative",
+    "institution",
+    "company",
+    "legal_instrument",
+    "model",
+    "dataset",
+    "event"
+   ],
+   "rule": "Every relationship in ontology.json whose subject has one of subject_types and whose object has one of object_types.",
+   "subject_types": [
+    "institution",
+    "company",
+    "initiative"
+   ]
+  }
+ },
+ "derived_from": [
+  "/data/ontology.json",
+  "/data/evidence.json"
+ ],
+ "documentation": "/data/",
+ "registry_version": "0.4.1",
  "rows": [
   {
    "classification": "VERIFIED FACT",

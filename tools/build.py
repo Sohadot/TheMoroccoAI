@@ -9,6 +9,7 @@ Generated outputs (committed, because GitHub Pages serves the repository as-is):
 Standard library only.
 """
 import datetime
+import hashlib
 import json
 import re
 import shutil
@@ -197,7 +198,7 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
   <div class="footer-inner">
     <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
     <span class="footer-note">Not affiliated with the Government of Morocco · Registry v{escape(model.evidence["version"])} · as of {escape(human_date(model.as_of))}</span>
-    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/evidence.json">Data</a> · <a href="/acquisition/">Acquisition</a></span>
+    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/">Data</a> · <a href="/acquisition/">Acquisition</a></span>
   </div>
 </footer>
 </body>
@@ -420,7 +421,9 @@ def render_registry_index(model):
 
 <section aria-labelledby="data-h">
   <h2 id="data-h"><span class="section-number">05</span>Machine-readable data</h2>
+  <p class="prose"><a href="/data/">Using the registry data</a> describes the files, identifiers, null values and versions, says which answers can be recomputed, and links to an example that checks the data independently.</p>
   <ul class="data-links">
+    <li><a href="/data/manifest.json"><code>/data/manifest.json</code></a>: the list of published JSON files, with the SHA-256 of each in this version.</li>
     <li><a href="/data/evidence.json"><code>/data/evidence.json</code></a>: every evidence record, with its source URL, dates, verbatim excerpts, classification and verification status.</li>
     <li><a href="/data/ontology.json"><code>/data/ontology.json</code></a>: entity types, domains, predicates, entities and typed relationships, each citing its evidence.</li>
     <li><a href="/registry/evidence/">All evidence on one page</a>, each record addressable as <code>/registry/evidence/#MAI-EV-NNNN</code>.</li>
@@ -431,7 +434,7 @@ def render_registry_index(model):
   <h2 id="method-h"><span class="section-number">06</span>Method and limits</h2>
   <div class="prose">
     <p>Each record was retrieved from its source on the stated retrieval date, and its excerpt was matched against the retrieved text. An automated validator checks every build. It requires unique identifiers, https source URLs, valid dates and complete fields, and that every entity and relationship cites existing evidence. It also blocks forward-looking wording in records classified as fact, and rejects any relationship whose classification its evidence does not support.</p>
-    <p>This version is deliberately small. It does not yet cover AI companies, models or datasets, and it omits facts it could not verify against an original source. Corrections can be sent to <a href="mailto:{CONTACT}?subject=TheMoroccoAI%20registry%20correction">{CONTACT}</a>.</p>
+    <p>The registry is deliberately selective: it omits facts it could not verify against an original source, and an absent entry is a gap in coverage. Corrections can be sent to <a href="mailto:{CONTACT}?subject=TheMoroccoAI%20registry%20correction">{CONTACT}</a>.</p>
   </div>
 </section>"""
     jsonld = {
@@ -727,13 +730,44 @@ def render_questions(model):
 
 # ─── INSTITUTIONAL MATRIX AND EVIDENCE GAPS ────────────────────────────────
 
+DOCUMENTED_AS = {"ANNOUNCED PLAN": "Announced or planned", "OFFICIAL TARGET": "Target",
+                 "INDEPENDENT ANALYSIS": "Registry inference", "UNVERIFIED CLAIM": "Unverified claim"}
+DOCUMENTED_AS_VERIFIED = {"signatory_of": "Signed", "operates": "Operated", "develops": "Developed"}
+DOCUMENTED_AS_VERIFIED_OTHERWISE = "Documented"
+DOCUMENTATION_BASIS = {
+    "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
+    "includes-formal-record": "A formal-act relationship that cites at least one record of another type.",
+    "declaration-or-event": "Any other relationship: declarations, public events and a programme's stated composition, whose primary record is an announcement. Not measured this way.",
+}
+
+
 def documented_as(rel):
     """What the relationship's own classification supports, in plain words. It never upgrades a record."""
     cls = rel["classification"]
     if cls != "VERIFIED FACT":
-        return {"ANNOUNCED PLAN": "Announced or planned", "OFFICIAL TARGET": "Target",
-                "INDEPENDENT ANALYSIS": "Registry inference", "UNVERIFIED CLAIM": "Unverified claim"}[cls]
-    return {"signatory_of": "Signed", "operates": "Operated", "develops": "Developed"}.get(rel["predicate"], "Documented")
+        return DOCUMENTED_AS[cls]
+    return DOCUMENTED_AS_VERIFIED.get(rel["predicate"], DOCUMENTED_AS_VERIFIED_OTHERWISE)
+
+
+def matrix_derivation():
+    """The rules that turn ontology.json and evidence.json into matrix rows, published with the rows so that a
+    consumer can recompute them without this code."""
+    return {
+        "row_selection": {"subject_types": list(registry.MATRIX_SUBJECT_TYPES), "object_types": list(registry.MATRIX_OBJECT_TYPES),
+                          "rule": "Every relationship in ontology.json whose subject has one of subject_types and whose object has one of object_types."},
+        "row_id": "subject|relationship|object, joined with '|'. A relationship is identified by this triple, which is unique in ontology.json.",
+        "documented_as": {"by_classification": DOCUMENTED_AS,
+                          "verified_fact_by_relationship": DOCUMENTED_AS_VERIFIED,
+                          "verified_fact_otherwise": DOCUMENTED_AS_VERIFIED_OTHERWISE,
+                          "rule": "Derived from the relationship's classification and, for VERIFIED FACT, its relationship type. It never upgrades a record."},
+        "documentation_basis": {"formal_act_relationships": list(registry.FORMAL_ACT_PREDICATES),
+                                "announcement_evidence_types": list(registry.ANNOUNCEMENT_TYPES),
+                                "values": DOCUMENTATION_BASIS,
+                                "rule": "Describes how a relationship is documented in this registry, not whether it is true."},
+        "object.lifecycle": "The related entity's lifecycle key from ontology.json (defined in its lifecycle_stages); null for entity types without a lifecycle.",
+        "object.stage": "A display label for object.lifecycle that also states the basis of an operational or pilot stage. Use object.lifecycle for machine processing.",
+        "qualifications": "Explanatory sentences for readers: the relationship's note in ontology.json, then fixed caveats added by rule. Not a controlled vocabulary.",
+    }
 
 
 def _record_date(r):
@@ -867,6 +901,31 @@ def gap_register(model, gaps):
     return out
 
 
+def gap_derivation():
+    """How the gap register is checked against the data, published so that a consumer can repeat the checks."""
+    return {
+        "computed_relationships": "A gap with a computed_relationships check lists the relationships whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis).",
+        "checks": {
+            "no_status_basis": "Triggered when a record in the entity's lifecycle_evidence has a status_basis listed in the check's bases.",
+            "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages.",
+            "no_ai_application_link": "Triggered when a relationship links the entity to an entity whose project_kind is ai-application.",
+            "computed_relationships": "Triggered when the computed list is empty.",
+            "rule": "The checks and digests are in /data/gaps.json. An open gap whose check is triggered, whose digest no longer matches, or that a record about its entities postdates (a record not in assessed_records) must be re-assessed: the build refuses to publish it.",
+        },
+        "assessed_fingerprint": {
+            "record_fields": list(registry.GAP_RECORD_FIELDS),
+            "entity_fields": list(registry.GAP_ENTITY_FIELDS),
+            "rule": ("The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters "
+                     "unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). "
+                     "The value has three keys. records: for each record whose related_entities include one of the gap's entities, "
+                     "[evidence_id] followed by the record's record_fields (null when absent), sorted by evidence_id. entities: for "
+                     "each of the gap's entities, [id] followed by its entity_fields (null when absent), sorted by id. relationships: "
+                     "for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, "
+                     "classification, evidence, note], the list sorted. A gap without entities has no digest."),
+        },
+    }
+
+
 def render_gaps(model, gaps):
     items = gap_register(model, gaps)
     arts = []
@@ -928,6 +987,142 @@ def render_evidence_index(model):
     return page(model, path="/registry/evidence/", current="evidence",
                 title="Evidence Records — TheMoroccoAI Registry",
                 description="All primary-source evidence records behind TheMoroccoAI registry, with verbatim excerpts, dates and claim classifications.",
+                body=body)
+
+
+# ─── DATA REFERENCE ───────────────────────────────────────────────────────
+
+RESOURCES = (
+    ("data/evidence.json", "canonical", "Evidence records: source URL and organisation, publication and retrieval dates, verbatim excerpts, classification, verification status and note. Defines the classifications and verification statuses it uses."),
+    ("data/ontology.json", "canonical", "Entity types, lifecycle stages, project kinds, origins, domains and predicates (each defined), then entities and typed relationships, each citing records in evidence.json."),
+    ("data/gaps.json", "canonical", "Evidence gaps: what is established (with records), what is not, what would resolve each, the records and data digest each assessment rests on, and the data checks re-run on every build."),
+    ("data/changelog.json", "canonical", "Published registry versions, corrections, and the commit or pull request behind each."),
+    ("registry/matrix/matrix.json", "derived", "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row."),
+    ("registry/gaps/gaps.json", "derived", "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json."),
+)
+CONSUMER = "examples/registry_consumer.py"
+
+
+def manifest(model, files):
+    """A catalogue of the published JSON with the SHA-256 of each file in this build, so that a consumer can tell
+    whether the files it fetched belong together."""
+    resources = []
+    for path, role, purpose in RESOURCES:
+        content = files[path].encode("utf-8") if path in files else (ROOT / path).read_bytes()
+        resources.append({"path": "/" + path, "role": role, "purpose": purpose, "bytes": len(content),
+                          "sha256": hashlib.sha256(content).hexdigest()})
+    return {
+        "registry": model.evidence["registry"], "registry_version": model.evidence["version"], "as_of": model.as_of,
+        "publisher": model.evidence["publisher"], "site": SITE, "documentation": "/data/",
+        "consumer_example": "/" + CONSUMER,
+        "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
+        "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered.",
+        "resources": resources,
+    }
+
+
+def render_data_reference(model, gaps, man):
+    ver, repo = model.evidence["version"], "https://github.com/Sohadot/TheMoroccoAI"
+    res_rows = [[f'<a href="{r["path"]}"><code>{escape(r["path"])}</code></a>', escape(r["role"]), escape(r["purpose"])] for r in man["resources"]]
+    q8_rows = [
+        ["Which organisations (institutions and companies) are connected to which projects, through which relationships", "Reproducible", "Selection of matrix rows by subject and object type"],
+        ["How each connection is documented (signed, developed, announced or planned, and so on)", "Reproducible", "The published documented_as rule, from the relationship's classification"],
+        ["How many connections rest only on announcements, news reports or descriptions", "Reproducible", "The published documentation_basis rule, from the cited records' evidence types"],
+        ["The counts in the summary sentence", "Reproducible", "Counting the rows above"],
+        ["Each relationship's classification, and the records it cites", "Recorded, not derivable", "An editorial judgment, made under the evidence rules and recorded in ontology.json"],
+        ["Each project's lifecycle stage and its basis", "Recorded, not derivable", "An editorial admission of a record that declares the stage, checked by the validator"],
+        ["The caveats (a signature is not delivery; these are the connections recorded here)", "Fixed wording", "Part of the answer's text, not computed"],
+    ]
+    q9_rows = [
+        ["Which official targets are recorded, as their sources state them, and for which strategy", "Reproducible", "Records classified OFFICIAL TARGET and the initiatives among their related entities"],
+        ["Which projects each strategy is recorded as including, and their stages", "Reproducible", "includes relationships from the strategy to entities with a lifecycle"],
+        ["Which gap covers the strategy, and whether it is open", "Reproducible", "gaps.json: the gap whose entities include the strategy, and its state"],
+        ["That no recorded evidence measures progress towards the Morocco AI 2030 targets", "Editorial assessment", "GAP-02 is open because an editor judged that its assessed records, including the ministry's presentation of main advances (MAI-EV-0040), quantify no progress. No data check backs this judgment; a consumer can confirm that the data it rests on has not changed since (its digest) but cannot re-derive the judgment"],
+        ["That a strategy without a gap has not been assessed", "Reproducible", "No gap's entities include it"],
+    ]
+    body = f"""<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Data</p>
+  <p class="label">MAI-DATA — Registry v{escape(ver)} · as of {escape(human_date(model.as_of))}</p>
+  <h1>Using the registry data</h1>
+  <p class="lede">The registry is published as JSON files that can be read and checked without this site's code. This page describes the files and their identifiers, where each statement comes from, what null and absent values mean, how versions work, and which answers can be recomputed from the data.</p>
+  <p class="notice"><strong>Rights.</strong> No content or data licence has been declared for the registry. Each record quotes a third-party source, and those quotations remain subject to their publishers' rights: nothing here grants a right to republish source material. TheMoroccoAI is independent and is not affiliated with the Government of Morocco or any institution it lists.</p>
+</header>
+<section aria-labelledby="d1-h">
+  <h2 id="d1-h"><span class="section-number">01</span>Files</h2>
+  <p class="prose">Start with <a href="/data/manifest.json"><code>/data/manifest.json</code></a>. It lists each file with its role and the SHA-256 of the version published in the same build. Canonical files are maintained by hand and validated on every build; derived files are generated from them and say so in <code>derived_from</code>. Every file is plain UTF-8 JSON and needs no authentication.</p>
+  {_table("Published JSON files", ["File", "Role", "Contents"], res_rows, "")}
+  <p class="prose">The HTML pages are generated from the same files. Every entity page also embeds its entity as JSON-LD.</p>
+</section>
+<section aria-labelledby="d2-h">
+  <h2 id="d2-h"><span class="section-number">02</span>Identifiers</h2>
+  <ul class="prose">
+    <li><strong>Evidence records:</strong> <code>MAI-EV-NNNN</code> (<code>evidence_id</code> in evidence.json). Readable at <code>/registry/evidence/#MAI-EV-NNNN</code>.</li>
+    <li><strong>Entities:</strong> a lowercase slug (<code>id</code> in ontology.json), also the page address <code>/registry/&lt;id&gt;/</code>.</li>
+    <li><strong>Relationships:</strong> have no separate identifier. Each is the triple <code>subject</code>, <code>predicate</code>, <code>object</code>, which the validator keeps unique; matrix.json writes it as <code>subject|predicate|object</code>.</li>
+    <li><strong>Gaps:</strong> <code>GAP-NN</code>, readable at <code>/registry/gaps/#gap-nn</code>.</li>
+    <li><strong>Defined values:</strong> classifications, verification statuses, entity types, lifecycle stages, project kinds, origins, domains, predicates and gap states are keys of dictionaries that define them in the same file.</li>
+  </ul>
+  <p class="prose">Since v0.1.0 no evidence or entity identifier has been removed, renamed or reused. A record whose claim later evidence contradicts is kept and marked <code>superseded_by</code>. One relationship has been replaced as a correction (v0.2.0), and the <a href="/methodology/#m6-h">changelog</a> lists it.</p>
+</section>
+<section aria-labelledby="d3-h">
+  <h2 id="d3-h"><span class="section-number">03</span>Provenance</h2>
+  <ul class="prose">
+    <li>Every entity cites records in <code>evidence</code>; a lifecycle stage cites <code>lifecycle_evidence</code>, an origin <code>origin_evidence</code>, and each attribute its own record.</li>
+    <li>Every relationship cites records in <code>evidence</code> and carries one <code>classification</code>, which is never stronger than its records support.</li>
+    <li>Every record gives the <code>source_url</code>, <code>source_organization</code>, <code>source_type</code>, <code>publication_date</code>, <code>retrieval_date</code>, verbatim <code>source_excerpts</code> in <code>source_language</code>, and a <code>verification_status</code> with a <code>verification_note</code> that states the record's limits.</li>
+    <li><code>claim</code> is the registry's summary of what the source documents; the excerpts are the source's own words.</li>
+    <li>A record's classification describes what its source documents, not whether a plan was delivered or a target met.</li>
+  </ul>
+</section>
+<section aria-labelledby="d4-h">
+  <h2 id="d4-h"><span class="section-number">04</span>Null, absent and unknown values</h2>
+  <ul class="prose">
+    <li><code>publication_date: null</code> means the source is undated. Use <code>retrieval_date</code>, the day the source was read, which is always present. Dates are <code>YYYY-MM-DD</code>, or <code>YYYY-MM</code> where the source gives only a month.</li>
+    <li>An absent optional field means "not recorded", never "no" or "none". For example, an entity without <code>lifecycle</code> is of a type that has no stage, and a record without <code>status_evidence</code> declares no stage.</li>
+    <li>In matrix.json, <code>object.lifecycle</code> and <code>object.stage</code> are null for entity types without a stage.</li>
+    <li>An empty list means none is recorded here, not that none exists.</li>
+    <li>A defined value (classification, stage, predicate, gap state) that is not defined in its file is an error. A consumer should stop rather than guess its meaning; the example below does.</li>
+    <li>Free-text fields (<code>status</code>, <code>note</code>, <code>summary</code>, <code>qualifications</code>) are for readers and are not a controlled vocabulary.</li>
+  </ul>
+</section>
+<section aria-labelledby="d5-h">
+  <h2 id="d5-h"><span class="section-number">05</span>Versions and updates</h2>
+  <ul class="prose">
+    <li>evidence.json and ontology.json carry the same <code>version</code> and <code>as_of</code> date, which the validator enforces; derived files carry them as <code>registry_version</code> and <code>as_of</code>. <code>as_of</code> is the date the registry's sources were last checked.</li>
+    <li>Each change to evidence.json, ontology.json or gaps.json is published under a new registry version with a <a href="/methodology/#m6-h">changelog</a> entry. Every change is a commit in the <a href="{repo}" rel="noopener">public repository</a>.</li>
+    <li>Fetch the manifest first and compare each file's SHA-256. A mismatch means the file came from a different build, for example while a new version propagates through caches; fetch again later.</li>
+    <li>When the data a gap rests on changes, the build fails until the gap is re-assessed. Each gap in data/gaps.json stores the records it was assessed against and a digest of that data (<code>assessed_fingerprint</code>), which a consumer can recompute.</li>
+  </ul>
+</section>
+<section aria-labelledby="d6-h">
+  <h2 id="d6-h"><span class="section-number">06</span>Coverage and limits</h2>
+  <p class="prose">The registry holds what it has documented so far: {len(model.records)} records, {len(model.entities)} entities and {len(model.relationships)} relationships. It is not a complete map of Morocco's AI ecosystem, and an absent organisation, relationship or record is a gap in coverage. Public availability is not use, a signature or an announcement is not delivery, and a target is not an outcome. The <a href="/methodology/">methodology</a> sets out what the registry does not establish, and the <a href="/registry/gaps/">gap register</a> lists {len(gaps["gaps"])} questions it cannot yet answer. Whether others use the data, and how, is not measured.</p>
+</section>
+<section aria-labelledby="d7-h">
+  <h2 id="d7-h"><span class="section-number">07</span>Which answers can be recomputed</h2>
+  <p class="prose">An answer is reproducible when it follows from the published data and published rules. Some parts rest on judgments that the data records but cannot derive; they are marked below. matrix.json publishes the rules for its derived fields under <code>derivation</code>.</p>
+  <h3 id="d7-q8">Q8: organisations and projects</h3>
+  {_table("Q8: what can be recomputed", ["Part of the answer", "Status", "From"], q8_rows, "")}
+  <h3 id="d7-q9">Q9: official targets and recorded progress</h3>
+  {_table("Q9: what can be recomputed", ["Part of the answer", "Status", "From"], q9_rows, "")}
+</section>
+<section aria-labelledby="d8-h">
+  <h2 id="d8-h"><span class="section-number">08</span>Checking the data yourself</h2>
+  <p class="prose"><a href="/{CONSUMER}"><code>/{CONSUMER}</code></a> (also in the <a href="{repo}/blob/main/{CONSUMER}" rel="noopener">repository</a>) reads only the published JSON. It uses the Python 3.10+ standard library and does not import this site's code. It stops with an error if a reference is missing, a value is undefined or the files do not belong to the same build.</p>
+  <ul class="prose">
+    <li><code>python3 registry_consumer.py verify</code>: checks the manifest and every reference. It also recomputes the matrix, the GAP-05 list, each gap's data checks and digest, and compares them with the published files.</li>
+    <li><code>python3 registry_consumer.py relationship ministry-digital-transition operates idarati-ai</code>: a relationship, its classification, and each supporting record with its source, dates and limits.</li>
+    <li><code>python3 registry_consumer.py gap GAP-03</code>: what a gap establishes and does not, with the result of its data checks.</li>
+    <li><code>python3 registry_consumer.py q8</code> and <code>q9</code>: the reproducible parts of those answers.</li>
+  </ul>
+  <p class="prose">By default it reads {SITE}. Use <code>--source</code> with another address or a local copy of the site.</p>
+</section>
+<section aria-labelledby="d9-h">
+  <h2 id="d9-h"><span class="section-number">09</span>Corrections</h2>
+  <p class="prose">Send corrections, with the record or entity identifier and a source, to <a href="mailto:{CONTACT}?subject=TheMoroccoAI.com%20%E2%80%94%20data%20correction">{CONTACT}</a>. Corrections are made in the canonical files and re-validated, then published as a new version, with the change listed in the changelog.</p>
+</section>"""
+    return page(model, path="/data/", title="Using the Registry Data — TheMoroccoAI",
+                description="How to read, verify and reuse TheMoroccoAI's published JSON: files, identifiers, provenance, null values, versions, coverage limits and which answers can be recomputed.",
                 body=body)
 
 
@@ -1007,7 +1202,7 @@ def render_methodology(model, changelog):
 <section aria-labelledby="m5-h">
   <h2 id="m5-h"><span class="section-number">05</span>Corrections and reuse</h2>
   <p class="prose">Corrections are made in the data, re-validated and published as a new commit on the <a href="{repo}" rel="noopener">public repository</a>, so every change is visible in its history. The record's verification note says what changed and why. Corrections with a source can be sent to <a href="mailto:{CONTACT}?subject=TheMoroccoAI.com%20%E2%80%94%20correction">{CONTACT}</a>.</p>
-  <p class="prose">The data is published as <a href="/data/evidence.json">evidence.json</a> and <a href="/data/ontology.json">ontology.json</a>. No content or data licence has been declared yet; that is the owner's decision.</p>
+  <p class="prose">The data is published as <a href="/data/evidence.json">evidence.json</a> and <a href="/data/ontology.json">ontology.json</a>, with the gap register and derived files; <a href="/data/">Using the registry data</a> explains how to read and verify them. No content or data licence has been declared yet; that is the owner's decision.</p>
 </section>
 <section aria-labelledby="m6-h">
   <h2 id="m6-h"><span class="section-number">06</span>Changelog</h2>
@@ -1213,7 +1408,7 @@ def inject(html_text, blocks):
 
 
 def sitemap(model):
-    paths = (["/", "/registry/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/methodology/", "/acquisition/"]
+    paths = (["/", "/registry/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/data/", "/methodology/", "/acquisition/"]
              + [entity_url(e) for e in sorted(model.entities)])
     urls = "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{model.as_of}</lastmod></url>\n" for p in paths)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
@@ -1232,14 +1427,20 @@ def outputs(model):
         "registry/matrix/index.html": render_matrix(model),
         "registry/matrix/matrix.json": _json({"registry_version": model.evidence["version"], "as_of": model.as_of,
                                               "scope": "Relationships recorded in this registry between organisations or initiatives and what they act on; not a complete map.",
+                                              "derived_from": ["/data/ontology.json", "/data/evidence.json"],
+                                              "derivation": matrix_derivation(), "documentation": "/data/",
                                               "rows": matrix_rows(model)}),
         "registry/gaps/index.html": render_gaps(model, gaps),
         "registry/gaps/gaps.json": _json({"registry_version": model.evidence["version"], "as_of": model.as_of, "note": gaps["note"],
+                                          "derived_from": ["/data/gaps.json", "/data/ontology.json", "/data/evidence.json"],
+                                          "states": gaps["states"], "documentation": "/data/", "derivation": gap_derivation(),
                                           "gaps": gap_register(model, gaps)}),
         "methodology/index.html": render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json")),
         "acquisition/index.html": render_acquisition(model),
         "sitemap.xml": sitemap(model),
     }
+    files["data/manifest.json"] = _json(manifest(model, files))
+    files["data/index.html"] = render_data_reference(model, gaps, json.loads(files["data/manifest.json"]))
     for eid, e in model.entities.items():
         files[f"registry/{eid}/index.html"] = render_entity(model, e)
     files["index.html"] = inject((ROOT / "index.html").read_text(encoding="utf-8"), homepage_blocks(model))

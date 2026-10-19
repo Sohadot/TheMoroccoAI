@@ -1,6 +1,10 @@
 {
   "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
   "open_wording": "No qualifying evidence is currently recorded in this registry.",
+  "states": {
+    "open": "The question cannot yet be answered from the records in this registry. It is a limit of coverage, not a finding that the evidence or the thing asked about does not exist.",
+    "resolved": "Records in this registry now answer the question; resolved_by lists them."
+  },
   "gaps": [
     {
       "id": "GAP-01",

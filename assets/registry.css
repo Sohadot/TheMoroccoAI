@@ -187,7 +187,8 @@ p + p { margin-top: 12px; }
 
 /* ─── EVIDENCE CARDS ─── */
 .evidence-list { list-style: none; display: grid; gap: 20px; }
-.evidence-card { border: 1px solid var(--border); background: rgba(255,255,255,0.3); padding: 22px 24px; scroll-margin-top: 72px; }
+/* A grid item's minimum width is its longest unbreakable string by default; quoted source data (URLs, JSON) can exceed a phone screen. */
+.evidence-card { border: 1px solid var(--border); background: rgba(255,255,255,0.3); padding: 22px 24px; scroll-margin-top: 72px; min-width: 0; overflow-wrap: anywhere; }
 .evidence-card:target { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
 .evidence-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 10px; }
 .evidence-id { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: var(--gold-ink); text-decoration: none; }
