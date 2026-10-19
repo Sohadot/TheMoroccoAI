@@ -539,6 +539,10 @@ class DataReference(unittest.TestCase):
             self.assertNotIn(x, current_ev)
             self.assertNotIn(x, current_ent)
 
+    def test_ci_fetches_the_history_the_identifier_check_needs(self):
+        workflow = (REPO / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+        self.assertRegex(workflow, r"uses: actions/checkout@v4\n\s+with:\n\s+fetch-depth: 0")
+
     def test_ontology_and_evidence_versions_must_agree(self):
         ont = json.loads(json.dumps(self.ontology))
         ont["version"] = "0.3.0"
