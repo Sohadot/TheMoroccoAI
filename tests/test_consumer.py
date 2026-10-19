@@ -462,7 +462,8 @@ class ReproducedAnswers(unittest.TestCase):
     def test_q9_flags_its_editorial_boundary(self):
         rows = {r["strategy"]: r for r in self.reg.q9()["rows"]}
         self.assertIn("editorial assessment only", rows["morocco-ai-2030"]["progress_basis"])
-        self.assertEqual(rows["digital-morocco-2030"]["progress_basis"], "not assessed")
+        self.assertIn("editorial assessment only", rows["digital-morocco-2030"]["progress_basis"])
+        self.assertEqual(rows["digital-morocco-2030"]["gap"], "GAP-06")
         page = (REPO / "data" / "index.html").read_text(encoding="utf-8")
         self.assertIn("Editorial assessment", page)
         self.assertIn("No data check backs this judgment", page)

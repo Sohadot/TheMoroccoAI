@@ -238,12 +238,13 @@ class Registry:
                 level = doc["verified_fact_by_relationship"].get(r["predicate"], doc["verified_fact_otherwise"])
             else:
                 level = doc["by_classification"][r["classification"]]
+            names = basis["assignment"]
             if r["predicate"] not in basis["formal_act_relationships"]:
-                how = "declaration-or-event"
+                how = names["not_a_formal_act"]
             elif all(self.records[x]["evidence_type"] in basis["announcement_evidence_types"] for x in r["evidence"]):
-                how = "announcement-or-description"
+                how = names["every_record_an_announcement"]
             else:
-                how = "includes-formal-record"
+                how = names["otherwise"]
             rows.append({"id": f"{r['subject']}|{r['predicate']}|{r['object']}", "subject": r["subject"], "relationship": r["predicate"],
                          "object": r["object"], "object_lifecycle": obj.get("lifecycle"), "object_stage": self.stage_label(r["object"]),
                          "classification": r["classification"],
@@ -278,7 +279,8 @@ class Registry:
         return [r for r in self.matrix_rows() if r["relationship"] in acts]
 
     def announcement_only(self):
-        return [r for r in self.matrix_rows() if r["documentation_basis"] == "announcement-or-description"]
+        only = self.matrix["derivation"]["documentation_basis"]["assignment"]["every_record_an_announcement"]
+        return [r for r in self.matrix_rows() if r["documentation_basis"] == only]
 
     def fingerprint(self, gap):
         """A gap's digest, computed as published in gaps.json (derivation.assessed_fingerprint)."""
@@ -390,7 +392,7 @@ class Registry:
             tally[r["documented_as"]] = tally.get(r["documented_as"], 0) + 1
         return {"organisations": len(orgs), "projects": len({r["object"] for r in rows}), "relationships": len(rows),
                 "documented_as": dict(sorted(tally.items(), key=lambda kv: (-kv[1], kv[0]))),
-                "announcement_only": sum(1 for r in rows if r["documentation_basis"] == "announcement-or-description"),
+                "announcement_only": sum(1 for r in rows if r["documentation_basis"] == self.matrix["derivation"]["documentation_basis"]["assignment"]["every_record_an_announcement"]),
                 "rows": orgs,
                 "not_derivable": ["Each relationship's classification and cited records (editorial, recorded in ontology.json)",
                                   "Each project's lifecycle stage (editorial admission of a record declaring it)"]}

@@ -57,6 +57,9 @@ EVIDENCE_TYPES = (
     "regulatory_record",
     "live_service_observation",
     "procurement_notice",
+    # The text of a signed agreement, convention or memorandum, read by the registry. No record has this type yet:
+    # every signature recorded so far is documented by a report of it.
+    "signed_instrument",
 )
 REQUIRED_EVIDENCE_FIELDS = (
     "evidence_id", "title", "source_organization", "source_type", "source_url",
@@ -518,8 +521,9 @@ def validate_ontology(ontology, evidence):
 # models and other organisations. Relationships to technologies and sectors are left to entity pages.
 MATRIX_SUBJECT_TYPES = ("institution", "company", "initiative")
 MATRIX_OBJECT_TYPES = ("project", "initiative", "institution", "company", "legal_instrument", "model", "dataset", "event")
-# Records that report or describe an act, as opposed to a formal record of it (an official report,
-# a regulatory record, a repository, a publication or a direct observation).
+# Records that report or describe an act, as opposed to other kinds of record (an official report, a regulatory
+# record, a repository, a publication or a direct observation). None of those other kinds is the instrument itself
+# (a signed text) unless its type is signed_instrument.
 ANNOUNCEMENT_TYPES = ("news_dispatch", "press_release", "official_announcement", "official_statement",
                       "organization_page", "case_study", "press_article")
 # Relationships that assert a formal act, normally recorded in an instrument (a signed text, a founding
@@ -585,6 +589,14 @@ def validate_gaps(gaps, evidence, ontology):
     if set(gaps.get("states") or {}) != set(GAP_STATES) or not all(str(v).strip() for v in (gaps.get("states") or {}).values()):
         errors.append(f"gaps.json: states must define exactly {', '.join(GAP_STATES)}")
     seen = set()
+    # Every strategy with an official target needs a gap on its progress, so that a reference answer about the target
+    # never stops at "not assessed".
+    covered = {e for g in gaps.get("gaps") or [] for e in g.get("entities") or []}
+    for r in evidence.get("records") or []:
+        if r.get("classification") == "OFFICIAL TARGET":
+            for e in r.get("related_entities") or []:
+                if entities.get(e, {}).get("type") == "initiative" and e not in covered:
+                    errors.append(f"gaps.json: {e} has an official target ({r['evidence_id']}) but no gap covers its progress")
     for g in gaps.get("gaps") or []:
         gid = g.get("id", "?")
         where = f"{gid}:"

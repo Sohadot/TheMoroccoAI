@@ -11,6 +11,11 @@
     "case_study",
     "press_article"
    ],
+   "assignment": {
+    "every_record_an_announcement": "announcement-or-description",
+    "not_a_formal_act": "declaration-or-event",
+    "otherwise": "includes-non-announcement-record"
+   },
    "formal_act_relationships": [
     "signatory_of",
     "created",
@@ -21,11 +26,14 @@
     "hosts",
     "lists_in_framework"
    ],
-   "rule": "For a relationship whose type is in formal_act_relationships: announcement-or-description when every record it cites has an evidence_type in announcement_evidence_types, otherwise includes-formal-record. For any other relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. documented_as and documentation_basis are independent: a row can read Signed while resting only on an announcement.",
+   "renamed": {
+    "includes-formal-record": "includes-non-announcement-record (v0.5.0)"
+   },
+   "rule": "For a relationship whose type is in formal_act_relationships: announcement-or-description when every record it cites has an evidence_type in announcement_evidence_types, otherwise includes-non-announcement-record. For any other relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. documented_as and documentation_basis are independent: a row can read Signed while resting only on an announcement.",
    "values": {
     "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
     "declaration-or-event": "Any other relationship: declarations, public events and a programme's stated composition, whose primary record is an announcement. Not measured this way.",
-    "includes-formal-record": "A formal-act relationship that cites at least one record of another type."
+    "includes-non-announcement-record": "A formal-act relationship that cites at least one record of another type: an official report, a regulatory record, a technical repository, a publication, a ranking or a direct observation. Such a record is not the instrument itself; a signed text would have evidence_type signed_instrument."
    }
   },
   "documented_as": {
@@ -67,6 +75,10 @@
      "when": "The relationship has a note in ontology.json"
     },
     {
+     "text": "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+     "when": "documented_as is Signed and no cited record has evidence_type signed_instrument"
+    },
+    {
      "text": "A signature is recorded as a signature; delivery is not documented.",
      "when": "documented_as is Signed and object.lifecycle is announced"
     },
@@ -75,7 +87,7 @@
      "when": "documented_as is Announced or planned"
     },
     {
-     "text": "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05).",
+     "text": "Documented here only by announcements, news reports or descriptions (GAP-05).",
      "when": "documentation_basis is announcement-or-description"
     }
    ]
@@ -108,7 +120,7 @@
   "/data/evidence.json"
  ],
  "documentation": "/data/",
- "registry_version": "0.4.1",
+ "registry_version": "0.5.0",
  "rows": [
   {
    "classification": "VERIFIED FACT",
@@ -142,7 +154,7 @@
     "type": "company"
    },
    "qualifications": [
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "created",
    "relationship_label": "created",
@@ -154,7 +166,7 @@
   },
   {
    "classification": "INDEPENDENT ANALYSIS",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Registry inference",
    "evidence": [
     {
@@ -218,8 +230,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -231,7 +244,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Developed",
    "evidence": [
     {
@@ -295,8 +308,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -308,7 +322,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -370,7 +384,7 @@
     "type": "project"
    },
    "qualifications": [
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "develops",
    "relationship_label": "develops",
@@ -404,8 +418,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -417,7 +432,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Developed",
    "evidence": [
     {
@@ -593,7 +608,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Developed",
    "evidence": [
     {
@@ -657,7 +672,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Operated",
    "evidence": [
     {
@@ -707,7 +722,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Operated",
    "evidence": [
     {
@@ -803,7 +818,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -825,6 +840,7 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -859,8 +875,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -872,7 +889,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -902,6 +919,7 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -938,7 +956,7 @@
    "qualifications": [
     "Reported by secondary press; the ministry's release could not be retrieved.",
     "Not verified as delivered.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -950,7 +968,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -972,6 +990,7 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1006,8 +1025,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1019,7 +1039,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1049,6 +1069,7 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1085,7 +1106,7 @@
    "qualifications": [
     "Planned deployment in public health facilities; not documented as started.",
     "Not verified as delivered.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "operates",
    "relationship_label": "operates",
@@ -1119,8 +1140,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1132,7 +1154,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1162,6 +1184,7 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1196,8 +1219,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1333,7 +1357,7 @@
    "qualifications": [
     "Reported by secondary press; the ministry's release could not be retrieved.",
     "Not verified as delivered.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1369,7 +1393,7 @@
    "qualifications": [
     "Integration announced in the future tense.",
     "Not verified as delivered.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "operates",
    "relationship_label": "operates",
@@ -1403,8 +1427,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1438,7 +1463,7 @@
     "type": "institution"
    },
    "qualifications": [
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "created",
    "relationship_label": "created",
@@ -1450,7 +1475,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -1482,7 +1507,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "includes-formal-record",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1512,6 +1537,7 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
@@ -1547,7 +1573,7 @@
    },
    "qualifications": [
     "Pre-seed round, as stated by the investor.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "invested_in",
    "relationship_label": "invested in",
@@ -1581,8 +1607,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1617,7 +1644,7 @@
    },
    "qualifications": [
     "Designation as a UNESCO Category 2 Centre.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "designated",
    "relationship_label": "designated",
@@ -1651,8 +1678,9 @@
     "type": "project"
    },
    "qualifications": [
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",

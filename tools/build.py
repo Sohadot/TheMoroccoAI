@@ -56,6 +56,10 @@ KIND_LABELS = {
     "ai-application": "AI application", "compute-infrastructure": "Compute infrastructure",
     "institute": "Institute", "agreement": "Agreement", "digital-platform": "Digital platform (not AI)",
 }
+KIND_COUNT_LABELS = {
+    "ai-application": ("AI application", "AI applications"), "compute-infrastructure": ("compute infrastructure", "compute infrastructure"),
+    "institute": ("institute", "institutes"), "agreement": ("agreement", "agreements"), "digital-platform": ("digital platform", "digital platforms"),
+}
 SOURCE_TYPE_LABELS = {
     "government_portal": "Government portal",
     "government_publication": "Government publication",
@@ -654,6 +658,21 @@ def render_questions(model):
                f"{len(mrows)} relationships: " + ", ".join(f"{k.lower()} {v}" for k, v in sorted(lv.items(), key=lambda kv: (-kv[1], kv[0])))
                + f". {sum(1 for r in mrows if r['documentation_basis'] == 'announcement-or-description')} of these rest only on announcements or news reports in this registry; that describes how they are documented here, not whether they are true. "
                "A signature or an announcement is not delivery, and these connections are the ones recorded here, not all that exist.")
+    projects8 = [ents[x] for x in sorted({r["object"]["id"] for r in mrows})]
+    kinds8 = {}
+    for e in projects8:
+        kinds8[e["project_kind"]] = kinds8.get(e["project_kind"], 0) + 1
+    stages8 = {}
+    for e in projects8:
+        stages8[e["lifecycle"]] = stages8.get(e["lifecycle"], 0) + 1
+    signed8 = [r for r in mrows if r["documented_as"] == "Signed"]
+    text8 = sum(1 for r in signed8 if SIGNED_TEXT_NOT_RECORDED not in r["qualifications"])
+    q8_scope = (f"The {len(projects8)} projects are all the projects these organisations are connected to, of every kind recorded: "
+                + ", ".join(f"{v} {KIND_COUNT_LABELS[k][v != 1]}" for k, v in sorted(kinds8.items(), key=lambda kv: (-kv[1], kv[0])))
+                + ". By stage: " + ", ".join(f"{v} {LIFECYCLE_LABELS[k].lower()}" for k, v in sorted(stages8.items(), key=lambda kv: (-kv[1], kv[0])))
+                + (". A digital platform here is a catalogue of AI solutions, not itself an AI system. " if "digital-platform" in kinds8 else ". ")
+                + (f"None of the {len(signed8)} signatures is documented by its signed text: each rests on a report of the signing."
+                   if not text8 else f"{text8} of the {len(signed8)} signatures are documented by their signed text."))
 
     # Q9: official targets against what the registry records about progress.
     gaps = registry.load(registry.ROOT / "data" / "gaps.json")
@@ -711,8 +730,9 @@ def render_questions(model):
   {_table("Unresolved and not recently reconfirmed entries", ["Entity", "Status", "Why"], q7, "No unresolved or not recently reconfirmed entry is recorded.")}
 </section>
 <section aria-labelledby="q8-h">
-  <h2 id="q8-h"><span class="section-number">Q8</span>Which organisations are connected to documented AI or computing projects, and what establishes each connection?</h2>
-  <p class="prose">{escape(q8_line)} The full set, with sources and qualifications, is in the <a href="/registry/matrix/">institutional matrix</a>.</p>
+  <h2 id="q8-h"><span class="section-number">Q8</span>Which organisations are connected to the AI-related and computing projects recorded in this registry, and what establishes each connection?</h2>
+  <p class="prose">{escape(q8_line)}</p>
+  <p class="prose">{escape(q8_scope)} The full set, with sources and qualifications, is in the <a href="/registry/matrix/">institutional matrix</a>.</p>
   {_table("Organisations and the projects they are documented as connected to", ["Organisation", "Projects (documented as; project stage)", "Evidence"], q8, "No organisation is connected to a project.")}
 </section>
 <section aria-labelledby="q9-h">
@@ -737,18 +757,22 @@ DOCUMENTED_AS = {"ANNOUNCED PLAN": "Announced or planned", "OFFICIAL TARGET": "T
                  "INDEPENDENT ANALYSIS": "Registry inference", "UNVERIFIED CLAIM": "Unverified claim"}
 DOCUMENTED_AS_VERIFIED = {"signatory_of": "Signed", "operates": "Operated", "develops": "Developed"}
 DOCUMENTED_AS_VERIFIED_OTHERWISE = "Documented"
+SIGNED_TEXT_NOT_RECORDED = "The signing is documented by a report of it; the signed text is not recorded in this registry."
 SIGNED_NOT_DELIVERED = "A signature is recorded as a signature; delivery is not documented."
 PLAN_NOT_DELIVERED = "Not verified as delivered."
-GAP05_CAVEAT = "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+GAP05_CAVEAT = "Documented here only by announcements, news reports or descriptions (GAP-05)."
 QUALIFICATION_RULES = [
     {"when": "The relationship has a note in ontology.json", "text": "the note"},
+    {"when": "documented_as is Signed and no cited record has evidence_type signed_instrument", "text": SIGNED_TEXT_NOT_RECORDED},
     {"when": "documented_as is Signed and object.lifecycle is announced", "text": SIGNED_NOT_DELIVERED},
     {"when": "documented_as is Announced or planned", "text": PLAN_NOT_DELIVERED},
     {"when": "documentation_basis is announcement-or-description", "text": GAP05_CAVEAT},
 ]
 DOCUMENTATION_BASIS = {
     "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
-    "includes-formal-record": "A formal-act relationship that cites at least one record of another type.",
+    "includes-non-announcement-record": ("A formal-act relationship that cites at least one record of another type: an official report, a "
+                                         "regulatory record, a technical repository, a publication, a ranking or a direct observation. Such a "
+                                         "record is not the instrument itself; a signed text would have evidence_type signed_instrument."),
     "declaration-or-event": "Any other relationship: declarations, public events and a programme's stated composition, whose primary record is an announcement. Not measured this way.",
 }
 
@@ -776,8 +800,11 @@ def matrix_derivation():
         "documentation_basis": {"formal_act_relationships": list(registry.FORMAL_ACT_PREDICATES),
                                 "announcement_evidence_types": list(registry.ANNOUNCEMENT_TYPES),
                                 "values": DOCUMENTATION_BASIS,
+                                "assignment": {"not_a_formal_act": "declaration-or-event", "every_record_an_announcement": "announcement-or-description",
+                                               "otherwise": "includes-non-announcement-record"},
+                                "renamed": {"includes-formal-record": "includes-non-announcement-record (v0.5.0)"},
                                 "rule": ("For a relationship whose type is in formal_act_relationships: announcement-or-description when every record it "
-                                         "cites has an evidence_type in announcement_evidence_types, otherwise includes-formal-record. For any other "
+                                         "cites has an evidence_type in announcement_evidence_types, otherwise includes-non-announcement-record. For any other "
                                          "relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. "
                                          "documented_as and documentation_basis are independent: a row can read Signed while resting only on an announcement.")},
         "object.lifecycle": "The related entity's lifecycle key from ontology.json (defined in its lifecycle_stages); null for entity types without a lifecycle.",
@@ -810,6 +837,8 @@ def matrix_rows(model):
         quals = []
         if rel.get("note"):
             quals.append(rel["note"])
+        if level == "Signed" and not any(model.records[x]["evidence_type"] == "signed_instrument" for x in rel["evidence"]):
+            quals.append(SIGNED_TEXT_NOT_RECORDED)
         if level == "Signed" and obj.get("lifecycle") == "announced":
             quals.append(SIGNED_NOT_DELIVERED)
         if level == "Announced or planned":
@@ -827,7 +856,7 @@ def matrix_rows(model):
             "classification": rel["classification"],
             "documented_as": level,
             "documentation_basis": ("announcement-or-description" if key in announcement_only
-                                    else "includes-formal-record" if rel["predicate"] in registry.FORMAL_ACT_PREDICATES
+                                    else "includes-non-announcement-record" if rel["predicate"] in registry.FORMAL_ACT_PREDICATES
                                     else "declaration-or-event"),
             "evidence": [{"id": x, "source_url": model.records[x]["source_url"], "source_type": model.records[x]["source_type"],
                           "evidence_type": model.records[x]["evidence_type"], "publication_date": model.records[x]["publication_date"],
@@ -858,6 +887,13 @@ def render_matrix(model):
     level_line = " · ".join(f"{k}: {v}" for k, v in sorted(levels.items(), key=lambda kv: (-kv[1], kv[0])))
     n_ann = sum(1 for r in rows if r["documentation_basis"] == "announcement-or-description")
     n_acts = len(registry.formal_act_relationships(model.ontology))
+    signed = [r for r in rows if r["documented_as"] == "Signed"]
+    n_text = sum(1 for r in signed if SIGNED_TEXT_NOT_RECORDED not in r["qualifications"])
+    kinds = sorted({e["evidence_type"].replace("_", " ") for r in signed for e in r["evidence"]})
+    signed_line = (f'For none of the {len(signed)} "Signed" rows is the signed text recorded: each signing is documented by a report of it '
+                   f'({", ".join(kinds)}), as the evidence column shows.'
+                   if not n_text else
+                   f'The signed text is recorded for {n_text} of the {len(signed)} "Signed" rows; the others rest on a report of the signing.')
     head = "".join(f'<th scope="col">{h}</th>' for h in ("Related entity", "Relationship", "Documented as", "Status of the related entity", "Evidence", "Qualification"))
     bodies = []
     for sid in subjects:
@@ -883,9 +919,9 @@ def render_matrix(model):
 <section aria-labelledby="mx1-h">
   <h2 id="mx1-h"><span class="section-number">01</span>How to read it</h2>
   <ul class="prose">
-    <li><strong>Documented as</strong> says only what the relationship's classification supports: {escape(level_line)}. "Signed" means the signature is documented, not that anything was delivered; "Operated" means a verified operator; "Announced or planned" is not verified as delivered.</li>
+    <li><strong>Documented as</strong> says only what the relationship's classification supports: {escape(level_line)}. "Signed" means the signature is documented, not that anything was delivered; "Operated" means a verified operator; "Announced or planned" is not verified as delivered. {escape(signed_line)}</li>
     <li><strong>Status of the related entity</strong> is its own lifecycle stage, with its basis. A project's status is not a measure of progress toward any national target.</li>
-    <li>Of the {n_acts} relationships that assert a formal act (a signature, creation, designation, investment, development or operation), {n_ann} rest only on announcements, news reports or descriptions; the instrument behind them is not recorded here (<a href="/registry/gaps/#gap-05">GAP-05</a>). This describes how they are documented in this registry, not whether they are true. Declarations and public events (presented, launched, organised, a programme's stated composition) are not measured this way: an official announcement is their primary record.</li>
+    <li>Of the {n_acts} relationships that assert a formal act (a signature, creation, designation, investment, development or operation), {n_ann} rest only on announcements, news reports or descriptions (<a href="/registry/gaps/#gap-05">GAP-05</a>); the others also cite another kind of record, such as an official report. This describes how they are documented in this registry, not whether they are true. Declarations and public events (presented, launched, organised, a programme's stated composition) are not measured this way: an official announcement is their primary record.</li>
     <li>An association between organisations is not a legal identity or a formal partnership unless a record says so.</li>
   </ul>
   <p class="prose">Jump to: {index}</p>
@@ -1094,8 +1130,8 @@ def render_data_reference(model, gaps, man):
         ["Which official targets are recorded, and for which strategy", "Reproducible", "Each record classified OFFICIAL TARGET, in evidence_id order, superseded or not; its claim (the registry's summary; the source's words are its excerpts); and each entity of type initiative among its related_entities, in that order. The targets relationships from strategies to sectors are not used"],
         ["Which projects each strategy is recorded as including, and their stages", "Reproducible", "includes relationships from the strategy to entities with a lifecycle, in ontology.json order"],
         ["Which gap covers the strategy, and whether it is open", "Reproducible", "data/gaps.json: the first gap, in file order, whose entities include the strategy, and its state"],
-        ["That no recorded evidence measures progress towards the Morocco AI 2030 targets", "Editorial assessment", "GAP-02 is open because an editor judged that its assessed records, including the ministry's presentation of main advances (MAI-EV-0040), quantify no progress. No data check backs this judgment; a consumer can confirm that the data it rests on has not changed since (its digest) but cannot re-derive the judgment"],
-        ["That a strategy without a gap has not been assessed", "Reproducible", "No gap's entities include it"],
+        ["That no recorded evidence measures progress towards the targets of Morocco AI 2030 or Digital Morocco 2030", "Editorial assessment", "GAP-02 and GAP-06 are open because an editor judged that their assessed records quantify no progress: for Morocco AI 2030 these include the ministry's presentation of main advances (MAI-EV-0040); for Digital Morocco 2030, a statement about digital spending (MAI-EV-0003), which is an unchecked input figure, not progress. No data check backs this judgment; a consumer can confirm that the data it rests on has not changed since (its digest) but cannot re-derive the judgment"],
+        ["That every strategy with an official target has a gap on its progress", "Reproducible", "The build refuses to publish an initiative related to an OFFICIAL TARGET record that no gap's entities include"],
     ]
     body = f"""<header class="page-head">
   <p class="breadcrumb"><a href="/registry/">Registry</a> / Data</p>
@@ -1130,6 +1166,7 @@ def render_data_reference(model, gaps, man):
     <li>Every record gives the <code>source_url</code>, <code>source_organization</code>, <code>source_type</code>, <code>publication_date</code>, <code>retrieval_date</code>, verbatim <code>source_excerpts</code> in <code>source_language</code>, and a <code>verification_status</code> with a <code>verification_note</code> that states the record's limits.</li>
     <li><code>claim</code> is the registry's summary of what the source documents; the excerpts are the source's own words.</li>
     <li>A record's classification describes what its source documents, not whether a plan was delivered or a target met.</li>
+    <li>A signature is documented by a report of it unless a record of the signed text itself is cited (evidence_type <code>signed_instrument</code>). {"No such record exists yet: every signature in the registry rests on a report of the signing." if not any(r["evidence_type"] == "signed_instrument" for r in model.records.values()) else "Rows citing one say so in matrix.json."}</li>
   </ul>
 </section>
 <section aria-labelledby="d4-h">
