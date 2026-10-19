@@ -1,5 +1,55 @@
 {
  "as_of": "2026-10-19",
+ "classification_support": {
+  "lifecycle": {
+   "announced": [
+    "ANNOUNCED PLAN",
+    "VERIFIED FACT"
+   ],
+   "discontinued": [
+    "VERIFIED FACT"
+   ],
+   "in-development": [
+    "VERIFIED FACT"
+   ],
+   "operational": [
+    "VERIFIED FACT"
+   ],
+   "pilot": [
+    "VERIFIED FACT"
+   ],
+   "released": [
+    "VERIFIED FACT"
+   ]
+  },
+  "lifecycle_rule": "An entity's lifecycle_evidence must include a record whose classification is in the stage's list. For a stage in status_stages, one of those records must also declare it (status_evidence equal to the stage). announced and unresolved need no declaring record; unresolved needs a note instead.",
+  "note": "Two of the validator's rules, published so that they can be checked. Its other rules (for example that an operational stage names its operator, or that a source is independent) are described in the methodology and README, not here.",
+  "relationship": {
+   "ANNOUNCED PLAN": [
+    "ANNOUNCED PLAN",
+    "OFFICIAL TARGET",
+    "VERIFIED FACT"
+   ],
+   "INDEPENDENT ANALYSIS": "at least two cited records and a note",
+   "OFFICIAL TARGET": [
+    "OFFICIAL TARGET"
+   ],
+   "UNVERIFIED CLAIM": [
+    "UNVERIFIED CLAIM"
+   ],
+   "VERIFIED FACT": [
+    "VERIFIED FACT"
+   ]
+  },
+  "relationship_rule": "A relationship with a classification listed here must cite at least one record whose classification is in its list.",
+  "status_stages": [
+   "in-development",
+   "pilot",
+   "operational",
+   "released",
+   "discontinued"
+  ]
+ },
  "consumer_example": "/examples/registry_consumer.py",
  "documentation": "/data/",
  "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
@@ -36,18 +86,18 @@
    "sha256": "bd1e18ba67393c5f795ca43fe5895f9a4af5284a02756e19760867fab799f437"
   },
   {
-   "bytes": 56942,
+   "bytes": 57560,
    "path": "/registry/matrix/matrix.json",
    "purpose": "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row.",
    "role": "derived",
-   "sha256": "f75a875dafff2b6f08478e2be1b2a992287d0492ed61d76f250299172cd67e34"
+   "sha256": "1b49d84eaf949d50af8f3784780ab1e204cca5897222b0d59ba49bfdb4e0db85"
   },
   {
-   "bytes": 16977,
+   "bytes": 17473,
    "path": "/registry/gaps/gaps.json",
    "purpose": "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json.",
    "role": "derived",
-   "sha256": "bb2c8bf46e90790afdf3af901a7d77a5805ef7971fb9d2b2180b0f70429008b5"
+   "sha256": "daa0cad53c6fe2f9005fb48a22dbe4d9d431057e2037f041c2c01293f90da92c"
   }
  ],
  "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",

@@ -354,6 +354,27 @@ class DefectsAreDetected(unittest.TestCase):
         self.copy.edit("/registry/matrix/matrix.json", lambda d: d.pop("derivation"))
         self.assertRejected("unexpected structure: KeyError 'derivation'")
 
+    def test_classification_stronger_than_its_records(self):
+        def upgrade(d):
+            r = next(r for r in d["relationships"] if r["classification"] == "ANNOUNCED PLAN" and r["predicate"] == "operates")
+            r["classification"] = "UNVERIFIED CLAIM"
+        self.copy.edit("/data/ontology.json", upgrade)
+        self.assertRejected("classified UNVERIFIED CLAIM but cites no UNVERIFIED CLAIM record")
+
+    def test_stage_without_a_declaring_record(self):
+        self.copy.edit("/data/ontology.json", lambda d: next(e for e in d["entities"] if e["id"] == "nexus-ai-factory").update(lifecycle="pilot"))
+        self.assertRejected("nexus-ai-factory: stage pilot is not declared by any of its lifecycle_evidence records")
+
+    def test_stage_label_out_of_date(self):
+        def relabel(d):
+            next(r for r in d["rows"] if r["object"]["id"] == "idarati-ai")["object"]["stage"] = "Operational"
+        self.copy.edit("/registry/matrix/matrix.json", relabel)
+        self.assertRejected("has object_stage 'Operational'")
+
+    def test_wrong_formal_act_count(self):
+        self.copy.edit("/registry/gaps/gaps.json", lambda d: next(g for g in d["gaps"] if g["id"] == "GAP-05").update(formal_act_relationships=43))
+        self.assertRejected("GAP-05 states 43 formal-act relationships")
+
     def test_derived_gap_list_out_of_date(self):
         self.copy.edit("/registry/gaps/gaps.json", lambda d: next(g for g in d["gaps"] if g["id"] == "GAP-05")["relationships"].pop())
         self.assertRejected("GAP-05 lists")

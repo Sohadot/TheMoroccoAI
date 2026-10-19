@@ -31,9 +31,9 @@
    "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages; an entity without a lifecycle counts as not in them.",
    "no_ai_application_link": "Triggered when any relationship, of any type and in either direction, joins the entity to an entity whose project_kind is ai-application.",
    "no_status_basis": "Triggered when a record in the entity's lifecycle_evidence has a status_basis listed in the check's bases.",
-   "rule": "The checks and digests are in /data/gaps.json. A check holds when it is not triggered. An open gap must be re-assessed, and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."
+   "rule": "The checks and digests are in /data/gaps.json. A check type not listed here is an error, not a check to skip. A check holds when it is not triggered; a triggered check is an error only while the gap is open. An open gap must be re-assessed, and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."
   },
-  "computed_relationships": "A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), in the matrix's row order. Its count is stated as N of M, where M is the number of matrix rows whose relationship type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these are all such relationships in ontology.json. The list measures documentation, not truth, and may include relationships already classified as announced plans."
+  "computed_relationships": "A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), in the matrix's row order, each entry giving id, subject, relationship, object, classification, evidence (ids) and evidence_types (in the same order). Its count is stated as N of M: N is the length of relationships and M, published as formal_act_relationships, the number of matrix rows whose relationship type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these are all such relationships in ontology.json. The list measures documentation, not truth, and may include relationships already classified as announced plans."
  },
  "derived_from": [
   "/data/gaps.json",
@@ -71,6 +71,7 @@
     "An operator's report of use (annual report, parliamentary answer, published usage statistics)",
     "An independent evaluation of the service"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-01",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "What documents actual use, adoption, accuracy, service outcomes or sustained operation of Idarati AI?",
@@ -110,6 +111,7 @@
    "evidence_needed": [
     "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-02",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "What publicly documented measurements show progress toward the official targets of Morocco AI 2030?",
@@ -145,6 +147,7 @@
     "Published usage or allocation reports",
     "Independent publications acknowledging Toubkal for specific AI models"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-03",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "What independently documents AI workloads on the Toubkal supercomputer, and at what scale?",
@@ -189,6 +192,7 @@
     "Official project documentation (permits, commissioning notices)",
     "Operator or independent confirmation that a facility is built and running"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-04",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "Which announced or signed computing and data-centre initiatives have verifiable construction, commissioning or operation?",
@@ -205,6 +209,7 @@
     "Published texts of the conventions and memoranda",
     "Official Bulletin publications where applicable"
    ],
+   "formal_act_relationships": 33,
    "id": "GAP-05",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "Which relationships asserting a formal act (a signature, creation, designation, investment, development or operation) rest only on announcements, news reports or descriptions in this registry?",

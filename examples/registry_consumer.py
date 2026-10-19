@@ -86,6 +86,7 @@ class Registry:
         p += self._check_definitions()
         p += self._check_references()
         if not p:  # recomputing derived data needs sound references
+            p += self._check_support()
             p += self._check_matrix()
             p += self._check_gaps()
         return p
@@ -186,6 +187,42 @@ class Registry:
             records_exist(g.get("resolved_by"), g["id"], "resolved_by")
         return p
 
+    def _check_support(self):
+        """The two validator rules published in the manifest (classification_support)."""
+        p, rules = [], self.manifest["classification_support"]
+        for r in self.relationships:
+            allowed = rules["relationship"].get(r["classification"])
+            cited = {self.records[x]["classification"] for x in r["evidence"]}
+            where = f"relationship {r['subject']}|{r['predicate']}|{r['object']}"
+            if r["classification"] == "INDEPENDENT ANALYSIS":
+                if len(r["evidence"]) < 2 or not str(r.get("note", "")).strip():
+                    p.append(f"{where}: INDEPENDENT ANALYSIS needs at least two records and a note")
+            elif isinstance(allowed, list) and not cited & set(allowed):
+                p.append(f"{where}: classified {r['classification']} but cites no {' or '.join(allowed)} record")
+        for e in self.ontology["entities"]:
+            stage = e.get("lifecycle")
+            if stage not in rules["lifecycle"]:
+                continue
+            cited = [self.records[x] for x in e.get("lifecycle_evidence") or []]
+            if not any(r["classification"] in rules["lifecycle"][stage] for r in cited):
+                p.append(f"{e['id']}: stage {stage} is not supported by a {' or '.join(rules['lifecycle'][stage])} record")
+            if stage in rules["status_stages"] and not any(r.get("status_evidence") == stage for r in cited):
+                p.append(f"{e['id']}: stage {stage} is not declared by any of its lifecycle_evidence records")
+        return p
+
+    def stage_label(self, eid):
+        """object.stage, as defined in matrix.json (derivation["object.stage"])."""
+        spec, e = self.matrix["derivation"]["object.stage"], self.entities[eid]
+        if not e.get("lifecycle"):
+            return None
+        label = spec["labels"][e["lifecycle"]]
+        if e["lifecycle"] in ("operational", "pilot"):
+            bases = {self.records[x].get("status_basis") for x in e.get("lifecycle_evidence") or []
+                     if self.records[x].get("status_evidence") == e["lifecycle"]}
+            if bases == {"public-availability-observed"}:
+                label += spec["availability_suffix"]
+        return label
+
     # ─── Derived data, recomputed from the canonical files ──────────────────
 
     def matrix_rows(self):
@@ -208,7 +245,8 @@ class Registry:
             else:
                 how = "includes-formal-record"
             rows.append({"id": f"{r['subject']}|{r['predicate']}|{r['object']}", "subject": r["subject"], "relationship": r["predicate"],
-                         "object": r["object"], "object_lifecycle": obj.get("lifecycle"), "classification": r["classification"],
+                         "object": r["object"], "object_lifecycle": obj.get("lifecycle"), "object_stage": self.stage_label(r["object"]),
+                         "classification": r["classification"],
                          "documented_as": level, "documentation_basis": how, "evidence": list(r["evidence"])})
         return sorted(rows, key=lambda x: (x["subject"], x["relationship"], x["object"]))
 
@@ -223,7 +261,7 @@ class Registry:
         for rid in sorted(set(mine) & set(published)):
             a, b = mine[rid], published[rid]
             got = {"subject": b["subject"]["id"], "relationship": b["relationship"], "object": b["object"]["id"],
-                   "object_lifecycle": b["object"]["lifecycle"], "classification": b["classification"],
+                   "object_lifecycle": b["object"]["lifecycle"], "object_stage": b["object"]["stage"], "classification": b["classification"],
                    "documented_as": b["documented_as"], "documentation_basis": b["documentation_basis"],
                    "evidence": [e["id"] for e in b["evidence"]]}
             for k, v in got.items():
@@ -234,6 +272,10 @@ class Registry:
                 if rec and any(e[k] != rec[k] for k in ("source_url", "source_type", "evidence_type", "publication_date", "retrieval_date")):
                     p.append(f"matrix.json: row {rid} describes {e['id']} differently from evidence.json")
         return p
+
+    def _formal_act_rows(self):
+        acts = self.matrix["derivation"]["documentation_basis"]["formal_act_relationships"]
+        return [r for r in self.matrix_rows() if r["relationship"] in acts]
 
     def announcement_only(self):
         return [r for r in self.matrix_rows() if r["documentation_basis"] == "announcement-or-description"]
@@ -295,6 +337,9 @@ class Registry:
                 mine = [r["id"] for r in self.announcement_only()]
                 if listed != mine:
                     p.append(f"registry/gaps/gaps.json: {gid} lists {len(listed)} relationships; the published data gives {len(mine)}")
+                formal = self._formal_act_rows()
+                if d.get("formal_act_relationships") != len(formal):
+                    p.append(f"registry/gaps/gaps.json: {gid} states {d.get('formal_act_relationships')} formal-act relationships; the published data gives {len(formal)}")
             ents = set(g["entities"])
             for item in g.get("established") or []:
                 for x in item["evidence"]:
@@ -450,7 +495,7 @@ def show_gap(reg, gid):
         out.append("  No data check is defined: the state rests on the editor's assessment alone.")
     if any(c["type"] == "computed_relationships" for c in g.get("checks") or []):
         rows = reg.announcement_only()
-        formal = [r for r in reg.matrix_rows() if r["relationship"] in reg.matrix["derivation"]["documentation_basis"]["formal_act_relationships"]]
+        formal = reg._formal_act_rows()
         out.append(f"  Recomputed: {len(rows)} of {len(formal)} formal-act relationships rest only on announcements, news reports or descriptions:")
         out += [f"    {r['id']} ({', '.join(r['evidence'])})" for r in rows]
     out.append("  The established and not-established statements are the editor's assessment; the lines above are what the data confirms.")

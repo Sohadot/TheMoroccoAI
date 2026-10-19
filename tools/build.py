@@ -492,6 +492,9 @@ def _months_before(day, months):
     return datetime.date(y, m, min(day.day, last))
 
 
+AVAILABILITY_SUFFIX = " (public availability; use not documented)"
+
+
 def stage_label(model, e):
     """Lifecycle label; an operational or pilot stage resting only on observed availability says so."""
     label = LIFECYCLE_LABELS[e["lifecycle"]]
@@ -499,7 +502,7 @@ def stage_label(model, e):
         bases = {model.records[x].get("status_basis") for x in e.get("lifecycle_evidence") or []
                  if model.records[x].get("status_evidence") == e["lifecycle"]}
         if bases == {"public-availability-observed"}:
-            label += " (public availability; use not documented)"
+            label += AVAILABILITY_SUFFIX
     return label
 
 
@@ -778,7 +781,11 @@ def matrix_derivation():
                                          "relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. "
                                          "documented_as and documentation_basis are independent: a row can read Signed while resting only on an announcement.")},
         "object.lifecycle": "The related entity's lifecycle key from ontology.json (defined in its lifecycle_stages); null for entity types without a lifecycle.",
-        "object.stage": "A display label for object.lifecycle that also states the basis of an operational or pilot stage. Use object.lifecycle for machine processing.",
+        "object.stage": {"labels": LIFECYCLE_LABELS, "availability_suffix": AVAILABILITY_SUFFIX,
+                         "rule": ("A display label: labels[object.lifecycle], followed by availability_suffix when the stage is operational or pilot "
+                                  "and every lifecycle_evidence record declaring that stage (status_evidence equal to it) has status_basis "
+                                  "public-availability-observed. Other bases (an operator's or independent report of use, an independent listing) "
+                                  "add nothing to the label. Use object.lifecycle and the records' status_basis for machine processing.")},
         "qualifications": {"rule": "Explanatory sentences for readers, in this order, each added when its condition holds. Not a controlled vocabulary.",
                            "rules": QUALIFICATION_RULES},
         "relationship_label": "The predicate's label in ontology.json (predicates.<relationship>.label).",
@@ -909,7 +916,9 @@ def gap_register(model, gaps):
         item["open_wording"] = gaps["open_wording"] if g["state"] == "open" else None
         item["resolved_by"] = g.get("resolved_by")
         item["relationships"] = None
+        item["formal_act_relationships"] = None
         if any(c["type"] == "computed_relationships" for c in g.get("checks") or []):
+            item["formal_act_relationships"] = len(registry.formal_act_relationships(model.ontology))
             item["relationships"] = [
                 {"id": f'{r["subject"]}|{r["predicate"]}|{r["object"]}', "subject": r["subject"], "relationship": r["predicate"],
                  "object": r["object"], "classification": r["classification"], "evidence": r["evidence"],
@@ -924,8 +933,9 @@ def gap_derivation():
     return {
         "computed_relationships": ("A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis "
                                    "is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), "
-                                   "in the matrix's row order. Its count is stated as N of M, where M is the number of matrix rows whose relationship "
-                                   "type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these "
+                                   "in the matrix's row order, each entry giving id, subject, relationship, object, classification, evidence (ids) and "
+                                   "evidence_types (in the same order). Its count is stated as N of M: N is the length of relationships and M, "
+                                   "published as formal_act_relationships, the number of matrix rows whose relationship type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these "
                                    "are all such relationships in ontology.json. The list measures documentation, not truth, and may include "
                                    "relationships already classified as announced plans."),
         "checks": {
@@ -933,7 +943,8 @@ def gap_derivation():
             "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages; an entity without a lifecycle counts as not in them.",
             "no_ai_application_link": "Triggered when any relationship, of any type and in either direction, joins the entity to an entity whose project_kind is ai-application.",
             "computed_relationships": "Triggered when the computed list is empty.",
-            "rule": ("The checks and digests are in /data/gaps.json. A check holds when it is not triggered. An open gap must be re-assessed, "
+            "rule": ("The checks and digests are in /data/gaps.json. A check type not listed here is an error, not a check to skip. "
+                     "A check holds when it is not triggered; a triggered check is an error only while the gap is open. An open gap must be re-assessed, "
                      "and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record "
                      "whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."),
         },
@@ -1043,6 +1054,18 @@ def manifest(model, files):
         "registry": model.evidence["registry"], "registry_version": model.evidence["version"], "as_of": model.as_of,
         "publisher": model.evidence["publisher"], "site": SITE, "documentation": "/data/",
         "consumer_example": "/" + CONSUMER,
+        "classification_support": {
+            "note": ("Two of the validator's rules, published so that they can be checked. Its other rules (for example that an operational "
+                     "stage names its operator, or that a source is independent) are described in the methodology and README, not here."),
+            "relationship": {**{k: sorted(v) for k, v in registry.RELATION_SUPPORT.items()},
+                             "INDEPENDENT ANALYSIS": "at least two cited records and a note"},
+            "relationship_rule": "A relationship with a classification listed here must cite at least one record whose classification is in its list.",
+            "lifecycle": {k: sorted(v) for k, v in registry.LIFECYCLE_SUPPORT.items()},
+            "status_stages": list(registry.STATUS_STAGES),
+            "lifecycle_rule": ("An entity's lifecycle_evidence must include a record whose classification is in the stage's list. For a stage in "
+                               "status_stages, one of those records must also declare it (status_evidence equal to the stage). announced and "
+                               "unresolved need no declaring record; unresolved needs a note instead."),
+        },
         "vocabularies": {
             "note": "Values the validator accepts in evidence.json, with display labels where the site uses them. Other defined values are defined in the file that uses them.",
             "source_type": {k: SOURCE_TYPE_LABELS[k] for k in registry.SOURCE_TYPES},
@@ -1059,17 +1082,17 @@ def render_data_reference(model, gaps, man):
     ver, repo = model.evidence["version"], "https://github.com/Sohadot/TheMoroccoAI"
     res_rows = [[f'<a href="{r["path"]}"><code>{escape(r["path"])}</code></a>', escape(r["role"]), escape(r["purpose"])] for r in man["resources"]]
     q8_rows = [
-        ["Which organisations are connected to which projects, through which relationships", "Reproducible", "Matrix rows whose subject has type institution or company and whose object has type project, of any project kind (institutes, agreements, digital platforms, compute infrastructure and AI applications). Models, datasets and initiatives are not included. Organisations are listed by name, ignoring case"],
+        ["Which organisations are connected to which projects, through which relationships", "Reproducible", "Matrix rows whose subject has type institution or company and whose object has type project, of any project kind (institutes, agreements, digital platforms, compute infrastructure and AI applications). Models, datasets and initiatives are not included. Organisations are listed by name compared in lower case; each organisation's rows keep matrix order, one line per relationship (an organisation with two relationships to one project has two); its evidence is the distinct ids of all its rows, sorted. Projects are counted as distinct entities"],
         ["How each connection is documented (signed, developed, announced or planned, and so on)", "Reproducible", "The published documented_as rule, from the relationship's classification"],
         ["How many connections rest only on announcements, news reports or descriptions", "Reproducible", "Rows whose documentation_basis is announcement-or-description, under the published rule"],
         ["The counts in the summary sentence", "Reproducible", "Counting the rows above"],
         ["Each relationship's classification, and the records it cites", "Recorded, not derivable", "An editorial judgment, made under the evidence rules and recorded in ontology.json"],
-        ["Each project's lifecycle stage and its basis", "Recorded, not derivable", "An editorial admission of a record that declares the stage, checked by the validator"],
+        ["Each project's lifecycle stage and its basis", "Recorded, not derivable", "An editorial judgment; the validator checks that it is supported (manifest: classification_support): a stage beyond announced cites a record that declares it"],
         ["The caveats (a signature is not delivery; these are the connections recorded here)", "Fixed wording", "Part of the answer's text, not computed"],
     ]
     q9_rows = [
-        ["Which official targets are recorded, as their sources state them, and for which strategy", "Reproducible", "Each record classified OFFICIAL TARGET (by evidence_id), its claim, and each entity of type initiative among its related_entities. The targets relationships from strategies to sectors are not used"],
-        ["Which projects each strategy is recorded as including, and their stages", "Reproducible", "includes relationships from the strategy to entities with a lifecycle"],
+        ["Which official targets are recorded, and for which strategy", "Reproducible", "Each record classified OFFICIAL TARGET, in evidence_id order, superseded or not; its claim (the registry's summary; the source's words are its excerpts); and each entity of type initiative among its related_entities, in that order. The targets relationships from strategies to sectors are not used"],
+        ["Which projects each strategy is recorded as including, and their stages", "Reproducible", "includes relationships from the strategy to entities with a lifecycle, in ontology.json order"],
         ["Which gap covers the strategy, and whether it is open", "Reproducible", "data/gaps.json: the first gap, in file order, whose entities include the strategy, and its state"],
         ["That no recorded evidence measures progress towards the Morocco AI 2030 targets", "Editorial assessment", "GAP-02 is open because an editor judged that its assessed records, including the ministry's presentation of main advances (MAI-EV-0040), quantify no progress. No data check backs this judgment; a consumer can confirm that the data it rests on has not changed since (its digest) but cannot re-derive the judgment"],
         ["That a strategy without a gap has not been assessed", "Reproducible", "No gap's entities include it"],
@@ -1097,7 +1120,7 @@ def render_data_reference(model, gaps, man):
     <li><strong>Defined values:</strong> classifications, verification statuses, entity types, lifecycle stages, project kinds, origins, domains, predicates and gap states are keys of dictionaries that define them in the same file.</li>
   </ul>
   <p class="prose">Published identifiers are not reused. A record, entity or relationship may be corrected or withdrawn; each such change is listed in the <a href="/methodology/#m6-h">changelog</a>, and a withdrawn identifier is never assigned to anything else. A record whose claim later evidence contradicts is kept and marked <code>superseded_by</code>.</p>
-  <p class="prose">Since v0.1.0, no evidence or entity identifier has been removed or reused: every identifier published in any version is still present, with the same source address for records and the same type for entities. A test checks this against every published version of the data on each build. One relationship has been replaced as a correction (v0.2.0).</p>
+  <p class="prose">Since v0.1.0, no evidence or entity identifier has been removed or reused: every identifier published in any version is still present, with the same source address for records and the same type for entities. Earlier versions are not published as files; a test checks this against every version of the data in the <a href="{repo}" rel="noopener">public repository's</a> history on each build, and anyone can repeat it from that history. One relationship has been replaced as a correction (v0.2.0).</p>
 </section>
 <section aria-labelledby="d3-h">
   <h2 id="d3-h"><span class="section-number">03</span>Provenance</h2>

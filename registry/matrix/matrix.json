@@ -45,7 +45,19 @@
   },
   "evidence": "For each record the relationship cites: its id, source_url, source_type, evidence_type, publication_date and retrieval_date, copied from evidence.json.",
   "object.lifecycle": "The related entity's lifecycle key from ontology.json (defined in its lifecycle_stages); null for entity types without a lifecycle.",
-  "object.stage": "A display label for object.lifecycle that also states the basis of an operational or pilot stage. Use object.lifecycle for machine processing.",
+  "object.stage": {
+   "availability_suffix": " (public availability; use not documented)",
+   "labels": {
+    "announced": "Announced",
+    "discontinued": "Discontinued",
+    "in-development": "In development",
+    "operational": "Operational",
+    "pilot": "Pilot",
+    "released": "Released",
+    "unresolved": "Unresolved"
+   },
+   "rule": "A display label: labels[object.lifecycle], followed by availability_suffix when the stage is operational or pilot and every lifecycle_evidence record declaring that stage (status_evidence equal to it) has status_basis public-availability-observed. Other bases (an operator's or independent report of use, an independent listing) add nothing to the label. Use object.lifecycle and the records' status_basis for machine processing."
+  },
   "object.status_as_recorded": "The related entity's free-text status field in ontology.json; null when absent.",
   "qualifications": {
    "rule": "Explanatory sentences for readers, in this order, each added when its condition holds. Not a controlled vocabulary.",
