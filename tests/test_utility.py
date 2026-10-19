@@ -167,6 +167,87 @@ class GapIntegrity(unittest.TestCase):
                     self.assertIn(f'href="/registry/evidence/#{e}"', html)
 
 
+class SemanticAudit(unittest.TestCase):
+    """Sprint 04 pre-merge semantic audit: each contested claim, the inference it may support, and a guard against more."""
+
+    def setUp(self):
+        self.evidence, self.ontology = registry.load_all()
+        self.records = {r["evidence_id"]: r for r in self.evidence["records"]}
+        self.gaps = load_gaps()
+        self.G = {g["id"]: g for g in self.gaps["gaps"]}
+
+    def test_mai_ev_0041_supports_execution_not_scale_or_independence(self):
+        r = self.records["MAI-EV-0041"]
+        # Allowed: specific fine-tuning runs were executed on Toubkal, as its operator's authors report.
+        self.assertTrue(any("performed on the Toubkal supercomputer by Belkasmi et al." in x for x in r["source_excerpts"]))
+        self.assertIn("Belkasmi et al.", r["claim"])
+        # Not allowed: scale, continuity, independent confirmation, or a stage change.
+        for limit in ("not independent", "not the scale, share or continuity of AI use"):
+            self.assertIn(limit, r["verification_note"])
+        self.assertNotRegex(r["claim"], r"\b(widely|routinely|regularly|production use|thousands)\b")
+        self.assertNotIn("status_evidence", r)
+
+    def test_gap_03_does_not_deny_ai_use(self):
+        g = self.G["GAP-03"]
+        self.assertIn("This is not a finding that Toubkal is not used for AI", g["unestablished"])
+        self.assertIn("MAI-EV-0041", [x for item in g["established"] for x in item["evidence"]])
+        html = (REPO / "registry" / "gaps" / "index.html").read_text(encoding="utf-8")
+        art = html[html.index('id="gap-03"'):html.index('id="gap-04"')]
+        self.assertIn("its operator&#x27;s own authors report specific fine-tuning runs", art)
+
+    def test_gap_05_measures_only_formal_acts_and_says_so(self):
+        listed = registry.announcement_only(self.ontology, self.evidence)
+        self.assertTrue(all(r["predicate"] in registry.FORMAL_ACT_PREDICATES for r in listed))
+        for declared in ("presented", "launched", "organized", "includes", "implemented_through"):
+            self.assertNotIn(declared, registry.FORMAL_ACT_PREDICATES)
+        self.assertIn("not whether it is true", self.G["GAP-05"]["unestablished"])
+        n, m = len(listed), len(registry.formal_act_relationships(self.ontology))
+        matrix = (REPO / "registry" / "matrix" / "index.html").read_text(encoding="utf-8")
+        self.assertIn(f"Of the {m} relationships that assert a formal act", matrix)
+        self.assertIn(f"{n} rest only on announcements", matrix)
+        self.assertIn("not whether they are true", matrix)
+
+    def test_declarations_are_not_marked_as_weakly_documented(self):
+        model = build.Model(self.evidence, self.ontology)
+        for r in build.matrix_rows(model):
+            if r["relationship"] not in registry.FORMAL_ACT_PREDICATES:
+                self.assertEqual(r["documentation_basis"], "declaration-or-event", r["id"])
+                self.assertFalse(any("GAP-05" in q for q in r["qualifications"]), r["id"])
+
+    def _stale(self, mutate):
+        e, o = copy.deepcopy(self.evidence), copy.deepcopy(self.ontology)
+        mutate(e, o)
+        return [x for x in registry.validate_gaps(self.gaps, e, o) if "has changed since it was assessed" in x]
+
+    def test_editing_an_assessed_record_forces_reassessment(self):
+        def reclassify(e, o):
+            next(r for r in e["records"] if r["evidence_id"] == "MAI-EV-0041")["classification"] = "UNVERIFIED CLAIM"
+        self.assertTrue(any(x.startswith("GAP-03") for x in self._stale(reclassify)))
+
+    def test_superseding_a_cited_record_forces_reassessment(self):
+        def supersede(e, o):
+            next(r for r in e["records"] if r["evidence_id"] == "MAI-EV-0038")["superseded_by"] = ["MAI-EV-0034"]
+        self.assertTrue(any(x.startswith("GAP-01") for x in self._stale(supersede)))
+
+    def test_new_relationship_without_new_record_forces_reassessment(self):
+        def relate(e, o):
+            o["relationships"].append({"subject": "um6p", "predicate": "operates", "object": "toubkal-supercomputer",
+                                       "evidence": ["MAI-EV-0041"], "classification": "VERIFIED FACT"})
+        self.assertTrue(any(x.startswith("GAP-03") for x in self._stale(relate)))
+
+    def test_changed_attribute_or_stage_forces_reassessment(self):
+        def attr(e, o):
+            next(x for x in o["entities"] if x["id"] == "idarati-ai")["attributes"].append({"name": "Users", "value": "1 million", "evidence": "MAI-EV-0034"})
+        self.assertTrue(any(x.startswith("GAP-01") for x in self._stale(attr)))
+
+    def test_mai_ev_0040_limits_absence_to_the_article(self):
+        r = self.records["MAI-EV-0040"]
+        self.assertIn("it gives no quantified progress", r["verification_note"])
+        g = copy.deepcopy(self.gaps)
+        next(x for x in g["gaps"] if x["id"] == "GAP-02")["unestablished"] = "No progress has been made."
+        self.assertTrue(any("states absence in the world" in x for x in registry.validate_gaps(g, self.evidence, self.ontology)))
+
+
 class QuestionsAndEvidence(unittest.TestCase):
     def setUp(self):
         self.evidence, self.ontology = registry.load_all()

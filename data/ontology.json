@@ -493,7 +493,7 @@
         {"name": "Installation year", "value": "2020", "evidence": "MAI-EV-0020"},
         {"name": "TOP500 rank, June 2026", "value": "409", "evidence": "MAI-EV-0020"},
         {"name": "GPU partitions", "value": "NVIDIA A100 (2022) and H100 (added 2025)", "evidence": "MAI-EV-0041"},
-        {"name": "Reported AI workloads (operator-affiliated authors)", "value": "Fine-tuning of transformer-based large language models", "evidence": "MAI-EV-0041"}
+        {"name": "Reported AI workloads (operator-affiliated authors)", "value": "Fine-tuning runs that produced the GemMaroc Moroccan Darija language models (Belkasmi et al.), presented as a benchmark", "evidence": "MAI-EV-0041"}
       ],
       "evidence": ["MAI-EV-0020", "MAI-EV-0041"]
     },

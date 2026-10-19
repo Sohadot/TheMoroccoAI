@@ -34,7 +34,7 @@
     "type": "company"
    },
    "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "created",
    "relationship_label": "created",
@@ -111,7 +111,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -188,7 +188,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -262,7 +262,7 @@
     "type": "project"
    },
    "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "develops",
    "relationship_label": "develops",
@@ -297,7 +297,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -343,7 +343,7 @@
   },
   {
    "classification": "ANNOUNCED PLAN",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Announced or planned",
    "evidence": [
     {
@@ -366,8 +366,7 @@
    },
    "qualifications": [
     "Named as a component by the ministry; no founding instrument is documented.",
-    "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Not verified as delivered."
    ],
    "relationship": "includes",
    "relationship_label": "includes",
@@ -379,7 +378,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -400,9 +399,7 @@
     "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
     "type": "project"
    },
-   "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
-   ],
+   "qualifications": [],
    "relationship": "includes",
    "relationship_label": "includes",
    "subject": {
@@ -413,7 +410,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -442,9 +439,7 @@
     "status_as_recorded": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
     "type": "project"
    },
-   "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
-   ],
+   "qualifications": [],
    "relationship": "includes",
    "relationship_label": "includes",
    "subject": {
@@ -455,7 +450,7 @@
   },
   {
    "classification": "ANNOUNCED PLAN",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Announced or planned",
    "evidence": [
     {
@@ -478,8 +473,7 @@
    },
    "qualifications": [
     "Named as a component by the ministry; no founding instrument is documented.",
-    "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Not verified as delivered."
    ],
    "relationship": "includes",
    "relationship_label": "includes",
@@ -523,7 +517,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -544,9 +538,7 @@
     "status_as_recorded": "Launched 2024-09-25. Targets run to 2030.",
     "type": "initiative"
    },
-   "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
-   ],
+   "qualifications": [],
    "relationship": "launched",
    "relationship_label": "launched",
    "subject": {
@@ -639,7 +631,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -660,9 +652,7 @@
     "status_as_recorded": "Held 2025-07-01 to 2025-07-02, Rabat.",
     "type": "event"
    },
-   "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
-   ],
+   "qualifications": [],
    "relationship": "organized",
    "relationship_label": "organised",
    "subject": {
@@ -673,7 +663,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -694,9 +684,7 @@
     "status_as_recorded": "Under implementation according to the ministry (September 2026). Targets run to 2030.",
     "type": "initiative"
    },
-   "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
-   ],
+   "qualifications": [],
    "relationship": "presented",
    "relationship_label": "presented",
    "subject": {
@@ -764,7 +752,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -842,7 +830,7 @@
    "qualifications": [
     "Reported by secondary press; the ministry's release could not be retrieved.",
     "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -911,7 +899,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -989,7 +977,7 @@
    "qualifications": [
     "Planned deployment in public health facilities; not documented as started.",
     "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "operates",
    "relationship_label": "operates",
@@ -1024,7 +1012,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1101,7 +1089,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1113,7 +1101,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Documented",
    "evidence": [
     {
@@ -1134,9 +1122,7 @@
     "status_as_recorded": "Announced in January 2026. Signed founding instruments are documented for JAZARI ROOT and JAZARI Industrie X.0.",
     "type": "initiative"
    },
-   "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
-   ],
+   "qualifications": [],
    "relationship": "implemented_through",
    "relationship_label": "implemented through",
    "subject": {
@@ -1147,7 +1133,7 @@
   },
   {
    "classification": "ANNOUNCED PLAN",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Announced or planned",
    "evidence": [
     {
@@ -1169,8 +1155,7 @@
     "type": "project"
    },
    "qualifications": [
-    "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Not verified as delivered."
    ],
    "relationship": "includes",
    "relationship_label": "includes",
@@ -1182,7 +1167,7 @@
   },
   {
    "classification": "ANNOUNCED PLAN",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "declaration-or-event",
    "documented_as": "Announced or planned",
    "evidence": [
     {
@@ -1204,8 +1189,7 @@
     "type": "project"
    },
    "qualifications": [
-    "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Not verified as delivered."
    ],
    "relationship": "includes",
    "relationship_label": "includes",
@@ -1241,7 +1225,7 @@
    "qualifications": [
     "Reported by secondary press; the ministry's release could not be retrieved.",
     "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1277,7 +1261,7 @@
    "qualifications": [
     "Integration announced in the future tense.",
     "Not verified as delivered.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "operates",
    "relationship_label": "operates",
@@ -1312,7 +1296,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1346,7 +1330,7 @@
     "type": "institution"
    },
    "qualifications": [
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "created",
    "relationship_label": "created",
@@ -1455,7 +1439,7 @@
    },
    "qualifications": [
     "Pre-seed round, as stated by the investor.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "invested_in",
    "relationship_label": "invested in",
@@ -1490,7 +1474,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1525,7 +1509,7 @@
    },
    "qualifications": [
     "Designation as a UNESCO Category 2 Centre.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "designated",
    "relationship_label": "designated",
@@ -1560,7 +1544,7 @@
    },
    "qualifications": [
     "A signature is recorded as a signature; delivery is not documented.",
-    "Documented only by announcements, news reports or descriptions (GAP-05)."
+    "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",

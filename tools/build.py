@@ -646,7 +646,7 @@ def render_questions(model):
         lv[r["documented_as"]] = lv.get(r["documented_as"], 0) + 1
     q8_line = (f"{len(orgs8)} organisations are documented as connected to {len({r['object']['id'] for r in mrows})} projects, through "
                f"{len(mrows)} relationships: " + ", ".join(f"{k.lower()} {v}" for k, v in sorted(lv.items(), key=lambda kv: (-kv[1], kv[0])))
-               + f". {sum(1 for r in mrows if r['documentation_basis'] == 'announcement-or-description')} of these rest only on announcements or news reports. "
+               + f". {sum(1 for r in mrows if r['documentation_basis'] == 'announcement-or-description')} of these rest only on announcements or news reports in this registry; that describes how they are documented here, not whether they are true. "
                "A signature or an announcement is not delivery, and these connections are the ones recorded here, not all that exist.")
 
     # Q9: official targets against what the registry records about progress.
@@ -756,7 +756,7 @@ def matrix_rows(model):
         if level == "Announced or planned":
             quals.append("Not verified as delivered.")
         if key in announcement_only:
-            quals.append("Documented only by announcements, news reports or descriptions (GAP-05).")
+            quals.append("Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05).")
         rows.append({
             "id": "|".join(key),
             "subject": {"id": subj["id"], "name": subj["name"], "type": subj["type"]},
@@ -767,7 +767,9 @@ def matrix_rows(model):
                        "status_as_recorded": obj.get("status")},
             "classification": rel["classification"],
             "documented_as": level,
-            "documentation_basis": "announcement-or-description" if key in announcement_only else "includes-formal-record",
+            "documentation_basis": ("announcement-or-description" if key in announcement_only
+                                    else "includes-formal-record" if rel["predicate"] in registry.FORMAL_ACT_PREDICATES
+                                    else "declaration-or-event"),
             "evidence": [{"id": x, "source_url": model.records[x]["source_url"], "source_type": model.records[x]["source_type"],
                           "evidence_type": model.records[x]["evidence_type"], "publication_date": model.records[x]["publication_date"],
                           "retrieval_date": model.records[x]["retrieval_date"]} for x in rel["evidence"]],
@@ -796,6 +798,7 @@ def render_matrix(model):
         levels[r["documented_as"]] = levels.get(r["documented_as"], 0) + 1
     level_line = " · ".join(f"{k}: {v}" for k, v in sorted(levels.items(), key=lambda kv: (-kv[1], kv[0])))
     n_ann = sum(1 for r in rows if r["documentation_basis"] == "announcement-or-description")
+    n_acts = len(registry.formal_act_relationships(model.ontology))
     head = "".join(f'<th scope="col">{h}</th>' for h in ("Related entity", "Relationship", "Documented as", "Status of the related entity", "Evidence", "Qualification"))
     bodies = []
     for sid in subjects:
@@ -823,7 +826,7 @@ def render_matrix(model):
   <ul class="prose">
     <li><strong>Documented as</strong> says only what the relationship's classification supports: {escape(level_line)}. "Signed" means the signature is documented, not that anything was delivered; "Operated" means a verified operator; "Announced or planned" is not verified as delivered.</li>
     <li><strong>Status of the related entity</strong> is its own lifecycle stage, with its basis. A project's status is not a measure of progress toward any national target.</li>
-    <li>{n_ann} of the {len(rows)} relationships rest only on announcements, news reports or descriptions; the underlying instruments are not recorded (<a href="/registry/gaps/#gap-05">GAP-05</a>).</li>
+    <li>Of the {n_acts} relationships that assert a formal act (a signature, creation, designation, investment, development or operation), {n_ann} rest only on announcements, news reports or descriptions; the instrument behind them is not recorded here (<a href="/registry/gaps/#gap-05">GAP-05</a>). This describes how they are documented in this registry, not whether they are true. Declarations and public events (presented, launched, organised, a programme's stated composition) are not measured this way: an official announcement is their primary record.</li>
     <li>An association between organisations is not a legal identity or a formal partnership unless a record says so.</li>
   </ul>
   <p class="prose">Jump to: {index}</p>
@@ -879,7 +882,8 @@ def render_gaps(model, gaps):
             rows = [[_ent_link(model, r["subject"]), escape(model.predicates[r["relationship"]]["label"]), _ent_link(model, r["object"]),
                      badge(r["classification"]), _ev_links(r["evidence"]) + " <span class=\"ev-meta\">" + escape(", ".join(sorted(set(t.replace("_", " ") for t in r["evidence_types"])))) + "</span>"]
                     for r in g["relationships"]]
-            table = (f'<p class="prose">{len(rows)} relationships, computed from the data on every build:</p>'
+            table = (f'<p class="prose">{len(rows)} of the {len(registry.formal_act_relationships(model.ontology))} relationships that assert a formal act, computed from the data on every build. '
+                     f'Declarations and public events (presented, launched, organised, a programme\'s stated composition) are not listed: an official announcement is their primary record.</p>'
                      + _table("Relationships documented only by announcements, news reports or descriptions",
                               ["Organisation or initiative", "Relationship", "Related entity", "Classification", "Evidence and record type"], rows, ""))
         arts.append(f"""<article class="gap" id="{g["id"].lower()}" aria-labelledby="{g["id"].lower()}-h">

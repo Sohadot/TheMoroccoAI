@@ -4,6 +4,7 @@ Standard library only. `validate(evidence, ontology)` returns a list of error
 strings; an empty list means both files are consistent.
 """
 import datetime
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -516,6 +517,12 @@ MATRIX_OBJECT_TYPES = ("project", "initiative", "institution", "company", "legal
 # a regulatory record, a repository, a publication or a direct observation).
 ANNOUNCEMENT_TYPES = ("news_dispatch", "press_release", "official_announcement", "official_statement",
                       "organization_page", "case_study", "press_article")
+# Relationships that assert a formal act, normally recorded in an instrument (a signed text, a founding
+# act, a designation, an investment, a release, an operated service). For declarations and public events
+# (presented, launched, organised, a programme's stated composition) the official announcement is itself
+# the primary record, so they are not measured this way.
+FORMAL_ACT_PREDICATES = ("signatory_of", "created", "designated", "invested_in", "develops", "operates",
+                         "hosts", "lists_in_framework")
 GAP_STATES = ("open", "resolved")
 
 
@@ -525,11 +532,39 @@ def matrix_relationships(ontology):
             if types.get(r["subject"]) in MATRIX_SUBJECT_TYPES and types.get(r["object"]) in MATRIX_OBJECT_TYPES]
 
 
+def formal_act_relationships(ontology):
+    return [r for r in matrix_relationships(ontology) if r["predicate"] in FORMAL_ACT_PREDICATES]
+
+
 def announcement_only(ontology, evidence):
-    """Matrix relationships whose every cited record is an announcement, news report or description."""
+    """Formal-act relationships whose every cited record is an announcement, news report or description.
+    This measures how a relationship is documented in this registry, not whether it is true."""
     records = {r["evidence_id"]: r for r in evidence.get("records") or []}
-    return [r for r in matrix_relationships(ontology)
+    return [r for r in formal_act_relationships(ontology)
             if r["evidence"] and all(records[x]["evidence_type"] in ANNOUNCEMENT_TYPES for x in r["evidence"] if x in records)]
+
+
+GAP_RECORD_FIELDS = ("claim", "classification", "status_evidence", "status_basis", "source_entity", "superseded_by",
+                     "associated_entities", "source_url", "publication_date", "verification_status", "related_entities")
+GAP_ENTITY_FIELDS = ("type", "lifecycle", "lifecycle_evidence", "project_kind", "attributes", "status", "evidence")
+
+
+def gap_fingerprint(gap, evidence, ontology):
+    """A digest of everything a gap's assessment rests on: the substance of every record about its entities,
+    those entities' stage and attributes, and every relationship touching them. Any change means the
+    published assessment may be stale."""
+    ents = set(gap.get("entities") or [])
+    if not ents:
+        return None
+    data = {
+        "records": sorted(([r["evidence_id"]] + [r.get(f) for f in GAP_RECORD_FIELDS]
+                           for r in evidence.get("records") or [] if ents & set(r.get("related_entities") or [])), key=lambda x: x[0]),
+        "entities": sorted(([e["id"]] + [e.get(f) for f in GAP_ENTITY_FIELDS]
+                            for e in ontology.get("entities") or [] if e["id"] in ents), key=lambda x: x[0]),
+        "relationships": sorted([r["subject"], r["predicate"], r["object"], r["classification"], r["evidence"], r.get("note")]
+                                for r in ontology.get("relationships") or [] if ents & {r["subject"], r["object"]}),
+    }
+    return hashlib.sha256(json.dumps(data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 
 
 def validate_gaps(gaps, evidence, ontology):
@@ -556,7 +591,8 @@ def validate_gaps(gaps, evidence, ontology):
         for field in ("question", "unestablished"):
             if not str(g.get(field, "")).strip():
                 errors.append(f"{where} needs a {field}")
-        if re.search(r"\bno evidence exists\b|\bdoes not exist\b|\bnever happened\b", str(g.get("unestablished", "")) + str(g.get("question", "")), re.I):
+        if re.search(r"\bno evidence exists\b|\bdoes not exist\b|\bnever happened\b|\bno progress (?:has been|was) made\b|"
+                     r"\bnothing (?:has been|was) (?:built|delivered)\b", str(g.get("unestablished", "")) + str(g.get("question", "")), re.I):
             errors.append(f"{where} states absence in the world; state only what this registry records")
         ents = g.get("entities") or []
         for e in ents:
@@ -575,6 +611,11 @@ def validate_gaps(gaps, evidence, ontology):
             unassessed = sorted(related - set(g.get("assessed_records") or []))
             if unassessed:
                 errors.append(f"{where} new evidence {', '.join(unassessed)} concerns this gap; re-assess it and update assessed_records")
+            current = gap_fingerprint(g, evidence, ontology)
+            if g.get("assessed_fingerprint") != current:
+                errors.append(f"{where} data this gap rests on has changed since it was assessed (fingerprint "
+                              f"{g.get('assessed_fingerprint')}, now {current}); re-assess the gap, then update its text, "
+                              f"assessed date and assessed_fingerprint (python3 tools/registry.py --gap-fingerprints)")
         if g.get("state") == "resolved":
             if not g.get("resolved_by") or any(x not in records for x in g["resolved_by"]):
                 errors.append(f"{where} a resolved gap must cite the existing records that resolve it (resolved_by)")
@@ -615,7 +656,14 @@ def validate(evidence, ontology, today=None):
 
 if __name__ == "__main__":
     import sys
-    problems = validate(*load_all())
+    evidence, ontology = load_all()
+    gaps = load(ROOT / "data" / "gaps.json")
+    if "--gap-fingerprints" in sys.argv:
+        # After re-assessing a gap, copy its current fingerprint into data/gaps.json.
+        for g in gaps["gaps"]:
+            print(g["id"], gap_fingerprint(g, evidence, ontology))
+        sys.exit(0)
+    problems = validate(evidence, ontology) + validate_gaps(gaps, evidence, ontology)
     for p in problems:
         print("ERROR", p)
     print(f"{len(problems)} problem(s)")

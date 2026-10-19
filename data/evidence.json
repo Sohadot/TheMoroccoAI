@@ -887,16 +887,18 @@
       "publication_date": "2025-10-03",
       "retrieval_date": "2026-10-19",
       "evidence_type": "journal_article",
-      "claim": "A peer-reviewed article in The Journal of Supercomputing, by authors affiliated with Mohammed VI Polytechnic University's College of Computing, describes Toubkal's GPU partitions (NVIDIA A100 nodes from the initial 2022 deployment and H100 nodes added in 2025) and states that fine-tuning of transformer-based large language models and large-scale computational fluid dynamics simulations have been run on the system.",
+      "claim": "A peer-reviewed article in The Journal of Supercomputing, by authors affiliated with Mohammed VI Polytechnic University's College of Computing, describes Toubkal's GPU partitions (NVIDIA A100 nodes from the initial 2022 deployment and H100 nodes added in 2025). It states that fine-tuning of transformer-based large language models and large-scale computational fluid dynamics simulations have been run on the system, and presents as a benchmark the fine-tuning runs, attributed to Belkasmi et al., that produced the GemMaroc Moroccan Darija language models.",
       "source_excerpts": [
         "TOUBKAL: a high-performance supercomputer powering scientific research in Africa",
         "The initial deployment in 2022 included five Dell XE8545 nodes with dual AMD EPYC 7713 CPUs and four NVIDIA A100-SXM4-80GB GPUs per node.",
         "In 2025, three Dell XE8640 nodes were added, each with dual Intel Xeon Platinum 8468 CPUs and four NVIDIA H100-HBM3-80GB GPUs.",
-        "we examine practical workloads such as fine-tuning transformer-based large language models (LLMs) and conducting large-scale computational fluid dynamics (CFD) simulations, both of which have been successfully run on Toubkal."
+        "we examine practical workloads such as fine-tuning transformer-based large language models (LLMs) and conducting large-scale computational fluid dynamics (CFD) simulations, both of which have been successfully run on Toubkal.",
+        "we present a practical benchmark demonstrating the fine-tuning of a large language model (LLM) performed on the Toubkal supercomputer by Belkasmi et al.",
+        "This work led to the creation of GemMaroc"
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "verified",
-      "verification_note": "Open-access article (CC BY 4.0), published online 3 October 2025. Every author lists an affiliation with the university that hosts and runs Toubkal, so the workload statement is the operator's own report, peer-reviewed but not independent. It names workload types, not their scale, users or projects. Benchmark, accuracy and energy figures in the article are not recorded. The verified fact is what the article states. Excerpts were matched against the article page retrieved on the retrieval date; automated requests to the publisher can receive a bot-challenge page, which the source checker reports as blocked and does not bypass.",
+      "verification_note": "Open-access article (CC BY 4.0), published online 3 October 2025. Every author lists an affiliation with the university that hosts and runs Toubkal, so the workload statement is the operator's own report, peer-reviewed but not independent. It documents specific fine-tuning runs (the GemMaroc study by Belkasmi et al., which the registry has not retrieved), not the scale, share or continuity of AI use. The article's user counts and utilisation figures are not recorded. Benchmark, accuracy and energy figures in the article are not recorded. The verified fact is what the article states. Excerpts were matched against the article page retrieved on the retrieval date; automated requests to the publisher can receive a bot-challenge page, which the source checker reports as blocked and does not bypass.",
       "related_entities": ["toubkal-supercomputer", "um6p"]
     }
   ]
