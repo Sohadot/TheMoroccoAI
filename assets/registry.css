@@ -251,3 +251,13 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
   .qtable { min-width: 560px; }
   .table-hint { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--text-sub); margin: 0 0 6px; }
 }
+
+/* ─── CHANGELOG ─── */
+.changelog { list-style: none; max-width: 720px; border-left: 2px solid var(--border-gold); margin-top: 16px; }
+.change { padding: 0 0 28px 20px; }
+.change h3 { font-size: 20px; color: var(--blue); margin: 2px 0 6px; }
+.change-meta { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--text-dim); }
+.change-meta a { color: var(--blue-mid); }
+.change ul { margin: 4px 0 0 20px; font-size: 16px; color: var(--text-sub); }
+.change-sub { margin-top: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+.table-wrap + .prose { margin-top: 16px; }

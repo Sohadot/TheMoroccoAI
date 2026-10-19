@@ -1,0 +1,72 @@
+{
+  "note": "Public changes to the registry and site. Each entry is a commit on the public repository's main branch; the commit and its message are the record. Counts are those of data/evidence.json and data/ontology.json at that commit.",
+  "repository": "https://github.com/Sohadot/TheMoroccoAI",
+  "entries": [
+    {
+      "date": "2026-10-18",
+      "commit": "391006a29e20a6554e7ab90f58734c12ac59404f",
+      "title": "Registry v0.3.0: AI deployment evidence",
+      "version": "0.3.0",
+      "records": 39,
+      "entities": 65,
+      "relationships": 78,
+      "changes": [
+        "Rules for operational and pilot claims: the basis must be stated, the operator named separately from any provider or developer, and outcomes are never recorded as facts.",
+        "First AI application recorded as operational (Idarati AI), on the basis of public availability only; use is not documented.",
+        "Health and financial-services entries, recorded as announced.",
+        "Questions page: deployments, operators, evidence recency, unresolved entries.",
+        "A separate source checker that re-fetches sources without changing data."
+      ],
+      "corrections": [
+        "DeepEcho software changed from in development to unresolved: the FDA record contradicts the company website's disclaimer, now marked superseded.",
+        "FDA wording corrected to 510(k) clearance; the applicant's link to the Moroccan company recorded as an association, not a legal identity.",
+        "A provider attribution for Idarati AI (Berexia) removed: the label appears only in interface text and is not shown on the assistant."
+      ]
+    },
+    {
+      "date": "2026-10-18",
+      "commit": "d35d0dfec09dd47b06dddbd56a41a00b0df8d72a",
+      "title": "Registry v0.2.0: companies, models, datasets and lifecycle stages",
+      "version": "0.2.0",
+      "records": 31,
+      "entities": 60,
+      "relationships": 67,
+      "changes": [
+        "AI companies, open models and datasets, and compute infrastructure.",
+        "Lifecycle stages for projects, models and datasets, each backed by a record that declares the stage.",
+        "First version of the questions page."
+      ],
+      "corrections": [
+        "The higher-education ministry recorded as a signatory of the Nador memorandum, on a new source naming the signatories.",
+        "The DarijaBERT developer link reclassified as independent analysis: the model card names \"AIOX Lab\", and identification is by name.",
+        "UM6P Ventures' origin set to unresolved; Toubkal recorded as compute infrastructure, not as an AI application."
+      ]
+    },
+    {
+      "date": "2026-10-18",
+      "commit": "6bc8d9a2fe1b76b87d35131d117368b4712b8dd0",
+      "title": "Registry v0.1.0: evidence registry, ontology and quality gates",
+      "version": "0.1.0",
+      "records": 18,
+      "entities": 41,
+      "relationships": 48,
+      "changes": [
+        "Evidence registry and ontology with claim classifications, a validator and automated quality gates.",
+        "Generated registry pages, an independence statement on every page and self-hosted fonts."
+      ],
+      "corrections": [
+        "False capability claims and placeholder links on the original homepage corrected.",
+        "The CNDP recorded as listing Law 09-08 in its regulatory framework, not as administering it.",
+        "Conventions signed for the creation of Jazari institutes no longer presented as constituted institutions."
+      ]
+    },
+    {
+      "date": "2026-02-13",
+      "commit": "aa400cfa038c4899435886ee0e2f9d5cee4fe0a4",
+      "title": "Site created",
+      "changes": [
+        "Initial single-page site published at themoroccoai.com."
+      ]
+    }
+  ]
+}

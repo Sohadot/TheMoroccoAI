@@ -4,7 +4,7 @@
     python3 tools/check_site.py --network  also resolve the acquisition contact's MX record
 
 Checks internal links and anchors, third-party resource loading, page metadata and
-canonical URLs, basic accessibility rules, the sitemap, the acquisition contact path,
+canonical URLs, basic accessibility rules, the sitemap, the acquisition page and contact path,
 independence wording, and that no confidential commercial terms or credentials are
 committed. Standard library only.
 """
@@ -270,6 +270,15 @@ def check_contact(parsed, network):
     mailtos = {urlparse(h).path for p in parsed.values() for h in p.links if h and h.startswith("mailto:")}
     if CONTACT not in {urlparse(h).path for h in home.links if h and h.startswith("mailto:")}:
         errors.append(f"index.html: no mailto link to the acquisition contact {CONTACT}")
+    # Acquisition details live on their own page, reachable from the homepage, so the reference
+    # experience is not dominated by sales content.
+    acq = parsed.get(ROOT / "acquisition" / "index.html")
+    if acq is None:
+        errors.append("acquisition/index.html: missing dedicated acquisition page")
+    elif CONTACT not in {urlparse(h).path for h in acq.links if h and h.startswith("mailto:")}:
+        errors.append(f"acquisition/index.html: no mailto link to the acquisition contact {CONTACT}")
+    if "/acquisition/" not in home.links:
+        errors.append("index.html: no link to /acquisition/")
     for addr in mailtos - {CONTACT}:
         errors.append(f"unexpected mailto address {addr}; all contact links must use {CONTACT}")
     if network:

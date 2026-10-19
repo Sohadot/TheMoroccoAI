@@ -1,5 +1,6 @@
 """Tests for generated output and the site quality gates.  Run: python3 -m unittest discover -s tests"""
 import datetime
+import html as html_lib
 import re
 import shutil
 import sys
@@ -180,9 +181,131 @@ class PublishedSite(unittest.TestCase):
     def test_homepage_acquisition_path(self):
         html = (REPO / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="acquire"', html)
+        self.assertIn('href="/acquisition/"', html)
         self.assertIn(f"mailto:{check_site.CONTACT}", html)
         self.assertIn(check_site.DISCLAIMER, html)
         self.assertNotIn("fonts.googleapis.com", html)
+
+
+def _section(html, sid):
+    """The HTML of the <section id=sid> element (sections are not nested on these pages)."""
+    start = html.index(f'id="{sid}"')
+    return html[start:html.index("</section>", start)]
+
+
+def _visible(html):
+    html = re.sub(r"<(script|style)\b.*?</\1>", " ", html, flags=re.S)
+    return re.sub(r"\s+", " ", html_lib.unescape(re.sub(r"<[^>]+>", " ", html)))
+
+
+class ReferenceFirstPositioning(unittest.TestCase):
+    """Sprint 03.5: the homepage leads with the registry; framing and acquisition are separated and labelled."""
+
+    def setUp(self):
+        self.home = (REPO / "index.html").read_text(encoding="utf-8")
+        self.evidence, self.ontology = registry.load_all()
+
+    def test_homepage_counts_come_from_the_data(self):
+        expected = {"version": self.evidence["version"], "records": len(self.evidence["records"]),
+                    "entities": len(self.ontology["entities"]), "relationships": len(self.ontology["relationships"]),
+                    "domains": len(self.ontology["domains"]), "entity-types": len(self.ontology["entity_types"])}
+        for key, value in expected.items():
+            found = re.findall(rf"<!--r:{key}-->(.*?)<!--/r:{key}-->", self.home)
+            self.assertTrue(found, key)
+            self.assertTrue(all(v == str(value) for v in found), (key, found, value))
+
+    def test_no_stale_hand_written_figures(self):
+        text = _visible(self.home)
+        self.assertNotIn("v0.1", text)
+        self.assertNotIn("seven entity types", text.lower())
+        self.assertNotIn("EN · AR · FR · TZM planned", text)
+
+    def test_reading_order_is_reference_first(self):
+        order = ['id="top"', 'id="coverage"', 'id="access"', 'id="examples"', 'id="method"', 'id="thesis"', 'id="acquire"']
+        positions = [self.home.index(x) for x in order]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("on the record", _visible(self.home[self.home.index("<h1"):self.home.index("</h1>")]))
+
+    def test_examples_link_to_their_supporting_outputs(self):
+        examples = self.home[self.home.index("<!--r:examples-->"):self.home.index("<!--/r:examples-->")]
+        self.assertEqual(examples.count('<article class="example"'), 3)
+        expectations = {"ex-idarati": ['href="/registry/idarati-ai/"', 'href="/registry/questions/#q6-h"', 'href="/registry/evidence/#MAI-EV-0038"'],
+                        "ex-2030": ['href="/registry/morocco-ai-2030/"', 'href="/registry/evidence/#MAI-EV-0011"'],
+                        "ex-infra": ['href="/registry/toubkal-supercomputer/"', 'href="/registry/questions/#q5-h"']}
+        for qid, links in expectations.items():
+            block = examples[examples.index(f'id="{qid}"'):]
+            block = block[:block.index("</article>")]
+            for link in links:
+                self.assertIn(link, block, (qid, link))
+
+    def test_examples_follow_the_evidence_rules(self):
+        examples = _visible(self.home[self.home.index("<!--r:examples-->"):self.home.index("<!--/r:examples-->")])
+        self.assertIn("Operational (public availability; use not documented)", examples)
+        self.assertIn("no usage, accuracy or outcome evidence is recorded", examples)
+        self.assertIn("records no target as achieved", examples)
+        self.assertIn("no record shows them built or running", examples)
+        self.assertNotIn("FDA-approved", self.home)
+
+    def test_strategic_claims_appear_only_as_labelled_framing(self):
+        thesis = _section(self.home, "thesis")
+        self.assertIn("Framing, not findings.", _visible(thesis))
+        outside = _visible(self.home.replace(thesis, ""))
+        for term in ("civilization", "civilizational", "inevitable", "scarce", "category anchor", "sovereign reference", "moat"):
+            self.assertNotIn(term, outside.lower(), term)
+
+    def test_framing_vocabulary_is_not_presented_as_the_ontology(self):
+        thesis = _visible(_section(self.home, "thesis"))
+        self.assertIn("They are not part of the registry’s ontology", thesis)
+        self.assertNotIn('id="ontology"', self.home)
+
+    def test_homepage_acquisition_section_is_discreet(self):
+        acquire = _visible(_section(self.home, "acquire"))
+        self.assertLess(len(acquire.split()), 90)
+        self.assertIn('href="/acquisition/"', _section(self.home, "acquire"))
+        for sales in ("acquirable", "Buyer", "Asset Class", "Category Anchor Domain"):
+            self.assertNotIn(sales, _visible(self.home), sales)
+        self.assertNotIn("nav-acquire", self.home)
+
+    def test_acquisition_page_separates_assets_from_potential(self):
+        page = (REPO / "acquisition" / "index.html").read_text(encoding="utf-8")
+        text = _visible(page)
+        self.assertIn(f'href="mailto:{check_site.CONTACT}?subject=', page)
+        self.assertIn("Owner's view of potential (not established)", text)
+        self.assertIn("no interest from any specific party is implied", text)
+        self.assertIn("No price, traffic or revenue figures are published", text)
+        self.assertIn("no institution has adopted or designated it", text)
+        self.assertIn(check_site.DISCLAIMER, text)
+
+    def test_every_page_links_to_acquisition_quietly(self):
+        for f in [REPO / "registry" / "index.html", REPO / "methodology" / "index.html", REPO / "registry" / "idarati-ai" / "index.html"]:
+            html = f.read_text(encoding="utf-8")
+            self.assertIn('href="/acquisition/"', html, f)
+            self.assertNotIn("nav-acquire", html, f)
+
+    def test_independence_is_unmistakable_on_the_homepage(self):
+        hero = _visible(_section(self.home, "top"))
+        self.assertIn("Not affiliated with the Government of Morocco", hero)
+        self.assertIn("not endorsed or operated by any institution it lists", hero)
+
+    def test_methodology_explains_limits_and_corrections(self):
+        text = _visible((REPO / "methodology" / "index.html").read_text(encoding="utf-8"))
+        for heading in ("What the registry documents", "What it does not establish", "How evidence is admitted",
+                        "Unsupported, conflicting and outdated claims", "Corrections and reuse", "Changelog"):
+            self.assertIn(heading, text)
+        self.assertIn("No content or data licence has been declared", text)
+
+    def test_changelog_matches_the_published_data(self):
+        log = registry.load(REPO / "data" / "changelog.json")
+        latest = next(c for c in log["entries"] if c.get("version"))
+        self.assertEqual((latest["version"], latest["records"], latest["entities"], latest["relationships"]),
+                         (self.evidence["version"], len(self.evidence["records"]), len(self.ontology["entities"]),
+                          len(self.ontology["relationships"])))
+        dates = [c["date"] for c in log["entries"]]
+        self.assertEqual(dates, sorted(dates, reverse=True))
+        page = (REPO / "methodology" / "index.html").read_text(encoding="utf-8")
+        for c in log["entries"]:
+            self.assertRegex(c["commit"], r"^[0-9a-f]{40}$")
+            self.assertIn(f'href="{log["repository"]}/commit/{c["commit"]}"', page)
 
 
 GOOD_PAGE = """<!DOCTYPE html><html lang="en"><head>
@@ -192,7 +315,7 @@ GOOD_PAGE = """<!DOCTYPE html><html lang="en"><head>
 <link rel="canonical" href="https://themoroccoai.com/">
 <meta property="og:url" content="https://themoroccoai.com/">
 </head><body><main><h1>Title</h1>
-<section id="acquire"><a href="mailto:agent@sohadot.com">Contact</a></section>
+<section id="acquire"><a href="mailto:agent@sohadot.com">Contact</a> <a href="/acquisition/">Acquisition</a></section>
 <p>Not affiliated with the Government of Morocco</p>
 </main></body></html>"""
 
@@ -203,7 +326,12 @@ class GatesCatchRegressions(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
         (self.tmp / "robots.txt").write_text("Sitemap: https://themoroccoai.com/sitemap.xml\n")
-        (self.tmp / "sitemap.xml").write_text("<urlset><url><loc>https://themoroccoai.com/</loc></url></urlset>")
+        (self.tmp / "sitemap.xml").write_text("<urlset><url><loc>https://themoroccoai.com/</loc></url>"
+                                              "<url><loc>https://themoroccoai.com/acquisition/</loc></url></urlset>")
+        (self.tmp / "acquisition").mkdir()
+        (self.tmp / "acquisition" / "index.html").write_text(
+            GOOD_PAGE.replace('href="https://themoroccoai.com/"', 'href="https://themoroccoai.com/acquisition/"')
+                     .replace('content="https://themoroccoai.com/"', 'content="https://themoroccoai.com/acquisition/"'), encoding="utf-8")
         self.addCleanup(shutil.rmtree, self.tmp)
         self._root = check_site.ROOT
         check_site.ROOT = self.tmp
@@ -270,6 +398,14 @@ class GatesCatchRegressions(unittest.TestCase):
     def test_missing_acquisition_contact(self):
         self.assertCaught(GOOD_PAGE.replace('<a href="mailto:agent@sohadot.com">Contact</a>', ""),
                           "no mailto link to the acquisition contact")
+
+    def test_missing_acquisition_page(self):
+        (self.tmp / "acquisition" / "index.html").unlink()
+        (self.tmp / "acquisition").rmdir()
+        self.assertCaught(GOOD_PAGE, "missing dedicated acquisition page")
+
+    def test_homepage_must_link_to_acquisition_page(self):
+        self.assertCaught(GOOD_PAGE.replace(' <a href="/acquisition/">Acquisition</a>', ""), "no link to /acquisition/")
 
     def test_stray_contact_address(self):
         self.assertCaught(GOOD_PAGE.replace("</main>", '<a href="mailto:someone@example.com">x</a></main>'),

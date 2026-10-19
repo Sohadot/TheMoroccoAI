@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TheMoroccoAI — Morocco AI Reference Infrastructure</title>
-<meta name="description" content="Independent intelligence and reference infrastructure for Morocco's AI ecosystem: an evidence-backed registry of institutions, initiatives and projects. Not a government platform.">
+<title>TheMoroccoAI — Independent Evidence Registry for Morocco’s AI Ecosystem</title>
+<meta name="description" content="An independent, evidence-backed registry of institutions, initiatives, projects, models and datasets in Morocco's AI ecosystem, with sources, classifications and open JSON data. Not a government platform.">
 <link rel="canonical" href="https://themoroccoai.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="TheMoroccoAI">
-<meta property="og:title" content="TheMoroccoAI — Morocco AI Reference Infrastructure">
-<meta property="og:description" content="Independent intelligence and reference infrastructure for Morocco's AI ecosystem: an evidence-backed registry of institutions, initiatives and projects.">
+<meta property="og:title" content="TheMoroccoAI — Independent Evidence Registry for Morocco’s AI Ecosystem">
+<meta property="og:description" content="An independent, evidence-backed registry of institutions, initiatives, projects, models and datasets in Morocco's AI ecosystem.">
 <meta property="og:url" content="https://themoroccoai.com/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -20,7 +20,7 @@
  "@type": "WebSite",
  "name": "TheMoroccoAI",
  "url": "https://themoroccoai.com/",
- "description": "Independent intelligence and reference infrastructure for Morocco's AI ecosystem. Not affiliated with the Government of Morocco.",
+ "description": "Independent evidence registry for Morocco's AI ecosystem. Not affiliated with the Government of Morocco.",
  "hasPart": {"@type": "Dataset", "name": "TheMoroccoAI Evidence Registry", "url": "https://themoroccoai.com/registry/"}
 }
 </script>
@@ -132,23 +132,15 @@
 
   .nav-links a:hover { color: var(--gold); }
 
-  .nav-acquire {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--blue);
-    text-decoration: none;
-    border: 1px solid var(--blue);
-    padding: 6px 14px;
-    transition: all 0.2s;
-  }
+  .nav-mark { text-decoration: none; }
+  .nav-links .nav-quiet { color: var(--blue); border-bottom: 1px solid var(--border-gold); }
 
-  .nav-acquire:hover {
-    background: var(--blue);
-    color: var(--paper);
+  .skip-link {
+    position: absolute; left: -999px; top: 8px; z-index: 200;
+    background: var(--blue); color: var(--paper); padding: 8px 12px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
   }
+  .skip-link:focus { left: 8px; }
 
   /* ─── HERO ─── */
   .hero {
@@ -627,90 +619,71 @@
     line-height: 1.5;
   }
 
-  /* ─── ACQUIRE SECTION ─── */
-  .acquire-section {
-    border-top: 1px solid var(--border);
-    background: var(--blue);
+  /* ─── NOTICE, ACCESS, EXAMPLES ─── */
+  .hero-notice {
+    margin-top: 20px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--gold);
+    background: rgba(255,255,255,0.45);
+    font-size: 16px !important;
+    color: var(--text-main) !important;
   }
 
-  .acquire-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 80px 32px;
+  .access-section { border-top: 1px solid var(--border); }
+  .access-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
   }
-
-  .acquire-left h2 {
-    color: var(--paper);
-    font-size: clamp(28px, 4vw, 42px);
-    margin-bottom: 20px;
+  .access-card {
+    display: flex; flex-direction: column; gap: 6px;
+    background: var(--paper);
+    padding: 24px 22px;
+    text-decoration: none;
+    transition: background 0.2s;
   }
+  .access-card:hover, .access-card:focus-visible { background: var(--sand); }
+  .access-id { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: var(--gold-ink); text-transform: uppercase; }
+  .access-title { font-size: 20px; font-weight: 600; color: var(--blue); line-height: 1.2; }
+  .access-desc { font-size: 15px; font-weight: 300; color: var(--text-sub); line-height: 1.5; }
 
-  .acquire-left p {
-    font-size: 16px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.72);
-    line-height: 1.7;
-    margin-bottom: 20px;
-  }
-
-  .acquire-list {
-    list-style: none;
-    margin-bottom: 32px;
-  }
-
-  .acquire-list li {
-    font-size: 15px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.72);
-    line-height: 1.6;
-    padding-left: 18px;
+  .examples-section { border-top: 1px solid var(--border); background: var(--sand); }
+  .examples { display: flex; flex-direction: column; gap: 20px; }
+  .example {
+    background: var(--paper);
+    border: 1px solid var(--border-gold);
+    padding: 26px 28px;
     position: relative;
   }
+  .example::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--gold); }
+  .example-q { font-size: 21px; font-weight: 600; color: var(--blue); line-height: 1.25; margin-bottom: 10px; }
+  .example-a p, .example-a li { font-size: 16px; font-weight: 400; color: var(--text-sub); line-height: 1.6; }
+  .example-a p + p { margin-top: 8px; }
+  .example-a ul { margin: 4px 0 8px 20px; }
+  .example-a a, .example-links a { color: var(--blue-mid); text-underline-offset: 3px; }
+  .example-cls { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .example-links { margin-top: 12px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: var(--text-dim); }
 
-  .acquire-list li::before {
-    content: '◆';
-    position: absolute;
-    left: 0;
-    top: 1px;
-    font-size: 8px;
-    color: var(--gold-light);
-  }
+  .posture-more { margin-top: 24px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; }
+  .posture-more a, .rule-text a { color: var(--blue-mid); }
 
-  .acquire-right {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+  .framing-note strong { color: var(--text-main); font-weight: 600; }
+  .thesis-quote { margin: 0 0 36px; padding: 0 0 0 20px; border-left: 2px solid var(--gold); }
+  .thesis-quote p { font-size: clamp(24px, 4vw, 34px); font-weight: 300; font-style: italic; color: var(--blue); line-height: 1.2; }
+  .thesis-quote footer { background: none; padding: 8px 0 0; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-dim); }
+  .thesis-cell-body a { color: var(--blue-mid); }
+  .vocab-head { margin-top: 48px; font-size: 22px; font-weight: 600; color: var(--blue); }
+  .vocab-note { margin: 4px 0 18px; font-size: 15px; font-weight: 300; color: var(--text-sub); }
+  .vocab-note a { color: var(--blue-mid); }
 
-  .acquire-stat {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .acquire-stat-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.62);
-  }
-
-  .acquire-stat-val {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--gold-light);
-    text-align: right;
-  }
-
-  .acquire-stat-val a { color: inherit; }
+  /* ─── ACQUISITION (discreet) ─── */
+  .acquire-section { border-top: 1px solid var(--border); }
+  .acquire-inner { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding-top: 48px; padding-bottom: 48px; }
+  .acquire-title { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+  .acquire-inner p { font-size: 16px; font-weight: 300; color: var(--text-sub); line-height: 1.65; max-width: 640px; }
+  .acquire-inner a { color: var(--blue-mid); text-underline-offset: 3px; }
 
   /* ─── FOOTER ─── */
   footer {
@@ -793,7 +766,7 @@
   /* ─── MOBILE ─── */
   @media (max-width: 700px) {
     nav { padding: 0 20px; gap: 12px; }
-    .nav-links { gap: 0; }
+    .nav-links { gap: 16px; }
     .nav-links li:not(.nav-keep) { display: none; }
 
     .hero { padding: 88px 20px 52px; }
@@ -801,9 +774,12 @@
     .thesis-grid { grid-template-columns: 1fr; }
     .landscape-grid { grid-template-columns: 1fr; }
     .onto-item { grid-template-columns: 80px 1fr; }
-    .onto-def { display: none; }
+    .onto-def { grid-column: 1 / -1; border-top: 1px solid var(--border); padding: 12px 20px 16px; }
+    .onto-term { border-right: none; }
 
-    .acquire-inner { grid-template-columns: 1fr; gap: 36px; }
+    .acquire-inner { grid-template-columns: 1fr; gap: 12px; }
+    .access-grid { grid-template-columns: 1fr; }
+    .example { padding: 22px 18px; }
     .posture-rules { grid-template-columns: 1fr; }
 
     .section-inner { padding: 56px 20px; }
@@ -815,146 +791,99 @@
 </head>
 
 <body>
+<a class="skip-link" href="#content">Skip to content</a>
 <div class="zellige-bg" aria-hidden="true"></div>
 
 <!-- NAV -->
 <nav aria-label="Primary">
-  <div class="nav-mark">
-    <div class="nav-sigil">
+  <a class="nav-mark" href="/">
+    <span class="nav-sigil">
       <svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
         <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/>
         <polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/>
         <circle cx="14" cy="14" r="2.5" fill="#b8892a"/>
       </svg>
-    </div>
+    </span>
     <span class="nav-name">TheMoroccoAI</span>
-  </div>
+  </a>
   <ul class="nav-links">
-    <li><a href="#thesis">Thesis</a></li>
-    <li><a href="#landscape">Landscape</a></li>
+    <li><a href="#coverage">Coverage</a></li>
     <li class="nav-keep"><a href="/registry/">Registry</a></li>
-    <li><a href="#ontology">Ontology</a></li>
-    <li><a href="#governance">Governance</a></li>
+    <li><a href="#examples">Questions</a></li>
+    <li><a href="#method">Method</a></li>
+    <li><a href="#thesis">Thesis</a></li>
+    <li class="nav-keep"><a href="/acquisition/" class="nav-quiet">Acquisition</a></li>
   </ul>
-  <a href="#acquire" class="nav-acquire">Acquire</a>
 </nav>
 
-<!-- HERO -->
-<main>
+<main id="content">
+<!-- 1. WHAT THIS IS -->
 <section class="hero" id="top">
   <div class="hero-meta">
     <div class="hero-meta-line"></div>
-    <span class="hero-meta-text">Independent Reference Infrastructure · AI · Morocco</span>
+    <span class="hero-meta-text">Independent evidence registry · AI · Morocco</span>
   </div>
 
   <div class="hero-title-block">
-    <div class="hero-label">MAI-ROOT-001 — Category Anchor</div>
-    <h1>The <em>intelligence</em><br>of a civilization<br>entering AI.</h1>
-    <div class="hero-arabic">المغرب · الذكاء الاصطناعي · البنية المرجعية</div>
+    <div class="hero-label">MAI-ROOT-001 — Independent evidence registry</div>
+    <h1>Morocco’s AI ecosystem, <em>on the record.</em></h1>
+    <div class="hero-arabic" lang="ar" dir="rtl">المغرب · الذكاء الاصطناعي · سجل الأدلة</div>
   </div>
 
   <div class="hero-thesis">
     <p>
-      Morocco is not merely a country on Africa's AI map.
-      It is a <strong>civilizational node</strong> — four languages,
-      three continents, millennia of knowledge translation.
-      TheMoroccoAI.com is an <strong>independent</strong> intelligence and reference
-      infrastructure that maps this transition with governed depth:
-      every reference claim is tied to its source.
+      TheMoroccoAI.com is an <strong>independent registry</strong> of the institutions, initiatives,
+      projects, models and datasets in Morocco’s artificial intelligence ecosystem. Every entry cites
+      its source, with a verbatim excerpt and dates, and facts, official targets, announced plans and
+      the registry’s own analysis are labelled separately.
     </p>
+    <p class="hero-notice"><strong>Independent.</strong> Not affiliated with the Government of Morocco,
+      and not endorsed or operated by any institution it lists. Records quote public sources; they are
+      not official statements.</p>
   </div>
 
   <div class="hero-cta">
-    <a href="/registry/" class="btn-primary">Explore the Registry</a>
-    <a href="#thesis" class="btn-secondary">Read the Thesis</a>
+    <a href="/registry/" class="btn-primary">Open the registry</a>
+    <a href="#access" class="btn-secondary">Inspect the evidence</a>
   </div>
 </section>
 
-<!-- STATUS BAR -->
-<div class="status-bar" role="complementary" aria-label="Asset status" tabindex="0">
+<!-- 2. CURRENT COVERAGE -->
+<div class="status-bar" role="group" aria-label="Current registry coverage" tabindex="0">
   <div class="status-item">
-    <div class="status-key">Asset ID</div>
-    <div class="status-val">MAI-ROOT-001</div>
+    <div class="status-key">Registry version</div>
+    <div class="status-val">v<!--r:version-->0.3.0<!--/r:version--></div>
   </div>
   <div class="status-item">
-    <div class="status-key">Category</div>
-    <div class="status-val">AI Reference Infrastructure</div>
-  </div>
-  <div class="status-item">
-    <div class="status-key">Languages</div>
-    <div class="status-val">EN · AR · FR · TZM planned</div>
-  </div>
-  <div class="status-item">
-    <div class="status-key">Source Requirement</div>
-    <div class="status-val">Primary &amp; Institutional</div>
-  </div>
-  <div class="status-item">
-    <div class="status-key">Phase</div>
-    <div class="status-val">Evidence Registry v0.1</div>
-  </div>
-  <div class="status-item">
-    <div class="status-key">Evidence Records</div>
+    <div class="status-key">Evidence records</div>
     <div class="status-val"><!--r:records-->39<!--/r:records--></div>
   </div>
   <div class="status-item">
-    <div class="status-key">Sources Checked</div>
+    <div class="status-key">Entities</div>
+    <div class="status-val"><!--r:entities-->65<!--/r:entities--></div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Relationships</div>
+    <div class="status-val"><!--r:relationships-->78<!--/r:relationships--></div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Sources checked</div>
     <div class="status-val"><!--r:as-of-->October 2026<!--/r:as-of--></div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">Edition</div>
+    <div class="status-val">English · AR, FR, TZM planned</div>
   </div>
 </div>
 
-<!-- THESIS -->
-<section class="thesis-section" id="thesis">
+<section class="landscape-section" id="coverage">
   <div class="section-inner">
     <div class="section-header">
-      <span class="section-number">01 — THESIS</span>
-      <h2>Why this asset<br>is inevitable.</h2>
-    </div>
-    <p class="section-intro">These six propositions are the owner’s strategic framing. They are not sourced findings. Sourced facts are in the <a href="/registry/">registry</a>.</p>
-
-    <div class="thesis-grid">
-      <div class="thesis-cell">
-        <div class="thesis-cell-id">MAI-T-001</div>
-        <div class="thesis-cell-title">Civilizational Positioning</div>
-        <p class="thesis-cell-body">Morocco has functioned as a knowledge bridge between Africa, Europe, and the Arab world for over a thousand years. The AI transition is not a rupture — it is a continuation of this structural role.</p>
-      </div>
-      <div class="thesis-cell">
-        <div class="thesis-cell-id">MAI-T-002</div>
-        <div class="thesis-cell-title">Category Scarcity</div>
-        <p class="thesis-cell-body">TheMoroccoAI.com names the category at the national level in one short, exact .com. A name like this cannot be recreated, only acquired or conceded.</p>
-      </div>
-      <div class="thesis-cell">
-        <div class="thesis-cell-id">MAI-T-003</div>
-        <div class="thesis-cell-title">Language Architecture</div>
-        <p class="thesis-cell-body">Four languages as infrastructure, not translation. Arabic, Amazigh (Tamazight), French, and English each unlock a different institutional audience and a different search surface. The English edition is live; the others are planned.</p>
-      </div>
-      <div class="thesis-cell">
-        <div class="thesis-cell-id">MAI-T-004</div>
-        <div class="thesis-cell-title">Governance as Moat</div>
-        <p class="thesis-cell-body">In an era of AI-generated content abundance, governed reference infrastructure with explicit source posture, versioning, and claim restraint is the scarcest digital asset class.</p>
-      </div>
-      <div class="thesis-cell">
-        <div class="thesis-cell-id">MAI-T-005</div>
-        <div class="thesis-cell-title">Strategic Timing</div>
-        <p class="thesis-cell-body">Morocco’s <a href="/registry/morocco-ai-2030/">AI 2030 roadmap</a>, the 2030 targets of <a href="/registry/digital-morocco-2030/">Digital Morocco 2030</a>, and Africa’s emerging AI market are converging. A reference layer has to exist before the market matures.</p>
-      </div>
-      <div class="thesis-cell">
-        <div class="thesis-cell-id">MAI-T-006</div>
-        <div class="thesis-cell-title">Buyer Logic</div>
-        <p class="thesis-cell-body">The asset fits organisations that need a neutral reference layer on Moroccan AI: global AI companies entering Africa, investors focused on MENA–Africa technology, research and policy institutions, and data or media businesses. No interest from any specific party is implied.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- LANDSCAPE -->
-<section class="landscape-section" id="landscape">
-  <div class="section-inner">
-    <div class="section-header">
-      <span class="section-number">02 — LANDSCAPE</span>
-      <h2 style="color:var(--paper)">The nodes of Morocco's<br>AI ecosystem.</h2>
+      <span class="section-number">01 — COVERAGE</span>
+      <h2>What the registry<br>covers so far.</h2>
     </div>
 
-    <p class="section-intro">Seven domains, each populated only from verified records. A domain with no verified record says so.</p>
+    <p class="section-intro"><!--r:domains-->7<!--/r:domains--> domains, each populated only from verified records. Coverage is partial: if an organisation or project is absent, the registry has not documented it yet. That is not evidence that it does not exist.</p>
 
     <div class="landscape-grid"><!--r:landscape-->
       <div class="landscape-node">
@@ -1016,151 +945,157 @@
   </div>
 </section>
 
-<!-- ONTOLOGY -->
-<section class="ontology-section" id="ontology">
+<!-- 3. ACCESS -->
+<section class="access-section" id="access">
   <div class="section-inner">
     <div class="section-header">
-      <span class="section-number">03 — ONTOLOGY</span>
-      <h2>The language this<br>asset defines.</h2>
+      <span class="section-number">02 — ACCESS</span>
+      <h2>Inspect the evidence<br>and the data.</h2>
     </div>
-    <p class="section-intro">The working vocabulary below frames the project. The operational ontology has seven entity types and typed relationships, each tied to evidence. It is published as <a href="/data/ontology.json">/data/ontology.json</a> and can be browsed in the <a href="/registry/">registry</a>.</p>
-
-    <div class="ornament-divider"><div class="ornament-diamond"></div></div>
-
-    <div class="ontology-list" role="list">
-      <div class="onto-item" role="listitem">
-        <div class="onto-id">MAI-O-001</div>
-        <div class="onto-term">AI Readiness</div>
-        <div class="onto-def">The institutional, infrastructural, regulatory, and talent capacity of a nation-state to absorb and produce AI systems at scale.</div>
-      </div>
-      <div class="onto-item" role="listitem">
-        <div class="onto-id">MAI-O-002</div>
-        <div class="onto-term">Civilizational Node</div>
-        <div class="onto-def">A geographic and cultural position that functions as a translation and routing layer between distinct knowledge traditions.</div>
-      </div>
-      <div class="onto-item" role="listitem">
-        <div class="onto-id">MAI-O-003</div>
-        <div class="onto-term">Sovereign Reference</div>
-        <div class="onto-def">A governed knowledge infrastructure that defines category terms without dependency on a single institutional authority.</div>
-      </div>
-      <div class="onto-item" role="listitem">
-        <div class="onto-id">MAI-O-004</div>
-        <div class="onto-term">Language Architecture</div>
-        <div class="onto-def">The deliberate structuring of multilingual content as institutional access layers, not mere translation of a primary text.</div>
-      </div>
-      <div class="onto-item" role="listitem">
-        <div class="onto-id">MAI-O-005</div>
-        <div class="onto-term">Category Anchor</div>
-        <div class="onto-def">A domain asset whose name, structure, and reference depth make it the default definitional node for a category — not merely a participant.</div>
-      </div>
-      <div class="onto-item" role="listitem">
-        <div class="onto-id">MAI-O-006</div>
-        <div class="onto-term">Governance Debt</div>
-        <div class="onto-def">The accumulated risk of an AI ecosystem that grows without explicit source posture, claim restraint, or versioned accountability.</div>
-      </div>
+    <div class="access-grid">
+      <a class="access-card" href="/registry/"><span class="access-id">MAI-REG</span><span class="access-title">Registry</span><span class="access-desc">Every entity with its relationships, lifecycle stage and evidence.</span></a>
+      <a class="access-card" href="/registry/questions/"><span class="access-id">MAI-Q</span><span class="access-title">Questions</span><span class="access-desc">Answers computed from the data, each linked to its records.</span></a>
+      <a class="access-card" href="/registry/evidence/"><span class="access-id">MAI-EV</span><span class="access-title">Evidence records</span><span class="access-desc">Source, verbatim excerpt, dates and classification for every claim.</span></a>
+      <a class="access-card" href="/data/evidence.json"><span class="access-id">JSON</span><span class="access-title">evidence.json</span><span class="access-desc">All <!--r:records-->39<!--/r:records--> evidence records, machine-readable.</span></a>
+      <a class="access-card" href="/data/ontology.json"><span class="access-id">JSON</span><span class="access-title">ontology.json</span><span class="access-desc"><!--r:entity-types-->10<!--/r:entity-types--> entity types, <!--r:entities-->65<!--/r:entities--> entities and their typed relationships.</span></a>
+      <a class="access-card" href="/methodology/"><span class="access-id">MAI-METHOD</span><span class="access-title">Methodology and changelog</span><span class="access-desc">Admission rules, limits, corrections and the public change history.</span></a>
     </div>
   </div>
 </section>
 
-<!-- GOVERNANCE -->
-<section class="governance-section" id="governance">
+<!-- 4. QUESTIONS ANSWERED FROM THE EVIDENCE -->
+<section class="examples-section" id="examples">
   <div class="section-inner">
     <div class="section-header">
-      <span class="section-number">04 — GOVERNANCE</span>
-      <h2>Source posture<br>and claim restraint.</h2>
+      <span class="section-number">03 — QUESTIONS</span>
+      <h2>Three questions<br>the evidence answers.</h2>
+    </div>
+    <p class="section-intro">Each answer below is generated from the registry data when the site is built, and links to the records behind it. More answers are on the <a href="/registry/questions/">questions page</a>.</p>
+    <div class="examples"><!--r:examples-->
+      <article class="example" aria-labelledby="ex-idarati">
+        <h3 class="example-q" id="ex-idarati">What is the documented status of Idarati AI?</h3>
+        <div class="example-a"><p><a href="/registry/idarati-ai/">Idarati AI</a>: Operational (public availability; use not documented). Operator: <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>. Basis: public availability on the operator&#x27;s own service (usage not documented). Latest supporting evidence 18 October 2026 (observed), within 12 months; operation after that date not reconfirmed. Public availability is not evidence of use: no usage, accuracy or outcome evidence is recorded.</p></div>
+        <p class="example-links">Evidence: <a href="/registry/idarati-ai/">entity page</a> · <a href="/registry/questions/#q6-h">Q6 deployments</a> · <a href="/registry/evidence/#MAI-EV-0034">MAI-EV-0034</a> · <a href="/registry/evidence/#MAI-EV-0035">MAI-EV-0035</a> · <a href="/registry/evidence/#MAI-EV-0038">MAI-EV-0038</a></p>
+      </article>
+      <article class="example" aria-labelledby="ex-2030">
+        <h3 class="example-q" id="ex-2030">What has Morocco AI 2030 set as targets, and what is verified so far?</h3>
+        <div class="example-a"><p>The Morocco AI 2030 roadmap, presented by the Ministry of Digital Transition and Administration Reform, sets 2030 targets of MAD 100 billion in added value to GDP, 50,000 direct and indirect jobs, and 200,000 trained and certified AI talents. The registry shows targets as targets, never as outcomes, and records no target as achieved.</p><p>The roadmap is recorded as including 2 projects, by announcement: <a href="/registry/sovereign-ai-marketplace/">Sovereign AI marketplace</a> (digital platform, not an AI application; operational (public availability; use not documented)); <a href="/registry/idarati-ai/">Idarati AI</a> (operational (public availability; use not documented)). Verified: it is implemented through <a href="/registry/jazari-network/">JAZARI Institutes network</a>.</p></div>
+        <p class="example-links">Evidence: <a href="/registry/morocco-ai-2030/">entity page</a> · <a href="/registry/evidence/#MAI-EV-0011">MAI-EV-0011</a> · <a href="/registry/questions/#q2-h">Q2 projects by stage</a></p>
+      </article>
+      <article class="example" aria-labelledby="ex-infra">
+        <h3 class="example-q" id="ex-infra">Which institutions are documented as connected to AI compute and data-centre infrastructure?</h3>
+        <div class="example-a"><ul><li><a href="/registry/toubkal-supercomputer/">Toubkal supercomputer</a>, compute infrastructure; operational: <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, hosts <span class="example-cls">(verified fact)</span></li><li><a href="/registry/nexus-ai-factory/">Nexus AI Factory</a>, compute infrastructure; announced: <a href="/registry/nexus-core-systems/">Nexus Core Systems</a>, signatory <span class="example-cls">(announced plan)</span>; <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(announced plan)</span></li><li><a href="/registry/green-data-centres-agreement/">Sovereign green data-centre infrastructure agreement</a>, agreement; announced: <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(verified fact)</span>; <a href="/registry/ministry-energy-transition/">Ministry of Energy Transition and Sustainable Development</a>, signatory <span class="example-cls">(verified fact)</span></li><li><a href="/registry/um6p-data-centre-partnership/">UM6P data-centre partnership convention</a>, agreement; announced: <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(verified fact)</span>; <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, signatory <span class="example-cls">(verified fact)</span></li></ul><p>3 of these 4 projects are only announced or signed: no record shows them built or running. A signature is recorded as a signature.</p></div>
+        <p class="example-links">Evidence: <a href="/registry/questions/#q5-h">Q5 relationships</a> · <a href="/registry/questions/#q2-h">Q2 projects by stage</a></p>
+      </article>
+    <!--/r:examples--></div>
+  </div>
+</section>
+
+<!-- 5. METHOD AND LIMITS -->
+<section class="governance-section" id="method">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">04 — METHOD</span>
+      <h2>Method<br>and limits.</h2>
     </div>
 
     <div class="posture-block">
-      <div class="posture-label">MAI-GOV-001 — Editorial Doctrine</div>
+      <div class="posture-label">MAI-GOV-001 — Editorial rules</div>
       <p class="posture-text">
-        Every reference claim in the registry is tied to a verifiable institutional, governmental or academic source.
-        The asset separates verified facts, official targets, announced plans, its own analysis
-        and unverified claims, and it labels its strategic framing as framing.
-        No claim is made beyond what the source evidence supports.
+        Every claim in the registry cites a source whose type is labelled, with a verbatim excerpt and dates.
+        Primary sources are preferred; press may support only an announced plan or an unverified claim.
+        Verified facts, official targets, announced plans, the registry’s own analysis and unverified
+        claims are kept separate. The rules are enforced by a validator and tests on every change.
       </p>
       <div class="posture-rules">
-        <div class="rule-item">
-          <span class="rule-mark" aria-hidden="true">◆</span>
-          <span class="rule-text">Primary and institutional sources: government, regulators, intergovernmental bodies, signatories, state news agency</span>
-        </div>
-        <div class="rule-item">
-          <span class="rule-mark" aria-hidden="true">◆</span>
-          <span class="rule-text">Every registry record carries its source URL, publication date and retrieval date</span>
-        </div>
-        <div class="rule-item">
-          <span class="rule-mark" aria-hidden="true">◆</span>
-          <span class="rule-text">No phantom URLs — only live, verified reference pages published</span>
-        </div>
-        <div class="rule-item">
-          <span class="rule-mark" aria-hidden="true">◆</span>
-          <span class="rule-text">Versioned data with a public change history; no silent content modification</span>
-        </div>
-        <div class="rule-item">
-          <span class="rule-mark" aria-hidden="true">◆</span>
-          <span class="rule-text">Claim restraint: targets are never shown as outcomes, and framing is labelled as framing</span>
-        </div>
-        <div class="rule-item">
-          <span class="rule-mark" aria-hidden="true">◆</span>
-          <span class="rule-text">Multilingual roadmap: Arabic, French and Tamazight editions are planned, not yet published</span>
-        </div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">Targets and plans are never shown as outcomes</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">Public availability is never counted as use; no outcome is recorded as fact</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">Conflicting evidence is marked unresolved; outdated claims are marked superseded, not hidden</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">Versioned data with a <a href="/methodology/#m6-h">public changelog</a>; no silent changes</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">Coverage is partial: absence from the registry is not absence in Morocco</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">The registry establishes no official status, endorsement or legal identity</span></div>
       </div>
+      <p class="posture-more"><a href="/methodology/">Full methodology, limits and changelog →</a></p>
     </div>
   </div>
 </section>
 
-<!-- ACQUIRE -->
+<!-- 6. THE OWNER'S STRATEGIC THESIS -->
+<section class="thesis-section" id="thesis">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">05 — THESIS</span>
+      <h2>The owner’s<br>strategic thesis.</h2>
+    </div>
+    <p class="section-intro framing-note"><strong>Framing, not findings.</strong> This section is the owner’s interpretation of why a structured reference on Moroccan AI matters and what role this site is intended to play. It is not sourced evidence, a government designation or a prediction. Sourced facts are in the <a href="/registry/">registry</a>.</p>
+
+    <blockquote class="thesis-quote"><p>“The intelligence of a civilization entering AI.”</p><footer>— the owner’s founding line for the project</footer></blockquote>
+
+    <div class="thesis-grid">
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-001 · Owner’s view</div>
+        <div class="thesis-cell-title">Civilizational positioning</div>
+        <p class="thesis-cell-body">In the owner’s view, Morocco has long served as a knowledge bridge between Africa, Europe and the Arab world, and the AI transition continues that role rather than breaking with it.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-002 · Owner’s view</div>
+        <div class="thesis-cell-title">Category name</div>
+        <p class="thesis-cell-body">TheMoroccoAI.com names the category at the national level in one short .com. The owner considers such a name scarce: it cannot be recreated, only acquired.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-003 · Ambition</div>
+        <div class="thesis-cell-title">Language architecture</div>
+        <p class="thesis-cell-body">Arabic, Tamazight, French and English editions, each serving a different institutional audience. Only the English edition is published; the others are planned.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-004 · Owner’s view</div>
+        <div class="thesis-cell-title">Governance as a moat</div>
+        <p class="thesis-cell-body">As AI-generated content multiplies, the owner expects governed references, with explicit sources, versions and claim restraint, to become scarce and valuable.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-005 · Owner’s view</div>
+        <div class="thesis-cell-title">Timing</div>
+        <p class="thesis-cell-body">Morocco’s <a href="/registry/morocco-ai-2030/">AI 2030 roadmap</a> and the 2030 targets of <a href="/registry/digital-morocco-2030/">Digital Morocco 2030</a> are recorded in the registry as targets. The owner’s view is that a reference layer is most useful before the market matures.</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">MAI-T-006 · Intended role</div>
+        <div class="thesis-cell-title">Category-level reference</div>
+        <p class="thesis-cell-body">The intended role is a category-level reference on Moroccan AI. That role is an aim: no institution has adopted, endorsed or designated the site.</p>
+      </div>
+    </div>
+
+    <h3 class="vocab-head">Framing vocabulary</h3>
+    <p class="vocab-note">The owner’s working terms. They are not part of the registry’s ontology, which is published as <a href="/data/ontology.json">/data/ontology.json</a>.</p>
+    <div class="ontology-list" role="list">
+      <div class="onto-item" role="listitem"><div class="onto-id">MAI-O-001</div><div class="onto-term">AI Readiness</div><div class="onto-def">The institutional, infrastructural, regulatory and talent capacity of a nation to absorb and produce AI systems at scale.</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">MAI-O-002</div><div class="onto-term">Civilizational Node</div><div class="onto-def">A geographic and cultural position that works as a translation and routing layer between knowledge traditions.</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">MAI-O-003</div><div class="onto-term">Sovereign Reference</div><div class="onto-def">A governed knowledge resource that defines category terms without depending on a single institutional authority. Used here as an aim, not as a claim of official status.</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">MAI-O-004</div><div class="onto-term">Language Architecture</div><div class="onto-def">Structuring multilingual content as institutional access layers, not as translations of one primary text.</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">MAI-O-005</div><div class="onto-term">Category Anchor</div><div class="onto-def">A domain whose name, structure and reference depth could make it the default reference for a category. A strategic aim.</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">MAI-O-006</div><div class="onto-term">Governance Debt</div><div class="onto-def">The accumulated risk of an AI ecosystem that grows without explicit sources, claim restraint or versioned accountability.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ACQUISITION (discreet) -->
 <section class="acquire-section" id="acquire">
-  <div class="acquire-inner">
-    <div class="acquire-left">
-      <h2>This asset<br>is acquirable.</h2>
-      <p>
-        TheMoroccoAI.com is available for strategic acquisition by an institution,
-        company or investment vehicle that wants to own an independent reference layer
-        on Morocco’s AI ecosystem. The asset is privately held. It is not a government
-        platform and has no affiliation with any public body.
-      </p>
-      <p>Components that can be transferred:</p>
-      <ul class="acquire-list">
-        <li>The TheMoroccoAI.com domain name</li>
-        <li>The site source: pages, static generator, validator and tests</li>
-        <li>The evidence registry and ontology data (JSON)</li>
-        <li>The visual identity and logo</li>
-      </ul>
-      <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20strategic%20enquiry" class="btn-primary">Strategic Enquiry</a>
-    </div>
-    <div class="acquire-right">
-      <div class="acquire-stat">
-        <span class="acquire-stat-label">Asset Class</span>
-        <span class="acquire-stat-val">Category Anchor Domain</span>
-      </div>
-      <div class="acquire-stat">
-        <span class="acquire-stat-label">Reference Depth</span>
-        <span class="acquire-stat-val">Registry v0.1 · <!--r:records-->39<!--/r:records--> records · <!--r:entities-->65<!--/r:entities--> entities</span>
-      </div>
-      <div class="acquire-stat">
-        <span class="acquire-stat-label">Language Coverage</span>
-        <span class="acquire-stat-val">EN · AR · FR · TZM planned</span>
-      </div>
-      <div class="acquire-stat">
-        <span class="acquire-stat-label">Buyer Type</span>
-        <span class="acquire-stat-val">Institutional / Strategic Only</span>
-      </div>
-      <div class="acquire-stat">
-        <span class="acquire-stat-label">Contact</span>
-        <span class="acquire-stat-val"><a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20strategic%20enquiry">agent@sohadot.com</a></span>
-      </div>
+  <div class="section-inner acquire-inner">
+    <span class="section-number">06 — ACQUISITION</span>
+    <div>
+      <h2 class="acquire-title">Ownership and acquisition</h2>
+      <p>TheMoroccoAI.com is privately held. The domain and its reference assets may be considered for acquisition. The <a href="/acquisition/">acquisition page</a> sets out what exists today and how it differs from the owner’s view of its potential. Confidential enquiries: <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20confidential%20acquisition%20enquiry">agent@sohadot.com</a>.</p>
     </div>
   </div>
 </section>
-
 </main>
 
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <span class="footer-brand">TheMoroccoAI.com · Independent Reference Infrastructure · 2026</span>
+    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
     <div class="footer-langs">
       <span>Not affiliated with the Government of Morocco</span>
+      <span><a href="/methodology/">Methodology</a> · <a href="/data/evidence.json">Data</a> · <a href="/acquisition/">Acquisition</a></span>
       <span><span class="footer-lang active" lang="en">EN</span> · AR · FR · <span lang="zgh">ⵜⵣⵎ</span> planned</span>
     </div>
   </div>

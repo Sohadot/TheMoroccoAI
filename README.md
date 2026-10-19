@@ -12,10 +12,13 @@ pages are committed.
 
 | Path | Purpose |
 | --- | --- |
-| `index.html` | Homepage: thesis, landscape, vocabulary, editorial doctrine, acquisition. Blocks between `<!--r:…-->` markers are generated. |
+| `index.html` | Homepage, reference first: what the registry is, coverage, access to the data, three questions answered from the evidence, method and limits, then the owner's labelled thesis and a short acquisition note. Figures and answers between `<!--r:…-->` markers are generated from the data. |
 | `data/evidence.json` | Evidence registry: one record per sourced claim, with source URL, publication and retrieval dates, verbatim excerpts, classification and verification status. |
 | `data/ontology.json` | Ontology: entity types, domains, predicates, entities and typed relationships, each citing evidence. |
 | `registry/` | Generated pages: registry index, questions page, all evidence, one page per entity. |
+| `methodology/` | Generated: what the registry documents and does not establish, admission and correction rules, and the changelog. |
+| `acquisition/` | Generated: transferable assets, what exists today compared with the owner's view of potential, confidential contact. |
+| `data/changelog.json` | Public changelog: one entry per published version, each tied to a commit on `main`. Add an entry when the registry version changes; a test checks that the latest entry matches the data. |
 | `tools/registry.py` | Validator for referential integrity and claim-classification rules. |
 | `tools/build.py` | Static generator: registry pages, homepage blocks, `sitemap.xml`. |
 | `tools/check_sources.py` | Source checker (network; never run by the build): re-fetches each source once per run, spaced per host, and re-matches its excerpts. Reports reachable, blocked, HTTP error, redirects, matched and changed separately, and flags superseded records; claim support stays a manual review. Never edits data or writes into `data/`. |
