@@ -302,7 +302,7 @@ class ReferenceFirstPositioning(unittest.TestCase):
         self.assertIn("Which institutions are documented as connected to computing and data-centre infrastructure?", text)
         self.assertIn("basis: independent listing", text)
         # The only workload statement is the operator's own (MAI-EV-0041): shown with its source and limits.
-        self.assertIn("Reported AI workloads (operator-affiliated authors): fine-tuning runs that produced the GemMaroc Moroccan Darija language models (Belkasmi et al.), presented as a benchmark", text)
+        self.assertIn("Reported AI workloads (operator-affiliated authors): fine-tuning runs that produced the GemMaroc Moroccan Darija language models (preprint by Skiredj et al.), presented as a benchmark", text)
         self.assertIn("they do not establish the scale, users or outcomes of AI use", text)
         self.assertIn('href="/registry/evidence/#MAI-EV-0041"', examples)
         self.assertIn('href="/registry/evidence/#MAI-EV-0020"', examples)

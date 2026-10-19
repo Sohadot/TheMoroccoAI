@@ -214,7 +214,7 @@ def evidence_card(model, r, *, heading="h3", show_entities=True):
     rid = r["evidence_id"]
     quotes = "".join(f"<p>“{escape(q)}”</p>" for q in r["source_excerpts"])
     lang = r.get("source_language", "en")
-    quote_lang = f' lang="{escape(lang)}"' if lang != "en" else ""
+    quote_lang = (f' lang="{escape(lang)}"' if lang != "en" else "") + (' dir="rtl"' if lang in ("ar", "he", "fa", "ur") else "")
     target = f'<dt>Target year</dt><dd>{r["target_year"]}</dd>' if r.get("target_year") else ""
     status = r["verification_status"]
     status_html = "Verified against source" if status == "verified" else '<span class="badge badge-partial">Partial verification</span>'
@@ -667,11 +667,15 @@ def render_questions(model):
         stages8[e["lifecycle"]] = stages8.get(e["lifecycle"], 0) + 1
     signed8 = [r for r in mrows if r["documented_as"] == "Signed"]
     text8 = sum(1 for r in signed8 if SIGNED_TEXT_NOT_RECORDED not in r["qualifications"])
+    gazette8 = [r for r in signed8 if SIGNED_GAZETTE_APPROVAL in r["qualifications"]]
+    gazette8_ids = sorted({e["id"] for r in gazette8 for e in r["evidence"] if e["evidence_type"] == "official_gazette"})
     q8_scope = (f"The {len(projects8)} projects are all the projects these organisations are connected to, of every kind recorded: "
                 + ", ".join(f"{v} {KIND_COUNT_LABELS[k][v != 1]}" for k, v in sorted(kinds8.items(), key=lambda kv: (-kv[1], kv[0])))
                 + ". By stage: " + ", ".join(f"{v} {LIFECYCLE_LABELS[k].lower()}" for k, v in sorted(stages8.items(), key=lambda kv: (-kv[1], kv[0])))
                 + (". A digital platform here is a catalogue of AI solutions, not itself an AI system. " if "digital-platform" in kinds8 else ". ")
-                + (f"None of the {len(signed8)} signatures is documented by its signed text: each rests on a report of the signing."
+                + (f"None of the {len(signed8)} signatures is documented by its signed text: each rests on a report of the signing"
+                   + (f"; for {len(gazette8)}, an official gazette record ({', '.join(gazette8_ids)}) also documents the legal approval "
+                      f"of the instrument, which is not its signed text." if gazette8 else ".")
                    if not text8 else f"{text8} of the {len(signed8)} signatures are documented by their signed text."))
 
     # Q9: official targets against what the registry records about progress.
@@ -758,12 +762,15 @@ DOCUMENTED_AS = {"ANNOUNCED PLAN": "Announced or planned", "OFFICIAL TARGET": "T
 DOCUMENTED_AS_VERIFIED = {"signatory_of": "Signed", "operates": "Operated", "develops": "Developed"}
 DOCUMENTED_AS_VERIFIED_OTHERWISE = "Documented"
 SIGNED_TEXT_NOT_RECORDED = "The signing is documented by a report of it; the signed text is not recorded in this registry."
+SIGNED_GAZETTE_APPROVAL = ("A cited official gazette record documents the legal approval of the instrument, not its signed text, "
+                           "and is not a report of the signing.")
 SIGNED_NOT_DELIVERED = "A signature is recorded as a signature; delivery is not documented."
 PLAN_NOT_DELIVERED = "Not verified as delivered."
 GAP05_CAVEAT = "Documented here only by announcements, news reports or descriptions (GAP-05)."
 QUALIFICATION_RULES = [
     {"when": "The relationship has a note in ontology.json", "text": "the note"},
     {"when": "documented_as is Signed and no cited record is a signed_instrument whose instrument.signatories include the subject", "text": SIGNED_TEXT_NOT_RECORDED},
+    {"when": "documented_as is Signed and a cited record has evidence_type official_gazette", "text": SIGNED_GAZETTE_APPROVAL},
     {"when": "documented_as is Signed and object.lifecycle is announced", "text": SIGNED_NOT_DELIVERED},
     {"when": "documented_as is Announced or planned", "text": PLAN_NOT_DELIVERED},
     {"when": "documentation_basis is announcement-or-description", "text": GAP05_CAVEAT},
@@ -771,8 +778,9 @@ QUALIFICATION_RULES = [
 DOCUMENTATION_BASIS = {
     "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
     "includes-non-announcement-record": ("A formal-act relationship that cites at least one record of another type: an official report, a "
-                                         "regulatory record, a technical repository, a publication, a ranking or a direct observation. Such a "
-                                         "record is not the instrument itself; a signed text would have evidence_type signed_instrument."),
+                                         "regulatory record, an official gazette text, a technical repository, a publication, a ranking or a direct observation. "
+                                         "Such a record is not the instrument itself: an official gazette text records a legal act about it, such "
+                                         "as its approval, and a signed text would have evidence_type signed_instrument."),
     "declaration-or-event": "Any other relationship: declarations, public events and a programme's stated composition, whose primary record is an announcement. Not measured this way.",
 }
 
@@ -839,6 +847,8 @@ def matrix_rows(model):
         if level == "Signed" and not any(model.records[x]["evidence_type"] == "signed_instrument"
                                          and rel["subject"] in model.records[x]["instrument"]["signatories"] for x in rel["evidence"]):
             quals.append(SIGNED_TEXT_NOT_RECORDED)
+        if level == "Signed" and any(model.records[x]["evidence_type"] == "official_gazette" for x in rel["evidence"]):
+            quals.append(SIGNED_GAZETTE_APPROVAL)
         if level == "Signed" and obj.get("lifecycle") == "announced":
             quals.append(SIGNED_NOT_DELIVERED)
         if level == "Announced or planned":
@@ -889,9 +899,13 @@ def render_matrix(model):
     n_acts = len(registry.formal_act_relationships(model.ontology))
     signed = [r for r in rows if r["documented_as"] == "Signed"]
     n_text = sum(1 for r in signed if SIGNED_TEXT_NOT_RECORDED not in r["qualifications"])
-    kinds = sorted({e["evidence_type"].replace("_", " ") for r in signed for e in r["evidence"]})
+    kinds = sorted({e["evidence_type"].replace("_", " ") for r in signed for e in r["evidence"] if e["evidence_type"] != "official_gazette"})
+    n_gazette = sum(1 for r in signed if SIGNED_GAZETTE_APPROVAL in r["qualifications"])
     signed_line = (f'For none of the {len(signed)} "Signed" rows is the signed text recorded: each signing is documented by a report of it '
-                   f'({", ".join(kinds)}), as the evidence column shows.'
+                   f'({", ".join(kinds)})'
+                   + (f', and {n_gazette} rows also cite an official gazette record of the instrument\'s legal approval, which is neither '
+                      f'the signed text nor a report of the signing' if n_gazette else '')
+                   + ', as the evidence column shows.'
                    if not n_text else
                    f'The signed text is recorded for {n_text} of the {len(signed)} "Signed" rows; the others rest on a report of the signing.')
     head = "".join(f'<th scope="col">{h}</th>' for h in ("Related entity", "Relationship", "Documented as", "Status of the related entity", "Evidence", "Qualification"))
@@ -1182,7 +1196,7 @@ def render_data_reference(model, gaps, man):
     <li>Every record gives the <code>source_url</code>, <code>source_organization</code>, <code>source_type</code>, <code>publication_date</code>, <code>retrieval_date</code>, verbatim <code>source_excerpts</code> in <code>source_language</code>, and a <code>verification_status</code> with a <code>verification_note</code> that states the record's limits.</li>
     <li><code>claim</code> is the registry's summary of what the source documents; the excerpts are the source's own words.</li>
     <li>A record's classification describes what its source documents, not whether a plan was delivered or a target met.</li>
-    <li>A signature is documented by a report of it unless a record of the signed text itself is cited (evidence_type <code>signed_instrument</code>). Such a record is admitted only when the registry has read the signed text in full, from a party to it or an official publisher of it; a report, summary, press release or news item about the signing never qualifies, even from a signatory or the government. The validator checks what it can (classification, verification, source type, the instrument's title, date, signatories and declared access, and that each signatory_of relationship citing it names one of its signatories); that the text was in fact read is an editorial requirement. {"No such record exists yet: every signature in the registry rests on a report of the signing." if not any(r["evidence_type"] == "signed_instrument" for r in model.records.values()) else "Rows citing one say so in matrix.json."}</li>
+    <li>A signature is documented by a report of it unless a record of the signed text itself is cited (evidence_type <code>signed_instrument</code>). Such a record is admitted only when the registry has read the signed text in full, from a party to it or an official publisher of it; a report, summary, press release or news item about the signing never qualifies, even from a signatory or the government. An official gazette text approving an instrument, with or without a published summary of it, records a legal act about the instrument: it is neither the signed text nor a report of the signing, and it never qualifies either. The validator checks what it can (classification, verification, source type, the instrument's title, date, signatories and declared access, and that each signatory_of relationship citing it names one of its signatories); that the text was in fact read is an editorial requirement. {"No such record exists yet: every signature in the registry rests on a report of the signing, and some also cite an official gazette record of the instrument's approval." if not any(r["evidence_type"] == "signed_instrument" for r in model.records.values()) else "Rows citing one say so in matrix.json."}</li>
   </ul>
 </section>
 <section aria-labelledby="d4-h">
@@ -1236,7 +1250,7 @@ def render_data_reference(model, gaps, man):
   <p class="prose">A breaking change makes data that a consumer accepted under one version fail under the next. Each is listed here, in the manifest (<code>breaking_changes</code>) and in the <a href="/methodology/#m6-h">changelog</a>. Old values are not accepted as aliases, so a consumer built for an earlier version fails rather than misreads the data.</p>
   {_table("Breaking changes to the published data", ["Version", "Field", "Old value", "New value", "Why", "Effect on an earlier consumer", "Migration"],
           [[escape(c["version"]), f'<code>{escape(c["file"])}</code> <code>{escape(c["field"])}</code>', f'<code>{escape(c["old"])}</code>',
-            f'<code>{escape(c["new"])}</code>', escape(c["reason"]) + f" In v{escape(c['version'])} it applies to {sum(1 for r in matrix_rows(model) if r['documentation_basis'] == c['new'])} rows.",
+            f'<code>{escape(c["new"])}</code>', escape(c["reason"]) + f" In v{escape(model.evidence['version'])} it applies to {sum(1 for r in matrix_rows(model) if r['documentation_basis'] == c['new'])} rows.",
             escape(c["consumer_effect"]), escape(c["migration"])] for c in BREAKING_CHANGES], "")}
   <p class="prose">Other changes in v0.5.0 add to the data without changing what existing values mean: a sentence in the qualifications of every Signed row, a sixth gap (GAP-06), and the evidence type <code>signed_instrument</code> in the manifest's vocabularies. A consumer that compares qualifications or gap lists exactly will see the additions.</p>
 </section>
@@ -1308,7 +1322,7 @@ def render_methodology(model, changelog):
   <h2 id="m3-h"><span class="section-number">03</span>How evidence is admitted</h2>
   <ul class="prose">
     <li>A record is added only after the original source has been retrieved and the excerpt matched against it.</li>
-    <li>A lifecycle stage beyond "announced" needs a verified record that declares that stage. A signature, announcement, procurement notice or market clearance never establishes operation.</li>
+    <li>A lifecycle stage beyond "announced" needs a verified record that declares that stage. A signature, announcement, procurement notice, market clearance or official gazette text never establishes operation: a gazette text shows legal establishment, not activity.</li>
     <li>An operational or pilot claim states its basis (public availability, an operator's report of use, or an independent source) and names the operator separately from any developer or provider.</li>
     <li>Inferences drawn by the registry are labelled independent analysis and need at least two records.</li>
     <li>Candidates that do not meet these rules are not published.</li>

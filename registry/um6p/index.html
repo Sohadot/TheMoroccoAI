@@ -56,6 +56,16 @@
   },
   {
    "@type": "CreativeWork",
+   "name": "GeneLM: genomic language model trained on the Toubkal supercomputer",
+   "url": "https://doi.org/10.1093/bib/bbaf311",
+   "publisher": {
+    "@type": "Organization",
+    "name": "Briefings in Bioinformatics (Oxford University Press); Akotenou and El Allali"
+   },
+   "datePublished": "2025-07-03"
+  },
+  {
+   "@type": "CreativeWork",
    "name": "Agreements signed in Salé on the sidelines of the First National AI Conference",
    "url": "https://www.maroc.ma/en/news/morocco-seals-several-agreements-promote-ai",
    "publisher": {
@@ -63,6 +73,16 @@
     "name": "Maroc.ma (national portal of the Kingdom of Morocco)"
    },
    "datePublished": "2025-07-03"
+  },
+  {
+   "@type": "CreativeWork",
+   "name": "GemMaroc: the preprint describing the GemMaroc fine-tuning runs",
+   "url": "https://arxiv.org/pdf/2505.17082v1",
+   "publisher": {
+    "@type": "Organization",
+    "name": "arXiv (preprint by Skiredj, Azhari, Atou, Tazi and Berrada)"
+   },
+   "datePublished": "2025-05-20"
   },
   {
    "@type": "CreativeWork",
@@ -104,7 +124,7 @@
   <p class="alt-names">Université Mohammed VI Polytechnique</p>
   <p class="lede">University that created the AI Movement research centre in March 2021, and signed a data-centre partnership convention at the July 2025 National AI Conference.</p>
   
-  <dl class="facts"><dt>Type</dt><dd>Institution</dd><dt>Domain</dt><dd>Research laboratories and academic initiatives</dd><dt>Identifier</dt><dd><code>um6p</code></dd><dt>Records</dt><dd>5</dd></dl>
+  <dl class="facts"><dt>Type</dt><dd>Institution</dd><dt>Domain</dt><dd>Research laboratories and academic initiatives</dd><dt>Identifier</dt><dd><code>um6p</code></dd><dt>Records</dt><dd>7</dd></dl>
 </header>
 <section aria-labelledby="rel-h">
   <h2 id="rel-h"><span class="section-number">01</span>Documented relationships</h2>
@@ -129,7 +149,7 @@
 <li class="evidence-card" id="MAI-EV-0041">
   <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0041">MAI-EV-0041</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
   <h3>TOUBKAL: peer-reviewed description of the system and its reported workloads</h3>
-  <p class="evidence-claim">A peer-reviewed article in The Journal of Supercomputing, by authors affiliated with Mohammed VI Polytechnic University&#x27;s College of Computing, describes Toubkal&#x27;s GPU partitions (NVIDIA A100 nodes from the initial 2022 deployment and H100 nodes added in 2025). It states that fine-tuning of transformer-based large language models and large-scale computational fluid dynamics simulations have been run on the system, and presents as a benchmark the fine-tuning runs, attributed to Belkasmi et al., that produced the GemMaroc Moroccan Darija language models.</p>
+  <p class="evidence-claim">A peer-reviewed article in The Journal of Supercomputing, by authors affiliated with Mohammed VI Polytechnic University&#x27;s College of Computing, describes Toubkal&#x27;s GPU partitions (NVIDIA A100 nodes from the initial 2022 deployment and H100 nodes added in 2025). It states that fine-tuning of transformer-based large language models and large-scale computational fluid dynamics simulations have been run on the system, and presents as a benchmark the fine-tuning runs that produced the GemMaroc Moroccan Darija language models, which it attributes to &quot;Belkasmi et al.&quot; while citing the GemMaroc preprint by Skiredj et al.</p>
   <blockquote class="evidence-quote" cite="https://link.springer.com/article/10.1007/s11227-025-07858-8"><p>“TOUBKAL: a high-performance supercomputer powering scientific research in Africa”</p><p>“The initial deployment in 2022 included five Dell XE8545 nodes with dual AMD EPYC 7713 CPUs and four NVIDIA A100-SXM4-80GB GPUs per node.”</p><p>“In 2025, three Dell XE8640 nodes were added, each with dual Intel Xeon Platinum 8468 CPUs and four NVIDIA H100-HBM3-80GB GPUs.”</p><p>“we examine practical workloads such as fine-tuning transformer-based large language models (LLMs) and conducting large-scale computational fluid dynamics (CFD) simulations, both of which have been successfully run on Toubkal.”</p><p>“we present a practical benchmark demonstrating the fine-tuning of a large language model (LLM) performed on the Toubkal supercomputer by Belkasmi et al.”</p><p>“This work led to the creation of GemMaroc”</p></blockquote>
   <dl class="evidence-meta">
     <dt>Source</dt><dd><a href="https://link.springer.com/article/10.1007/s11227-025-07858-8" rel="noopener">The Journal of Supercomputing (Springer)</a> · Peer-reviewed journal</dd>
@@ -137,7 +157,7 @@
     <dt>Retrieved</dt><dd>19 October 2026</dd>
     <dt>Verification</dt><dd>Verified against source</dd><dt>Related</dt><dd><a href="/registry/toubkal-supercomputer/">Toubkal supercomputer</a>, <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a></dd>
   </dl>
-  <p class="evidence-note">Open-access article (CC BY 4.0), published online 3 October 2025. Every author lists an affiliation with the university that hosts and runs Toubkal, so the workload statement is the operator&#x27;s own report, peer-reviewed but not independent. It documents specific fine-tuning runs (the GemMaroc study by Belkasmi et al., which the registry has not retrieved), not the scale, share or continuity of AI use. The article&#x27;s user counts and utilisation figures are not recorded. Benchmark, accuracy and energy figures in the article are not recorded. The verified fact is what the article states. Excerpts were matched against the article page retrieved on the retrieval date; automated requests to the publisher can receive a bot-challenge page, which the source checker reports as blocked and does not bypass.</p>
+  <p class="evidence-note">Open-access article (CC BY 4.0), published online 3 October 2025. Every author lists an affiliation with the university that hosts and runs Toubkal, so the workload statement is the operator&#x27;s own report, peer-reviewed but not independent. It documents specific fine-tuning runs, not the scale, share or continuity of AI use. The article names their authors &quot;Belkasmi et al.&quot;, but its reference [57] is the GemMaroc preprint by Skiredj, Azhari, Atou, Tazi and Berrada (MAI-EV-0042); that preprint does not itself say where the runs were made. The article&#x27;s statement that they ran on Toubkal comes from its own authors, none of whom is an author of the preprint. The article&#x27;s user counts and utilisation figures are not recorded. Benchmark, accuracy and energy figures in the article are not recorded. The verified fact is what the article states. Excerpts were matched against the article page retrieved on the retrieval date; automated requests to the publisher can receive a bot-challenge page, which the source checker reports as blocked and does not bypass.</p>
 </li>
 <li class="evidence-card" id="MAI-EV-0007">
   <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0007">MAI-EV-0007</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
@@ -152,6 +172,19 @@
   </dl>
   <p class="evidence-note">The fact recorded is the signature of the convention. Its stated purpose is quoted as written; delivery is not verified.</p>
 </li>
+<li class="evidence-card" id="MAI-EV-0043">
+  <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0043">MAI-EV-0043</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
+  <h3>GeneLM: genomic language model trained on the Toubkal supercomputer</h3>
+  <p class="evidence-claim">A peer-reviewed article by two researchers of Mohammed VI Polytechnic University&#x27;s College of Computing reports that the coding-sequence classification experiments for their bacterial genomic language model were conducted on the Toubkal supercomputer, with training on two NVIDIA A100 80GB GPUs for a total of 37 hours over two epochs.</p>
+  <blockquote class="evidence-quote" cite="https://doi.org/10.1093/bib/bbaf311"><p>“The CDS classification experiments were conducted on the Toubkal supercomputer.”</p><p>“The training was performed on two NVIDIA A100 GPUs, each equipped with 80GB of memory.”</p><p>“the total training duration was 37 h for two epochs.”</p><p>“providing access to the supercomputing resources (cc.um6p.ma/toubkal-super-computer)”</p></blockquote>
+  <dl class="evidence-meta">
+    <dt>Source</dt><dd><a href="https://doi.org/10.1093/bib/bbaf311" rel="noopener">Briefings in Bioinformatics (Oxford University Press); Akotenou and El Allali</a> · Peer-reviewed journal</dd>
+    <dt>Published</dt><dd>3 July 2025</dd>
+    <dt>Retrieved</dt><dd>19 October 2026</dd>
+    <dt>Verification</dt><dd>Verified against source</dd><dt>Related</dt><dd><a href="/registry/toubkal-supercomputer/">Toubkal supercomputer</a>, <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a></dd>
+  </dl>
+  <p class="evidence-note">Open-access article (CC BY), published 3 July 2025. The publisher&#x27;s site refuses automated requests, so the excerpts were matched against the full text deposited in Europe PMC (PMC12222049). Both authors are affiliated with the university that runs Toubkal: this is the researchers&#x27; own account of one training run, not independent documentation, and it says nothing of Toubkal&#x27;s overall AI use, its scale or its continuity.</p>
+</li>
 <li class="evidence-card" id="MAI-EV-0019">
   <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0019">MAI-EV-0019</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
   <h3>Agreements signed in Salé on the sidelines of the First National AI Conference</h3>
@@ -164,6 +197,19 @@
     <dt>Verification</dt><dd>Verified against source</dd><dt>Related</dt><dd><a href="/registry/jazari-institute-nador/">Al Jazari Institute, Province of Nador</a>, <a href="/registry/ministry-higher-education/">Ministry of Higher Education, Scientific Research and Innovation</a>, <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, <a href="/registry/um6p-data-centre-partnership/">UM6P data-centre partnership convention</a>, <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, <a href="/registry/green-data-centres-agreement/">Sovereign green data-centre infrastructure agreement</a>, <a href="/registry/ministry-energy-transition/">Ministry of Energy Transition and Sustainable Development</a>, <a href="/registry/first-national-ai-conference-2025/">First National AI Conference (Assises nationales de l&#x27;IA)</a></dd>
   </dl>
   <p class="evidence-note">Page dated Thursday 3 July 2025; &quot;Wednesday&quot; is 2 July 2025. This source names the signatories that the ministry&#x27;s synthesis report (MAI-EV-0005 to MAI-EV-0007) describes only in general terms. The conference itself is reported as held in Rabat (MAI-EV-0004); the signing ceremony is reported in Salé.</p>
+</li>
+<li class="evidence-card" id="MAI-EV-0042">
+  <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0042">MAI-EV-0042</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
+  <h3>GemMaroc: the preprint describing the GemMaroc fine-tuning runs</h3>
+  <p class="evidence-claim">The preprint introducing the GemMaroc Moroccan Darija language models, by three authors from Mohammed VI Polytechnic University&#x27;s College of Computing, one from Hugging Face and one from the National Institute of Posts and Telecoms, reports that its fine-tuning experiments ran on two NVIDIA A100-80GB GPUs, and the 27-billion-parameter GemMaroc model on eight NVIDIA H100-80GB GPUs, taking about 48 GPU-hours. It expresses the total cost as a cloud cost, using a public on-demand rate in a Runpod Cloud region, and does not name the computing facility used.</p>
+  <blockquote class="evidence-quote" cite="https://arxiv.org/pdf/2505.17082v1"><p>“College of Computing, Mohammed VI Polytechnic University, Benguerir, Morocco”</p><p>“All fine-tuning experiments were conducted on 2×A100-80GB GPUs, except for our largest model, the 27-billion-parameter GEMMAROC, which was fine-tuned on 8×H100-80GB GPUs.”</p><p>“consuming approximately 48 GPU-hours and keeping the total cloud cost well under $100.”</p><p>“Based on the public on-demand rate of $2 per A100-hour in the selected Runpod Cloud region.”</p></blockquote>
+  <dl class="evidence-meta">
+    <dt>Source</dt><dd><a href="https://arxiv.org/pdf/2505.17082v1" rel="noopener">arXiv (preprint by Skiredj, Azhari, Atou, Tazi and Berrada)</a> · Academic preprint</dd>
+    <dt>Published</dt><dd>20 May 2025</dd>
+    <dt>Retrieved</dt><dd>19 October 2026</dd>
+    <dt>Verification</dt><dd>Verified against source</dd><dt>Related</dt><dd><a href="/registry/toubkal-supercomputer/">Toubkal supercomputer</a>, <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, <a href="/registry/large-language-models/">Large language models</a></dd>
+  </dl>
+  <p class="evidence-note">arXiv preprint, version 1 of 20 May 2025, not peer-reviewed; excerpts matched against the PDF. The excerpt on the hardware was checked against the rendered page: the PDF&#x27;s text layer splits the small-capital model name and drops the hyphen in &quot;H100-80GB&quot; at a line break, so automated matching reports it missing. No author is named Belkasmi: the Toubkal article (MAI-EV-0041) attributes these runs to &quot;Belkasmi et al.&quot; but its reference [57] is this preprint by Skiredj et al. The preprint does not mention Toubkal, the African Supercomputing Centre or any acknowledgement of computing resources; its cost footnote uses a commercial cloud provider&#x27;s public rate, which may be a costing convention rather than where the runs took place. It therefore neither confirms nor rules out that the runs were made on Toubkal. Three of the five authors are affiliated with the university that runs Toubkal.</p>
 </li>
 <li class="evidence-card" id="MAI-EV-0016">
   <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0016">MAI-EV-0016</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
@@ -189,7 +235,7 @@
 <footer>
   <div class="footer-inner">
     <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
-    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.5.0 · as of 19 October 2026</span>
+    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.6.0 · as of 19 October 2026</span>
     <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/">Data</a> · <a href="/acquisition/">Acquisition</a></span>
   </div>
 </footer>

@@ -26,6 +26,16 @@
  "subjectOf": [
   {
    "@type": "CreativeWork",
+   "name": "GemMaroc: the preprint describing the GemMaroc fine-tuning runs",
+   "url": "https://arxiv.org/pdf/2505.17082v1",
+   "publisher": {
+    "@type": "Organization",
+    "name": "arXiv (preprint by Skiredj, Azhari, Atou, Tazi and Berrada)"
+   },
+   "datePublished": "2025-05-20"
+  },
+  {
+   "@type": "CreativeWork",
    "name": "Al-Atlas-0.5B model card",
    "url": "https://huggingface.co/atlasia/Al-Atlas-0.5B",
    "publisher": {
@@ -82,7 +92,7 @@
   
   <p class="lede">Generative language models trained on large text corpora.</p>
   
-  <dl class="facts"><dt>Type</dt><dd>Technology</dd><dt>Identifier</dt><dd><code>large-language-models</code></dd><dt>Records</dt><dd>3</dd></dl>
+  <dl class="facts"><dt>Type</dt><dd>Technology</dd><dt>Identifier</dt><dd><code>large-language-models</code></dd><dt>Records</dt><dd>4</dd></dl>
 </header>
 <section aria-labelledby="rel-h">
   <h2 id="rel-h"><span class="section-number">01</span>Documented relationships</h2>
@@ -91,6 +101,19 @@
 <section aria-labelledby="ev-h">
   <h2 id="ev-h"><span class="section-number">02</span>Evidence</h2>
   <ul class="evidence-list">
+<li class="evidence-card" id="MAI-EV-0042">
+  <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0042">MAI-EV-0042</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
+  <h3>GemMaroc: the preprint describing the GemMaroc fine-tuning runs</h3>
+  <p class="evidence-claim">The preprint introducing the GemMaroc Moroccan Darija language models, by three authors from Mohammed VI Polytechnic University&#x27;s College of Computing, one from Hugging Face and one from the National Institute of Posts and Telecoms, reports that its fine-tuning experiments ran on two NVIDIA A100-80GB GPUs, and the 27-billion-parameter GemMaroc model on eight NVIDIA H100-80GB GPUs, taking about 48 GPU-hours. It expresses the total cost as a cloud cost, using a public on-demand rate in a Runpod Cloud region, and does not name the computing facility used.</p>
+  <blockquote class="evidence-quote" cite="https://arxiv.org/pdf/2505.17082v1"><p>“College of Computing, Mohammed VI Polytechnic University, Benguerir, Morocco”</p><p>“All fine-tuning experiments were conducted on 2×A100-80GB GPUs, except for our largest model, the 27-billion-parameter GEMMAROC, which was fine-tuned on 8×H100-80GB GPUs.”</p><p>“consuming approximately 48 GPU-hours and keeping the total cloud cost well under $100.”</p><p>“Based on the public on-demand rate of $2 per A100-hour in the selected Runpod Cloud region.”</p></blockquote>
+  <dl class="evidence-meta">
+    <dt>Source</dt><dd><a href="https://arxiv.org/pdf/2505.17082v1" rel="noopener">arXiv (preprint by Skiredj, Azhari, Atou, Tazi and Berrada)</a> · Academic preprint</dd>
+    <dt>Published</dt><dd>20 May 2025</dd>
+    <dt>Retrieved</dt><dd>19 October 2026</dd>
+    <dt>Verification</dt><dd>Verified against source</dd><dt>Related</dt><dd><a href="/registry/toubkal-supercomputer/">Toubkal supercomputer</a>, <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, <a href="/registry/large-language-models/">Large language models</a></dd>
+  </dl>
+  <p class="evidence-note">arXiv preprint, version 1 of 20 May 2025, not peer-reviewed; excerpts matched against the PDF. The excerpt on the hardware was checked against the rendered page: the PDF&#x27;s text layer splits the small-capital model name and drops the hyphen in &quot;H100-80GB&quot; at a line break, so automated matching reports it missing. No author is named Belkasmi: the Toubkal article (MAI-EV-0041) attributes these runs to &quot;Belkasmi et al.&quot; but its reference [57] is this preprint by Skiredj et al. The preprint does not mention Toubkal, the African Supercomputing Centre or any acknowledgement of computing resources; its cost footnote uses a commercial cloud provider&#x27;s public rate, which may be a costing convention rather than where the runs took place. It therefore neither confirms nor rules out that the runs were made on Toubkal. Three of the five authors are affiliated with the university that runs Toubkal.</p>
+</li>
 <li class="evidence-card" id="MAI-EV-0025">
   <div class="evidence-top"><a class="evidence-id" href="/registry/evidence/#MAI-EV-0025">MAI-EV-0025</a><span class="badge badge-verified-fact">VERIFIED FACT</span></div>
   <h3>Al-Atlas-0.5B model card</h3>
@@ -141,7 +164,7 @@
 <footer>
   <div class="footer-inner">
     <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
-    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.5.0 · as of 19 October 2026</span>
+    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.6.0 · as of 19 October 2026</span>
     <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/">Data</a> · <a href="/acquisition/">Acquisition</a></span>
   </div>
 </footer>
