@@ -193,6 +193,18 @@ class DefectsAreDetected(unittest.TestCase):
         self.copy.edit("/data/ontology.json", drop)
         self.assertRejected("names law-09-08, which is not in ontology.json")
 
+    def test_relationship_naming_a_missing_entity(self):
+        self.copy.edit("/data/ontology.json", lambda d: d["relationships"][0].update(object="no-such-project"))
+        self.assertRejected("subject or object names no-such-project, which is not in ontology.json")
+
+    def test_new_record_postdating_a_gap_assessment(self):
+        def add(d):
+            r = json.loads(json.dumps(next(r for r in d["records"] if r["evidence_id"] == "MAI-EV-0020")))
+            r["evidence_id"] = "MAI-EV-0099"
+            d["records"].append(r)
+        self.copy.edit("/data/evidence.json", add)
+        self.assertRejected("GAP-03: MAI-EV-0099 concern this gap but postdate its assessment")
+
     def test_record_naming_a_missing_entity(self):
         self.copy.edit("/data/evidence.json", lambda d: d["records"][0]["related_entities"].append("no-such-entity"))
         self.assertRejected("names no-such-entity")
@@ -386,6 +398,12 @@ class DataReference(unittest.TestCase):
             self.assertEqual(len(raw), res["bytes"])
             self.assertIn(f'href="{res["path"]}"', self.page)
         self.assertEqual({r["role"] for r in self.manifest["resources"]}, {"canonical", "derived"})
+
+    def test_manifest_hashes_the_files_of_its_own_build(self):
+        model = build.Model(self.evidence, self.ontology)
+        files = {"registry/matrix/matrix.json": '{"changed": true}\n'}
+        res = {r["path"]: r for r in build.manifest(model, files)["resources"]}
+        self.assertEqual(res["/registry/matrix/matrix.json"]["sha256"], hashlib.sha256(b'{"changed": true}\n').hexdigest())
 
     def test_derived_files_name_their_sources_and_rules(self):
         matrix = json.loads((REPO / "registry" / "matrix" / "matrix.json").read_text(encoding="utf-8"))
