@@ -117,7 +117,7 @@
   "/data/evidence.json"
  ],
  "documentation": "/data/",
- "registry_version": "0.5.0",
+ "registry_version": "0.6.0",
  "rows": [
   {
    "classification": "VERIFIED FACT",
@@ -205,7 +205,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -215,6 +215,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "government_portal",
      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "al-akhawayn-university|signatory_of|jazari-industrie-x0",
@@ -223,13 +231,12 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -283,7 +290,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -293,6 +300,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "signatory_organization",
      "source_url": "https://cgem.ma/activites/signature-de-la-convention-constitutive-du-gip-institut-jazari-root/"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "cgem|signatory_of|jazari-root",
@@ -301,13 +316,12 @@
     "lifecycle": "announced",
     "name": "Institut Jazari ROOT",
     "stage": "Announced",
-    "status_as_recorded": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
+    "status_as_recorded": "Constitutive convention signed 2026-01-12 and approved by joint order of 16 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -481,11 +495,11 @@
     "lifecycle": "announced",
     "name": "JAZARI EduTech",
     "stage": "Announced",
-    "status_as_recorded": "Named only. No founding convention, nor any signing of one, is documented in the registry.",
+    "status_as_recorded": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
-    "Named as a component by the ministry; no founding convention, nor any signing of one, is documented.",
+    "Named as a component by the ministry; its founding convention was approved in July 2026 (Bulletin Officiel 7534), but its operation is not documented.",
     "Not verified as delivered."
    ],
    "relationship": "includes",
@@ -516,7 +530,7 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [],
@@ -556,7 +570,7 @@
     "lifecycle": "announced",
     "name": "Institut Jazari ROOT",
     "stage": "Announced",
-    "status_as_recorded": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
+    "status_as_recorded": "Constitutive convention signed 2026-01-12 and approved by joint order of 16 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [],
@@ -588,11 +602,11 @@
     "lifecycle": "announced",
     "name": "JAZARI Smart City",
     "stage": "Announced",
-    "status_as_recorded": "Named only. No founding convention, nor any signing of one, is documented in the registry.",
+    "status_as_recorded": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
-    "Named as a component by the ministry; no founding convention, nor any signing of one, is documented.",
+    "Named as a component by the ministry; its founding convention was approved in July 2026 (Bulletin Officiel 7534), but its operation is not documented.",
     "Not verified as delivered."
    ],
    "relationship": "includes",
@@ -833,7 +847,7 @@
     "lifecycle": "announced",
     "name": "Sovereign green data-centre infrastructure agreement",
     "stage": "Announced",
-    "status_as_recorded": "Agreement signed July 2025. No facility documented.",
+    "status_as_recorded": "Agreement signed July 2025. In April 2026 a follow-on convention launched strategic studies for a green data-centre programme in Dakhla (Igoudar); no facility is documented as built.",
     "type": "project"
    },
    "qualifications": [
@@ -850,7 +864,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -860,6 +874,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "government_portal",
      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "ministry-digital-transition|signatory_of|jazari-industrie-x0",
@@ -868,13 +890,12 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -928,9 +949,9 @@
    }
   },
   {
-   "classification": "ANNOUNCED PLAN",
+   "classification": "VERIFIED FACT",
    "documentation_basis": "announcement-or-description",
-   "documented_as": "Announced or planned",
+   "documented_as": "Signed",
    "evidence": [
     {
      "evidence_type": "press_article",
@@ -939,6 +960,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "secondary_press",
      "source_url": "https://lobservateur.info/article/117888/economie/gitex-2026-nexus-ai-factory-un-mega-projet-a-12-mmdh-pour-lia-et-le-calcul-intensif"
+    },
+    {
+     "evidence_type": "official_announcement",
+     "id": "MAI-EV-0044",
+     "publication_date": "2026-04-08",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_portal",
+     "source_url": "https://www.mmsp.gov.ma/fr/actualites/nexus-core-systems-lance-au-maroc-une-%C2%AB-ai-factory-plateform%C2%BB"
     }
    ],
    "id": "ministry-digital-transition|signatory_of|nexus-ai-factory",
@@ -947,12 +976,13 @@
     "lifecycle": "announced",
     "name": "Nexus AI Factory",
     "stage": "Announced",
-    "status_as_recorded": "Announced (memorandum, April 2026). Nothing built according to the recorded sources.",
+    "status_as_recorded": "Announced (memorandum signed April 2026). No construction, commissioning or operation is documented in the recorded sources.",
     "type": "project"
    },
    "qualifications": [
-    "Reported by secondary press; the ministry's release could not be retrieved.",
-    "Not verified as delivered.",
+    "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published.",
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A signature is recorded as a signature; delivery is not documented.",
     "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
@@ -1000,7 +1030,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1010,6 +1040,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "government_portal",
      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "ministry-economy-finance|signatory_of|jazari-industrie-x0",
@@ -1018,13 +1056,12 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1062,7 +1099,7 @@
     "lifecycle": "announced",
     "name": "Sovereign green data-centre infrastructure agreement",
     "stage": "Announced",
-    "status_as_recorded": "Agreement signed July 2025. No facility documented.",
+    "status_as_recorded": "Agreement signed July 2025. In April 2026 a follow-on convention launched strategic studies for a green data-centre programme in Dakhla (Igoudar); no facility is documented as built.",
     "type": "project"
    },
    "qualifications": [
@@ -1194,7 +1231,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1204,6 +1241,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "government_portal",
      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "ministry-industry-commerce|signatory_of|jazari-industrie-x0",
@@ -1212,13 +1257,12 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1248,7 +1292,7 @@
     "lifecycle": null,
     "name": "JAZARI Institutes network",
     "stage": null,
-    "status_as_recorded": "Announced in January 2026. Signings of founding conventions are reported for JAZARI ROOT and JAZARI Industrie X.0; their signed texts are not recorded, and no institute is documented as constituted or operating.",
+    "status_as_recorded": "Announced in January 2026. The founding conventions of JAZARI ROOT, JAZARI Industrie X.0, JAZARI Smart City and JAZARI EduTech were approved by joint orders in July 2026 (Bulletin Officiel 7534); their signed texts are not published, and no institute is documented as operating.",
     "type": "initiative"
    },
    "qualifications": [
@@ -1331,9 +1375,9 @@
    }
   },
   {
-   "classification": "ANNOUNCED PLAN",
+   "classification": "VERIFIED FACT",
    "documentation_basis": "announcement-or-description",
-   "documented_as": "Announced or planned",
+   "documented_as": "Signed",
    "evidence": [
     {
      "evidence_type": "press_article",
@@ -1342,6 +1386,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "secondary_press",
      "source_url": "https://lobservateur.info/article/117888/economie/gitex-2026-nexus-ai-factory-un-mega-projet-a-12-mmdh-pour-lia-et-le-calcul-intensif"
+    },
+    {
+     "evidence_type": "official_announcement",
+     "id": "MAI-EV-0044",
+     "publication_date": "2026-04-08",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_portal",
+     "source_url": "https://www.mmsp.gov.ma/fr/actualites/nexus-core-systems-lance-au-maroc-une-%C2%AB-ai-factory-plateform%C2%BB"
     }
    ],
    "id": "nexus-core-systems|signatory_of|nexus-ai-factory",
@@ -1350,12 +1402,13 @@
     "lifecycle": "announced",
     "name": "Nexus AI Factory",
     "stage": "Announced",
-    "status_as_recorded": "Announced (memorandum, April 2026). Nothing built according to the recorded sources.",
+    "status_as_recorded": "Announced (memorandum signed April 2026). No construction, commissioning or operation is documented in the recorded sources.",
     "type": "project"
    },
    "qualifications": [
-    "Reported by secondary press; the ministry's release could not be retrieved.",
-    "Not verified as delivered.",
+    "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published.",
+    "The signing is documented by a report of it; the signed text is not recorded in this registry.",
+    "A signature is recorded as a signature; delivery is not documented.",
     "Documented here only by announcements, news reports or descriptions (GAP-05)."
    ],
    "relationship": "signatory_of",
@@ -1404,7 +1457,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1414,6 +1467,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "government_portal",
      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "uemf|signatory_of|jazari-industrie-x0",
@@ -1422,13 +1483,12 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1584,7 +1644,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1594,6 +1654,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "government_portal",
      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "umi|signatory_of|jazari-industrie-x0",
@@ -1602,13 +1670,12 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",
@@ -1655,7 +1722,7 @@
   },
   {
    "classification": "VERIFIED FACT",
-   "documentation_basis": "announcement-or-description",
+   "documentation_basis": "includes-non-announcement-record",
    "documented_as": "Signed",
    "evidence": [
     {
@@ -1665,6 +1732,14 @@
      "retrieval_date": "2026-10-18",
      "source_type": "government_portal",
      "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "official_gazette",
+     "id": "MAI-EV-0047",
+     "publication_date": "2026-08-13",
+     "retrieval_date": "2026-10-19",
+     "source_type": "government_publication",
+     "source_url": "https://www.sgg.gov.ma/BO/AR/3111/2026/BO_7534_Ar.pdf"
     }
    ],
    "id": "usmba|signatory_of|jazari-industrie-x0",
@@ -1673,13 +1748,12 @@
     "lifecycle": "announced",
     "name": "JAZARI Industrie X.0",
     "stage": "Announced",
-    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "status_as_recorded": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
     "type": "project"
    },
    "qualifications": [
     "The signing is documented by a report of it; the signed text is not recorded in this registry.",
-    "A signature is recorded as a signature; delivery is not documented.",
-    "Documented here only by announcements, news reports or descriptions (GAP-05)."
+    "A signature is recorded as a signature; delivery is not documented."
    ],
    "relationship": "signatory_of",
    "relationship_label": "signatory of",

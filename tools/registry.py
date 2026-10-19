@@ -57,6 +57,9 @@ EVIDENCE_TYPES = (
     "regulatory_record",
     "live_service_observation",
     "procurement_notice",
+    # A text published in the Bulletin Officiel (law, decree, order, or the published summary of a convention).
+    # It establishes a legal act; it never shows that anything operates or is used.
+    "official_gazette",
     # The text of a signed agreement, convention or memorandum, which the registry has read in full (see
     # INSTRUMENT_SOURCES and _check_instrument). A report of a signing never has this type, whoever publishes it.
     # No record has this type yet: every signature recorded so far is documented by a report of it.
@@ -102,9 +105,17 @@ REGULATORY_APPROVAL = re.compile(
     r"\bFDA[- ]approv\w*|\bapprov\w*\b(?:\W+\w+){0,5}?\W+(?:FDA|Food and Drug Administration)\b", re.IGNORECASE)
 QUOTED = re.compile(r'"[^"]*"|\u201c[^\u201d]*\u201d|\u00ab[^\u00bb]*\u00bb')
 # Record types that can never establish a lifecycle status, or that a project is operated: a
-# procurement notice shows intent to buy, and a market clearance shows permission to sell.
-NO_STATUS_TYPES = ("procurement_notice",)
-NO_USE_TYPES = ("procurement_notice", "regulatory_record")
+# procurement notice shows intent to buy, a market clearance shows permission to sell, and an
+# official gazette shows legal establishment.
+NO_STATUS_TYPES = ("procurement_notice", "official_gazette")
+NO_USE_TYPES = ("procurement_notice", "regulatory_record", "official_gazette")
+
+
+def _a(evidence_type):
+    name = evidence_type.replace("_", " ")
+    return ("an " if name[0] in "aeiou" else "a ") + name
+
+
 PROJECT_KINDS_REQUIRED = ("project",)
 # Origins that need a source independent of the company itself.
 INDEPENDENT_ORIGINS = ("based-in-morocco", "foreign-moroccan-operations-verified")
@@ -267,13 +278,13 @@ def validate_evidence(evidence, today=None):
                 if basis in OPERATOR_BASES and not r.get("source_entity"):
                     errors.append(f"{where} basis '{basis}' needs source_entity naming the operator that published it")
                 if r.get("evidence_type") in NO_USE_TYPES:
-                    errors.append(f"{where} a {r.get('evidence_type')} cannot evidence '{status}': "
-                                  f"permission to market or intent to buy is not use")
+                    errors.append(f"{where} {_a(r['evidence_type'])} cannot evidence '{status}': "
+                                  f"permission to market, intent to buy or legal establishment is not use")
                 if basis == "public-availability-observed" and USAGE.search(claim):
                     errors.append(f"{where} an availability observation cannot assert use or continuity "
                                   f"({USAGE.search(claim).group(0)!r}); use needs a report of use")
             if r.get("evidence_type") in NO_STATUS_TYPES:
-                errors.append(f"{where} a procurement notice cannot evidence a lifecycle status")
+                errors.append(f"{where} {_a(r['evidence_type'])} cannot evidence a lifecycle status")
         elif r.get("status_basis") is not None:
             errors.append(f"{where} status_basis is only meaningful with status_evidence")
         if cls == "VERIFIED FACT" and PERFORMANCE.search(claim):
@@ -543,7 +554,7 @@ def validate_ontology(ontology, evidence):
                 for x in ev):
             errors.append(f"{where} a verified operator must be documented by a record the operator published "
                           f"(source_entity) or by an independent source; a provider label, a vendor's page, "
-                          f"a market clearance or a procurement notice does not show who operates a service")
+                          f"a market clearance, a procurement notice or a gazette act does not show who operates a service")
         if cls == "INDEPENDENT ANALYSIS":
             if len(ev) < 2 or not str(rel.get("note", "")).strip():
                 errors.append(f"{where} INDEPENDENT ANALYSIS needs a note and at least two records")

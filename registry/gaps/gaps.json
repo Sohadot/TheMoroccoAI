@@ -139,13 +139,25 @@
      "evidence": [
       "MAI-EV-0041"
      ],
-     "text": "A peer-reviewed article by authors affiliated with its host university states that large-language-model fine-tuning has been run on it, and presents as a benchmark the runs that produced the GemMaroc Moroccan Darija models (attributed to Belkasmi et al.)."
+     "text": "A peer-reviewed article by authors affiliated with its host university states that large-language-model fine-tuning has been run on it, and presents as a benchmark the runs that produced the GemMaroc Moroccan Darija models."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0042"
+     ],
+     "text": "The GemMaroc preprint that the article cites (Skiredj et al.; three of its five authors are from the host university) reports the size of those runs, about 58 GPU-hours on A100 and H100 GPUs, but does not say where they were made, and expresses their cost at a commercial cloud provider's public rate."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0043"
+     ],
+     "text": "Two researchers of the host university report training a bacterial genomic language model on Toubkal: two A100 GPUs for 37 hours."
     }
    ],
    "evidence_needed": [
-    "The GemMaroc study by Belkasmi et al., which the article cites, if it documents its use of Toubkal",
-    "Published usage or allocation reports",
-    "Independent publications acknowledging Toubkal for specific AI models"
+    "Published usage or allocation reports for Toubkal (projects, GPU-hours, AI share)",
+    "Publications by authors not affiliated with UM6P that acknowledge Toubkal for specific AI models",
+    "A statement by the GemMaroc authors of where their fine-tuning runs were made"
    ],
    "formal_act_relationships": null,
    "id": "GAP-03",
@@ -154,7 +166,7 @@
    "relationships": null,
    "resolved_by": null,
    "state": "open",
-   "unestablished": "Independent documentation of AI workloads on Toubkal, and the scale, share, users or continuity of AI use. This is not a finding that Toubkal is not used for AI: its operator's own authors report specific fine-tuning runs. What is missing is independent and quantified documentation."
+   "unestablished": "Independent documentation of AI workloads on Toubkal, and the scale, share, users or continuity of its AI use. This is not a finding that Toubkal is not used for AI: researchers affiliated with its operator report specific runs. What is missing is documentation by a party independent of the operator, and system-level, quantified reporting."
   },
   {
    "assessed": "2026-10-19",
@@ -183,9 +195,16 @@
     },
     {
      "evidence": [
-      "MAI-EV-0030"
+      "MAI-EV-0030",
+      "MAI-EV-0044"
      ],
-     "text": "A memorandum on the Nexus AI Factory is reported by the press only."
+     "text": "The Nexus AI Factory memorandum was signed at GITEX Africa 2026 by Nexus Core Systems, the Ministry of Digital Transition and two other public bodies, according to the ministry's own release, which states its investment and capacity figures as commitments."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0045"
+     ],
+     "text": "In April 2026 a convention that the ministry presents as following the green data-centres agreement launched the strategic studies for a green data-centre programme in Dakhla."
     }
    ],
    "evidence_needed": [
@@ -199,7 +218,7 @@
    "relationships": null,
    "resolved_by": null,
    "state": "open",
-   "unestablished": "Construction, commissioning or operation of any of these facilities."
+   "unestablished": "Construction, commissioning or operation of any of these facilities. A memorandum, a convention or the launch of studies is not construction."
   },
   {
    "assessed": "2026-10-19",
@@ -232,32 +251,6 @@
     {
      "classification": "VERIFIED FACT",
      "evidence": [
-      "MAI-EV-0009"
-     ],
-     "evidence_types": [
-      "news_dispatch"
-     ],
-     "id": "al-akhawayn-university|signatory_of|jazari-industrie-x0",
-     "object": "jazari-industrie-x0",
-     "relationship": "signatory_of",
-     "subject": "al-akhawayn-university"
-    },
-    {
-     "classification": "VERIFIED FACT",
-     "evidence": [
-      "MAI-EV-0008"
-     ],
-     "evidence_types": [
-      "press_release"
-     ],
-     "id": "cgem|signatory_of|jazari-root",
-     "object": "jazari-root",
-     "relationship": "signatory_of",
-     "subject": "cgem"
-    },
-    {
-     "classification": "VERIFIED FACT",
-     "evidence": [
       "MAI-EV-0029",
       "MAI-EV-0028"
      ],
@@ -286,41 +279,17 @@
     {
      "classification": "VERIFIED FACT",
      "evidence": [
-      "MAI-EV-0009"
+      "MAI-EV-0030",
+      "MAI-EV-0044"
      ],
      "evidence_types": [
-      "news_dispatch"
-     ],
-     "id": "ministry-digital-transition|signatory_of|jazari-industrie-x0",
-     "object": "jazari-industrie-x0",
-     "relationship": "signatory_of",
-     "subject": "ministry-digital-transition"
-    },
-    {
-     "classification": "ANNOUNCED PLAN",
-     "evidence": [
-      "MAI-EV-0030"
-     ],
-     "evidence_types": [
-      "press_article"
+      "press_article",
+      "official_announcement"
      ],
      "id": "ministry-digital-transition|signatory_of|nexus-ai-factory",
      "object": "nexus-ai-factory",
      "relationship": "signatory_of",
      "subject": "ministry-digital-transition"
-    },
-    {
-     "classification": "VERIFIED FACT",
-     "evidence": [
-      "MAI-EV-0009"
-     ],
-     "evidence_types": [
-      "news_dispatch"
-     ],
-     "id": "ministry-economy-finance|signatory_of|jazari-industrie-x0",
-     "object": "jazari-industrie-x0",
-     "relationship": "signatory_of",
-     "subject": "ministry-economy-finance"
     },
     {
      "classification": "ANNOUNCED PLAN",
@@ -351,23 +320,12 @@
     {
      "classification": "VERIFIED FACT",
      "evidence": [
-      "MAI-EV-0009"
+      "MAI-EV-0030",
+      "MAI-EV-0044"
      ],
      "evidence_types": [
-      "news_dispatch"
-     ],
-     "id": "ministry-industry-commerce|signatory_of|jazari-industrie-x0",
-     "object": "jazari-industrie-x0",
-     "relationship": "signatory_of",
-     "subject": "ministry-industry-commerce"
-    },
-    {
-     "classification": "ANNOUNCED PLAN",
-     "evidence": [
-      "MAI-EV-0030"
-     ],
-     "evidence_types": [
-      "press_article"
+      "press_article",
+      "official_announcement"
      ],
      "id": "nexus-core-systems|signatory_of|nexus-ai-factory",
      "object": "nexus-ai-factory",
@@ -386,19 +344,6 @@
      "object": "swam-fraud-scoring",
      "relationship": "operates",
      "subject": "swam"
-    },
-    {
-     "classification": "VERIFIED FACT",
-     "evidence": [
-      "MAI-EV-0009"
-     ],
-     "evidence_types": [
-      "news_dispatch"
-     ],
-     "id": "uemf|signatory_of|jazari-industrie-x0",
-     "object": "jazari-industrie-x0",
-     "relationship": "signatory_of",
-     "subject": "uemf"
     },
     {
      "classification": "VERIFIED FACT",
@@ -429,19 +374,6 @@
     {
      "classification": "VERIFIED FACT",
      "evidence": [
-      "MAI-EV-0009"
-     ],
-     "evidence_types": [
-      "news_dispatch"
-     ],
-     "id": "umi|signatory_of|jazari-industrie-x0",
-     "object": "jazari-industrie-x0",
-     "relationship": "signatory_of",
-     "subject": "umi"
-    },
-    {
-     "classification": "VERIFIED FACT",
-     "evidence": [
       "MAI-EV-0015"
      ],
      "evidence_types": [
@@ -451,19 +383,6 @@
      "object": "ai-movement",
      "relationship": "designated",
      "subject": "unesco"
-    },
-    {
-     "classification": "VERIFIED FACT",
-     "evidence": [
-      "MAI-EV-0009"
-     ],
-     "evidence_types": [
-      "news_dispatch"
-     ],
-     "id": "usmba|signatory_of|jazari-industrie-x0",
-     "object": "jazari-industrie-x0",
-     "relationship": "signatory_of",
-     "subject": "usmba"
     }
    ],
    "resolved_by": null,
@@ -502,11 +421,17 @@
       "MAI-EV-0018"
      ],
      "text": "The ministry's report on the First National AI Conference frames the conference within the strategy."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0046"
+     ],
+     "text": "The United Nations ranked Morocco 101st in the e-government development index in 2022 and 90th in 2024; no edition shows the 113th place given as the strategy's starting point. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy."
     }
    ],
    "evidence_needed": [
     "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)",
-    "The e-government development index rankings the ranking objective refers to, published in the United Nations E-Government Survey",
+    "The next edition of the United Nations E-Government Survey, the index the ranking objective refers to",
     "Finance-law documents for the stated investment figures"
    ],
    "formal_act_relationships": null,
@@ -516,11 +441,11 @@
    "relationships": null,
    "resolved_by": null,
    "state": "open",
-   "unestablished": "Any measured progress towards the jobs, GDP-contribution, public-services or e-government ranking objectives. No project is recorded as included in the strategy, and the investment figure is an unchecked statement about spending, not progress towards a target."
+   "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or e-government ranking objectives. No project is recorded as included in the strategy, the investment figure is an unchecked statement about spending, and no edition of the United Nations index later than 2024 had been published on the assessment date."
   }
  ],
  "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. A gap is opened when a reference question asks something the records cannot answer; every strategy with an official target has a gap on its measured progress, which the build checks. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
- "registry_version": "0.5.0",
+ "registry_version": "0.6.0",
  "states": {
   "open": "The question cannot yet be answered from the records in this registry. It is a limit of coverage, not a finding that the evidence or the thing asked about does not exist.",
   "resolved": "Records in this registry now answer the question; resolved_by lists them."

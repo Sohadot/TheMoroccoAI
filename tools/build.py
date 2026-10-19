@@ -214,7 +214,7 @@ def evidence_card(model, r, *, heading="h3", show_entities=True):
     rid = r["evidence_id"]
     quotes = "".join(f"<p>“{escape(q)}”</p>" for q in r["source_excerpts"])
     lang = r.get("source_language", "en")
-    quote_lang = f' lang="{escape(lang)}"' if lang != "en" else ""
+    quote_lang = (f' lang="{escape(lang)}"' if lang != "en" else "") + (' dir="rtl"' if lang in ("ar", "he", "fa", "ur") else "")
     target = f'<dt>Target year</dt><dd>{r["target_year"]}</dd>' if r.get("target_year") else ""
     status = r["verification_status"]
     status_html = "Verified against source" if status == "verified" else '<span class="badge badge-partial">Partial verification</span>'
@@ -1236,7 +1236,7 @@ def render_data_reference(model, gaps, man):
   <p class="prose">A breaking change makes data that a consumer accepted under one version fail under the next. Each is listed here, in the manifest (<code>breaking_changes</code>) and in the <a href="/methodology/#m6-h">changelog</a>. Old values are not accepted as aliases, so a consumer built for an earlier version fails rather than misreads the data.</p>
   {_table("Breaking changes to the published data", ["Version", "Field", "Old value", "New value", "Why", "Effect on an earlier consumer", "Migration"],
           [[escape(c["version"]), f'<code>{escape(c["file"])}</code> <code>{escape(c["field"])}</code>', f'<code>{escape(c["old"])}</code>',
-            f'<code>{escape(c["new"])}</code>', escape(c["reason"]) + f" In v{escape(c['version'])} it applies to {sum(1 for r in matrix_rows(model) if r['documentation_basis'] == c['new'])} rows.",
+            f'<code>{escape(c["new"])}</code>', escape(c["reason"]) + f" In v{escape(model.evidence['version'])} it applies to {sum(1 for r in matrix_rows(model) if r['documentation_basis'] == c['new'])} rows.",
             escape(c["consumer_effect"]), escape(c["migration"])] for c in BREAKING_CHANGES], "")}
   <p class="prose">Other changes in v0.5.0 add to the data without changing what existing values mean: a sentence in the qualifications of every Signed row, a sixth gap (GAP-06), and the evidence type <code>signed_instrument</code> in the manifest's vocabularies. A consumer that compares qualifications or gap lists exactly will see the additions.</p>
 </section>
@@ -1308,7 +1308,7 @@ def render_methodology(model, changelog):
   <h2 id="m3-h"><span class="section-number">03</span>How evidence is admitted</h2>
   <ul class="prose">
     <li>A record is added only after the original source has been retrieved and the excerpt matched against it.</li>
-    <li>A lifecycle stage beyond "announced" needs a verified record that declares that stage. A signature, announcement, procurement notice or market clearance never establishes operation.</li>
+    <li>A lifecycle stage beyond "announced" needs a verified record that declares that stage. A signature, announcement, procurement notice, market clearance or official gazette text never establishes operation: a gazette text shows legal establishment, not activity.</li>
     <li>An operational or pilot claim states its basis (public availability, an operator's report of use, or an independent source) and names the operator separately from any developer or provider.</li>
     <li>Inferences drawn by the registry are labelled independent analysis and need at least two records.</li>
     <li>Candidates that do not meet these rules are not published.</li>

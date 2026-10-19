@@ -193,7 +193,7 @@ class SemanticAudit(unittest.TestCase):
         self.assertIn("MAI-EV-0041", [x for item in g["established"] for x in item["evidence"]])
         html = (REPO / "registry" / "gaps" / "index.html").read_text(encoding="utf-8")
         art = html[html.index('id="gap-03"'):html.index('id="gap-04"')]
-        self.assertIn("its operator&#x27;s own authors report specific fine-tuning runs", art)
+        self.assertIn("researchers affiliated with its operator report specific runs", art)
 
     def test_gap_05_measures_only_formal_acts_and_says_so(self):
         listed = registry.announcement_only(self.ontology, self.evidence)

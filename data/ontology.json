@@ -1,6 +1,6 @@
 {
   "ontology": "TheMoroccoAI Ontology",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "as_of": "2026-10-19",
   "description": "Entities and relationships of Morocco's AI ecosystem, each tied to records in evidence.json. Chain: Institution → Initiative → Project → Evidence → Technology → Sector.",
   "entity_types": {
@@ -88,7 +88,7 @@
       "summary": "The government department that launched Digital Morocco 2030 in September 2024, organised the First National AI Conference in July 2025 and presented the Morocco AI 2030 roadmap in September 2026.",
       "status": "Named in sources up to September 2026. See the note on the October 2026 government.",
       "note": "The government appointed on 16 October 2026 includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform. The registry has not yet verified whether that ministry takes over this department's portfolio.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040", "MAI-EV-0044", "MAI-EV-0045", "MAI-EV-0047"]
     },
     {
       "id": "ministry-ai-digital-transformation",
@@ -108,7 +108,7 @@
       "alt_names": ["Ministère de l'Industrie et du Commerce"],
       "domain": "government-policy",
       "summary": "Signatory of the March 2026 convention creating the JAZARI Industrie X.0 institute.",
-      "evidence": ["MAI-EV-0009"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0047"]
     },
     {
       "id": "ministry-economy-finance",
@@ -117,7 +117,7 @@
       "alt_names": ["Ministère de l'Economie et des Finances"],
       "domain": "government-policy",
       "summary": "Signatory of the March 2026 convention creating the JAZARI Industrie X.0 institute.",
-      "evidence": ["MAI-EV-0009"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0047"]
     },
     {
       "id": "ministry-higher-education",
@@ -135,7 +135,7 @@
       "alt_names": [],
       "domain": "government-policy",
       "summary": "Party to a July 2025 agreement on sustainable and sovereign digital infrastructure (green data centres).",
-      "evidence": ["MAI-EV-0006", "MAI-EV-0019"]
+      "evidence": ["MAI-EV-0006", "MAI-EV-0019", "MAI-EV-0045"]
     },
     {
       "id": "um6p",
@@ -144,7 +144,7 @@
       "alt_names": ["Université Mohammed VI Polytechnique"],
       "domain": "research-academia",
       "summary": "University that created the AI Movement research centre in March 2021, and signed a data-centre partnership convention at the July 2025 National AI Conference.",
-      "evidence": ["MAI-EV-0007", "MAI-EV-0016", "MAI-EV-0019", "MAI-EV-0020", "MAI-EV-0041"]
+      "evidence": ["MAI-EV-0007", "MAI-EV-0016", "MAI-EV-0019", "MAI-EV-0020", "MAI-EV-0041", "MAI-EV-0042", "MAI-EV-0043"]
     },
     {
       "id": "ai-movement",
@@ -162,7 +162,7 @@
       "alt_names": ["Université Euro-Méditerranéenne de Fès"],
       "domain": "research-academia",
       "summary": "One of the four Fès-Meknès universities that signed the JAZARI Industrie X.0 convention in March 2026.",
-      "evidence": ["MAI-EV-0009"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0047"]
     },
     {
       "id": "usmba",
@@ -171,7 +171,7 @@
       "alt_names": ["Université Sidi Mohammed Ben Abdellah"],
       "domain": "research-academia",
       "summary": "One of the four Fès-Meknès universities that signed the JAZARI Industrie X.0 convention in March 2026.",
-      "evidence": ["MAI-EV-0009"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0047"]
     },
     {
       "id": "umi",
@@ -180,7 +180,7 @@
       "alt_names": ["Université Moulay Ismail"],
       "domain": "research-academia",
       "summary": "One of the four Fès-Meknès universities that signed the JAZARI Industrie X.0 convention in March 2026.",
-      "evidence": ["MAI-EV-0009"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0047"]
     },
     {
       "id": "al-akhawayn-university",
@@ -189,7 +189,7 @@
       "alt_names": ["Université Al Akhawayn d'Ifrane"],
       "domain": "research-academia",
       "summary": "One of the four Fès-Meknès universities that signed the JAZARI Industrie X.0 convention in March 2026.",
-      "evidence": ["MAI-EV-0009"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0047"]
     },
     {
       "id": "cgem",
@@ -198,7 +198,7 @@
       "alt_names": ["Confédération Générale des Entreprises du Maroc"],
       "domain": "funding-partnerships",
       "summary": "Private-sector confederation whose president signed the constitutive convention of the Institut Jazari ROOT public-interest group in January 2026.",
-      "evidence": ["MAI-EV-0008"]
+      "evidence": ["MAI-EV-0008", "MAI-EV-0047"]
     },
     {
       "id": "unesco",
@@ -226,7 +226,7 @@
       "domain": "government-policy",
       "summary": "National digital strategy launched on 25 September 2024. Its official targets include 240,000 direct jobs in 2030 and a rise from 113th to 50th place in the e-government development index.",
       "status": "Launched 2024-09-25. Targets run to 2030.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018", "MAI-EV-0046"]
     },
     {
       "id": "morocco-ai-2030",
@@ -245,7 +245,7 @@
       "alt_names": ["Réseau des instituts Jazari", "Al Jazari Institutes"],
       "domain": "research-academia",
       "summary": "Announced network of AI institutes of excellence that the ministry describes as the operational arm of Morocco AI 2030 for research and innovation. It was announced as covering the twelve regions, with JAZARI ROOT as its core.",
-      "status": "Announced in January 2026. Signings of founding conventions are reported for JAZARI ROOT and JAZARI Industrie X.0; their signed texts are not recorded, and no institute is documented as constituted or operating.",
+      "status": "Announced in January 2026. The founding conventions of JAZARI ROOT, JAZARI Industrie X.0, JAZARI Smart City and JAZARI EduTech were approved by joint orders in July 2026 (Bulletin Officiel 7534); their signed texts are not published, and no institute is documented as operating.",
       "evidence": ["MAI-EV-0010", "MAI-EV-0012"]
     },
     {
@@ -268,11 +268,11 @@
       "alt_names": ["JAZARI ROOT"],
       "domain": "research-academia",
       "summary": "Institute planned as a public-interest group (GIP) and described by the ministry as the technical and strategic core of the JAZARI network, around e-government, smart rural and mountain zones, and major sporting events. CGEM and several ministerial departments signed its constitutive convention on 12 January 2026.",
-      "status": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
+      "status": "Constitutive convention signed 2026-01-12 and approved by joint order of 16 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0008", "MAI-EV-0010"],
-      "evidence": ["MAI-EV-0008", "MAI-EV-0010", "MAI-EV-0012"]
+      "evidence": ["MAI-EV-0008", "MAI-EV-0010", "MAI-EV-0012", "MAI-EV-0047"]
     },
     {
       "id": "jazari-industrie-x0",
@@ -281,11 +281,11 @@
       "alt_names": ["Institut Al-Jazari pour l'Industrie"],
       "domain": "research-academia",
       "summary": "Al-Jazari institute for smart industry. A convention for its creation was signed in Fès on 10 March 2026 by three ministries and the four universities of the Fès-Meknès region. Its stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
-      "status": "Founding convention signed 2026-03-10. Operational status not verified.",
+      "status": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0009"],
-      "evidence": ["MAI-EV-0009", "MAI-EV-0012"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0012", "MAI-EV-0047"]
     },
     {
       "id": "jazari-smart-city",
@@ -294,11 +294,11 @@
       "alt_names": [],
       "domain": "research-academia",
       "summary": "Named by the ministry in September 2026 as one of the components of the JAZARI Institutes network.",
-      "status": "Named only. No founding convention, nor any signing of one, is documented in the registry.",
+      "status": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0012"],
-      "evidence": ["MAI-EV-0012"]
+      "evidence": ["MAI-EV-0012", "MAI-EV-0047"]
     },
     {
       "id": "jazari-edutech",
@@ -307,11 +307,11 @@
       "alt_names": [],
       "domain": "research-academia",
       "summary": "Named by the ministry in September 2026 as one of the components of the JAZARI Institutes network.",
-      "status": "Named only. No founding convention, nor any signing of one, is documented in the registry.",
+      "status": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0012"],
-      "evidence": ["MAI-EV-0012"]
+      "evidence": ["MAI-EV-0012", "MAI-EV-0047"]
     },
     {
       "id": "jazari-institute-nador",
@@ -333,11 +333,11 @@
       "alt_names": [],
       "domain": "infrastructure-sovereignty",
       "summary": "Agreement signed at the July 2025 National AI Conference with the Ministry of Energy Transition and Sustainable Development, on sustainable, high-performing and sovereign digital infrastructure (green data centres).",
-      "status": "Agreement signed July 2025. No facility documented.",
+      "status": "Agreement signed July 2025. In April 2026 a follow-on convention launched strategic studies for a green data-centre programme in Dakhla (Igoudar); no facility is documented as built.",
       "project_kind": "agreement",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0006", "MAI-EV-0019"],
-      "evidence": ["MAI-EV-0006", "MAI-EV-0019"]
+      "evidence": ["MAI-EV-0006", "MAI-EV-0019", "MAI-EV-0045"]
     },
     {
       "id": "um6p-data-centre-partnership",
@@ -398,8 +398,8 @@
     {"id": "internet-of-things", "type": "technology", "name": "Internet of Things", "alt_names": [], "summary": "Networked sensors and devices.", "evidence": ["MAI-EV-0009"]},
     {"id": "robotics", "type": "technology", "name": "Advanced robotics", "alt_names": [], "summary": "Robotic systems for production and services.", "evidence": ["MAI-EV-0009"]},
     {"id": "industrial-data-analytics", "type": "technology", "name": "Industrial data analytics", "alt_names": [], "summary": "Analysis of industrial operational data, including for predictive maintenance.", "evidence": ["MAI-EV-0009"]},
-    {"id": "data-centres", "type": "technology", "name": "Data centres", "alt_names": [], "summary": "Facilities hosting compute and storage, a base layer for AI capacity and data sovereignty.", "evidence": ["MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0030"]},
-    {"id": "public-administration", "type": "sector", "name": "Public administration and e-government", "alt_names": [], "summary": "Digital public services and administrative procedures.", "evidence": ["MAI-EV-0002", "MAI-EV-0010", "MAI-EV-0013", "MAI-EV-0014", "MAI-EV-0034"]},
+    {"id": "data-centres", "type": "technology", "name": "Data centres", "alt_names": [], "summary": "Facilities hosting compute and storage, a base layer for AI capacity and data sovereignty.", "evidence": ["MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0030", "MAI-EV-0045"]},
+    {"id": "public-administration", "type": "sector", "name": "Public administration and e-government", "alt_names": [], "summary": "Digital public services and administrative procedures.", "evidence": ["MAI-EV-0002", "MAI-EV-0010", "MAI-EV-0013", "MAI-EV-0014", "MAI-EV-0034", "MAI-EV-0046"]},
     {"id": "digital-economy", "type": "sector", "name": "Digital economy", "alt_names": [], "summary": "Digital-sector jobs, firms and contribution to GDP.", "evidence": ["MAI-EV-0002"]},
     {"id": "industry", "type": "sector", "name": "Industry and manufacturing", "alt_names": [], "summary": "Industrial production, including Industry 4.0 transformation.", "evidence": ["MAI-EV-0009"]},
     {"id": "education-research", "type": "sector", "name": "Education, training and research", "alt_names": [], "summary": "AI skills training, higher education and applied research.", "evidence": ["MAI-EV-0005", "MAI-EV-0016"]},
@@ -474,7 +474,7 @@
       "note": "Origin is recorded from the press report's reference to the company's \"filiale marocaine\" (Moroccan subsidiary). The parent company's country of incorporation is not stated in the recorded source.",
       "origin": "foreign-moroccan-subsidiary-reported",
       "origin_evidence": ["MAI-EV-0030"],
-      "evidence": ["MAI-EV-0030"]
+      "evidence": ["MAI-EV-0030", "MAI-EV-0044"]
     },
     {
       "id": "toubkal-supercomputer",
@@ -482,7 +482,7 @@
       "name": "Toubkal supercomputer",
       "alt_names": ["Toubkal"],
       "domain": "infrastructure-sovereignty",
-      "summary": "High-performance computing system at the African Supercomputing Centre of Mohammed VI Polytechnic University, installed in 2020 and listed in the June 2026 TOP500 at rank 409, with 71,232 cores and a 3.16 PFlop/s Linpack result. It is general-purpose computing infrastructure with CPU and GPU partitions. Authors affiliated with its host university report that fine-tuning of large language models has been run on it; no specific AI application, its scale or its users are documented in this registry.",
+      "summary": "High-performance computing system at the African Supercomputing Centre of Mohammed VI Polytechnic University, installed in 2020 and listed in the June 2026 TOP500 at rank 409, with 71,232 cores and a 3.16 PFlop/s Linpack result. It is general-purpose computing infrastructure with CPU and GPU partitions. Authors affiliated with its host university report AI workloads run on it, including the training of a genomic language model; no independent documentation of its AI use, nor its scale or users, is recorded in this registry.",
       "status": "Operational compute infrastructure, as listed in the June 2026 TOP500 (benchmark result unchanged since June 2021). Current utilisation not documented.",
       "project_kind": "compute-infrastructure",
       "lifecycle": "operational",
@@ -493,9 +493,10 @@
         {"name": "Installation year", "value": "2020", "evidence": "MAI-EV-0020"},
         {"name": "TOP500 rank, June 2026", "value": "409", "evidence": "MAI-EV-0020"},
         {"name": "GPU partitions", "value": "NVIDIA A100 (2022) and H100 (added 2025)", "evidence": "MAI-EV-0041"},
-        {"name": "Reported AI workloads (operator-affiliated authors)", "value": "Fine-tuning runs that produced the GemMaroc Moroccan Darija language models (Belkasmi et al.), presented as a benchmark", "evidence": "MAI-EV-0041"}
+        {"name": "Reported AI workloads (operator-affiliated authors)", "value": "Fine-tuning runs that produced the GemMaroc Moroccan Darija language models (preprint by Skiredj et al.), presented as a benchmark by the system's authors; the preprint itself does not say where the runs were made", "evidence": "MAI-EV-0041"},
+        {"name": "AI training run reported by its researchers (operator-affiliated)", "value": "A bacterial genomic language model trained on two NVIDIA A100 GPUs for 37 hours (Akotenou and El Allali, 2025)", "evidence": "MAI-EV-0043"}
       ],
-      "evidence": ["MAI-EV-0020", "MAI-EV-0041"]
+      "evidence": ["MAI-EV-0020", "MAI-EV-0041", "MAI-EV-0042", "MAI-EV-0043"]
     },
     {
       "id": "nexus-ai-factory",
@@ -503,12 +504,12 @@
       "name": "Nexus AI Factory",
       "alt_names": ["Nexus AI Factory Platform"],
       "domain": "infrastructure-sovereignty",
-      "summary": "Planned AI and high-performance computing platform covered by a memorandum signed at GITEX Africa 2026, with a first phase at Nouaceur (MAD 5 billion, 16 MW initial capacity) according to press reports.",
-      "status": "Announced (memorandum, April 2026). Nothing built according to the recorded sources.",
+      "summary": "Planned AI and high-performance computing platform covered by a memorandum of understanding signed at GITEX Africa 2026 by Nexus Core Systems, the Ministry of Digital Transition, the investment ministry and AMDIE, according to the ministry. The ministry states a first phase at Nouaceur (MAD 5 billion, 16 MW) as a commitment.",
+      "status": "Announced (memorandum signed April 2026). No construction, commissioning or operation is documented in the recorded sources.",
       "project_kind": "compute-infrastructure",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0030"],
-      "evidence": ["MAI-EV-0030"]
+      "evidence": ["MAI-EV-0030", "MAI-EV-0044"]
     },
     {
       "id": "deepecho-ultrasound-software",
@@ -599,7 +600,7 @@
       ],
       "evidence": ["MAI-EV-0025", "MAI-EV-0026"]
     },
-    {"id": "large-language-models", "type": "technology", "name": "Large language models", "alt_names": [], "summary": "Generative language models trained on large text corpora.", "evidence": ["MAI-EV-0021", "MAI-EV-0022", "MAI-EV-0025"]},
+    {"id": "large-language-models", "type": "technology", "name": "Large language models", "alt_names": [], "summary": "Generative language models trained on large text corpora.", "evidence": ["MAI-EV-0021", "MAI-EV-0022", "MAI-EV-0025", "MAI-EV-0042"]},
     {"id": "natural-language-processing", "type": "technology", "name": "Natural language processing", "alt_names": [], "summary": "Computational processing and understanding of human language.", "evidence": ["MAI-EV-0024"]},
     {"id": "high-performance-computing", "type": "technology", "name": "High-performance computing", "alt_names": [], "summary": "Supercomputing and large-scale compute infrastructure.", "evidence": ["MAI-EV-0020", "MAI-EV-0030"]},
     {"id": "medical-imaging-ai", "type": "technology", "name": "AI-assisted medical imaging", "alt_names": [], "summary": "Machine learning applied to the interpretation of medical images and video.", "evidence": ["MAI-EV-0029"]},
@@ -673,20 +674,20 @@
     {"subject": "morocco-ai-2030", "predicate": "implemented_through", "object": "jazari-network", "evidence": ["MAI-EV-0012"], "classification": "VERIFIED FACT", "note": "The ministry's description of how the roadmap is to be implemented; implementation through the network is not documented."},
     {"subject": "jazari-network", "predicate": "includes", "object": "jazari-root", "evidence": ["MAI-EV-0010", "MAI-EV-0012"], "classification": "VERIFIED FACT"},
     {"subject": "jazari-network", "predicate": "includes", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0012"], "classification": "VERIFIED FACT"},
-    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-smart-city", "evidence": ["MAI-EV-0012"], "classification": "ANNOUNCED PLAN", "note": "Named as a component by the ministry; no founding convention, nor any signing of one, is documented."},
-    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-edutech", "evidence": ["MAI-EV-0012"], "classification": "ANNOUNCED PLAN", "note": "Named as a component by the ministry; no founding convention, nor any signing of one, is documented."},
+    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-smart-city", "evidence": ["MAI-EV-0012"], "classification": "ANNOUNCED PLAN", "note": "Named as a component by the ministry; its founding convention was approved in July 2026 (Bulletin Officiel 7534), but its operation is not documented."},
+    {"subject": "jazari-network", "predicate": "includes", "object": "jazari-edutech", "evidence": ["MAI-EV-0012"], "classification": "ANNOUNCED PLAN", "note": "Named as a component by the ministry; its founding convention was approved in July 2026 (Bulletin Officiel 7534), but its operation is not documented."},
     {"subject": "jazari-institute-nador", "predicate": "related_to", "object": "jazari-network", "evidence": ["MAI-EV-0005", "MAI-EV-0012"], "classification": "INDEPENDENT ANALYSIS", "note": "The Nador institute carries the Al Jazari name and predates the network announcement. The September 2026 list of network components does not mention it, so membership in the network is not established."},
-    {"subject": "cgem", "predicate": "signatory_of", "object": "jazari-root", "evidence": ["MAI-EV-0008"], "classification": "VERIFIED FACT"},
+    {"subject": "cgem", "predicate": "signatory_of", "object": "jazari-root", "evidence": ["MAI-EV-0008", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
     {"subject": "jazari-root", "predicate": "targets", "object": "public-administration", "evidence": ["MAI-EV-0010"], "classification": "ANNOUNCED PLAN"},
     {"subject": "jazari-root", "predicate": "targets", "object": "rural-development", "evidence": ["MAI-EV-0010"], "classification": "ANNOUNCED PLAN"},
     {"subject": "jazari-root", "predicate": "targets", "object": "sport", "evidence": ["MAI-EV-0010"], "classification": "ANNOUNCED PLAN"},
-    {"subject": "ministry-industry-commerce", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009"], "classification": "VERIFIED FACT"},
-    {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009"], "classification": "VERIFIED FACT"},
-    {"subject": "ministry-economy-finance", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009"], "classification": "VERIFIED FACT"},
-    {"subject": "uemf", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009"], "classification": "VERIFIED FACT"},
-    {"subject": "usmba", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009"], "classification": "VERIFIED FACT"},
-    {"subject": "umi", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009"], "classification": "VERIFIED FACT"},
-    {"subject": "al-akhawayn-university", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009"], "classification": "VERIFIED FACT"},
+    {"subject": "ministry-industry-commerce", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
+    {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
+    {"subject": "ministry-economy-finance", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
+    {"subject": "uemf", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
+    {"subject": "usmba", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
+    {"subject": "umi", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
+    {"subject": "al-akhawayn-university", "predicate": "signatory_of", "object": "jazari-industrie-x0", "evidence": ["MAI-EV-0009", "MAI-EV-0047"], "classification": "VERIFIED FACT"},
     {"subject": "jazari-industrie-x0", "predicate": "applies", "object": "artificial-intelligence", "evidence": ["MAI-EV-0009"], "classification": "ANNOUNCED PLAN"},
     {"subject": "jazari-industrie-x0", "predicate": "applies", "object": "internet-of-things", "evidence": ["MAI-EV-0009"], "classification": "ANNOUNCED PLAN"},
     {"subject": "jazari-industrie-x0", "predicate": "applies", "object": "robotics", "evidence": ["MAI-EV-0009"], "classification": "ANNOUNCED PLAN"},
@@ -713,8 +714,8 @@
     {"subject": "cndp", "predicate": "lists_in_framework", "object": "law-09-08", "evidence": ["MAI-EV-0017"], "classification": "VERIFIED FACT"},
     {"subject": "um6p", "predicate": "hosts", "object": "toubkal-supercomputer", "evidence": ["MAI-EV-0020"], "classification": "VERIFIED FACT"},
     {"subject": "toubkal-supercomputer", "predicate": "applies", "object": "high-performance-computing", "evidence": ["MAI-EV-0020"], "classification": "VERIFIED FACT"},
-    {"subject": "nexus-core-systems", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030"], "classification": "ANNOUNCED PLAN", "note": "Reported by secondary press; the ministry's release could not be retrieved."},
-    {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030"], "classification": "ANNOUNCED PLAN", "note": "Reported by secondary press; the ministry's release could not be retrieved."},
+    {"subject": "nexus-core-systems", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030", "MAI-EV-0044"], "classification": "VERIFIED FACT", "note": "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published."},
+    {"subject": "ministry-digital-transition", "predicate": "signatory_of", "object": "nexus-ai-factory", "evidence": ["MAI-EV-0030", "MAI-EV-0044"], "classification": "VERIFIED FACT", "note": "Signature stated by the ministry's own release (MAI-EV-0044); the memorandum's text is not published."},
     {"subject": "nexus-ai-factory", "predicate": "applies", "object": "high-performance-computing", "evidence": ["MAI-EV-0030"], "classification": "ANNOUNCED PLAN"},
     {"subject": "nexus-ai-factory", "predicate": "applies", "object": "data-centres", "evidence": ["MAI-EV-0030"], "classification": "ANNOUNCED PLAN"},
     {"subject": "aiox-labs", "predicate": "created", "object": "deepecho", "evidence": ["MAI-EV-0028", "MAI-EV-0027"], "classification": "VERIFIED FACT"},

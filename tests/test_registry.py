@@ -310,7 +310,7 @@ class ValidatorRejects(unittest.TestCase):
         self.ontology["relationships"].append({"subject": "ministry-health", "predicate": "operates",
                                                "object": "deepecho-ultrasound-software", "evidence": ["MAI-EV-0032"],
                                                "classification": "VERIFIED FACT"})
-        self.assertError("a regulatory_record cannot evidence 'operational'")
+        self.assertError("a regulatory record cannot evidence 'operational'")
         self.assertError("a verified operator must be documented by a record the operator published")
 
     def test_clearance_is_not_called_approval(self):

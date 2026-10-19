@@ -34,7 +34,8 @@ class SignedRelationships(unittest.TestCase):
 
     def test_every_signature_states_its_evidence_basis(self):
         signed = [r for r in self.rows if r["documented_as"] == "Signed"]
-        self.assertEqual(len(signed), 16)
+        self.assertEqual(len(signed), sum(1 for r in self.ontology["relationships"]
+                                          if r["predicate"] == "signatory_of" and r["classification"] == "VERIFIED FACT"))
         for r in signed:
             types = {e["evidence_type"] for e in r["evidence"]}
             self.assertNotIn("signed_instrument", types, r["id"])
@@ -44,12 +45,15 @@ class SignedRelationships(unittest.TestCase):
         signed = [r for r in self.rows if r["documented_as"] == "Signed"]
         ann = [r for r in signed if r["documentation_basis"] == "announcement-or-description"]
         other = [r for r in signed if r["documentation_basis"] == "includes-non-announcement-record"]
-        self.assertEqual((len(ann), len(other)), (10, 6))
+        self.assertEqual(len(ann) + len(other), len(signed))
         for r in ann:
             self.assertIn(build.GAP05_CAVEAT, r["qualifications"])
+            self.assertTrue(all(e["evidence_type"] in registry.ANNOUNCEMENT_TYPES for e in r["evidence"]), r["id"])
         for r in other:
             self.assertNotIn(build.GAP05_CAVEAT, r["qualifications"])
-            self.assertTrue(any(e["evidence_type"] == "official_report" for e in r["evidence"]), r["id"])
+            # An official report or a gazette text: a record of the signing, never the signed text.
+            self.assertTrue(any(e["evidence_type"] in ("official_report", "official_gazette") for e in r["evidence"]), r["id"])
+            self.assertIn(build.SIGNED_TEXT_NOT_RECORDED, r["qualifications"])
 
     @staticmethod
     def instrument_record(ev, signatories):
@@ -118,7 +122,8 @@ class SignedRelationships(unittest.TestCase):
             if "rows" in data:
                 self.assertEqual({r["documentation_basis"] for r in data["rows"]},
                                  {"announcement-or-description", "includes-non-announcement-record", "declaration-or-event"})
-        self.assertIn('For none of the 16 "Signed" rows is the signed text recorded', visible("registry/matrix/index.html"))
+        n = sum(1 for r in self.rows if r["documented_as"] == "Signed")
+        self.assertIn(f'For none of the {n} "Signed" rows is the signed text recorded', visible("registry/matrix/index.html"))
         gap05 = next(g for g in json.loads((REPO / "data" / "gaps.json").read_text(encoding="utf-8"))["gaps"] if g["id"] == "GAP-05")
         self.assertIn("not the signed text", gap05["unestablished"])
 
@@ -154,7 +159,8 @@ class Q8Scope(unittest.TestCase):
         for k, v in stages.items():
             self.assertIn(f"{v} {build.LIFECYCLE_LABELS[k].lower()}", self.text)
         self.assertIn("not itself an AI system", self.text)
-        self.assertIn("None of the 16 signatures is documented by its signed text", self.text)
+        n = sum(1 for r in rows if r["documented_as"] == "Signed")
+        self.assertIn(f"None of the {n} signatures is documented by its signed text", self.text)
 
 
 class TargetsAndProgress(unittest.TestCase):
@@ -174,7 +180,7 @@ class TargetsAndProgress(unittest.TestCase):
         g = next(g for g in self.gaps["gaps"] if g["id"] == "GAP-06")
         self.assertEqual(g["state"], "open")
         self.assertEqual(g["checks"], [])
-        self.assertEqual(sorted(g["assessed_records"]), ["MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018"])
+        self.assertLessEqual({"MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018"}, set(g["assessed_records"]))
         spending = next(x for x in g["established"] if x["evidence"] == ["MAI-EV-0003"])
         self.assertIn("has not checked these figures", spending["text"])
         self.assertIn("spending is an input, not a measure of the targets", spending["text"])
@@ -212,10 +218,10 @@ class BreakingChangeNotice(unittest.TestCase):
         self.assertIn("exits with status 1", bc[0]["consumer_effect"])
         page = visible("data/index.html")
         note = page[page.index("09 Changes to the data contract"):page.index("10 Corrections")]
-        for x in ("includes-formal-record", "includes-non-announcement-record", "not accepted as aliases", "In v0.5.0 it applies to 14 rows"):
+        for x in ("includes-formal-record", "includes-non-announcement-record", "not accepted as aliases", "only the name changed"):
             self.assertIn(x, note)
-        log = json.loads((REPO / "data" / "changelog.json").read_text(encoding="utf-8"))["entries"][0]
-        self.assertEqual(log["version"], "0.5.0")
+        log = next(e for e in json.loads((REPO / "data" / "changelog.json").read_text(encoding="utf-8"))["entries"]
+                   if e["version"] == "0.5.0")
         self.assertTrue(any("includes-formal-record" in x and "No alias" in x for x in log["breaking_changes"]))
         self.assertIn("Breaking changes to the data contract", visible("methodology/index.html"))
         # No alias: no published JSON value and no consumer path accepts the old name.
@@ -265,7 +271,7 @@ class ConsumerCompatibility(unittest.TestCase):
     def test_consumer_verifies_the_new_version(self):
         code, out, err = self.run_consumer(REPO, "verify")
         self.assertEqual(code, 0, err)
-        self.assertIn("registry 0.5.0", out)
+        self.assertIn(f"registry {registry.load_all()[0]['version']}", out)
         self.assertIn("6 gaps", out)
 
     def test_consumer_takes_basis_names_from_the_data(self):
@@ -299,6 +305,102 @@ class ConsumerCompatibility(unittest.TestCase):
         manifest = json.loads((REPO / "data" / "manifest.json").read_text(encoding="utf-8"))
         self.assertIn("signed_instrument", manifest["vocabularies"]["evidence_type"])
         self.assertFalse(any(r["evidence_type"] == "signed_instrument" for r in registry.load_all()[0]["records"]))
+
+
+class EvidenceAcquisition(unittest.TestCase):
+    """Sprint 07: what the gazette, the ministry releases, the preprints and the UN entry may and may not establish."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.evidence, cls.ontology = registry.load_all()
+        cls.records = {r["evidence_id"]: r for r in cls.evidence["records"]}
+        cls.gaps = json.loads((REPO / "data" / "gaps.json").read_text(encoding="utf-8"))
+
+    def errors(self, mutate):
+        ev, on = copy.deepcopy(self.evidence), copy.deepcopy(self.ontology)
+        mutate(ev, on)
+        return registry.validate(ev, on)
+
+    def test_a_gazette_cannot_set_a_stage_or_show_use(self):
+        def stage(ev, on):
+            r = next(r for r in ev["records"] if r["evidence_id"] == "MAI-EV-0047")
+            r.update(status_evidence="operational", status_basis="operator-reported-use", source_entity="cgem")
+        errs = self.errors(stage)
+        self.assertTrue(any("an official gazette cannot evidence a lifecycle status" in e for e in errs), errs)
+        self.assertTrue(any("official gazette cannot evidence 'operational'" in e for e in errs), errs)
+
+    def test_a_gazette_cannot_document_an_operator(self):
+        def operates(ev, on):
+            on["relationships"].append({"subject": "cgem", "predicate": "operates", "object": "jazari-root",
+                                        "evidence": ["MAI-EV-0047"], "classification": "VERIFIED FACT"})
+        self.assertTrue(any("a verified operator must be documented" in e for e in self.errors(operates)))
+
+    def test_gazette_is_not_a_signed_instrument_and_stages_stay_announced(self):
+        r = self.records["MAI-EV-0047"]
+        self.assertEqual(r["evidence_type"], "official_gazette")
+        self.assertNotIn("status_evidence", r)
+        self.assertIn("not the signed text", r["verification_note"])
+        for e in self.ontology["entities"]:
+            if e["id"].startswith("jazari-") and e.get("lifecycle"):
+                self.assertEqual(e["lifecycle"], "announced", e["id"])
+
+    def test_gazette_moves_the_jazari_signatures_out_of_gap_05(self):
+        cited = [r for r in self.ontology["relationships"] if "MAI-EV-0047" in r["evidence"]]
+        self.assertEqual(len(cited), 8)
+        self.assertTrue(all(r["predicate"] == "signatory_of" and r["classification"] == "VERIFIED FACT" for r in cited))
+        key = lambda r: (r["subject"], r["predicate"], r["object"])
+        listed = {key(r) for r in registry.announcement_only(self.ontology, self.evidence)}
+        self.assertFalse(listed & {key(r) for r in cited})
+        n, m = len(listed), len(registry.formal_act_relationships(self.ontology))
+        self.assertIn(f"{n} of the {m} relationships that assert a formal act", visible("registry/gaps/index.html"))
+
+    def test_nexus_signatures_rest_on_the_ministry_release_without_construction(self):
+        for s in ("nexus-core-systems", "ministry-digital-transition"):
+            r = next(r for r in self.ontology["relationships"]
+                     if (r["subject"], r["predicate"], r["object"]) == (s, "signatory_of", "nexus-ai-factory"))
+            self.assertEqual(r["classification"], "VERIFIED FACT")
+            self.assertIn("MAI-EV-0044", r["evidence"])
+            self.assertIn("not published", r["note"])
+        nexus = next(e for e in self.ontology["entities"] if e["id"] == "nexus-ai-factory")
+        self.assertEqual(nexus["lifecycle"], "announced")
+        for t in (nexus["summary"], nexus.get("status", ""), self.records["MAI-EV-0045"]["verification_note"]):
+            self.assertNotRegex(t, r"(?i)\b(under construction|construction (has )?(started|began|begun)|is operational)\b")
+
+    def test_no_registry_text_attributes_gemmaroc_to_belkasmi(self):
+        texts = [self.records["MAI-EV-0041"]["claim"]]
+        texts += [a.get("value", "") + " " + a.get("name", "") for e in self.ontology["entities"] for a in e.get("attributes", [])]
+        texts += [e.get(k, "") for e in self.ontology["entities"] for k in ("summary", "status", "note")]
+        for t in texts:
+            if "Belkasmi" in t:
+                self.assertIn("attributes to", t)
+        self.assertIn("Skiredj", self.records["MAI-EV-0041"]["claim"])
+
+    def test_preprint_does_not_place_the_runs_on_toubkal(self):
+        note = self.records["MAI-EV-0042"]["verification_note"]
+        self.assertIn("not peer-reviewed", note)
+        self.assertRegex(note, r"neither confirms nor rules out")
+        self.assertEqual(self.records["MAI-EV-0042"]["classification"], "VERIFIED FACT")
+        self.assertNotIn("status_evidence", self.records["MAI-EV-0042"])
+
+    def test_un_entry_is_a_starting_position_not_progress(self):
+        r = self.records["MAI-EV-0046"]
+        self.assertIn("position at the start of the strategy, not progress", r["verification_note"])
+        g = next(g for g in self.gaps["gaps"] if g["id"] == "GAP-06")
+        self.assertIn("MAI-EV-0046", g["assessed_records"])
+        self.assertNotRegex(" ".join(x.get("statement", "") if isinstance(x, dict) else x for x in g["established"]),
+                            r"(?i)\b(progress|improved|achieved|on track)\b")
+
+    def test_arabic_excerpts_are_marked_right_to_left(self):
+        page = (REPO / "registry" / "evidence" / "index.html").read_text(encoding="utf-8")
+        quotes = re.findall(r'<blockquote class="evidence-quote"[^>]*>', page)
+        arabic = [q for q in quotes if 'lang="ar"' in q]
+        self.assertEqual(len(arabic), sum(1 for r in self.evidence["records"] if r["source_language"] == "ar"))
+        self.assertTrue(all('dir="rtl"' in q for q in arabic))
+        self.assertFalse(any('dir="rtl"' in q for q in quotes if 'lang="ar"' not in q))
+
+    def test_no_gap_closed_by_this_sprint(self):
+        self.assertEqual({g["state"] for g in self.gaps["gaps"]}, {"open"})
+        self.assertFalse(any(r["evidence_type"] == "signed_instrument" for r in self.evidence["records"]))
 
 
 if __name__ == "__main__":

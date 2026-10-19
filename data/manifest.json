@@ -67,49 +67,49 @@
  "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
  "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
  "registry": "TheMoroccoAI Evidence Registry",
- "registry_version": "0.5.0",
+ "registry_version": "0.6.0",
  "resources": [
   {
-   "bytes": 74856,
+   "bytes": 91672,
    "path": "/data/evidence.json",
    "purpose": "Evidence records: source URL and organisation, publication and retrieval dates, verbatim excerpts, classification, verification status and note. Defines the classifications and verification statuses it uses.",
    "role": "canonical",
-   "sha256": "29b7aa1744e0ece3ce8622d40703e1e453ca0a5490694c5bd5d386814791dcd1"
+   "sha256": "26a3b5694415ce11b1e3fa2b6a155eb8da2aa05028ea7de7a39ddf387b51ac55"
   },
   {
-   "bytes": 59975,
+   "bytes": 61760,
    "path": "/data/ontology.json",
    "purpose": "Entity types, lifecycle stages, project kinds, origins, domains and predicates (each defined), then entities and typed relationships, each citing records in evidence.json.",
    "role": "canonical",
-   "sha256": "c710587de31f40ef51ab307d2076a8751f8edae972d5bf32b37876f1e39ebd7c"
+   "sha256": "39faba0b8e70e303b2ef644da4ef0e8a509fe87e3a591ff9c858d45d623f04a2"
   },
   {
-   "bytes": 11110,
+   "bytes": 12981,
    "path": "/data/gaps.json",
    "purpose": "Evidence gaps: what is established (with records), what is not, what would resolve each, the records and data digest each assessment rests on, and the data checks re-run on every build.",
    "role": "canonical",
-   "sha256": "af50ef2716796b60d8be6626c56407e421bd2611a62d5a67b8b9509dd28f11fe"
+   "sha256": "fe9196a140ed04f4d80084122bac4d06c16a64a8fd1fd907695ea01c238173a1"
   },
   {
-   "bytes": 10759,
+   "bytes": 13290,
    "path": "/data/changelog.json",
    "purpose": "Published registry versions, corrections, and the commit or pull request behind each.",
    "role": "canonical",
-   "sha256": "a64d126816de26f752f5dfb52d4a73a1f170f934c63d32c3e8a252f26f70ab08"
+   "sha256": "50072309d6910d6d0ee68124f4c094d3929372486e77a493f927d02c0ab2316d"
   },
   {
-   "bytes": 59714,
+   "bytes": 63873,
    "path": "/registry/matrix/matrix.json",
    "purpose": "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row.",
    "role": "derived",
-   "sha256": "7e4f18da4285d555b879aaa63299ffa011c0819131ed9bcb30dbc82a7c2150b2"
+   "sha256": "3e8434781502478135a3d6e5fa54387430c9899332c1f272308bc9ad1b63689e"
   },
   {
-   "bytes": 19811,
+   "bytes": 18957,
    "path": "/registry/gaps/gaps.json",
    "purpose": "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json.",
    "role": "derived",
-   "sha256": "c1201853467a569bf56511dd01610d9cdcd5f79172b17df950a59a071aee175c"
+   "sha256": "dedb78c59c9ef8af608294b4a7c26a817a90e76b95093c9a9ad422e0a47b64fe"
   }
  ],
  "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
@@ -133,6 +133,7 @@
    "regulatory_record",
    "live_service_observation",
    "procurement_notice",
+   "official_gazette",
    "signed_instrument"
   ],
   "note": "Values the validator accepts in evidence.json, with display labels where the site uses them. Other defined values are defined in the file that uses them.",
