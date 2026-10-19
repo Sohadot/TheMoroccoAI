@@ -16,10 +16,10 @@
     "sector": "An economic or public-policy sector a source names as targeted."
   },
   "lifecycle_stages": {
-    "announced": "Announced, presented, or covered by a signed agreement or memorandum; no evidence of delivery.",
+    "announced": "Announced, presented, or covered by a signed agreement or memorandum; delivery is not documented in this registry.",
     "in-development": "Being built or validated, as stated by its developer or an official source.",
     "pilot": "Running as a documented pilot or trial.",
-    "operational": "Documented as running in production by a source independent of announcements.",
+    "operational": "Documented as running in production by a record that is not an announcement: an observation of the operator's live service, an operator's report of use, or an independent source. The status record's status_basis says which; public availability is not evidence of use.",
     "released": "A model or dataset that is publicly downloadable from its stated repository.",
     "discontinued": "Documented as stopped or withdrawn.",
     "unresolved": "The recorded evidence conflicts or is insufficient to establish a stage; the entity's note says why."

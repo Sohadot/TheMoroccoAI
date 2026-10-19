@@ -24,16 +24,16 @@
     "verification_status",
     "related_entities"
    ],
-   "rule": "The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). The value has three keys. records: for each record whose related_entities include one of the gap's entities, [evidence_id] followed by the record's record_fields (null when absent), sorted by evidence_id. entities: for each of the gap's entities, [id] followed by its entity_fields (null when absent), sorted by id. relationships: for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, classification, evidence, note] (note null when absent), the list sorted. A gap without entities has no digest."
+   "rule": "The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). The value is an object with three keys, each holding a list of JSON arrays (not objects). records: for each record whose related_entities (not associated_entities) include one of the gap's entities, superseded records included, the array [evidence_id] followed by the values of record_fields in that order (null when absent), sorted by evidence_id. entities: for each of the gap's entities, [id] followed by the values of entity_fields (null when absent), sorted by id. relationships: for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, classification, evidence, note] with evidence in its ontology.json order and note null when absent, the arrays sorted by subject, then predicate, then object (unique, so later elements are never compared). Field values are copied as they are in the files, lists unsorted. A gap without entities has no digest."
   },
   "checks": {
    "computed_relationships": "Triggered when the computed list is empty.",
-   "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages.",
-   "no_ai_application_link": "Triggered when a relationship links the entity to an entity whose project_kind is ai-application.",
+   "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages; an entity without a lifecycle counts as not in them.",
+   "no_ai_application_link": "Triggered when any relationship, of any type and in either direction, joins the entity to an entity whose project_kind is ai-application.",
    "no_status_basis": "Triggered when a record in the entity's lifecycle_evidence has a status_basis listed in the check's bases.",
-   "rule": "The checks and digests are in /data/gaps.json. An open gap whose check is triggered, whose digest no longer matches, or that a record about its entities postdates (a record not in assessed_records) must be re-assessed: the build refuses to publish it."
+   "rule": "The checks and digests are in /data/gaps.json. A check holds when it is not triggered. An open gap must be re-assessed, and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."
   },
-  "computed_relationships": "A gap with a computed_relationships check lists the relationships whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis)."
+  "computed_relationships": "A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), in the matrix's row order. Its count is stated as N of M, where M is the number of matrix rows whose relationship type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these are all such relationships in ontology.json. The list measures documentation, not truth, and may include relationships already classified as announced plans."
  },
  "derived_from": [
   "/data/gaps.json",

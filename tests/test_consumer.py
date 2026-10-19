@@ -267,6 +267,14 @@ class DefectsAreDetected(unittest.TestCase):
         self.copy.edit("/data/ontology.json", lambda d: next(e for e in d["entities"] if e.get("lifecycle")).update(lifecycle="paused"))
         self.assertRejected("lifecycle stage 'paused' is not defined")
 
+    def test_unknown_evidence_type_or_basis(self):
+        self.copy.edit("/data/evidence.json", lambda d: d["records"][0].update(evidence_type="rumour"))
+        self.assertRejected("evidence type 'rumour' is not defined")
+
+    def test_unknown_status_basis(self):
+        self.copy.edit("/data/evidence.json", lambda d: next(r for r in d["records"] if r.get("status_basis")).update(status_basis="vibes"))
+        self.assertRejected("status basis 'vibes' is not defined")
+
     def test_unknown_classification(self):
         self.copy.edit("/data/evidence.json", lambda d: d["records"][0].update(classification="PROBABLE FACT"))
         self.assertRejected("classification 'PROBABLE FACT' is not defined")
@@ -338,7 +346,7 @@ class DefectsAreDetected(unittest.TestCase):
             for r in d["records"]:
                 if r["evidence_type"] in ("news_dispatch", "press_release", "official_announcement", "official_statement",
                                           "organization_page", "case_study", "press_article"):
-                    r["evidence_type"] = "signed_agreement"
+                    r["evidence_type"] = "official_report"
         self.copy.edit("/data/evidence.json", formal)
         self.assertRejected("GAP-05: open, but the data no longer satisfies: at least one relationship documented only by announcements")
 
@@ -463,6 +471,21 @@ class DataReference(unittest.TestCase):
         self.assertEqual(set(gaps["derivation"]["checks"]) - {"rule"},
                          {"no_status_basis", "lifecycle_in", "no_ai_application_link", "computed_relationships"})
         self.assertEqual(set(gaps["states"]), set(registry.GAP_STATES))
+
+    def test_published_rules_cover_every_derived_field(self):
+        # The clean-room review found these undocumented; each now has a published rule.
+        d = json.loads((REPO / "registry" / "matrix" / "matrix.json").read_text(encoding="utf-8"))["derivation"]
+        for key in ("row_order", "qualifications", "relationship_label", "object.status_as_recorded", "evidence"):
+            self.assertIn(key, d)
+        texts = [q["text"] for q in d["qualifications"]["rules"][1:]]
+        for row in json.loads((REPO / "registry" / "matrix" / "matrix.json").read_text(encoding="utf-8"))["rows"]:
+            for q in row["qualifications"]:
+                self.assertTrue(q in texts or q == next(r.get("note") for r in self.ontology["relationships"]
+                                                       if "|".join((r["subject"], r["predicate"], r["object"])) == row["id"]), q)
+        v = self.manifest["vocabularies"]
+        self.assertEqual(set(v["source_type"]), set(registry.SOURCE_TYPES))
+        self.assertEqual(v["evidence_type"], list(registry.EVIDENCE_TYPES))
+        self.assertEqual(set(v["status_basis"]), set(registry.STATUS_BASES))
 
     def test_generator_uses_the_published_rules(self):
         # documented_as is computed from the same tables matrix.json publishes.

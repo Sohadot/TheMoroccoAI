@@ -734,6 +734,15 @@ DOCUMENTED_AS = {"ANNOUNCED PLAN": "Announced or planned", "OFFICIAL TARGET": "T
                  "INDEPENDENT ANALYSIS": "Registry inference", "UNVERIFIED CLAIM": "Unverified claim"}
 DOCUMENTED_AS_VERIFIED = {"signatory_of": "Signed", "operates": "Operated", "develops": "Developed"}
 DOCUMENTED_AS_VERIFIED_OTHERWISE = "Documented"
+SIGNED_NOT_DELIVERED = "A signature is recorded as a signature; delivery is not documented."
+PLAN_NOT_DELIVERED = "Not verified as delivered."
+GAP05_CAVEAT = "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05)."
+QUALIFICATION_RULES = [
+    {"when": "The relationship has a note in ontology.json", "text": "the note"},
+    {"when": "documented_as is Signed and object.lifecycle is announced", "text": SIGNED_NOT_DELIVERED},
+    {"when": "documented_as is Announced or planned", "text": PLAN_NOT_DELIVERED},
+    {"when": "documentation_basis is announcement-or-description", "text": GAP05_CAVEAT},
+]
 DOCUMENTATION_BASIS = {
     "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
     "includes-formal-record": "A formal-act relationship that cites at least one record of another type.",
@@ -756,6 +765,7 @@ def matrix_derivation():
         "row_selection": {"subject_types": list(registry.MATRIX_SUBJECT_TYPES), "object_types": list(registry.MATRIX_OBJECT_TYPES),
                           "rule": "Every relationship in ontology.json whose subject has one of subject_types and whose object has one of object_types."},
         "row_id": "subject|relationship|object, joined with '|'. A relationship is identified by this triple, which is unique in ontology.json.",
+        "row_order": "Rows are sorted by the tuple (subject, relationship, object), compared element by element as strings; not by row_id, so 'um6p|…' sorts before 'um6p-ventures|…'. Each row's evidence keeps the order of the relationship's evidence list in ontology.json.",
         "documented_as": {"by_classification": DOCUMENTED_AS,
                           "verified_fact_by_relationship": DOCUMENTED_AS_VERIFIED,
                           "verified_fact_otherwise": DOCUMENTED_AS_VERIFIED_OTHERWISE,
@@ -763,10 +773,18 @@ def matrix_derivation():
         "documentation_basis": {"formal_act_relationships": list(registry.FORMAL_ACT_PREDICATES),
                                 "announcement_evidence_types": list(registry.ANNOUNCEMENT_TYPES),
                                 "values": DOCUMENTATION_BASIS,
-                                "rule": "Describes how a relationship is documented in this registry, not whether it is true."},
+                                "rule": ("For a relationship whose type is in formal_act_relationships: announcement-or-description when every record it "
+                                         "cites has an evidence_type in announcement_evidence_types, otherwise includes-formal-record. For any other "
+                                         "relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. "
+                                         "documented_as and documentation_basis are independent: a row can read Signed while resting only on an announcement.")},
         "object.lifecycle": "The related entity's lifecycle key from ontology.json (defined in its lifecycle_stages); null for entity types without a lifecycle.",
         "object.stage": "A display label for object.lifecycle that also states the basis of an operational or pilot stage. Use object.lifecycle for machine processing.",
-        "qualifications": "Explanatory sentences for readers: the relationship's note in ontology.json, then fixed caveats added by rule. Not a controlled vocabulary.",
+        "qualifications": {"rule": "Explanatory sentences for readers, in this order, each added when its condition holds. Not a controlled vocabulary.",
+                           "rules": QUALIFICATION_RULES},
+        "relationship_label": "The predicate's label in ontology.json (predicates.<relationship>.label).",
+        "subject.name, object.name, object.type": "Copied from the entity in ontology.json.",
+        "object.status_as_recorded": "The related entity's free-text status field in ontology.json; null when absent.",
+        "evidence": "For each record the relationship cites: its id, source_url, source_type, evidence_type, publication_date and retrieval_date, copied from evidence.json.",
     }
 
 
@@ -786,11 +804,11 @@ def matrix_rows(model):
         if rel.get("note"):
             quals.append(rel["note"])
         if level == "Signed" and obj.get("lifecycle") == "announced":
-            quals.append("A signature is recorded as a signature; delivery is not documented.")
+            quals.append(SIGNED_NOT_DELIVERED)
         if level == "Announced or planned":
-            quals.append("Not verified as delivered.")
+            quals.append(PLAN_NOT_DELIVERED)
         if key in announcement_only:
-            quals.append("Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05).")
+            quals.append(GAP05_CAVEAT)
         rows.append({
             "id": "|".join(key),
             "subject": {"id": subj["id"], "name": subj["name"], "type": subj["type"]},
@@ -904,24 +922,34 @@ def gap_register(model, gaps):
 def gap_derivation():
     """How the gap register is checked against the data, published so that a consumer can repeat the checks."""
     return {
-        "computed_relationships": "A gap with a computed_relationships check lists the relationships whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis).",
+        "computed_relationships": ("A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis "
+                                   "is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), "
+                                   "in the matrix's row order. Its count is stated as N of M, where M is the number of matrix rows whose relationship "
+                                   "type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these "
+                                   "are all such relationships in ontology.json. The list measures documentation, not truth, and may include "
+                                   "relationships already classified as announced plans."),
         "checks": {
             "no_status_basis": "Triggered when a record in the entity's lifecycle_evidence has a status_basis listed in the check's bases.",
-            "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages.",
-            "no_ai_application_link": "Triggered when a relationship links the entity to an entity whose project_kind is ai-application.",
+            "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages; an entity without a lifecycle counts as not in them.",
+            "no_ai_application_link": "Triggered when any relationship, of any type and in either direction, joins the entity to an entity whose project_kind is ai-application.",
             "computed_relationships": "Triggered when the computed list is empty.",
-            "rule": "The checks and digests are in /data/gaps.json. An open gap whose check is triggered, whose digest no longer matches, or that a record about its entities postdates (a record not in assessed_records) must be re-assessed: the build refuses to publish it.",
+            "rule": ("The checks and digests are in /data/gaps.json. A check holds when it is not triggered. An open gap must be re-assessed, "
+                     "and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record "
+                     "whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."),
         },
         "assessed_fingerprint": {
             "record_fields": list(registry.GAP_RECORD_FIELDS),
             "entity_fields": list(registry.GAP_ENTITY_FIELDS),
             "rule": ("The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters "
                      "unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). "
-                     "The value has three keys. records: for each record whose related_entities include one of the gap's entities, "
-                     "[evidence_id] followed by the record's record_fields (null when absent), sorted by evidence_id. entities: for "
-                     "each of the gap's entities, [id] followed by its entity_fields (null when absent), sorted by id. relationships: "
-                     "for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, "
-                     "classification, evidence, note] (note null when absent), the list sorted. A gap without entities has no digest."),
+                     "The value is an object with three keys, each holding a list of JSON arrays (not objects). records: for each "
+                     "record whose related_entities (not associated_entities) include one of the gap's entities, superseded records "
+                     "included, the array [evidence_id] followed by the values of record_fields in that order (null when absent), "
+                     "sorted by evidence_id. entities: for each of the gap's entities, [id] followed by the values of entity_fields "
+                     "(null when absent), sorted by id. relationships: for each relationship whose subject or object is one of the gap's "
+                     "entities, [subject, predicate, object, classification, evidence, note] with evidence in its ontology.json order and "
+                     "note null when absent, the arrays sorted by subject, then predicate, then object (unique, so later elements are "
+                     "never compared). Field values are copied as they are in the files, lists unsorted. A gap without entities has no digest."),
         },
     }
 
@@ -1015,6 +1043,12 @@ def manifest(model, files):
         "registry": model.evidence["registry"], "registry_version": model.evidence["version"], "as_of": model.as_of,
         "publisher": model.evidence["publisher"], "site": SITE, "documentation": "/data/",
         "consumer_example": "/" + CONSUMER,
+        "vocabularies": {
+            "note": "Values the validator accepts in evidence.json, with display labels where the site uses them. Other defined values are defined in the file that uses them.",
+            "source_type": {k: SOURCE_TYPE_LABELS[k] for k in registry.SOURCE_TYPES},
+            "evidence_type": list(registry.EVIDENCE_TYPES),
+            "status_basis": {k: STATUS_BASIS_LABELS[k] for k in registry.STATUS_BASES},
+        },
         "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
         "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
         "resources": resources,
@@ -1025,18 +1059,18 @@ def render_data_reference(model, gaps, man):
     ver, repo = model.evidence["version"], "https://github.com/Sohadot/TheMoroccoAI"
     res_rows = [[f'<a href="{r["path"]}"><code>{escape(r["path"])}</code></a>', escape(r["role"]), escape(r["purpose"])] for r in man["resources"]]
     q8_rows = [
-        ["Which organisations (institutions and companies) are connected to which projects, through which relationships", "Reproducible", "Selection of matrix rows by subject and object type"],
+        ["Which organisations are connected to which projects, through which relationships", "Reproducible", "Matrix rows whose subject has type institution or company and whose object has type project, of any project kind (institutes, agreements, digital platforms, compute infrastructure and AI applications). Models, datasets and initiatives are not included. Organisations are listed by name, ignoring case"],
         ["How each connection is documented (signed, developed, announced or planned, and so on)", "Reproducible", "The published documented_as rule, from the relationship's classification"],
-        ["How many connections rest only on announcements, news reports or descriptions", "Reproducible", "The published documentation_basis rule, from the cited records' evidence types"],
+        ["How many connections rest only on announcements, news reports or descriptions", "Reproducible", "Rows whose documentation_basis is announcement-or-description, under the published rule"],
         ["The counts in the summary sentence", "Reproducible", "Counting the rows above"],
         ["Each relationship's classification, and the records it cites", "Recorded, not derivable", "An editorial judgment, made under the evidence rules and recorded in ontology.json"],
         ["Each project's lifecycle stage and its basis", "Recorded, not derivable", "An editorial admission of a record that declares the stage, checked by the validator"],
         ["The caveats (a signature is not delivery; these are the connections recorded here)", "Fixed wording", "Part of the answer's text, not computed"],
     ]
     q9_rows = [
-        ["Which official targets are recorded, as their sources state them, and for which strategy", "Reproducible", "Records classified OFFICIAL TARGET and the initiatives among their related entities"],
+        ["Which official targets are recorded, as their sources state them, and for which strategy", "Reproducible", "Each record classified OFFICIAL TARGET (by evidence_id), its claim, and each entity of type initiative among its related_entities. The targets relationships from strategies to sectors are not used"],
         ["Which projects each strategy is recorded as including, and their stages", "Reproducible", "includes relationships from the strategy to entities with a lifecycle"],
-        ["Which gap covers the strategy, and whether it is open", "Reproducible", "gaps.json: the gap whose entities include the strategy, and its state"],
+        ["Which gap covers the strategy, and whether it is open", "Reproducible", "data/gaps.json: the first gap, in file order, whose entities include the strategy, and its state"],
         ["That no recorded evidence measures progress towards the Morocco AI 2030 targets", "Editorial assessment", "GAP-02 is open because an editor judged that its assessed records, including the ministry's presentation of main advances (MAI-EV-0040), quantify no progress. No data check backs this judgment; a consumer can confirm that the data it rests on has not changed since (its digest) but cannot re-derive the judgment"],
         ["That a strategy without a gap has not been assessed", "Reproducible", "No gap's entities include it"],
     ]
@@ -1083,6 +1117,7 @@ def render_data_reference(model, gaps, man):
     <li>In matrix.json, <code>object.lifecycle</code> and <code>object.stage</code> are null for entity types without a stage.</li>
     <li>An empty list means none is recorded here, not that none exists.</li>
     <li>A defined value (classification, stage, predicate, gap state) that is not defined in its file is an error. A consumer should stop rather than guess its meaning; the example below does.</li>
+    <li>The values accepted for <code>source_type</code>, <code>evidence_type</code> and <code>status_basis</code> are listed in the manifest under <code>vocabularies</code>.</li>
     <li>Free-text fields (<code>status</code>, <code>note</code>, <code>summary</code>, <code>qualifications</code>) are for readers and are not a controlled vocabulary.</li>
   </ul>
 </section>
@@ -1091,6 +1126,7 @@ def render_data_reference(model, gaps, man):
   <ul class="prose">
     <li>evidence.json and ontology.json carry the same <code>version</code> and <code>as_of</code> date, which the validator enforces; derived files carry them as <code>registry_version</code> and <code>as_of</code>. <code>as_of</code> is the date the registry's sources were last checked.</li>
     <li>The registry version changes, with a <a href="/methodology/#m6-h">changelog</a> entry, whenever the published reference data or its meaning changes: records, entities, relationships, gap assessments or the definitions they use. An editorial change that affects neither, such as a typo in a note, may be published without a new version. Every change is a commit in the <a href="{repo}" rel="noopener">public repository</a>.</li>
+    <li>data/gaps.json and data/changelog.json carry no version of their own: their place in a build is shown by the manifest only.</li>
     <li>Fetch the manifest first and compare each file's SHA-256. A mismatch means the file came from a different build, for example while a new version propagates through caches; fetch again later.</li>
     <li>The hashes are published by the same site as the files. They show that the files you fetched belong to one build and were not changed after it; they are not a signature, and they do not show who published the files or that their content is accurate. Accuracy rests on the cited sources, which each record links to.</li>
     <li>When the data a gap rests on changes, the build fails until the gap is re-assessed. Each gap in data/gaps.json stores the records it was assessed against and a digest of that data (<code>assessed_fingerprint</code>), which a consumer can recompute.</li>
@@ -1102,7 +1138,7 @@ def render_data_reference(model, gaps, man):
 </section>
 <section aria-labelledby="d7-h">
   <h2 id="d7-h"><span class="section-number">07</span>Which answers can be recomputed</h2>
-  <p class="prose">An answer is reproducible when it follows from the published data and published rules. Some parts rest on judgments that the data records but cannot derive; they are marked below. matrix.json publishes the rules for its derived fields under <code>derivation</code>.</p>
+  <p class="prose">An answer is reproducible when it follows from the published data and published rules. Some parts rest on judgments that the data records but cannot derive; they are marked below. matrix.json publishes the rules for its derived fields, row order and caveats under <code>derivation</code>; registry/gaps/gaps.json publishes the gap checks and the digest algorithm.</p>
   <h3 id="d7-q8">Q8: organisations and projects</h3>
   {_table("Q8: what can be recomputed", ["Part of the answer", "Status", "From"], q8_rows, "")}
   <h3 id="d7-q9">Q9: official targets and recorded progress</h3>

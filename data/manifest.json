@@ -15,11 +15,11 @@
    "sha256": "abc8debf066cd3ca953bb199e947ad463966027672ecd06e84a9fb4934e6f455"
   },
   {
-   "bytes": 59416,
+   "bytes": 59626,
    "path": "/data/ontology.json",
    "purpose": "Entity types, lifecycle stages, project kinds, origins, domains and predicates (each defined), then entities and typed relationships, each citing records in evidence.json.",
    "role": "canonical",
-   "sha256": "6ff57fde6c257cb52648ab94e5b84626f3993e62f2721bcbf45e8d05012f217a"
+   "sha256": "4376e5f2984fee910084fd52c2c3767066cb952fe1ebd097d243f4809d0df45d"
   },
   {
    "bytes": 8633,
@@ -29,27 +29,70 @@
    "sha256": "15b66386bd8df48aa6f952f56a2a8d274e0febd1183cd801a29903b880255614"
   },
   {
-   "bytes": 7003,
+   "bytes": 7700,
    "path": "/data/changelog.json",
    "purpose": "Published registry versions, corrections, and the commit or pull request behind each.",
    "role": "canonical",
-   "sha256": "b5bfe7c06109bb542cb3283f2910664d46b7e1ed14e6e9d1efaedcbf902f55ee"
+   "sha256": "bd1e18ba67393c5f795ca43fe5895f9a4af5284a02756e19760867fab799f437"
   },
   {
-   "bytes": 55233,
+   "bytes": 56942,
    "path": "/registry/matrix/matrix.json",
    "purpose": "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row.",
    "role": "derived",
-   "sha256": "5c5168ca0d2fc7c49778d2a907d00e8e37616b3139d2b49783bb4cb4c8bc5c64"
+   "sha256": "f75a875dafff2b6f08478e2be1b2a992287d0492ed61d76f250299172cd67e34"
   },
   {
-   "bytes": 16020,
+   "bytes": 16977,
    "path": "/registry/gaps/gaps.json",
    "purpose": "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json.",
    "role": "derived",
-   "sha256": "755d6c626714f4f94180d3ce04003cc01103b8799e678f96ba8a5aa4bfe06eda"
+   "sha256": "bb2c8bf46e90790afdf3af901a7d77a5805ef7971fb9d2b2180b0f70429008b5"
   }
  ],
  "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
- "site": "https://themoroccoai.com"
+ "site": "https://themoroccoai.com",
+ "vocabularies": {
+  "evidence_type": [
+   "news_dispatch",
+   "official_report",
+   "official_statement",
+   "official_announcement",
+   "press_release",
+   "regulatory_page",
+   "model_card",
+   "dataset_card",
+   "preprint",
+   "journal_article",
+   "organization_page",
+   "case_study",
+   "ranking_entry",
+   "press_article",
+   "regulatory_record",
+   "live_service_observation",
+   "procurement_notice"
+  ],
+  "note": "Values the validator accepts in evidence.json, with display labels where the site uses them. Other defined values are defined in the file that uses them.",
+  "source_type": {
+   "academic_journal": "Peer-reviewed journal",
+   "academic_preprint": "Academic preprint",
+   "government_portal": "Government portal",
+   "government_publication": "Government publication",
+   "independent_list": "Independent list",
+   "intergovernmental_organization": "Intergovernmental organisation",
+   "investor_publication": "Investor publication",
+   "organization_website": "Organisation's own website",
+   "regulator": "Regulator",
+   "secondary_press": "Secondary press",
+   "signatory_organization": "Signatory organisation",
+   "state_news_agency": "State news agency",
+   "technical_repository": "Technical repository"
+  },
+  "status_basis": {
+   "independent-listing": "independent listing",
+   "independent-report-of-use": "independent report of use",
+   "operator-report-of-use": "operator's report of use",
+   "public-availability-observed": "public availability on the operator's own service (usage not documented)"
+  }
+ }
 }

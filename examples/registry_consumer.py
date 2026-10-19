@@ -99,7 +99,8 @@ class Registry:
         return [f"{name}: version {fv} as of {fa}, but the manifest is version {v} as of {a}" for name, fv, fa in found if (fv, fa) != (v, a)]
 
     def _check_definitions(self):
-        """Each defined value must be defined in its own file; an undefined one is not guessed at."""
+        """Each defined value must be defined in its own file, or for record types and bases in the manifest's
+        vocabularies; an undefined one is not guessed at."""
         p = []
         ev, on = self.evidence, self.ontology
 
@@ -107,7 +108,11 @@ class Registry:
             if value is not None and value not in table:
                 p.append(f"{where}: {what} {value!r} is not defined in the published data")
 
+        vocab = self.manifest["vocabularies"]
         for r in ev["records"]:
+            defined(r.get("source_type"), vocab["source_type"], "source type", r["evidence_id"])
+            defined(r.get("evidence_type"), vocab["evidence_type"], "evidence type", r["evidence_id"])
+            defined(r.get("status_basis"), vocab["status_basis"], "status basis", r["evidence_id"])
             defined(r.get("classification"), ev["classifications"], "classification", r["evidence_id"])
             defined(r.get("verification_status"), ev["verification_statuses"], "verification status", r["evidence_id"])
             defined(r.get("status_evidence"), on["lifecycle_stages"], "declared stage", r["evidence_id"])
