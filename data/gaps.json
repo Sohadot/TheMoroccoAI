@@ -1,0 +1,210 @@
+{
+  "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
+  "open_wording": "No qualifying evidence is currently recorded in this registry.",
+  "gaps": [
+    {
+      "id": "GAP-01",
+      "question": "What documents actual use, adoption, accuracy, service outcomes or sustained operation of Idarati AI?",
+      "entities": [
+        "idarati-ai"
+      ],
+      "established": [
+        {
+          "text": "The ministry presented Idarati AI as an agentic AI assistant for administrative procedures.",
+          "evidence": [
+            "MAI-EV-0013",
+            "MAI-EV-0040"
+          ]
+        },
+        {
+          "text": "It was publicly available on the ministry's own services on 18 October 2026, and answered a test question through its public interface.",
+          "evidence": [
+            "MAI-EV-0034",
+            "MAI-EV-0035",
+            "MAI-EV-0038"
+          ]
+        }
+      ],
+      "unestablished": "How many people use it, its accuracy, its effect on administrative services, and whether it has operated continuously. Public availability on one date does not establish any of these.",
+      "evidence_needed": [
+        "An operator's report of use (annual report, parliamentary answer, published usage statistics)",
+        "An independent evaluation of the service"
+      ],
+      "checks": [
+        {
+          "type": "no_status_basis",
+          "entity": "idarati-ai",
+          "bases": [
+            "operator-report-of-use",
+            "independent-report-of-use"
+          ]
+        }
+      ],
+      "assessed_records": [
+        "MAI-EV-0013",
+        "MAI-EV-0034",
+        "MAI-EV-0035",
+        "MAI-EV-0038",
+        "MAI-EV-0040"
+      ],
+      "assessed_fingerprint": "072120842339cd82",
+      "assessed": "2026-10-19",
+      "state": "open"
+    },
+    {
+      "id": "GAP-02",
+      "question": "What publicly documented measurements show progress toward the official targets of Morocco AI 2030?",
+      "entities": [
+        "morocco-ai-2030"
+      ],
+      "established": [
+        {
+          "text": "The roadmap sets three 2030 targets: MAD 100 billion in added value to GDP, 50,000 direct and indirect jobs, and 200,000 trained and certified AI talents.",
+          "evidence": [
+            "MAI-EV-0011"
+          ]
+        },
+        {
+          "text": "The ministry's September 2026 presentation of the roadmap's \"main advances\" restated the targets and listed items presented (the AI marketplace, Idarati AI, a proof of concept of a national meta-application and e-wallet), without quantified progress towards the targets.",
+          "evidence": [
+            "MAI-EV-0040"
+          ]
+        },
+        {
+          "text": "Two projects are recorded as included in the roadmap, on the basis of that presentation.",
+          "evidence": [
+            "MAI-EV-0013"
+          ]
+        }
+      ],
+      "unestablished": "Any measured progress towards the value-added, jobs or talent targets. A project's status is not a measure of progress towards them.",
+      "evidence_needed": [
+        "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)"
+      ],
+      "checks": [],
+      "assessed_records": [
+        "MAI-EV-0008",
+        "MAI-EV-0011",
+        "MAI-EV-0012",
+        "MAI-EV-0013",
+        "MAI-EV-0018",
+        "MAI-EV-0040"
+      ],
+      "assessed_fingerprint": "50ab42a3a488252f",
+      "assessed": "2026-10-19",
+      "state": "open"
+    },
+    {
+      "id": "GAP-03",
+      "question": "What independently documents AI workloads on the Toubkal supercomputer, and at what scale?",
+      "entities": [
+        "toubkal-supercomputer"
+      ],
+      "established": [
+        {
+          "text": "Toubkal is listed in the June 2026 TOP500 as general-purpose high-performance computing; the listing documents capacity, not workloads or users.",
+          "evidence": [
+            "MAI-EV-0020"
+          ]
+        },
+        {
+          "text": "A peer-reviewed article by authors affiliated with its host university states that large-language-model fine-tuning has been run on it, and presents as a benchmark the runs that produced the GemMaroc Moroccan Darija models (attributed to Belkasmi et al.).",
+          "evidence": [
+            "MAI-EV-0041"
+          ]
+        }
+      ],
+      "unestablished": "Independent documentation of AI workloads on Toubkal, and the scale, share, users or continuity of AI use. This is not a finding that Toubkal is not used for AI: its operator's own authors report specific fine-tuning runs. What is missing is independent and quantified documentation.",
+      "evidence_needed": [
+        "The GemMaroc study by Belkasmi et al., which the article cites, if it documents its use of Toubkal",
+        "Published usage or allocation reports",
+        "Independent publications acknowledging Toubkal for specific AI models"
+      ],
+      "checks": [
+        {
+          "type": "no_ai_application_link",
+          "entity": "toubkal-supercomputer"
+        }
+      ],
+      "assessed_records": [
+        "MAI-EV-0020",
+        "MAI-EV-0041"
+      ],
+      "assessed_fingerprint": "82be8209a0580f53",
+      "assessed": "2026-10-19",
+      "state": "open"
+    },
+    {
+      "id": "GAP-04",
+      "question": "Which announced or signed computing and data-centre initiatives have verifiable construction, commissioning or operation?",
+      "entities": [
+        "nexus-ai-factory",
+        "green-data-centres-agreement",
+        "um6p-data-centre-partnership"
+      ],
+      "established": [
+        {
+          "text": "Agreements on green data-centre infrastructure and on a data-centre partnership with UM6P were signed at the First National AI Conference.",
+          "evidence": [
+            "MAI-EV-0006",
+            "MAI-EV-0007",
+            "MAI-EV-0019"
+          ]
+        },
+        {
+          "text": "A memorandum on the Nexus AI Factory is reported by the press only.",
+          "evidence": [
+            "MAI-EV-0030"
+          ]
+        }
+      ],
+      "unestablished": "Construction, commissioning or operation of any of these facilities.",
+      "evidence_needed": [
+        "Official project documentation (permits, commissioning notices)",
+        "Operator or independent confirmation that a facility is built and running"
+      ],
+      "checks": [
+        {
+          "type": "lifecycle_in",
+          "entities": [
+            "nexus-ai-factory",
+            "green-data-centres-agreement",
+            "um6p-data-centre-partnership"
+          ],
+          "stages": [
+            "announced"
+          ]
+        }
+      ],
+      "assessed_records": [
+        "MAI-EV-0006",
+        "MAI-EV-0007",
+        "MAI-EV-0019",
+        "MAI-EV-0030"
+      ],
+      "assessed_fingerprint": "60bb6cbb1229a7e3",
+      "assessed": "2026-10-19",
+      "state": "open"
+    },
+    {
+      "id": "GAP-05",
+      "question": "Which relationships asserting a formal act (a signature, creation, designation, investment, development or operation) rest only on announcements, news reports or descriptions in this registry?",
+      "entities": [],
+      "established": [],
+      "unestablished": "The instrument or formal record behind each relationship listed below: the signed text, founding act, designation, investment or operating record. This measures how each relationship is documented in this registry, not whether it is true: an official report of a signing is good evidence that a signing was announced, not of what the instrument says.",
+      "evidence_needed": [
+        "Published texts of the conventions and memoranda",
+        "Official Bulletin publications where applicable"
+      ],
+      "checks": [
+        {
+          "type": "computed_relationships",
+          "list": "announcement_only"
+        }
+      ],
+      "assessed_records": [],
+      "assessed": "2026-10-19",
+      "state": "open"
+    }
+  ]
+}

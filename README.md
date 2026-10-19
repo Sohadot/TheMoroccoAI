@@ -16,6 +16,9 @@ pages are committed.
 | `data/evidence.json` | Evidence registry: one record per sourced claim, with source URL, publication and retrieval dates, verbatim excerpts, classification and verification status. |
 | `data/ontology.json` | Ontology: entity types, domains, predicates, entities and typed relationships, each citing evidence. |
 | `registry/` | Generated pages: registry index, questions page, all evidence, one page per entity. |
+| `registry/matrix/` | Generated institutional evidence matrix (HTML and `matrix.json`): each organisation's and initiative's documented relationships, with classification, the related entity's status, sources and qualifications. |
+| `registry/gaps/` | Generated evidence gap register (HTML and `gaps.json`) from `data/gaps.json`. |
+| `data/gaps.json` | Open evidence questions: what is established (with records), what is not, what would resolve each. The validator re-checks every gap on each build: a new or edited record, or a changed stage, attribute or relationship concerning a gap's entities (tracked by `assessed_fingerprint`), or data that contradicts an open gap, fails the build until the gap is re-assessed (`python3 tools/registry.py --gap-fingerprints`). A resolved gap must cite the records that resolve it. |
 | `methodology/` | Generated: what the registry documents and does not establish, admission and correction rules, and the changelog. |
 | `acquisition/` | Generated: transferable assets, what exists today compared with the owner's view of potential, confidential contact. |
 | `data/changelog.json` | Public changelog: one entry per published version, each tied to a commit on `main`. Add an entry when the registry version changes; a test checks that the latest entry matches the data. |
@@ -71,6 +74,11 @@ and relationships classified beyond what their evidence supports.
   name or other indicators without establishing legal identity (it cannot support their origin, a
   VERIFIED FACT relationship on its own, or an unlabelled attribute). `superseded_by` marks a record
   whose quotation still matches but whose claim later evidence contradicts; it cannot set a stage.
+- **Matrix wording** ("documented as"): derived from each relationship's own classification only. "Signed" or
+  "operated" needs a VERIFIED FACT; an announced plan is never shown as delivered. Relationships that assert a formal
+  act (signing, creating, designating, investing, developing, operating) whose every record is an
+  announcement, news report or description are listed in GAP-05; that measures documentation here, not
+  truth. Declarations and public events are not measured this way.
 - **Regulatory wording**: a 510(k) is a clearance; registry text may not call a device FDA-approved
   except inside a quotation.
 - **Origin** (companies): `based-in-morocco` (independent source required),

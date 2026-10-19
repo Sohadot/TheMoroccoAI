@@ -65,6 +65,7 @@ SOURCE_TYPE_LABELS = {
     "organization_website": "Organisation's own website",
     "technical_repository": "Technical repository",
     "academic_preprint": "Academic preprint",
+    "academic_journal": "Peer-reviewed journal",
     "investor_publication": "Investor publication",
     "independent_list": "Independent list",
     "secondary_press": "Secondary press",
@@ -180,6 +181,8 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
   <ul class="nav-links">
     {nav_link("/registry/", "Registry", "registry")}
     {nav_link("/registry/questions/", "Questions", "questions", "nav-optional")}
+    {nav_link("/registry/matrix/", "Matrix", "matrix", "nav-optional")}
+    {nav_link("/registry/gaps/", "Gaps", "gaps", "nav-optional")}
     {nav_link("/registry/evidence/", "Evidence", "evidence", "nav-optional")}
     {nav_link("/methodology/", "Methodology", "methodology", "nav-optional")}
     {nav_link("/acquisition/", "Acquisition", "acquisition", "nav-optional")}
@@ -395,6 +398,7 @@ def render_registry_index(model):
 <section aria-labelledby="start-h">
   <h2 id="start-h"><span class="section-number">01</span>Start here</h2>
   <p class="prose"><a href="/registry/questions/">Questions the registry answers</a> lists which organisations have documented AI activity, which projects are operational or only announced, which models and datasets are public, and which relationships are verified. Each answer links to its evidence.</p>
+  <p class="prose">The <a href="/registry/matrix/">institutional matrix</a> shows which organisations are documented as connected to which projects and initiatives, and on what evidence. The <a href="/registry/gaps/">evidence gap register</a> lists what the registry cannot yet establish.</p>
   <p class="prose">The fullest chain in this version runs from <a href="{entity_url("morocco-ai-2030")}">Morocco AI 2030</a> to the <a href="{entity_url("jazari-network")}">JAZARI Institutes network</a>, its core institute <a href="{entity_url("jazari-root")}">Institut Jazari ROOT</a> and the <a href="{entity_url("jazari-industrie-x0")}">JAZARI Industrie X.0</a> convention signed in Fès. It then goes on to the signatories, the stated technologies and the targeted sectors. Each page shows the source excerpt, the publication and retrieval dates, and the classification of every claim.</p>
 </section>
 
@@ -628,6 +632,37 @@ def render_questions(model):
             if r["classification"] == cls and ents[r["subject"]]["type"] in org_types and r["predicate"] in activity_preds + ("launched", "presented", "organized", "designated", "lists_in_framework"):
                 q5.append([badge(cls), f'{_ent_link(model, r["subject"])} <span class="rel-type">{escape(model.predicates[r["predicate"]]["label"])}</span> {_ent_link(model, r["object"])}',
                            _ev_links(r["evidence"])])
+    # Q8: organisations connected to projects, from the matrix rows.
+    mrows = [r for r in matrix_rows(model) if r["object"]["type"] == "project" and r["subject"]["type"] in org_types]
+    q8, orgs8 = [], []
+    for sid in sorted({r["subject"]["id"] for r in mrows}, key=lambda i: ents[i]["name"].lower()):
+        mine = [r for r in mrows if r["subject"]["id"] == sid]
+        orgs8.append(sid)
+        q8.append([_ent_link(model, sid),
+                   "; ".join(f'{_ent_link(model, r["object"]["id"])} ({escape(r["documented_as"].lower())}; {escape((r["object"]["stage"] or "").lower())})' for r in mine),
+                   _ev_links(sorted({e["id"] for r in mine for e in r["evidence"]})) + f' · <a href="/registry/matrix/#m-{sid}">matrix</a>'])
+    lv = {}
+    for r in mrows:
+        lv[r["documented_as"]] = lv.get(r["documented_as"], 0) + 1
+    q8_line = (f"{len(orgs8)} organisations are documented as connected to {len({r['object']['id'] for r in mrows})} projects, through "
+               f"{len(mrows)} relationships: " + ", ".join(f"{k.lower()} {v}" for k, v in sorted(lv.items(), key=lambda kv: (-kv[1], kv[0])))
+               + f". {sum(1 for r in mrows if r['documentation_basis'] == 'announcement-or-description')} of these rest only on announcements or news reports in this registry; that describes how they are documented here, not whether they are true. "
+               "A signature or an announcement is not delivery, and these connections are the ones recorded here, not all that exist.")
+
+    # Q9: official targets against what the registry records about progress.
+    gaps = registry.load(registry.ROOT / "data" / "gaps.json")
+    q9 = []
+    for r in sorted((r for r in model.records.values() if r["classification"] == "OFFICIAL TARGET"), key=lambda r: r["evidence_id"]):
+        inits = [e for e in r["related_entities"] if ents[e]["type"] == "initiative"]
+        for i in inits:
+            inc = [x["object"] for x in rels if x["subject"] == i and x["predicate"] == "includes" and ents[x["object"]].get("lifecycle")]
+            gap = next((g for g in gaps["gaps"] if i in g["entities"]), None)
+            progress = (f'{escape(gaps["open_wording"])} <a href="/registry/gaps/#{gap["id"].lower()}">{gap["id"]}</a>' if gap and gap["state"] == "open"
+                        else (f'See <a href="/registry/gaps/#{gap["id"].lower()}">{gap["id"]}</a>' if gap else "Not yet assessed in the gap register."))
+            q9.append([_ent_link(model, i), f'{escape(r["claim"])} {_ev_links([r["evidence_id"]])}',
+                       "; ".join(f'{_ent_link(model, x)} ({escape(stage_label(model, ents[x]).lower())})' for x in inc) or "None recorded",
+                       progress])
+
     by_cls = {c: sum(1 for r in rels if r["classification"] == c) for c in registry.CLASSIFICATIONS}
     cls_line = " · ".join(f"{c.title()}: {n}" for c, n in by_cls.items() if n)
 
@@ -646,6 +681,7 @@ def render_questions(model):
   <h2 id="q2-h"><span class="section-number">Q2</span>Which projects are operational, and which are only announced?</h2>
   <p class="prose">{escape(stage_line)}. A stage other than "announced" requires a verified record that explicitly documents that stage. "Operational" and "pilot" must rest on a record published by a verified operator of the project or by an independent source, never on a developer's or vendor's page, press, a procurement notice, a signature or an announcement. The kind column separates AI applications from compute infrastructure and digital platforms, neither of which counts as an AI deployment.</p>
   <p class="prose">{escape(ai_line)}</p>
+  <p class="prose">Who is connected to each project is in Q8 and the <a href="/registry/matrix/">institutional matrix</a>; what the registry cannot yet establish is in the <a href="/registry/gaps/">evidence gap register</a>.</p>
   {_table("Projects by lifecycle stage", ["Project", "Kind", "Lifecycle", "Basis", "Status"], q2, "No project recorded.")}
 </section>
 <section aria-labelledby="q3-h">
@@ -668,6 +704,16 @@ def render_questions(model):
   <p class="prose">Entities whose evidence conflicts or is insufficient to establish a stage, and operational or pilot projects whose latest supporting evidence is more than twelve months before the registry date. Such a project keeps its stage: the registry records a discontinuation only when a source documents one. Candidates still under review are not published until they pass the registry's evidence rules.</p>
   {_table("Unresolved and not recently reconfirmed entries", ["Entity", "Status", "Why"], q7, "No unresolved or not recently reconfirmed entry is recorded.")}
 </section>
+<section aria-labelledby="q8-h">
+  <h2 id="q8-h"><span class="section-number">Q8</span>Which organisations are connected to documented AI or computing projects, and what establishes each connection?</h2>
+  <p class="prose">{escape(q8_line)} The full set, with sources and qualifications, is in the <a href="/registry/matrix/">institutional matrix</a>.</p>
+  {_table("Organisations and the projects they are documented as connected to", ["Organisation", "Projects (documented as; project stage)", "Evidence"], q8, "No organisation is connected to a project.")}
+</section>
+<section aria-labelledby="q9-h">
+  <h2 id="q9-h"><span class="section-number">Q9</span>What does the registry establish about national targets, and which outcomes remain unverified?</h2>
+  <p class="prose">Each official target as its source states it, the projects the strategy is recorded as including, and what the registry records about measured progress. Targets are never shown as outcomes, and a project's status is not progress toward a target.</p>
+  {_table("Official targets and recorded progress", ["Strategy", "Official target", "Projects recorded as included (stage)", "Measured progress"], q9, "No official target recorded.")}
+</section>
 <section aria-labelledby="q5-h">
   <h2 id="q5-h"><span class="section-number">Q5</span>Which institutional relationships are supported by evidence?</h2>
   <p class="prose">All relationships by classification: {escape(cls_line)}. The table lists those between organisations and what they launch, sign, build, host or fund.</p>
@@ -676,6 +722,194 @@ def render_questions(model):
     return page(model, path="/registry/questions/", current="questions",
                 title="Questions the Registry Answers — TheMoroccoAI",
                 description="Evidence-linked answers about Morocco's AI ecosystem: organisations with documented AI activity, deployed versus announced AI applications and their operators, public models and datasets, sectors and verified relationships.",
+                body=body)
+
+
+# ─── INSTITUTIONAL MATRIX AND EVIDENCE GAPS ────────────────────────────────
+
+def documented_as(rel):
+    """What the relationship's own classification supports, in plain words. It never upgrades a record."""
+    cls = rel["classification"]
+    if cls != "VERIFIED FACT":
+        return {"ANNOUNCED PLAN": "Announced or planned", "OFFICIAL TARGET": "Target",
+                "INDEPENDENT ANALYSIS": "Registry inference", "UNVERIFIED CLAIM": "Unverified claim"}[cls]
+    return {"signatory_of": "Signed", "operates": "Operated", "develops": "Developed"}.get(rel["predicate"], "Documented")
+
+
+def _record_date(r):
+    return (human_date(r["publication_date"]), "published") if r["publication_date"] else (human_date(r["retrieval_date"]), "retrieved")
+
+
+def matrix_rows(model):
+    """One row per matrix relationship, deterministic, every field traceable to the canonical data."""
+    announcement_only = {(r["subject"], r["predicate"], r["object"]) for r in registry.announcement_only(model.ontology, model.evidence)}
+    rows = []
+    for rel in sorted(registry.matrix_relationships(model.ontology), key=lambda r: (r["subject"], r["predicate"], r["object"])):
+        subj, obj = model.entities[rel["subject"]], model.entities[rel["object"]]
+        key = (rel["subject"], rel["predicate"], rel["object"])
+        level = documented_as(rel)
+        quals = []
+        if rel.get("note"):
+            quals.append(rel["note"])
+        if level == "Signed" and obj.get("lifecycle") == "announced":
+            quals.append("A signature is recorded as a signature; delivery is not documented.")
+        if level == "Announced or planned":
+            quals.append("Not verified as delivered.")
+        if key in announcement_only:
+            quals.append("Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05).")
+        rows.append({
+            "id": "|".join(key),
+            "subject": {"id": subj["id"], "name": subj["name"], "type": subj["type"]},
+            "relationship": rel["predicate"],
+            "relationship_label": model.predicates[rel["predicate"]]["label"],
+            "object": {"id": obj["id"], "name": obj["name"], "type": obj["type"],
+                       "lifecycle": obj.get("lifecycle"), "stage": stage_label(model, obj) if obj.get("lifecycle") else None,
+                       "status_as_recorded": obj.get("status")},
+            "classification": rel["classification"],
+            "documented_as": level,
+            "documentation_basis": ("announcement-or-description" if key in announcement_only
+                                    else "includes-formal-record" if rel["predicate"] in registry.FORMAL_ACT_PREDICATES
+                                    else "declaration-or-event"),
+            "evidence": [{"id": x, "source_url": model.records[x]["source_url"], "source_type": model.records[x]["source_type"],
+                          "evidence_type": model.records[x]["evidence_type"], "publication_date": model.records[x]["publication_date"],
+                          "retrieval_date": model.records[x]["retrieval_date"]} for x in rel["evidence"]],
+            "qualifications": quals,
+        })
+    return rows
+
+
+def _evidence_cell(model, ev):
+    out = []
+    for x in ev:
+        r = model.records[x["id"]] if isinstance(x, dict) else model.records[x]
+        date, how = _record_date(r)
+        out.append(f'<a href="/registry/evidence/#{r["evidence_id"]}">{r["evidence_id"]}</a> '
+                   f'<span class="ev-meta">{escape(SOURCE_TYPE_LABELS[r["source_type"]])} · {how} {escape(date)} · '
+                   f'<a href="{escape(r["source_url"])}" rel="noopener">source</a></span>')
+    return "<br>".join(out)
+
+
+def render_matrix(model):
+    rows = matrix_rows(model)
+    order = {"institution": 0, "company": 1, "initiative": 2}
+    subjects = sorted({r["subject"]["id"] for r in rows}, key=lambda i: (order[model.entities[i]["type"]], model.entities[i]["name"].lower()))
+    levels = {}
+    for r in rows:
+        levels[r["documented_as"]] = levels.get(r["documented_as"], 0) + 1
+    level_line = " · ".join(f"{k}: {v}" for k, v in sorted(levels.items(), key=lambda kv: (-kv[1], kv[0])))
+    n_ann = sum(1 for r in rows if r["documentation_basis"] == "announcement-or-description")
+    n_acts = len(registry.formal_act_relationships(model.ontology))
+    head = "".join(f'<th scope="col">{h}</th>' for h in ("Related entity", "Relationship", "Documented as", "Status of the related entity", "Evidence", "Qualification"))
+    bodies = []
+    for sid in subjects:
+        subj = model.entities[sid]
+        trs = [f'<tr class="group-row"><th scope="rowgroup" colspan="6" id="m-{sid}">{_ent_link(model, sid)} '
+               f'<span class="ev-meta">{escape(TYPE_SINGULAR[subj["type"]])}</span></th></tr>']
+        for r in (x for x in rows if x["subject"]["id"] == sid):
+            o = r["object"]
+            status = escape(o["stage"]) if o["stage"] else (f'As recorded: {escape(o["status_as_recorded"])}' if o["status_as_recorded"] else "—")
+            trs.append(f'<tr><td>{_ent_link(model, o["id"])} <span class="ev-meta">{escape(TYPE_SINGULAR[o["type"]])}</span></td>'
+                       f'<td>{escape(r["relationship_label"])}</td><td>{escape(r["documented_as"])}<br>{badge(r["classification"])}</td>'
+                       f'<td>{status}</td><td>{_evidence_cell(model, r["evidence"])}</td>'
+                       f'<td>{escape(" ".join(r["qualifications"])) or "—"}</td></tr>')
+        bodies.append("<tbody>" + "".join(trs) + "</tbody>")
+    index = " · ".join(f'<a href="#m-{sid}">{escape(model.entities[sid]["name"])}</a>' for sid in subjects)
+    body = f"""<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Institutional matrix</p>
+  <p class="label">MAI-MATRIX — Generated from the registry data</p>
+  <h1>Institutional evidence matrix</h1>
+  <p class="lede">What each organisation or initiative recorded here is documented as doing with projects, initiatives, instruments and models, with the classification of each relationship, the status of the related entity and the records behind it.</p>
+  <p class="notice"><strong>Scope.</strong> This matrix covers the {len(rows)} relationships recorded in this registry between {len(subjects)} organisations and initiatives and what they act on. It is not a complete map of Morocco's AI ecosystem, and an absent relationship is a gap in coverage. Machine-readable: <a href="/registry/matrix/matrix.json">matrix.json</a>.</p>
+</header>
+<section aria-labelledby="mx1-h">
+  <h2 id="mx1-h"><span class="section-number">01</span>How to read it</h2>
+  <ul class="prose">
+    <li><strong>Documented as</strong> says only what the relationship's classification supports: {escape(level_line)}. "Signed" means the signature is documented, not that anything was delivered; "Operated" means a verified operator; "Announced or planned" is not verified as delivered.</li>
+    <li><strong>Status of the related entity</strong> is its own lifecycle stage, with its basis. A project's status is not a measure of progress toward any national target.</li>
+    <li>Of the {n_acts} relationships that assert a formal act (a signature, creation, designation, investment, development or operation), {n_ann} rest only on announcements, news reports or descriptions; the instrument behind them is not recorded here (<a href="/registry/gaps/#gap-05">GAP-05</a>). This describes how they are documented in this registry, not whether they are true. Declarations and public events (presented, launched, organised, a programme's stated composition) are not measured this way: an official announcement is their primary record.</li>
+    <li>An association between organisations is not a legal identity or a formal partnership unless a record says so.</li>
+  </ul>
+  <p class="prose">Jump to: {index}</p>
+</section>
+<section aria-labelledby="mx2-h">
+  <h2 id="mx2-h"><span class="section-number">02</span>Relationships by organisation and initiative</h2>
+  {_table_bodies("Institutional evidence matrix", head, bodies)}
+</section>"""
+    return page(model, path="/registry/matrix/", current="matrix",
+                title="Institutional Evidence Matrix — TheMoroccoAI",
+                description="Which institutions, companies and initiatives are documented as connected to Moroccan AI projects, how each connection is classified, and the evidence behind it.",
+                body=body)
+
+
+def _table_bodies(label, head, bodies):
+    return (f'<p class="table-hint">Scroll the table sideways to see all columns.</p>'
+            f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
+            f'<table class="qtable"><thead><tr>{head}</tr></thead>{"".join(bodies)}</table></div>')
+
+
+def gap_register(model, gaps):
+    """The gaps with their computed parts resolved, shared by the HTML page and the JSON output."""
+    out = []
+    for g in gaps["gaps"]:
+        item = {k: g[k] for k in ("id", "question", "entities", "unestablished", "evidence_needed", "assessed", "state")}
+        item["entities"] = [{"id": e, "name": model.entities[e]["name"]} for e in g["entities"]]
+        item["established"] = g["established"]
+        item["open_wording"] = gaps["open_wording"] if g["state"] == "open" else None
+        item["resolved_by"] = g.get("resolved_by")
+        item["relationships"] = None
+        if any(c["type"] == "computed_relationships" for c in g.get("checks") or []):
+            item["relationships"] = [
+                {"id": f'{r["subject"]}|{r["predicate"]}|{r["object"]}', "subject": r["subject"], "relationship": r["predicate"],
+                 "object": r["object"], "classification": r["classification"], "evidence": r["evidence"],
+                 "evidence_types": [model.records[x]["evidence_type"] for x in r["evidence"]]}
+                for r in sorted(registry.announcement_only(model.ontology, model.evidence), key=lambda r: (r["subject"], r["predicate"], r["object"]))]
+        out.append(item)
+    return out
+
+
+def render_gaps(model, gaps):
+    items = gap_register(model, gaps)
+    arts = []
+    for g in items:
+        state = "Open" if g["state"] == "open" else "Resolved"
+        ents = ", ".join(_ent_link(model, e["id"]) for e in g["entities"]) or "Relationships listed below"
+        est = "".join(f'<li>{escape(x["text"])} {_ev_links(x["evidence"])}</li>' for x in g["established"]) or "<li>See the relationships listed below.</li>"
+        need = "".join(f"<li>{escape(x)}</li>" for x in g["evidence_needed"])
+        open_line = f' <strong>{escape(g["open_wording"])}</strong>' if g["open_wording"] else ""
+        resolved = f'<p class="prose">Resolved by: {_ev_links(g["resolved_by"])}</p>' if g["resolved_by"] else ""
+        table = ""
+        if g["relationships"]:
+            rows = [[_ent_link(model, r["subject"]), escape(model.predicates[r["relationship"]]["label"]), _ent_link(model, r["object"]),
+                     badge(r["classification"]), _ev_links(r["evidence"]) + " <span class=\"ev-meta\">" + escape(", ".join(sorted(set(t.replace("_", " ") for t in r["evidence_types"])))) + "</span>"]
+                    for r in g["relationships"]]
+            table = (f'<p class="prose">{len(rows)} of the {len(registry.formal_act_relationships(model.ontology))} relationships that assert a formal act, computed from the data on every build. '
+                     f'Declarations and public events (presented, launched, organised, a programme\'s stated composition) are not listed: an official announcement is their primary record.</p>'
+                     + _table("Relationships documented only by announcements, news reports or descriptions",
+                              ["Organisation or initiative", "Relationship", "Related entity", "Classification", "Evidence and record type"], rows, ""))
+        arts.append(f"""<article class="gap" id="{g["id"].lower()}" aria-labelledby="{g["id"].lower()}-h">
+  <h2 id="{g["id"].lower()}-h"><span class="section-number">{g["id"]}</span>{escape(g["question"])}</h2>
+  <p class="gap-meta"><span class="badge badge-gap-{g["state"]}">{state}</span> Last assessed {escape(human_date(g["assessed"]))} · Concerns: {ents}</p>
+  <h3>What this registry establishes</h3>
+  <ul class="prose">{est}</ul>
+  <h3>What it does not establish</h3>
+  <p class="prose">{escape(g["unestablished"])}{open_line}</p>
+  {resolved}
+  <h3>Evidence that would resolve it</h3>
+  <ul class="prose">{need}</ul>
+  {table}
+</article>""")
+    body = f"""<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Evidence gaps</p>
+  <p class="label">MAI-GAPS — Open evidence questions</p>
+  <h1>Evidence gap register</h1>
+  <p class="lede">Questions this registry cannot yet answer, with what it does establish, what it does not, and what evidence would settle each one.</p>
+  <p class="notice"><strong>A gap is a limit of this registry's coverage.</strong> The statement "{escape(gaps["open_wording"].rstrip("."))}" does not mean that no such evidence exists, nor that anything failed. Machine-readable: <a href="/registry/gaps/gaps.json">gaps.json</a>.</p>
+</header>
+<p class="prose">{escape(gaps["note"])}</p>
+{"".join(arts)}"""
+    return page(model, path="/registry/gaps/", current="gaps",
+                title="Evidence Gap Register — TheMoroccoAI",
+                description="Open evidence questions about Morocco's AI ecosystem: what the registry establishes, what it does not, and what evidence would resolve each question.",
                 body=body)
 
 
@@ -714,13 +948,15 @@ def render_methodology(model, changelog):
     for c in changelog["entries"]:
         figures = (f' · v{escape(c["version"])} · {c["records"]} records, {c["entities"]} entities, {c["relationships"]} relationships'
                    if c.get("version") else "")
+        ref = (f'<a href="{repo}/commit/{c["commit"]}" rel="noopener">{c["commit"][:7]}</a>' if c.get("commit")
+               else f'<a href="{repo}/pull/{c["pull_request"]}" rel="noopener">pull request #{c["pull_request"]}</a>')
         changes = "".join(f"<li>{escape(x)}</li>" for x in c.get("changes", []))
         fixes = "".join(f"<li>{escape(x)}</li>" for x in c.get("corrections", []))
         fixes = f'<p class="change-sub">Corrections to previously published content</p><ul>{fixes}</ul>' if fixes else ""
         review = "".join(f"<li>{escape(x)}</li>" for x in c.get("review_fixes", []))
         fixes += f'<p class="change-sub">Found in pre-release review (never published)</p><ul>{review}</ul>' if review else ""
         entries.append(f"""<li class="change">
-  <p class="change-meta"><time datetime="{c["date"]}">{escape(human_date(c["date"]))}</time> · <a href="{repo}/commit/{c["commit"]}" rel="noopener">{c["commit"][:7]}</a>{figures}</p>
+  <p class="change-meta"><time datetime="{c["date"]}">{escape(human_date(c["date"]))}</time> · {ref}{figures}</p>
   <h3>{escape(c["title"])}</h3>
   <ul>{changes}</ul>{fixes}
 </li>""")
@@ -764,6 +1000,7 @@ def render_methodology(model, changelog):
     <li>Statements the registry could not check are kept only as unverified claims, with a note saying what was not checked.</li>
     <li>Where sources conflict or are insufficient, the stage is "unresolved", with the reason stated.</li>
     <li>A record whose quotation still matches its source but whose claim later evidence contradicts is marked superseded and can no longer set a stage. It stays visible.</li>
+    <li>Questions the evidence cannot yet answer are published in the <a href="/registry/gaps/">evidence gap register</a>, with what is established, what is not and what would resolve them. A gap must be re-assessed whenever a new record concerns it.</li>
     <li>When the latest evidence for an operational claim is more than 12 months old, the <a href="/registry/questions/#q7-h">questions page</a> says current operation has not been reconfirmed. Elapsed time never changes a stage by itself.</li>
   </ul>
 </section>
@@ -943,14 +1180,20 @@ def homepage_examples(model):
         if x["lifecycle"] in ("operational", "pilot"):
             f = deployment_facts(model, x)
             basis = f' (basis: {escape("; ".join(f["bases"]))}; {escape(f["currency"][0].lower() + f["currency"][1:])})'
-        rows.append(f'<li>{_ent_link(model, x["id"])}, {escape(_stage_with_kind(model, x))}{basis}: {who}</li>')
+        reported = [a for a in x.get("attributes") or [] if a["name"].startswith("Reported AI workloads")]
+        work = "".join(f'; {escape(a["name"])}: {escape(a["value"][0].lower() + a["value"][1:])} {_ev_links([a["evidence"]])}' for a in reported)
+        rows.append(f'<li>{_ent_link(model, x["id"])}, {escape(_stage_with_kind(model, x))}{basis}: {who}{work}</li>')
     announced = sum(1 for x in infra if x["lifecycle"] == "announced")
     ids = {x["id"] for x in infra}
     runs_ai = any({r["subject"], r["object"]} & ids and ents[r["subject"] if r["object"] in ids else r["object"]].get("project_kind") == "ai-application"
                   for r in rels)
-    workload = ("Compute infrastructure is not an AI application: the registry documents capacity, not what runs on it, "
-                "and records no AI workload on these systems." if not runs_ai else
-                "Compute infrastructure is not an AI application; workloads are recorded only where a source documents them.")
+    reports = any(a["name"].startswith("Reported AI workloads") for x in infra for a in x.get("attributes") or [])
+    if not runs_ai and not reports:
+        workload = ("Compute infrastructure is not an AI application: the registry documents capacity, not what runs on it, "
+                    "and records no AI workload on these systems.")
+    else:
+        workload = ("Compute infrastructure is not an AI application. Reported AI workloads are shown only where a source states them, "
+                    "with who reported them; they do not establish the scale, users or outcomes of AI use (GAP-03).")
     out.append(_example(
         "ex-infra", "Which institutions are documented as connected to computing and data-centre infrastructure?",
         f'<ul>{"".join(rows)}</ul><p>{announced} of these {len(infra)} projects are only announced or signed: no record shows them built '
@@ -970,17 +1213,29 @@ def inject(html_text, blocks):
 
 
 def sitemap(model):
-    paths = (["/", "/registry/", "/registry/questions/", "/registry/evidence/", "/methodology/", "/acquisition/"]
+    paths = (["/", "/registry/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/methodology/", "/acquisition/"]
              + [entity_url(e) for e in sorted(model.entities)])
     urls = "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{model.as_of}</lastmod></url>\n" for p in paths)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
 
 
+def _json(data):
+    return json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
+
+
 def outputs(model):
+    gaps = registry.load(registry.ROOT / "data" / "gaps.json")
     files = {
         "registry/index.html": render_registry_index(model),
         "registry/evidence/index.html": render_evidence_index(model),
         "registry/questions/index.html": render_questions(model),
+        "registry/matrix/index.html": render_matrix(model),
+        "registry/matrix/matrix.json": _json({"registry_version": model.evidence["version"], "as_of": model.as_of,
+                                              "scope": "Relationships recorded in this registry between organisations or initiatives and what they act on; not a complete map.",
+                                              "rows": matrix_rows(model)}),
+        "registry/gaps/index.html": render_gaps(model, gaps),
+        "registry/gaps/gaps.json": _json({"registry_version": model.evidence["version"], "as_of": model.as_of, "note": gaps["note"],
+                                          "gaps": gap_register(model, gaps)}),
         "methodology/index.html": render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json")),
         "acquisition/index.html": render_acquisition(model),
         "sitemap.xml": sitemap(model),
@@ -994,7 +1249,7 @@ def outputs(model):
 def main(argv):
     check = "--check" in argv
     evidence, ontology = registry.load_all()
-    errors = registry.validate(evidence, ontology)
+    errors = registry.validate(evidence, ontology) + registry.validate_gaps(registry.load(registry.ROOT / "data" / "gaps.json"), evidence, ontology)
     if errors:
         for e in errors:
             print("ERROR", e)

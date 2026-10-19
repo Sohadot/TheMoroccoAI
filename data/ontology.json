@@ -88,7 +88,7 @@
       "summary": "The government department that launched Digital Morocco 2030 in September 2024, organised the First National AI Conference in July 2025 and presented the Morocco AI 2030 roadmap in September 2026.",
       "status": "Named in sources up to September 2026. See the note on the October 2026 government.",
       "note": "The government appointed on 16 October 2026 includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform. The registry has not yet verified whether that ministry takes over this department's portfolio.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040"]
     },
     {
       "id": "ministry-ai-digital-transformation",
@@ -144,7 +144,7 @@
       "alt_names": ["Université Mohammed VI Polytechnique"],
       "domain": "research-academia",
       "summary": "University that created the AI Movement research centre in March 2021, and signed a data-centre partnership convention at the July 2025 National AI Conference.",
-      "evidence": ["MAI-EV-0007", "MAI-EV-0016", "MAI-EV-0019", "MAI-EV-0020"]
+      "evidence": ["MAI-EV-0007", "MAI-EV-0016", "MAI-EV-0019", "MAI-EV-0020", "MAI-EV-0041"]
     },
     {
       "id": "ai-movement",
@@ -236,7 +236,7 @@
       "domain": "government-policy",
       "summary": "National AI roadmap presented by the Ministry of Digital Transition and Administration Reform. It is built on three pillars and relies on the JAZARI Institutes network. Its official 2030 targets are MAD 100 billion in added value to GDP, 50,000 jobs and 200,000 certified AI talents.",
       "status": "Under implementation according to the ministry (September 2026). Targets run to 2030.",
-      "evidence": ["MAI-EV-0008", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0018"]
+      "evidence": ["MAI-EV-0008", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0018", "MAI-EV-0040"]
     },
     {
       "id": "jazari-network",
@@ -363,7 +363,7 @@
       "project_kind": "digital-platform",
       "lifecycle": "operational",
       "lifecycle_evidence": ["MAI-EV-0034"],
-      "evidence": ["MAI-EV-0013", "MAI-EV-0034"]
+      "evidence": ["MAI-EV-0013", "MAI-EV-0034", "MAI-EV-0040"]
     },
     {
       "id": "idarati-ai",
@@ -381,7 +381,7 @@
         {"name": "Access points", "value": "chatbot.idarati.ma, opened from idarati.ma", "evidence": "MAI-EV-0038"},
         {"name": "Scope", "value": "National public-service portal", "evidence": "MAI-EV-0035"}
       ],
-      "evidence": ["MAI-EV-0013", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038"]
+      "evidence": ["MAI-EV-0013", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040"]
     },
     {
       "id": "law-09-08",
@@ -482,7 +482,7 @@
       "name": "Toubkal supercomputer",
       "alt_names": ["Toubkal"],
       "domain": "infrastructure-sovereignty",
-      "summary": "High-performance computing system at the African Supercomputing Centre of Mohammed VI Polytechnic University, installed in 2020 and listed in the June 2026 TOP500 at rank 409, with 71,232 cores and a 3.16 PFlop/s Linpack result. It is general-purpose computing infrastructure; no specific AI application running on it is documented in this registry.",
+      "summary": "High-performance computing system at the African Supercomputing Centre of Mohammed VI Polytechnic University, installed in 2020 and listed in the June 2026 TOP500 at rank 409, with 71,232 cores and a 3.16 PFlop/s Linpack result. It is general-purpose computing infrastructure with CPU and GPU partitions. Authors affiliated with its host university report that fine-tuning of large language models has been run on it; no specific AI application, its scale or its users are documented in this registry.",
       "status": "Operational compute infrastructure, as listed in the June 2026 TOP500 (benchmark result unchanged since June 2021). Current utilisation not documented.",
       "project_kind": "compute-infrastructure",
       "lifecycle": "operational",
@@ -491,9 +491,11 @@
         {"name": "Linpack performance (Rmax)", "value": "3.16 PFlop/s", "evidence": "MAI-EV-0020"},
         {"name": "Cores", "value": "71,232", "evidence": "MAI-EV-0020"},
         {"name": "Installation year", "value": "2020", "evidence": "MAI-EV-0020"},
-        {"name": "TOP500 rank, June 2026", "value": "409", "evidence": "MAI-EV-0020"}
+        {"name": "TOP500 rank, June 2026", "value": "409", "evidence": "MAI-EV-0020"},
+        {"name": "GPU partitions", "value": "NVIDIA A100 (2022) and H100 (added 2025)", "evidence": "MAI-EV-0041"},
+        {"name": "Reported AI workloads (operator-affiliated authors)", "value": "Fine-tuning runs that produced the GemMaroc Moroccan Darija language models (Belkasmi et al.), presented as a benchmark", "evidence": "MAI-EV-0041"}
       ],
-      "evidence": ["MAI-EV-0020"]
+      "evidence": ["MAI-EV-0020", "MAI-EV-0041"]
     },
     {
       "id": "nexus-ai-factory",

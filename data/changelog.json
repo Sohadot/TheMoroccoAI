@@ -1,7 +1,22 @@
 {
-  "note": "Compiled on 19 October 2026 from the public repository's history; it was not published alongside each release. Each entry is a commit on main, and the commit and its message are the record. Counts are those of data/evidence.json and data/ontology.json at that commit. Corrections changed content that had already been published; pre-release review fixes were made before a version was merged and were never published.",
+  "note": "Compiled on 19 October 2026 from the public repository's history; it was not published alongside each release. Each entry links to its commit on main or to the pull request that published it, where the merge commit is shown. Counts are those of data/evidence.json and data/ontology.json in that version; for registry versions the date is the registry's as-of date. Corrections changed content that had already been published; pre-release review fixes were made before a version was merged and were never published.",
   "repository": "https://github.com/Sohadot/TheMoroccoAI",
   "entries": [
+    {
+      "date": "2026-10-19",
+      "pull_request": 5,
+      "title": "Registry v0.4.0: institutional matrix and evidence gaps",
+      "version": "0.4.0",
+      "records": 41,
+      "entities": 65,
+      "relationships": 78,
+      "changes": [
+        "Institutional evidence matrix: each organisation's and initiative's documented relationships, with classification, the related entity's status, sources and qualifications, also as matrix.json.",
+        "Evidence gap register: five open questions, with what the registry establishes, what it does not and what would resolve each, also as gaps.json; gaps are re-checked against the data on every build.",
+        "Questions Q8 (organisations and projects) and Q9 (official targets and recorded progress).",
+        "Two records: the ministry's presentation of the Maroc IA 2030 roadmap's main advances (MAI-EV-0040), and a peer-reviewed article on Toubkal reporting large-language-model fine-tuning, written by authors affiliated with its host university (MAI-EV-0041)."
+      ]
+    },
     {
       "date": "2026-10-18",
       "commit": "391006a29e20a6554e7ab90f58734c12ac59404f",

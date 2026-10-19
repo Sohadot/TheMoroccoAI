@@ -261,3 +261,13 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
 .change ul { margin: 4px 0 0 20px; font-size: 16px; color: var(--text-sub); }
 .change-sub { margin-top: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
 .table-wrap + .prose { margin-top: 16px; }
+
+/* ─── MATRIX AND GAPS ─── */
+.qtable .group-row th { background: var(--sand, #e8dcc8); text-align: left; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--blue); padding: 10px 14px; }
+.ev-meta { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: var(--text-dim); }
+.gap { border-top: 1px solid var(--border); padding-top: 28px; margin-top: 36px; }
+.gap h3 { font-size: 18px; color: var(--blue); margin: 18px 0 6px; }
+.gap-meta { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); margin: 6px 0 4px; }
+.badge-gap-open { background: #fff4e0; color: #7a4a00; border: 1px solid #d9a441; }
+.badge-gap-resolved { background: #e6f2ea; color: #1e5631; border: 1px solid #6aa67f; }
+.qtable .group-row .ev-meta { color: var(--text-sub); }

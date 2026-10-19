@@ -37,7 +37,8 @@ class SourceChecker(unittest.TestCase):
 
     def test_blocked_and_challenge_pages_are_not_checked(self):
         for kwargs in ({"status": 403, "body": b"Forbidden"}, {"status": 429, "body": b""},
-                       {"status": 200, "body": b"<title>Just a moment...</title>"}):
+                       {"status": 200, "body": b"<title>Just a moment...</title>"},
+                       {"status": 200, "body": b"<title>Client Challenge</title><p>Please enable JavaScript to proceed.</p>"}):
             with self.subTest(**{k: str(v) for k, v in kwargs.items()}):
                 e = check_sources.check_record(RECORD, fetcher(**kwargs))
                 self.assertEqual(e["fetch"], "blocked")

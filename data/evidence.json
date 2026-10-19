@@ -1,7 +1,7 @@
 {
   "registry": "TheMoroccoAI Evidence Registry",
-  "version": "0.3.0",
-  "as_of": "2026-10-18",
+  "version": "0.4.0",
+  "as_of": "2026-10-19",
   "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
   "classifications": {
     "VERIFIED FACT": "An event, act or status that the cited source documents directly (for example, a signature, a launch or an appointment).",
@@ -853,6 +853,53 @@
       "verification_status": "verified",
       "verification_note": "Primary regulatory document. A 510(k) clearance permits marketing in the United States; the FDA distinguishes it from premarket approval (PMA). It is not a finding of clinical outcomes and does not authorise or show use in Morocco. The summary's performance figures are not recorded, and the contact person's name, e-mail address and telephone number are not reproduced. The shared web domain and Moroccan data sites associate the applicant with the deepecho.io developer that UM6P Ventures describes as Morocco-based (MAI-EV-0028), but no source establishes their legal relationship.",
       "related_entities": ["deepecho-ultrasound-software", "deepecho"]
+    },
+    {
+      "evidence_id": "MAI-EV-0040",
+      "title": "Maroc IA 2030: presentation of the roadmap's \"main advances\"",
+      "source_organization": "Maroc.ma (national portal of the Kingdom of Morocco)",
+      "source_type": "government_portal",
+      "source_url": "https://www.maroc.ma/fr/actualites/les-principales-avancees-de-la-feuille-de-route-maroc-ia-2030-presentees-rabat",
+      "source_language": "fr",
+      "publication_date": "2026-09-09",
+      "retrieval_date": "2026-10-19",
+      "evidence_type": "news_dispatch",
+      "claim": "The national portal reports that the Ministry of Digital Transition and Administration Reform presented in Rabat what it calls the main advances of the Maroc IA 2030 roadmap. The article describes the roadmap as resting on three pillars and ten structuring programmes, and lists the items presented: the sovereign AI marketplace, Idarati AI, a proof of concept of the national meta-application and e-wallet, and a \"Livre Rose\" on digital sovereignty.",
+      "source_excerpts": [
+        "a présenté, mardi à Rabat, les principales avancées de la feuille de route \"Maroc IA 2030\"",
+        "Cette feuille de route repose sur trois grands socles",
+        "outre dix programmes structurants",
+        "Parmi les premières solutions figure Idarati AI",
+        "un Proof of Concept (POC) de la méta-application et du e-wallet national"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "The French version of the dispatch behind MAI-EV-0011 to MAI-EV-0013, with more detail. Although it presents the roadmap's \"main advances\", it gives no quantified progress towards the three 2030 targets (MAD 100 billion, 50,000 jobs, 200,000 talents): it restates them and lists items presented. A presentation is not evidence of delivery or use.",
+      "related_entities": ["morocco-ai-2030", "ministry-digital-transition", "sovereign-ai-marketplace", "idarati-ai"]
+    },
+    {
+      "evidence_id": "MAI-EV-0041",
+      "title": "TOUBKAL: peer-reviewed description of the system and its reported workloads",
+      "source_organization": "The Journal of Supercomputing (Springer)",
+      "source_type": "academic_journal",
+      "source_url": "https://link.springer.com/article/10.1007/s11227-025-07858-8",
+      "source_language": "en",
+      "publication_date": "2025-10-03",
+      "retrieval_date": "2026-10-19",
+      "evidence_type": "journal_article",
+      "claim": "A peer-reviewed article in The Journal of Supercomputing, by authors affiliated with Mohammed VI Polytechnic University's College of Computing, describes Toubkal's GPU partitions (NVIDIA A100 nodes from the initial 2022 deployment and H100 nodes added in 2025). It states that fine-tuning of transformer-based large language models and large-scale computational fluid dynamics simulations have been run on the system, and presents as a benchmark the fine-tuning runs, attributed to Belkasmi et al., that produced the GemMaroc Moroccan Darija language models.",
+      "source_excerpts": [
+        "TOUBKAL: a high-performance supercomputer powering scientific research in Africa",
+        "The initial deployment in 2022 included five Dell XE8545 nodes with dual AMD EPYC 7713 CPUs and four NVIDIA A100-SXM4-80GB GPUs per node.",
+        "In 2025, three Dell XE8640 nodes were added, each with dual Intel Xeon Platinum 8468 CPUs and four NVIDIA H100-HBM3-80GB GPUs.",
+        "we examine practical workloads such as fine-tuning transformer-based large language models (LLMs) and conducting large-scale computational fluid dynamics (CFD) simulations, both of which have been successfully run on Toubkal.",
+        "we present a practical benchmark demonstrating the fine-tuning of a large language model (LLM) performed on the Toubkal supercomputer by Belkasmi et al.",
+        "This work led to the creation of GemMaroc"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Open-access article (CC BY 4.0), published online 3 October 2025. Every author lists an affiliation with the university that hosts and runs Toubkal, so the workload statement is the operator's own report, peer-reviewed but not independent. It documents specific fine-tuning runs (the GemMaroc study by Belkasmi et al., which the registry has not retrieved), not the scale, share or continuity of AI use. The article's user counts and utilisation figures are not recorded. Benchmark, accuracy and energy figures in the article are not recorded. The verified fact is what the article states. Excerpts were matched against the article page retrieved on the retrieval date; automated requests to the publisher can receive a bot-challenge page, which the source checker reports as blocked and does not bypass.",
+      "related_entities": ["toubkal-supercomputer", "um6p"]
     }
   ]
 }
