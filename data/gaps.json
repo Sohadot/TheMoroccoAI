@@ -1,5 +1,5 @@
 {
-  "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
+  "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. A gap is opened when a reference question asks something the records cannot answer; every strategy with an official target has a gap on its measured progress, which the build checks. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
   "open_wording": "No qualifying evidence is currently recorded in this registry.",
   "states": {
     "open": "The question cannot yet be answered from the records in this registry. It is a limit of coverage, not a finding that the evidence or the thing asked about does not exist.",
@@ -94,7 +94,7 @@
         "MAI-EV-0018",
         "MAI-EV-0040"
       ],
-      "assessed_fingerprint": "50ab42a3a488252f",
+      "assessed_fingerprint": "a0f5768748f67c38",
       "assessed": "2026-10-19",
       "state": "open"
     },
@@ -195,7 +195,7 @@
       "question": "Which relationships asserting a formal act (a signature, creation, designation, investment, development or operation) rest only on announcements, news reports or descriptions in this registry?",
       "entities": [],
       "established": [],
-      "unestablished": "The instrument or formal record behind each relationship listed below: the signed text, founding act, designation, investment or operating record. This measures how each relationship is documented in this registry, not whether it is true: an official report of a signing is good evidence that a signing was announced, not of what the instrument says.",
+      "unestablished": "Any record other than an announcement, news report or description for each relationship listed below. Relationships not listed cite at least one other kind of record, such as an official report; for a signature that is still a report of the signing, not the signed text, which this registry does not record for any signature. This measures how each relationship is documented in this registry, not whether it is true.",
       "evidence_needed": [
         "Published texts of the conventions and memoranda",
         "Official Bulletin publications where applicable"
@@ -207,6 +207,55 @@
         }
       ],
       "assessed_records": [],
+      "assessed": "2026-10-19",
+      "state": "open"
+    },
+    {
+      "id": "GAP-06",
+      "question": "What publicly documented measurements show progress toward the official targets of Digital Morocco 2030?",
+      "entities": [
+        "digital-morocco-2030"
+      ],
+      "established": [
+        {
+          "text": "The strategy was launched in Rabat on 25 September 2024 by the Ministry of Digital Transition and Administration Reform.",
+          "evidence": [
+            "MAI-EV-0001"
+          ]
+        },
+        {
+          "text": "Its official 2030 objectives include 240,000 direct jobs with a contribution to GDP, digitalised public services, and a rise from 113th to 50th place in the e-government development index.",
+          "evidence": [
+            "MAI-EV-0002"
+          ]
+        },
+        {
+          "text": "The Head of Government stated that public investment in digital technology rose from MAD 11 million in 2021 to more than MAD 1.7 billion in 2024. The registry has not checked these figures, and spending is an input, not a measure of the targets.",
+          "evidence": [
+            "MAI-EV-0003"
+          ]
+        },
+        {
+          "text": "The ministry's report on the First National AI Conference frames the conference within the strategy.",
+          "evidence": [
+            "MAI-EV-0018"
+          ]
+        }
+      ],
+      "unestablished": "Any measured progress towards the jobs, GDP-contribution, public-services or e-government ranking objectives. No project is recorded as included in the strategy, and the investment figure is an unchecked statement about spending, not progress towards a target.",
+      "evidence_needed": [
+        "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)",
+        "The e-government development index rankings the ranking objective refers to, published in the United Nations E-Government Survey",
+        "Finance-law documents for the stated investment figures"
+      ],
+      "checks": [],
+      "assessed_records": [
+        "MAI-EV-0001",
+        "MAI-EV-0002",
+        "MAI-EV-0003",
+        "MAI-EV-0018"
+      ],
+      "assessed_fingerprint": "995977d4b1f1ba0b",
       "assessed": "2026-10-19",
       "state": "open"
     }

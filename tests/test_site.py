@@ -330,7 +330,7 @@ class ReferenceFirstPositioning(unittest.TestCase):
         page = _visible((REPO / "methodology" / "index.html").read_text(encoding="utf-8"))
         self.assertIn("Corrections to previously published content", page)
         self.assertIn("Found in pre-release review (never published)", page)
-        allowed = {"date", "commit", "pull_request", "title", "version", "records", "entities", "relationships", "changes", "corrections", "review_fixes"}
+        allowed = {"date", "commit", "pull_request", "title", "version", "records", "entities", "relationships", "changes", "corrections", "review_fixes", "breaking_changes"}
         for c in log["entries"]:
             self.assertLessEqual(set(c), allowed, c.get("commit") or c.get("pull_request"))
 

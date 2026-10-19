@@ -1,6 +1,6 @@
 {
   "registry": "TheMoroccoAI Evidence Registry",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "as_of": "2026-10-19",
   "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
   "classifications": {
@@ -215,7 +215,7 @@
       ],
       "classification": "ANNOUNCED PLAN",
       "verification_status": "verified",
-      "verification_note": "Coverage of all twelve regions is an announced design. The registry documents signed instruments for JAZARI ROOT (MAI-EV-0008) and JAZARI Industrie X.0 (MAI-EV-0009) only.",
+      "verification_note": "Coverage of all twelve regions is an announced design. The registry records reported signings of founding conventions for JAZARI ROOT (MAI-EV-0008) and JAZARI Industrie X.0 (MAI-EV-0009) only; neither signed text is recorded.",
       "related_entities": ["jazari-network", "jazari-root", "ministry-digital-transition", "public-administration", "rural-development", "sport"]
     },
     {
@@ -257,7 +257,7 @@
       ],
       "classification": "VERIFIED FACT",
       "verification_status": "verified",
-      "verification_note": "The fact recorded is how the ministry described the roadmap's structure. The registry has no separate signed instrument for JAZARI Smart City or JAZARI EduTech.",
+      "verification_note": "The fact recorded is how the ministry described the roadmap's structure. The registry records no founding convention, nor any signing of one, for JAZARI Smart City or JAZARI EduTech.",
       "related_entities": ["morocco-ai-2030", "ministry-digital-transition", "jazari-network", "jazari-root", "jazari-smart-city", "jazari-edutech", "jazari-industrie-x0"]
     },
     {
