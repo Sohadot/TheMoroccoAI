@@ -768,6 +768,10 @@
     nav { padding: 0 20px; gap: 12px; }
     .nav-links { gap: 16px; }
     .nav-links li:not(.nav-keep) { display: none; }
+    @media (max-width: 360px) {
+      nav { padding: 0 16px; }
+      .nav-links a { letter-spacing: 0.06em; }
+    }
 
     .hero { padding: 76px 20px 44px; min-height: 0; }
     .hero-meta { display: none; }
@@ -858,7 +862,7 @@
 <div class="status-bar" role="group" aria-label="Current registry coverage" tabindex="0">
   <div class="status-item">
     <div class="status-key">Registry version</div>
-    <div class="status-val">v<!--r:version-->0.4.0<!--/r:version--></div>
+    <div class="status-val">v<!--r:version-->0.4.1<!--/r:version--></div>
   </div>
   <div class="status-item">
     <div class="status-key">Evidence records</div>

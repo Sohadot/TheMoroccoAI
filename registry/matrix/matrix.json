@@ -1,6 +1,114 @@
 {
  "as_of": "2026-10-19",
- "registry_version": "0.4.0",
+ "derivation": {
+  "documentation_basis": {
+   "announcement_evidence_types": [
+    "news_dispatch",
+    "press_release",
+    "official_announcement",
+    "official_statement",
+    "organization_page",
+    "case_study",
+    "press_article"
+   ],
+   "formal_act_relationships": [
+    "signatory_of",
+    "created",
+    "designated",
+    "invested_in",
+    "develops",
+    "operates",
+    "hosts",
+    "lists_in_framework"
+   ],
+   "rule": "For a relationship whose type is in formal_act_relationships: announcement-or-description when every record it cites has an evidence_type in announcement_evidence_types, otherwise includes-formal-record. For any other relationship: declaration-or-event. Describes how a relationship is documented in this registry, not whether it is true. documented_as and documentation_basis are independent: a row can read Signed while resting only on an announcement.",
+   "values": {
+    "announcement-or-description": "A formal-act relationship whose every cited record has one of the announcement evidence types. These are listed in GAP-05.",
+    "declaration-or-event": "Any other relationship: declarations, public events and a programme's stated composition, whose primary record is an announcement. Not measured this way.",
+    "includes-formal-record": "A formal-act relationship that cites at least one record of another type."
+   }
+  },
+  "documented_as": {
+   "by_classification": {
+    "ANNOUNCED PLAN": "Announced or planned",
+    "INDEPENDENT ANALYSIS": "Registry inference",
+    "OFFICIAL TARGET": "Target",
+    "UNVERIFIED CLAIM": "Unverified claim"
+   },
+   "rule": "Derived from the relationship's classification and, for VERIFIED FACT, its relationship type. It never upgrades a record.",
+   "verified_fact_by_relationship": {
+    "develops": "Developed",
+    "operates": "Operated",
+    "signatory_of": "Signed"
+   },
+   "verified_fact_otherwise": "Documented"
+  },
+  "evidence": "For each record the relationship cites: its id, source_url, source_type, evidence_type, publication_date and retrieval_date, copied from evidence.json.",
+  "object.lifecycle": "The related entity's lifecycle key from ontology.json (defined in its lifecycle_stages); null for entity types without a lifecycle.",
+  "object.stage": {
+   "availability_suffix": " (public availability; use not documented)",
+   "labels": {
+    "announced": "Announced",
+    "discontinued": "Discontinued",
+    "in-development": "In development",
+    "operational": "Operational",
+    "pilot": "Pilot",
+    "released": "Released",
+    "unresolved": "Unresolved"
+   },
+   "rule": "A display label: labels[object.lifecycle], followed by availability_suffix when the stage is operational or pilot and every lifecycle_evidence record declaring that stage (status_evidence equal to it) has status_basis public-availability-observed. Other bases (an operator's or independent report of use, an independent listing) add nothing to the label. Use object.lifecycle and the records' status_basis for machine processing."
+  },
+  "object.status_as_recorded": "The related entity's free-text status field in ontology.json; null when absent.",
+  "qualifications": {
+   "rule": "Explanatory sentences for readers, in this order, each added when its condition holds. Not a controlled vocabulary.",
+   "rules": [
+    {
+     "text": "the note",
+     "when": "The relationship has a note in ontology.json"
+    },
+    {
+     "text": "A signature is recorded as a signature; delivery is not documented.",
+     "when": "documented_as is Signed and object.lifecycle is announced"
+    },
+    {
+     "text": "Not verified as delivered.",
+     "when": "documented_as is Announced or planned"
+    },
+    {
+     "text": "Documented here only by announcements, news reports or descriptions; the instrument is not recorded (GAP-05).",
+     "when": "documentation_basis is announcement-or-description"
+    }
+   ]
+  },
+  "relationship_label": "The predicate's label in ontology.json (predicates.<relationship>.label).",
+  "row_id": "subject|relationship|object, joined with '|'. A relationship is identified by this triple, which is unique in ontology.json.",
+  "row_order": "Rows are sorted by the tuple (subject, relationship, object), compared element by element as strings; not by row_id, so 'um6p|…' sorts before 'um6p-ventures|…'. Each row's evidence keeps the order of the relationship's evidence list in ontology.json.",
+  "row_selection": {
+   "object_types": [
+    "project",
+    "initiative",
+    "institution",
+    "company",
+    "legal_instrument",
+    "model",
+    "dataset",
+    "event"
+   ],
+   "rule": "Every relationship in ontology.json whose subject has one of subject_types and whose object has one of object_types.",
+   "subject_types": [
+    "institution",
+    "company",
+    "initiative"
+   ]
+  },
+  "subject.name, object.name, object.type": "Copied from the entity in ontology.json."
+ },
+ "derived_from": [
+  "/data/ontology.json",
+  "/data/evidence.json"
+ ],
+ "documentation": "/data/",
+ "registry_version": "0.4.1",
  "rows": [
   {
    "classification": "VERIFIED FACT",

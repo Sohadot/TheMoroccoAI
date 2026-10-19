@@ -1,0 +1,148 @@
+{
+ "as_of": "2026-10-19",
+ "classification_support": {
+  "lifecycle": {
+   "announced": [
+    "ANNOUNCED PLAN",
+    "VERIFIED FACT"
+   ],
+   "discontinued": [
+    "VERIFIED FACT"
+   ],
+   "in-development": [
+    "VERIFIED FACT"
+   ],
+   "operational": [
+    "VERIFIED FACT"
+   ],
+   "pilot": [
+    "VERIFIED FACT"
+   ],
+   "released": [
+    "VERIFIED FACT"
+   ]
+  },
+  "lifecycle_rule": "An entity's lifecycle_evidence must include a record whose classification is in the stage's list. For a stage in status_stages, one of those records must also declare it (status_evidence equal to the stage). announced and unresolved need no declaring record; unresolved needs a note instead.",
+  "note": "Two of the validator's rules, published so that they can be checked. Its other rules (for example that an operational stage names its operator, or that a source is independent) are described in the methodology and README, not here.",
+  "relationship": {
+   "ANNOUNCED PLAN": [
+    "ANNOUNCED PLAN",
+    "OFFICIAL TARGET",
+    "VERIFIED FACT"
+   ],
+   "INDEPENDENT ANALYSIS": "at least two cited records and a note",
+   "OFFICIAL TARGET": [
+    "OFFICIAL TARGET"
+   ],
+   "UNVERIFIED CLAIM": [
+    "UNVERIFIED CLAIM"
+   ],
+   "VERIFIED FACT": [
+    "VERIFIED FACT"
+   ]
+  },
+  "relationship_rule": "A relationship with a classification listed here must cite at least one record whose classification is in its list.",
+  "status_stages": [
+   "in-development",
+   "pilot",
+   "operational",
+   "released",
+   "discontinued"
+  ]
+ },
+ "consumer_example": "/examples/registry_consumer.py",
+ "documentation": "/data/",
+ "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
+ "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
+ "registry": "TheMoroccoAI Evidence Registry",
+ "registry_version": "0.4.1",
+ "resources": [
+  {
+   "bytes": 74780,
+   "path": "/data/evidence.json",
+   "purpose": "Evidence records: source URL and organisation, publication and retrieval dates, verbatim excerpts, classification, verification status and note. Defines the classifications and verification statuses it uses.",
+   "role": "canonical",
+   "sha256": "abc8debf066cd3ca953bb199e947ad463966027672ecd06e84a9fb4934e6f455"
+  },
+  {
+   "bytes": 59626,
+   "path": "/data/ontology.json",
+   "purpose": "Entity types, lifecycle stages, project kinds, origins, domains and predicates (each defined), then entities and typed relationships, each citing records in evidence.json.",
+   "role": "canonical",
+   "sha256": "4376e5f2984fee910084fd52c2c3767066cb952fe1ebd097d243f4809d0df45d"
+  },
+  {
+   "bytes": 8633,
+   "path": "/data/gaps.json",
+   "purpose": "Evidence gaps: what is established (with records), what is not, what would resolve each, the records and data digest each assessment rests on, and the data checks re-run on every build.",
+   "role": "canonical",
+   "sha256": "15b66386bd8df48aa6f952f56a2a8d274e0febd1183cd801a29903b880255614"
+  },
+  {
+   "bytes": 7700,
+   "path": "/data/changelog.json",
+   "purpose": "Published registry versions, corrections, and the commit or pull request behind each.",
+   "role": "canonical",
+   "sha256": "bd1e18ba67393c5f795ca43fe5895f9a4af5284a02756e19760867fab799f437"
+  },
+  {
+   "bytes": 57560,
+   "path": "/registry/matrix/matrix.json",
+   "purpose": "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row.",
+   "role": "derived",
+   "sha256": "1b49d84eaf949d50af8f3784780ab1e204cca5897222b0d59ba49bfdb4e0db85"
+  },
+  {
+   "bytes": 17473,
+   "path": "/registry/gaps/gaps.json",
+   "purpose": "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json.",
+   "role": "derived",
+   "sha256": "daa0cad53c6fe2f9005fb48a22dbe4d9d431057e2037f041c2c01293f90da92c"
+  }
+ ],
+ "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
+ "site": "https://themoroccoai.com",
+ "vocabularies": {
+  "evidence_type": [
+   "news_dispatch",
+   "official_report",
+   "official_statement",
+   "official_announcement",
+   "press_release",
+   "regulatory_page",
+   "model_card",
+   "dataset_card",
+   "preprint",
+   "journal_article",
+   "organization_page",
+   "case_study",
+   "ranking_entry",
+   "press_article",
+   "regulatory_record",
+   "live_service_observation",
+   "procurement_notice"
+  ],
+  "note": "Values the validator accepts in evidence.json, with display labels where the site uses them. Other defined values are defined in the file that uses them.",
+  "source_type": {
+   "academic_journal": "Peer-reviewed journal",
+   "academic_preprint": "Academic preprint",
+   "government_portal": "Government portal",
+   "government_publication": "Government publication",
+   "independent_list": "Independent list",
+   "intergovernmental_organization": "Intergovernmental organisation",
+   "investor_publication": "Investor publication",
+   "organization_website": "Organisation's own website",
+   "regulator": "Regulator",
+   "secondary_press": "Secondary press",
+   "signatory_organization": "Signatory organisation",
+   "state_news_agency": "State news agency",
+   "technical_repository": "Technical repository"
+  },
+  "status_basis": {
+   "independent-listing": "independent listing",
+   "independent-report-of-use": "independent report of use",
+   "operator-report-of-use": "operator's report of use",
+   "public-availability-observed": "public availability on the operator's own service (usage not documented)"
+  }
+ }
+}

@@ -19,6 +19,8 @@ pages are committed.
 | `registry/matrix/` | Generated institutional evidence matrix (HTML and `matrix.json`): each organisation's and initiative's documented relationships, with classification, the related entity's status, sources and qualifications. |
 | `registry/gaps/` | Generated evidence gap register (HTML and `gaps.json`) from `data/gaps.json`. |
 | `data/gaps.json` | Open evidence questions: what is established (with records), what is not, what would resolve each. The validator re-checks every gap on each build: a new or edited record, or a changed stage, attribute or relationship concerning a gap's entities (tracked by `assessed_fingerprint`), or data that contradicts an open gap, fails the build until the gap is re-assessed (`python3 tools/registry.py --gap-fingerprints`). A resolved gap must cite the records that resolve it. |
+| `data/index.html`, `data/manifest.json` | Generated: the data reference for external consumers (files, identifiers, provenance, null values, versions, reproducibility of Q8 and Q9) and a manifest of the published JSON with the SHA-256 of each file. |
+| `examples/registry_consumer.py` | Published example consumer: reads only the JSON listed in the manifest (standard library, no import of `tools/`), verifies references, versions and hashes, recomputes the matrix, gap checks and digests from the rules published in `matrix.json` and `registry/gaps/gaps.json`, and prints relationships, gaps and the reproducible parts of Q8 and Q9. `python3 examples/registry_consumer.py --source . verify` runs it on a local checkout. |
 | `methodology/` | Generated: what the registry documents and does not establish, admission and correction rules, and the changelog. |
 | `acquisition/` | Generated: transferable assets, what exists today compared with the owner's view of potential, confidential contact. |
 | `data/changelog.json` | Public changelog: one entry per published version, each tied to a commit on `main`. Add an entry when the registry version changes; a test checks that the latest entry matches the data. |
@@ -26,7 +28,7 @@ pages are committed.
 | `tools/build.py` | Static generator: registry pages, homepage blocks, `sitemap.xml`. |
 | `tools/check_sources.py` | Source checker (network; never run by the build): re-fetches each source once per run, spaced per host, and re-matches its excerpts. Reports reachable, blocked, HTTP error, redirects, matched and changed separately, and flags superseded records; claim support stays a manual review. Never edits data or writes into `data/`. |
 | `tools/check_site.py` | Site gates: links, anchors, metadata, canonicals, third-party resources, accessibility basics, sitemap, contact path, confidential terms, credentials. |
-| `tests/` | `unittest` suite, including negative cases for every gate. |
+| `tests/` | `unittest` suite, including negative cases for every gate. `test_layout.py` renders narrow pages in headless Chromium with the web fonts removed; it skips when no Chromium or Chrome binary is found (set `CHROME_BIN`). |
 | `assets/` | Registry stylesheet and self-hosted fonts (SIL OFL 1.1, see `assets/fonts/OFL.txt`). |
 | `AUDIT_REPORT.md` | Sprint 01 repository audit and its evidence. |
 
@@ -81,6 +83,13 @@ and relationships classified beyond what their evidence supports.
   truth. Declarations and public events are not measured this way.
 - **Regulatory wording**: a 510(k) is a clearance; registry text may not call a device FDA-approved
   except inside a quotation.
+- **Versions**: `evidence.json` and `ontology.json` carry the same `version` and `as_of`; the validator rejects a
+  mismatch. The version changes, with a changelog entry, whenever published reference data or its meaning changes
+  (records, entities, relationships, gap assessments, definitions); an editorial change that affects neither may be
+  published without one.
+- **Identifiers**: published identifiers are never reused. A record, entity or relationship may be corrected or
+  withdrawn, with the change in the changelog; a withdrawn identifier stays retired. `tests/test_consumer.py` checks
+  every published version on `main` (CI fetches full history); list a withdrawal in `WITHDRAWN` there.
 - **Origin** (companies): `based-in-morocco` (independent source required),
   `self-described-moroccan`, `foreign-moroccan-subsidiary-reported`,
   `foreign-moroccan-operations-verified` (independent primary source required) or `unresolved`,

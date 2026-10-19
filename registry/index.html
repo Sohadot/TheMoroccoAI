@@ -21,7 +21,7 @@
  "name": "TheMoroccoAI Evidence Registry",
  "description": "Primary-source evidence records and an ontology of institutions, initiatives and projects in Morocco's AI ecosystem, with claims classified as verified fact, official target, announced plan, independent analysis or unverified claim.",
  "url": "https://themoroccoai.com/registry/",
- "version": "0.4.0",
+ "version": "0.4.1",
  "dateModified": "2026-10-19",
  "isAccessibleForFree": true,
  "creator": {
@@ -65,7 +65,7 @@
 <main id="content">
 <div class="page">
 <header class="page-head">
-  <p class="label">MAI-REG — Reference Registry v0.4.0</p>
+  <p class="label">MAI-REG — Reference Registry v0.4.1</p>
   <h1>Morocco’s AI ecosystem, <em>on the record.</em></h1>
   <p class="lede">Institutions, initiatives and projects in Morocco’s artificial intelligence ecosystem. Every entry cites its source, whose type is labelled, with a verbatim excerpt and dates, and <strong>facts, official targets, announced plans and our own analysis are labelled separately</strong>.</p>
   <p class="notice"><strong>Independent.</strong> TheMoroccoAI is an independent reference project. It is not affiliated with, endorsed by or operated by the Government of Morocco or any institution listed here. Records quote public sources and link to them; they are not official statements.</p>
@@ -103,7 +103,9 @@
 
 <section aria-labelledby="data-h">
   <h2 id="data-h"><span class="section-number">05</span>Machine-readable data</h2>
+  <p class="prose"><a href="/data/">Using the registry data</a> describes the files, identifiers, null values and versions, says which answers can be recomputed, and links to an example that checks the data independently.</p>
   <ul class="data-links">
+    <li><a href="/data/manifest.json"><code>/data/manifest.json</code></a>: the list of published JSON files, with the SHA-256 of each in this version.</li>
     <li><a href="/data/evidence.json"><code>/data/evidence.json</code></a>: every evidence record, with its source URL, dates, verbatim excerpts, classification and verification status.</li>
     <li><a href="/data/ontology.json"><code>/data/ontology.json</code></a>: entity types, domains, predicates, entities and typed relationships, each citing its evidence.</li>
     <li><a href="/registry/evidence/">All evidence on one page</a>, each record addressable as <code>/registry/evidence/#MAI-EV-NNNN</code>.</li>
@@ -114,7 +116,7 @@
   <h2 id="method-h"><span class="section-number">06</span>Method and limits</h2>
   <div class="prose">
     <p>Each record was retrieved from its source on the stated retrieval date, and its excerpt was matched against the retrieved text. An automated validator checks every build. It requires unique identifiers, https source URLs, valid dates and complete fields, and that every entity and relationship cites existing evidence. It also blocks forward-looking wording in records classified as fact, and rejects any relationship whose classification its evidence does not support.</p>
-    <p>This version is deliberately small. It does not yet cover AI companies, models or datasets, and it omits facts it could not verify against an original source. Corrections can be sent to <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI%20registry%20correction">agent@sohadot.com</a>.</p>
+    <p>The registry is deliberately selective: it omits facts it could not verify against an original source, and an absent entry is a gap in coverage. Corrections can be sent to <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI%20registry%20correction">agent@sohadot.com</a>.</p>
   </div>
 </section>
 </div>
@@ -122,8 +124,8 @@
 <footer>
   <div class="footer-inner">
     <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
-    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.4.0 · as of 19 October 2026</span>
-    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/evidence.json">Data</a> · <a href="/acquisition/">Acquisition</a></span>
+    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.4.1 · as of 19 October 2026</span>
+    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/">Data</a> · <a href="/acquisition/">Acquisition</a></span>
   </div>
 </footer>
 </body>

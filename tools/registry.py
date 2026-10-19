@@ -405,6 +405,11 @@ def validate_ontology(ontology, evidence):
     entities = ontology.get("entities") or []
     if not entities:
         errors.append("ontology.json: no entities")
+    # Both files are published as one registry version; a consumer must be able to tell that they belong together.
+    for field in ("version", "as_of"):
+        if ontology.get(field) != evidence.get(field):
+            errors.append(f"ontology.json: {field} {ontology.get(field)!r} differs from evidence.json ({evidence.get(field)!r}); "
+                          "both files carry the registry's version and as_of date")
     # Keys are written into HTML ids and URLs by the generator, so they must be plain slugs.
     stages = ontology.get("lifecycle_stages") or {}
     origins = ontology.get("origins") or {}
@@ -577,6 +582,8 @@ def validate_gaps(gaps, evidence, ontology):
     wording = gaps.get("open_wording", "")
     if wording != "No qualifying evidence is currently recorded in this registry.":
         errors.append("gaps.json: open_wording must state a limit of the registry, not of the world")
+    if set(gaps.get("states") or {}) != set(GAP_STATES) or not all(str(v).strip() for v in (gaps.get("states") or {}).values()):
+        errors.append(f"gaps.json: states must define exactly {', '.join(GAP_STATES)}")
     seen = set()
     for g in gaps.get("gaps") or []:
         gid = g.get("id", "?")

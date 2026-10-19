@@ -1,5 +1,46 @@
 {
  "as_of": "2026-10-19",
+ "derivation": {
+  "assessed_fingerprint": {
+   "entity_fields": [
+    "type",
+    "lifecycle",
+    "lifecycle_evidence",
+    "project_kind",
+    "attributes",
+    "status",
+    "evidence"
+   ],
+   "record_fields": [
+    "claim",
+    "classification",
+    "status_evidence",
+    "status_basis",
+    "source_entity",
+    "superseded_by",
+    "associated_entities",
+    "source_url",
+    "publication_date",
+    "verification_status",
+    "related_entities"
+   ],
+   "rule": "The first 16 hexadecimal digits of the SHA-256 of a UTF-8 JSON text with sorted keys, non-ASCII characters unescaped and the separators ', ' and ': ' (Python's json.dumps(value, sort_keys=True, ensure_ascii=False)). The value is an object with three keys, each holding a list of JSON arrays (not objects). records: for each record whose related_entities (not associated_entities) include one of the gap's entities, superseded records included, the array [evidence_id] followed by the values of record_fields in that order (null when absent), sorted by evidence_id. entities: for each of the gap's entities, [id] followed by the values of entity_fields (null when absent), sorted by id. relationships: for each relationship whose subject or object is one of the gap's entities, [subject, predicate, object, classification, evidence, note] with evidence in its ontology.json order and note null when absent, the arrays sorted by subject, then predicate, then object (unique, so later elements are never compared). Field values are copied as they are in the files, lists unsorted. A gap without entities has no digest."
+  },
+  "checks": {
+   "computed_relationships": "Triggered when the computed list is empty.",
+   "lifecycle_in": "Triggered when a listed entity's lifecycle is not one of the check's stages; an entity without a lifecycle counts as not in them.",
+   "no_ai_application_link": "Triggered when any relationship, of any type and in either direction, joins the entity to an entity whose project_kind is ai-application.",
+   "no_status_basis": "Triggered when a record in the entity's lifecycle_evidence has a status_basis listed in the check's bases.",
+   "rule": "The checks and digests are in /data/gaps.json. A check type not listed here is an error, not a check to skip. A check holds when it is not triggered; a triggered check is an error only while the gap is open. An open gap must be re-assessed, and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."
+  },
+  "computed_relationships": "A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), in the matrix's row order, each entry giving id, subject, relationship, object, classification, evidence (ids) and evidence_types (in the same order). Its count is stated as N of M: N is the length of relationships and M, published as formal_act_relationships, the number of matrix rows whose relationship type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these are all such relationships in ontology.json. The list measures documentation, not truth, and may include relationships already classified as announced plans."
+ },
+ "derived_from": [
+  "/data/gaps.json",
+  "/data/ontology.json",
+  "/data/evidence.json"
+ ],
+ "documentation": "/data/",
  "gaps": [
   {
    "assessed": "2026-10-19",
@@ -30,6 +71,7 @@
     "An operator's report of use (annual report, parliamentary answer, published usage statistics)",
     "An independent evaluation of the service"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-01",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "What documents actual use, adoption, accuracy, service outcomes or sustained operation of Idarati AI?",
@@ -69,6 +111,7 @@
    "evidence_needed": [
     "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-02",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "What publicly documented measurements show progress toward the official targets of Morocco AI 2030?",
@@ -104,6 +147,7 @@
     "Published usage or allocation reports",
     "Independent publications acknowledging Toubkal for specific AI models"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-03",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "What independently documents AI workloads on the Toubkal supercomputer, and at what scale?",
@@ -148,6 +192,7 @@
     "Official project documentation (permits, commissioning notices)",
     "Operator or independent confirmation that a facility is built and running"
    ],
+   "formal_act_relationships": null,
    "id": "GAP-04",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "Which announced or signed computing and data-centre initiatives have verifiable construction, commissioning or operation?",
@@ -164,6 +209,7 @@
     "Published texts of the conventions and memoranda",
     "Official Bulletin publications where applicable"
    ],
+   "formal_act_relationships": 33,
    "id": "GAP-05",
    "open_wording": "No qualifying evidence is currently recorded in this registry.",
    "question": "Which relationships asserting a formal act (a signature, creation, designation, investment, development or operation) rest only on announcements, news reports or descriptions in this registry?",
@@ -426,5 +472,9 @@
   }
  ],
  "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
- "registry_version": "0.4.0"
+ "registry_version": "0.4.1",
+ "states": {
+  "open": "The question cannot yet be answered from the records in this registry. It is a limit of coverage, not a finding that the evidence or the thing asked about does not exist.",
+  "resolved": "Records in this registry now answer the question; resolved_by lists them."
+ }
 }
