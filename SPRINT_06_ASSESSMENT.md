@@ -189,4 +189,75 @@ an open question, so none was created. This is listed below as an owner decision
 2. **JAZARI institutes delivery.** Should a gap cover the institutes' constitution and operation, parallel to
    GAP-04? I did not create one, because no reference answer currently leaves it unanswered.
 3. **`signed_instrument`.** The type is reserved but unused. Please confirm that reading a signed text should be
-   recorded this way when one is obtained.
+   recorded this way when one is obtained. (The pre-merge review below now defines its admission rules.)
+
+## Pre-merge compatibility review (owner request)
+
+### 1–2. Breaking change and migration note
+
+- **Where it is declared.** The rename of `matrix.json` `rows[].documentation_basis` from `includes-formal-record` to
+  `includes-non-announcement-record` is now declared as a breaking change to the data contract in three places:
+  - the manifest (`breaking_changes`: version, file, field, old, new, reason, consumer effect, migration);
+  - `/data/` section 09, "Changes to the data contract";
+  - the v0.5.0 changelog entry (`breaking_changes`, rendered on `/methodology/`).
+- **What the note says:**
+  - The rows the value covers are unchanged (14). Only the name changed, because the old one read as "the signed text
+    is recorded".
+  - The old value is accepted nowhere: there is no alias.
+  - A v0.4.1 consumer fails closed. A test runs the v0.4.1 example consumer from `c621153` and confirms it exits 1
+    with the documented message.
+  - Migration: replace the literal, or read the names from `derivation.documentation_basis.assignment`.
+- **Additive changes**, listed as such: a sentence added to the qualifications, GAP-06, and the
+  `signed_instrument` vocabulary value.
+- **Removed:** the interim `renamed` key in `matrix.json`, so that no mapping in a data file could be read as an alias.
+
+### 3. `signed_instrument` admission
+
+**Enforced by the validator:**
+- the record is a VERIFIED FACT with `verification_status: verified`;
+- its source type is a party or an official publisher (`government_publication`, `government_portal`,
+  `signatory_organization`, `regulator`, `intergovernmental_organization`). News agencies, the press, repositories
+  and lists are rejected;
+- it carries an `instrument` field with `title`, `signed_on`, `signatories` (at least two, each among
+  `related_entities`) and `access: full-text-read`;
+- only such a record may carry `instrument`;
+- a `signatory_of` relationship citing it must name one of its signatories;
+- the Signed caveat lifts only for a subject listed among those signatories.
+
+**Not enforceable mechanically, and stated as an editorial admission requirement** in the README and on `/data/`:
+the registry must have read the signed text in full. A report, summary, press release or news item about the
+signing never qualifies, even from a signatory or the government.
+
+10 negative cases are tested. No record has this type.
+
+### 4. JAZARI evidence audit
+
+- **No implication of delivery or operation.** All five JAZARI institutes are `announced`, each status says operation
+  or constitution is not verified, and their relationships are signatures (VERIFIED FACT, reported), composition
+  (VERIFIED FACT, or ANNOUNCED PLAN for Smart City and EduTech) and stated technologies and sectors (ANNOUNCED PLAN).
+- **The signed-text defect from Stage 1 recurred**, and is corrected:
+  - the network's `status` said "Signed founding instruments are documented for JAZARI ROOT and JAZARI Industrie
+    X.0";
+  - the MAI-EV-0010 note said the registry "documents signed instruments";
+  - the MAI-EV-0012 note and the Smart City and EduTech texts contrasted themselves with instruments that are not
+    held.
+- **The registry index** called JAZARI ROOT the network's "core institute". It now says "planned core institute",
+  and the network "announced".
+- **`morocco-ai-2030 implemented_through jazari-network`** (VERIFIED FACT, MAI-EV-0012) records the ministry's
+  description of the roadmap's design. It read as "Documented" with no qualification. It now carries a note:
+  implementation through the network is not documented. The classification is unchanged.
+- **GAP-02 re-assessed.** The note touches Morocco AI 2030, so the build required it. The text is unchanged; the
+  fingerprint is now `a0f5768748f67c38`.
+- **No new gap.** No published answer leaves JAZARI delivery unassessed: Q2 shows every institute as announced.
+  The parallel with GAP-04 remains an owner decision.
+
+### 5. Re-run
+
+- **Gates:** validator 0 problems; 78 generated files, 0 stale; `check_site --network` 74 pages, 0 problems.
+- **Consumer:** `verify` OK on v0.5.0, 6 gaps.
+- **Tests:** **271**, all passing.
+- **Mutations:**
+  - this review: 13 of 13 caught (R01–R13);
+  - the Sprint 06 set re-run: 13 caught. S02 no longer applies, because its target line was rewritten; R06 tests the
+    same behaviour.
+- **Determinism:** two rebuilds under different locale, time zone and hash seed leave 0 files differing.
