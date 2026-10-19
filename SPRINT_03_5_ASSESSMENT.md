@@ -103,3 +103,30 @@ No ranking, national total or completeness claim is made.
   owner's.
 - The three example answers depend on specific entity ids (`idarati-ai`, `morocco-ai-2030`). Removing
   or renaming one fails the build loudly; it cannot publish a silently wrong answer.
+
+## Independent pre-merge audit of PR #4 (on `13e813a`)
+
+Requested by the owner before merge. Data unchanged; findings and corrections:
+
+| # | Severity | Finding | Correction |
+| --- | --- | --- | --- |
+| 1 | MAJOR | **Toubkal presented as "AI compute".** The registry records it as general-purpose HPC (TOP500 listing, benchmark unchanged since 2021, no AI workload documented). The third example asked about "AI compute" and showed Toubkal as operational without its basis | Question now asks about "computing and data-centre infrastructure". Operational rows show their basis and evidence recency. The answer says compute infrastructure is not an AI application and no AI workload is recorded; that sentence is generated from the data. MAI-EV-0020 is linked |
+| 2 | MAJOR | **Morocco AI 2030 answer could read as progress.** The roadmap's "includes" links rest on a ministry presentation (MAI-EV-0013), which was not linked, and the answer did not say that a project's status is not progress toward the targets | Answer states the basis ("on the basis of the ministry's presentation") and links MAI-EV-0013. It adds the target record's own note ("The source gives no progress figures towards them") and that a project's status is not a measure of progress |
+| 3 | MAJOR | **Changelog presented pre-release review fixes as corrections, and did not say it was compiled retrospectively.** Checked against the data at each merge: the CNDP, Jazari, DarijaBERT, UM6P Ventures, Toubkal, FDA-wording and Berexia items were fixed before their version merged and were never published | Entries now separate "Corrections to previously published content" (3, each checked against the published data) from "Found in pre-release review (never published)". The note says the log was compiled on 19 October 2026 from repository history and not published with each release. "Site created" now says the site was committed, not published, on 13 February 2026 |
+| 4 | MINOR | **Acquisition page understated availability**: "may be considered for acquisition"; contact only at the end | "Available for strategic acquisition", with the confidential contact in the opening paragraph. Two rows added to the existing-versus-potential table (the exact-match domain; the public change history), with the owner's view stated as such; link to the owner's thesis. Contact path: mailto with subject; MX record for sohadot.com verified by `check_site.py --network` |
+| 5 | MINOR | **First screen did not lead to an answer**: the hero's second button went to the data access cards, and on 1280×800 and 1366×768 the buttons sat below the fold | Second button "See questions it answers" goes to the generated answers. Hero spacing reduced (text unchanged): both buttons in the first screen on desktop down to 1366×768; on a 375×740 phone, "Open the registry" is in the first screen |
+
+**Practical visitor test** (scripted in Chromium, desktop and mobile; homepage start, no prior knowledge):
+
+| Real question | Path | Result |
+| --- | --- | --- |
+| "Is Idarati AI actually being used?" | Hero "See questions it answers" (1 click) → answer → MAI-EV-0038 (2nd click) | Documented answer after 1 click: operational on public availability, use not documented. The primary record (source, verbatim excerpt, retrieval date) after 2 clicks. The owner's thesis was never on screen before the answer |
+| "Which Darija language models are publicly documented?" (not a homepage example) | Access card "Questions" (1 click) → Q3 | Atlas-Chat, DarijaBERT, Al-Atlas, Darija-SFT-Mixture with their evidence links; thesis never on screen |
+
+**Data licence:** no decision taken. The pages state only that no licence has been declared. Rights in
+the database and its organisation should be separated from the rights of cited sources before any
+licence is chosen.
+
+**After the audit:** 155 tests (4 new for these findings). Mutation testing: 21 of 21 caught (13
+earlier and 8 new); one earlier mutation, removing the contact in section 04, now leaves the contact in
+the opening paragraph, so it was re-run removing both. All other gates pass, and the data is unchanged.

@@ -294,6 +294,43 @@ class ReferenceFirstPositioning(unittest.TestCase):
             self.assertIn(heading, text)
         self.assertIn("No content or data licence has been declared", text)
 
+    def test_examples_do_not_exceed_their_evidence(self):
+        examples = self.home[self.home.index("<!--r:examples-->"):self.home.index("<!--/r:examples-->")]
+        text = _visible(examples)
+        # Toubkal is general-purpose computing: shown with its basis, never as AI compute in use.
+        self.assertNotIn("AI compute", text)
+        self.assertIn("Which institutions are documented as connected to computing and data-centre infrastructure?", text)
+        self.assertIn("basis: independent listing", text)
+        self.assertIn("records no AI workload on these systems", text)
+        self.assertIn('href="/registry/evidence/#MAI-EV-0020"', examples)
+        # Morocco AI 2030: inclusion rests on a presentation, and project status is not progress toward targets.
+        self.assertIn("on the basis of the ministry's presentation", text)
+        self.assertIn("A project's status is not a measure of progress toward the quantified targets", text)
+        self.assertIn("The source gives no progress figures towards them", text)
+        self.assertIn('href="/registry/evidence/#MAI-EV-0013"', examples)
+
+    def test_first_screen_leads_to_answered_questions(self):
+        hero = _section(self.home, "top")
+        self.assertIn('href="#examples"', hero)
+        self.assertLess(self.home.index('id="examples"'), self.home.index('id="thesis"'))
+
+    def test_acquisition_page_states_availability_and_contact_up_front(self):
+        page = (REPO / "acquisition" / "index.html").read_text(encoding="utf-8")
+        lede = page[page.index('<p class="lede">'):]
+        lede = lede[:lede.index("</p>")]
+        self.assertIn("available for strategic acquisition", lede)
+        self.assertIn(f'href="mailto:{check_site.CONTACT}?subject=', lede)
+
+    def test_changelog_is_marked_as_retrospective_and_separates_review_fixes(self):
+        log = registry.load(REPO / "data" / "changelog.json")
+        self.assertIn("it was not published alongside each release", log["note"])
+        page = _visible((REPO / "methodology" / "index.html").read_text(encoding="utf-8"))
+        self.assertIn("Corrections to previously published content", page)
+        self.assertIn("Found in pre-release review (never published)", page)
+        allowed = {"date", "commit", "title", "version", "records", "entities", "relationships", "changes", "corrections", "review_fixes"}
+        for c in log["entries"]:
+            self.assertLessEqual(set(c), allowed, c["commit"])
+
     def test_changelog_matches_the_published_data(self):
         log = registry.load(REPO / "data" / "changelog.json")
         latest = next(c for c in log["entries"] if c.get("version"))

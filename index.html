@@ -150,7 +150,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 100px 32px 64px;
+    padding: 80px 32px 56px;
     max-width: 900px;
     margin: 0 auto;
   }
@@ -159,7 +159,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
     opacity: 0;
     animation: fadeUp 0.8s ease 0.2s forwards;
   }
@@ -219,7 +219,7 @@
   }
 
   .hero-thesis {
-    margin-top: 36px;
+    margin-top: 24px;
     max-width: 560px;
     opacity: 0;
     animation: fadeUp 0.9s ease 0.6s forwards;
@@ -240,7 +240,7 @@
   .hero-cta {
     display: flex;
     gap: 16px;
-    margin-top: 44px;
+    margin-top: 28px;
     flex-wrap: wrap;
     opacity: 0;
     animation: fadeUp 0.9s ease 0.8s forwards;
@@ -621,7 +621,7 @@
 
   /* ─── NOTICE, ACCESS, EXAMPLES ─── */
   .hero-notice {
-    margin-top: 20px;
+    margin-top: 16px;
     padding: 12px 16px;
     border-left: 3px solid var(--gold);
     background: rgba(255,255,255,0.45);
@@ -769,7 +769,13 @@
     .nav-links { gap: 16px; }
     .nav-links li:not(.nav-keep) { display: none; }
 
-    .hero { padding: 88px 20px 52px; }
+    .hero { padding: 76px 20px 44px; min-height: 0; }
+    .hero-meta { display: none; }
+    .hero-thesis { margin-top: 20px; }
+    .hero-thesis p { font-size: 17px; line-height: 1.55; }
+    .hero-notice { margin-top: 14px; padding: 10px 14px; font-size: 15px !important; }
+    .hero-cta { margin-top: 22px; gap: 10px; }
+    .hero-cta a { padding: 12px 20px; }
 
     .thesis-grid { grid-template-columns: 1fr; }
     .landscape-grid { grid-template-columns: 1fr; }
@@ -844,7 +850,7 @@
 
   <div class="hero-cta">
     <a href="/registry/" class="btn-primary">Open the registry</a>
-    <a href="#access" class="btn-secondary">Inspect the evidence</a>
+    <a href="#examples" class="btn-secondary">See questions it answers</a>
   </div>
 </section>
 
@@ -979,13 +985,13 @@
       </article>
       <article class="example" aria-labelledby="ex-2030">
         <h3 class="example-q" id="ex-2030">What has Morocco AI 2030 set as targets, and what is verified so far?</h3>
-        <div class="example-a"><p>The Morocco AI 2030 roadmap, presented by the Ministry of Digital Transition and Administration Reform, sets 2030 targets of MAD 100 billion in added value to GDP, 50,000 direct and indirect jobs, and 200,000 trained and certified AI talents. The registry shows targets as targets, never as outcomes, and records no target as achieved.</p><p>The roadmap is recorded as including 2 projects, by announcement: <a href="/registry/sovereign-ai-marketplace/">Sovereign AI marketplace</a> (digital platform, not an AI application; operational (public availability; use not documented)); <a href="/registry/idarati-ai/">Idarati AI</a> (operational (public availability; use not documented)). Verified: it is implemented through <a href="/registry/jazari-network/">JAZARI Institutes network</a>.</p></div>
-        <p class="example-links">Evidence: <a href="/registry/morocco-ai-2030/">entity page</a> · <a href="/registry/evidence/#MAI-EV-0011">MAI-EV-0011</a> · <a href="/registry/questions/#q2-h">Q2 projects by stage</a></p>
+        <div class="example-a"><p>The Morocco AI 2030 roadmap, presented by the Ministry of Digital Transition and Administration Reform, sets 2030 targets of MAD 100 billion in added value to GDP, 50,000 direct and indirect jobs, and 200,000 trained and certified AI talents. These are targets. The source gives no progress figures towards them. The registry shows targets as targets, never as outcomes, and records no target as achieved.</p><p>The roadmap is recorded as including 2 projects, on the basis of the ministry's presentation: <a href="/registry/sovereign-ai-marketplace/">Sovereign AI marketplace</a> (digital platform, not an AI application; operational (public availability; use not documented)); <a href="/registry/idarati-ai/">Idarati AI</a> (operational (public availability; use not documented)). Verified: it is implemented through <a href="/registry/jazari-network/">JAZARI Institutes network</a>. A project's status is not a measure of progress toward the quantified targets.</p></div>
+        <p class="example-links">Evidence: <a href="/registry/morocco-ai-2030/">entity page</a> · <a href="/registry/evidence/#MAI-EV-0011">MAI-EV-0011</a> · <a href="/registry/evidence/#MAI-EV-0013">MAI-EV-0013</a> · <a href="/registry/questions/#q2-h">Q2 projects by stage</a></p>
       </article>
       <article class="example" aria-labelledby="ex-infra">
-        <h3 class="example-q" id="ex-infra">Which institutions are documented as connected to AI compute and data-centre infrastructure?</h3>
-        <div class="example-a"><ul><li><a href="/registry/toubkal-supercomputer/">Toubkal supercomputer</a>, compute infrastructure; operational: <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, hosts <span class="example-cls">(verified fact)</span></li><li><a href="/registry/nexus-ai-factory/">Nexus AI Factory</a>, compute infrastructure; announced: <a href="/registry/nexus-core-systems/">Nexus Core Systems</a>, signatory <span class="example-cls">(announced plan)</span>; <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(announced plan)</span></li><li><a href="/registry/green-data-centres-agreement/">Sovereign green data-centre infrastructure agreement</a>, agreement; announced: <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(verified fact)</span>; <a href="/registry/ministry-energy-transition/">Ministry of Energy Transition and Sustainable Development</a>, signatory <span class="example-cls">(verified fact)</span></li><li><a href="/registry/um6p-data-centre-partnership/">UM6P data-centre partnership convention</a>, agreement; announced: <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(verified fact)</span>; <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, signatory <span class="example-cls">(verified fact)</span></li></ul><p>3 of these 4 projects are only announced or signed: no record shows them built or running. A signature is recorded as a signature.</p></div>
-        <p class="example-links">Evidence: <a href="/registry/questions/#q5-h">Q5 relationships</a> · <a href="/registry/questions/#q2-h">Q2 projects by stage</a></p>
+        <h3 class="example-q" id="ex-infra">Which institutions are documented as connected to computing and data-centre infrastructure?</h3>
+        <div class="example-a"><ul><li><a href="/registry/toubkal-supercomputer/">Toubkal supercomputer</a>, compute infrastructure; operational (basis: independent listing; latest supporting evidence June 2026, within 12 months; operation after that date not reconfirmed): <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, hosts <span class="example-cls">(verified fact)</span></li><li><a href="/registry/nexus-ai-factory/">Nexus AI Factory</a>, compute infrastructure; announced: <a href="/registry/nexus-core-systems/">Nexus Core Systems</a>, signatory <span class="example-cls">(announced plan)</span>; <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(announced plan)</span></li><li><a href="/registry/green-data-centres-agreement/">Sovereign green data-centre infrastructure agreement</a>, agreement; announced: <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(verified fact)</span>; <a href="/registry/ministry-energy-transition/">Ministry of Energy Transition and Sustainable Development</a>, signatory <span class="example-cls">(verified fact)</span></li><li><a href="/registry/um6p-data-centre-partnership/">UM6P data-centre partnership convention</a>, agreement; announced: <a href="/registry/ministry-digital-transition/">Ministry of Digital Transition and Administration Reform</a>, signatory <span class="example-cls">(verified fact)</span>; <a href="/registry/um6p/">Mohammed VI Polytechnic University (UM6P)</a>, signatory <span class="example-cls">(verified fact)</span></li></ul><p>3 of these 4 projects are only announced or signed: no record shows them built or running. A signature is recorded as a signature. Compute infrastructure is not an AI application: the registry documents capacity, not what runs on it, and records no AI workload on these systems.</p></div>
+        <p class="example-links">Evidence: <a href="/registry/evidence/#MAI-EV-0006">MAI-EV-0006</a> · <a href="/registry/evidence/#MAI-EV-0007">MAI-EV-0007</a> · <a href="/registry/evidence/#MAI-EV-0019">MAI-EV-0019</a> · <a href="/registry/evidence/#MAI-EV-0020">MAI-EV-0020</a> · <a href="/registry/evidence/#MAI-EV-0030">MAI-EV-0030</a> · <a href="/registry/questions/#q5-h">Q5 relationships</a> · <a href="/registry/questions/#q2-h">Q2 projects by stage</a></p>
       </article>
     <!--/r:examples--></div>
   </div>
@@ -1083,7 +1089,7 @@
     <span class="section-number">06 — ACQUISITION</span>
     <div>
       <h2 class="acquire-title">Ownership and acquisition</h2>
-      <p>TheMoroccoAI.com is privately held. The domain and its reference assets may be considered for acquisition. The <a href="/acquisition/">acquisition page</a> sets out what exists today and how it differs from the owner’s view of its potential. Confidential enquiries: <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20confidential%20acquisition%20enquiry">agent@sohadot.com</a>.</p>
+      <p>TheMoroccoAI.com is privately held. The domain and its reference assets are available for strategic acquisition. The <a href="/acquisition/">acquisition page</a> sets out what exists today and how it differs from the owner’s view of its potential. Confidential enquiries: <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20confidential%20acquisition%20enquiry">agent@sohadot.com</a>.</p>
     </div>
   </div>
 </section>

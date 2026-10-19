@@ -1,5 +1,5 @@
 {
-  "note": "Public changes to the registry and site. Each entry is a commit on the public repository's main branch; the commit and its message are the record. Counts are those of data/evidence.json and data/ontology.json at that commit.",
+  "note": "Compiled on 19 October 2026 from the public repository's history; it was not published alongside each release. Each entry is a commit on main, and the commit and its message are the record. Counts are those of data/evidence.json and data/ontology.json at that commit. Corrections changed content that had already been published; pre-release review fixes were made before a version was merged and were never published.",
   "repository": "https://github.com/Sohadot/TheMoroccoAI",
   "entries": [
     {
@@ -18,8 +18,10 @@
         "A separate source checker that re-fetches sources without changing data."
       ],
       "corrections": [
-        "DeepEcho software changed from in development to unresolved: the FDA record contradicts the company website's disclaimer, now marked superseded.",
-        "FDA wording corrected to 510(k) clearance; the applicant's link to the Moroccan company recorded as an association, not a legal identity.",
+        "DeepEcho software changed from in development (published in v0.2.0) to unresolved: the FDA record contradicts the company website's disclaimer, which no longer sets a stage and is marked superseded."
+      ],
+      "review_fixes": [
+        "FDA wording limited to 510(k) clearance, and the applicant's link to the Moroccan company recorded as an association, not a legal identity.",
         "A provider attribution for Idarati AI (Berexia) removed: the label appears only in interface text and is not shown on the assistant."
       ]
     },
@@ -37,8 +39,10 @@
         "First version of the questions page."
       ],
       "corrections": [
-        "The higher-education ministry recorded as a signatory of the Nador memorandum, on a new source naming the signatories.",
-        "The DarijaBERT developer link reclassified as independent analysis: the model card names \"AIOX Lab\", and identification is by name.",
+        "The higher-education ministry, recorded in v0.1.0 as involved in the Nador memorandum, recorded as a signatory on a new source naming the signatories."
+      ],
+      "review_fixes": [
+        "The DarijaBERT developer link classified as independent analysis: the model card names \"AIOX Lab\", and identification is by name.",
         "UM6P Ventures' origin set to unresolved; Toubkal recorded as compute infrastructure, not as an AI application."
       ]
     },
@@ -55,9 +59,11 @@
         "Generated registry pages, an independence statement on every page and self-hosted fonts."
       ],
       "corrections": [
-        "False capability claims and placeholder links on the original homepage corrected.",
+        "Unsourced claims, rules that were not true of the site and placeholder links on the original homepage removed or corrected."
+      ],
+      "review_fixes": [
         "The CNDP recorded as listing Law 09-08 in its regulatory framework, not as administering it.",
-        "Conventions signed for the creation of Jazari institutes no longer presented as constituted institutions."
+        "Conventions signed for the creation of Jazari institutes not presented as constituted institutions."
       ]
     },
     {
@@ -65,7 +71,7 @@
       "commit": "aa400cfa038c4899435886ee0e2f9d5cee4fe0a4",
       "title": "Site created",
       "changes": [
-        "Initial single-page site published at themoroccoai.com."
+        "Initial single-page site committed; the CNAME for themoroccoai.com was added the same day (commit 9ac75fd)."
       ]
     }
   ]

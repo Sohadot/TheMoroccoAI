@@ -716,7 +716,9 @@ def render_methodology(model, changelog):
                    if c.get("version") else "")
         changes = "".join(f"<li>{escape(x)}</li>" for x in c.get("changes", []))
         fixes = "".join(f"<li>{escape(x)}</li>" for x in c.get("corrections", []))
-        fixes = f'<p class="change-sub">Corrections</p><ul>{fixes}</ul>' if fixes else ""
+        fixes = f'<p class="change-sub">Corrections to previously published content</p><ul>{fixes}</ul>' if fixes else ""
+        review = "".join(f"<li>{escape(x)}</li>" for x in c.get("review_fixes", []))
+        fixes += f'<p class="change-sub">Found in pre-release review (never published)</p><ul>{review}</ul>' if review else ""
         entries.append(f"""<li class="change">
   <p class="change-meta"><time datetime="{c["date"]}">{escape(human_date(c["date"]))}</time> · <a href="{repo}/commit/{c["commit"]}" rel="noopener">{c["commit"][:7]}</a>{figures}</p>
   <h3>{escape(c["title"])}</h3>
@@ -787,7 +789,7 @@ def render_acquisition(model):
     body = f"""<header class="page-head">
   <p class="label">MAI-ACQ — Acquisition</p>
   <h1>Acquisition</h1>
-  <p class="lede">TheMoroccoAI.com and its reference assets are privately held and may be considered for acquisition. This page separates what exists today from the owner's view of its potential.</p>
+  <p class="lede">TheMoroccoAI.com and its reference assets are privately held and available for strategic acquisition. Confidential enquiries: <a href="{mail}">{CONTACT}</a>. This page separates what exists today, which can be inspected, from the owner's view of its potential, which is set out in the <a href="/#thesis">owner's thesis</a>.</p>
   <p class="notice"><strong>Independent.</strong> The asset is not a government platform. It is not affiliated with, endorsed by or operated by the Government of Morocco or any institution it lists, and no institution has adopted or designated it.</p>
 </header>
 <section aria-labelledby="a1-h">
@@ -803,12 +805,16 @@ def render_acquisition(model):
 <section aria-labelledby="a2-h">
   <h2 id="a2-h"><span class="section-number">02</span>Existing assets and future potential</h2>
   {_table("Existing assets compared with potential", ["Exists today, and can be inspected", "Owner's view of potential (not established)"], [
+      ["The exact-match domain TheMoroccoAI.com, serving this registry",
+       "A national category name for AI in Morocco that cannot be recreated, only acquired"],
       [f'An evidence registry of {n_rec} sourced records and {n_ent} entities, each claim classified (<a href="/registry/">registry</a>)',
        "A category-level reference on Morocco's AI ecosystem"],
       ['Machine-readable data (<a href="/data/evidence.json">evidence.json</a>, <a href="/data/ontology.json">ontology.json</a>) and a <a href="/registry/questions/">questions page</a> generated from it',
        "A data layer that organisations working on Moroccan AI could build on"],
       ['Published rules enforced by a validator and automated tests on every change (<a href="/methodology/">methodology</a>)',
        "A governed reference whose method can be audited"],
+      ['A public change history tied to each published version (<a href="/methodology/#m6-h">changelog</a>)',
+       "Provenance a successor can keep extending without a break in its record"],
       ["An English edition", "Arabic, French and Tamazight editions (planned, not published)"],
   ], "")}
   <p class="prose">Nothing on this site indicates that any institution or company has expressed interest. No price, traffic or revenue figures are published.</p>
@@ -907,7 +913,8 @@ def homepage_examples(model):
     plan = ents["morocco-ai-2030"]
     targets = [r for r in model.records.values() if r["classification"] == "OFFICIAL TARGET" and plan["id"] in r["related_entities"]]
     included = [ents[r["object"]] for r in rels if r["subject"] == plan["id"] and r["predicate"] == "includes"]
-    target_text = " ".join(escape(r["claim"]) for r in targets)
+    target_text = " ".join(f'{escape(r["claim"])} {escape(r["verification_note"])}' for r in targets)
+    include_ids = sorted({x for r in rels if r["subject"] == plan["id"] and r["predicate"] == "includes" for x in r["evidence"]})
     parts = "; ".join(f'{_ent_link(model, x["id"])} ({escape(_stage_with_kind(model, x))})' for x in included)
     verified = [r for r in rels if r["subject"] == plan["id"] and r["classification"] == "VERIFIED FACT"]
     via = ", ".join(f'{escape(model.predicates[r["predicate"]]["label"])} {_ent_link(model, r["object"])}' for r in verified)
@@ -915,8 +922,10 @@ def homepage_examples(model):
     out.append(_example(
         "ex-2030", "What has Morocco AI 2030 set as targets, and what is verified so far?",
         f'<p>{target_text} The registry shows targets as targets, never as outcomes, and records no target as achieved.</p>'
-        f'<p>The roadmap is recorded as including {len(included)} projects, by announcement: {parts}.{via}</p>',
-        [(entity_url(plan["id"]), "entity page")] + [(f"/registry/evidence/#{r['evidence_id']}", r["evidence_id"]) for r in targets]
+        f'<p>The roadmap is recorded as including {len(included)} projects, on the basis of the ministry\'s presentation: {parts}.{via} '
+        f'A project\'s status is not a measure of progress toward the quantified targets.</p>',
+        [(entity_url(plan["id"]), "entity page")]
+        + [(f"/registry/evidence/#{x}", x) for x in [r["evidence_id"] for r in targets] + include_ids]
         + [("/registry/questions/#q2-h", "Q2 projects by stage")]))
 
     # 3. Institutions documented as connected to compute and data-centre infrastructure.
@@ -930,13 +939,24 @@ def homepage_examples(model):
         links = [r for r in rels if r["object"] == x["id"] and ents[r["subject"]]["type"] in ("institution", "company")]
         who = "; ".join(f'{_ent_link(model, r["subject"])}, {escape(model.predicates[r["predicate"]]["label"].removesuffix(" of"))} '
                         f'<span class="example-cls">({escape(r["classification"].lower())})</span>' for r in links) or "no organisation recorded"
-        rows.append(f'<li>{_ent_link(model, x["id"])}, {escape(_stage_with_kind(model, x))}: {who}</li>')
+        basis = ""
+        if x["lifecycle"] in ("operational", "pilot"):
+            f = deployment_facts(model, x)
+            basis = f' (basis: {escape("; ".join(f["bases"]))}; {escape(f["currency"][0].lower() + f["currency"][1:])})'
+        rows.append(f'<li>{_ent_link(model, x["id"])}, {escape(_stage_with_kind(model, x))}{basis}: {who}</li>')
     announced = sum(1 for x in infra if x["lifecycle"] == "announced")
+    ids = {x["id"] for x in infra}
+    runs_ai = any({r["subject"], r["object"]} & ids and ents[r["subject"] if r["object"] in ids else r["object"]].get("project_kind") == "ai-application"
+                  for r in rels)
+    workload = ("Compute infrastructure is not an AI application: the registry documents capacity, not what runs on it, "
+                "and records no AI workload on these systems." if not runs_ai else
+                "Compute infrastructure is not an AI application; workloads are recorded only where a source documents them.")
     out.append(_example(
-        "ex-infra", "Which institutions are documented as connected to AI compute and data-centre infrastructure?",
+        "ex-infra", "Which institutions are documented as connected to computing and data-centre infrastructure?",
         f'<ul>{"".join(rows)}</ul><p>{announced} of these {len(infra)} projects are only announced or signed: no record shows them built '
-        f'or running. A signature is recorded as a signature.</p>',
-        [("/registry/questions/#q5-h", "Q5 relationships"), ("/registry/questions/#q2-h", "Q2 projects by stage")]))
+        f'or running. A signature is recorded as a signature. {workload}</p>',
+        [(f"/registry/evidence/#{x}", x) for x in sorted({y for i in infra for y in i["lifecycle_evidence"]})]
+        + [("/registry/questions/#q5-h", "Q5 relationships"), ("/registry/questions/#q2-h", "Q2 projects by stage")]))
     return "\n".join(out)
 
 
