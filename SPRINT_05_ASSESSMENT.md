@@ -115,9 +115,11 @@ The consumer's recomputed matrix, GAP-05 list and all gap digests equal the gene
 ## 5. Tests and mutation testing
 
 - Gates: validator 0 problems; 78 generated files, 0 stale; `check_site --network` 74 pages, 0 problems.
-- Tests: **240** (188 before), none skipped:
+- Tests: **240** (188 before), none skipped locally:
   - `test_consumer.py`: 50;
   - `test_layout.py`: 2.
+
+  In CI, one test (identifier history) skipped because the checkout was shallow; see section 8.
 - Determinism: rebuilt under `C` / Asia/Tokyo / `PYTHONHASHSEED=11` and `C.UTF-8` / America/Los_Angeles / `PYTHONHASHSEED=999`, with 0 files differing. Consumer output is identical across three hash seeds for every command.
 
 Adversarial copies: one defect per copy of the published files, each rejected with exit 1 and a specific message.
@@ -154,3 +156,91 @@ Three mutations survived a first run: a relationship naming a missing entity, re
 2. **Identifier policy.** The page states a fact: since v0.1.0 no evidence or entity id has been removed, renamed or reused. Should that become a formal commitment, such as ids are never reused and removals are tombstoned?
 3. **Versioning policy.** The page says each change to evidence.json, ontology.json or gaps.json gets a new version and a changelog entry. Is a patch/minor scheme (0.4.1 here for a documentation and metadata release) acceptable?
 4. **Measuring reuse.** Nothing is measured, and analytics were not added. Any measurement (for example, asking reusers to cite the version and as-of date, or a voluntary contact) needs your approval.
+
+## 8. Owner pre-merge review
+
+### Owner decisions, applied
+
+| Decision | Applied as |
+| --- | --- |
+| No licence now | Unchanged: none declared. Pages state that source excerpts remain subject to their publishers' rights. |
+| Identifiers | `/data/` and README: published identifiers are never reused; a record, entity or relationship may be corrected or withdrawn, with the change in the changelog; a withdrawn identifier stays retired. |
+| Versioning | A new version when published reference data or its meaning changes (records, entities, relationships, gap assessments, definitions); an editorial change that affects neither may be published without one. |
+| Usage measurement | None added. |
+
+### 1. Manifest integrity
+
+- **Real mixed versions.** The v0.4.0 `evidence.json` from `main`, served next to the current manifest, is rejected twice: on its SHA-256 and on its version. The v0.4.0 `ontology.json` is rejected on its version (0.3.0) even when the manifest is re-signed around it.
+- **Stated limit.** A test shows that a consistent edit with a re-signed manifest passes: whoever can rewrite the files can rewrite the manifest. `/data/`, the manifest's `note` and the consumer's `verify` output now say that the hashes are not a signature, and that they do not show who published the files or that their content is accurate.
+
+### 2. Reproducibility without hidden rules
+
+Two clean-room passes were run by an agent that could read only a copy of the published JSON and the `/data/` page as text. It could not see the site's code, tests or consumer, and it wrote its own standard-library code.
+
+- **Pass 1** (published files at `35c0885`'s parent): every hash, all 43 matrix rows, GAP-05 (19 of 33), all gap digests and checks, and Q8/Q9 reproduced. But it had to guess at 13 points:
+  - the Q8 scope;
+  - row and evidence order;
+  - the GAP-05 scope and N of M;
+  - the digest's structure;
+  - the meaning of "postdates" and of a check "holding";
+  - check direction and missing lifecycles;
+  - undefined values of `status_basis`, `evidence_type` and `source_type`;
+  - unpublished caveat rules;
+  - the Q9 join;
+  - build membership of files without a version.
+- **Fixes**, each now published in `matrix.json` / `gaps.json` `derivation`, the manifest or `/data/`:
+  - the accepted values for `source_type`, `evidence_type` and `status_basis` (which the consumer checks);
+  - the qualification rules;
+  - the ordering rules;
+  - the exact digest structure;
+  - the check semantics;
+  - the Q8 and Q9 scope and joins.
+
+  The review also showed that the operational stage definition ("by a source independent of announcements") could be read as requiring an independent source. It now says what the rules allow and that availability is not use. The announced definition no longer states an absence of evidence.
+- **Pass 2** (revised files): every comparison passed, including row order, qualifications and digests. It still found three things:
+  - `object.stage` had no rule, and the documentation said every operational stage states its basis, which is untrue for Toubkal's independent listing;
+  - M in "19 of 33" was not published;
+  - `/data/` said every stage rests on a declaring record, which is untrue for announced and unresolved stages.
+
+  All three are fixed:
+  - the stage-label rule is published and the consumer recomputes every label;
+  - GAP-05 publishes `formal_act_relationships` (33);
+  - the validator's classification-support rules are published in the manifest and checked by the consumer.
+
+  The Q8 and Q9 ordering, grouping and evidence lists are specified.
+
+Still not reproducible from the files, and labelled as such:
+- the editorial judgments (classifications, stages, gap text and state; GAP-02 has no data check);
+- the validator's rules beyond classification support (operator naming, source independence), which are described in prose only.
+
+### 3. Identifier stability
+
+All four published data states on `main` were audited (`6bc8d9a`, `d35d0df`, `391006a`, `a0dedad`):
+- No evidence or entity identifier was ever removed.
+- None changed its source URL, title, publisher, publication date or classification (records), or its type or name (entities).
+- The only removal is one relationship, replaced as a correction in v0.2.0 and listed in the changelog.
+
+The claim is therefore supported. The test behind it was weak, and is now fixed:
+- It checked only v0.1.0's identifiers, and it **skipped in CI** because the checkout was shallow.
+- It now checks every first-parent version of the data against the current files: no removal, same source address, same entity type, with a `WITHDRAWN` list for documented withdrawals.
+- CI fetches full history, and the test fails in CI instead of skipping when history is missing. A further test checks the workflow setting.
+- Verified behaviour: removing a published entity fails by name; a shallow local clone skips; a shallow CI clone fails.
+
+`/data/` notes that earlier versions are not published as files, so the check is repeated from the public repository's history.
+
+### Mutation testing of the review changes
+
+- Review round: 9 mutations. 7 caught directly. The test-only mutation was replaced by a real removal, which is caught. The shallow-CI mutation is now caught by the workflow test.
+- Clean-room round: 6 mutations, all caught. The mixed-basis stage-label mutation was caught after a dedicated test was added.
+
+### Observations for the owner (not changed)
+
+- **Q8 wording.** The question says "AI or computing projects", but Q8 counts every project: AI institutes, signed agreements, and the AI Marketplace, which the data classes as a digital platform rather than an AI deployment. Options: reword the question, or narrow the count.
+- **"Signed" on a news dispatch alone.** Nine matrix rows read "Signed" while resting only on a news dispatch; their caveat and `documentation_basis` say so. A reader of `documented_as` alone could miss it.
+- **GAP-05 includes announced plans.** It includes relationships already classified as announced plans, so part of its count is a second statement of the same limit.
+- **Digital Morocco 2030.** It has an official target but no gap, so Q9 reports it as not assessed.
+
+### Final figures
+
+- Tests: **252**, all passing locally and in CI.
+- Gates: validator 0 problems; 78 generated files, 0 stale; `check_site --network` 74 pages, 0 problems.
