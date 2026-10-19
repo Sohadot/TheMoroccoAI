@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import registry  # noqa: E402
 
-TODAY = datetime.date(2026, 10, 18)
+TODAY = datetime.date(2026, 10, 19)
 
 
 class RepositoryData(unittest.TestCase):

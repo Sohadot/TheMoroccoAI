@@ -72,7 +72,7 @@ class PublishedSite(unittest.TestCase):
             if r["evidence_id"] in ids:
                 r["publication_date"] = date
         html = build.render_questions(build.Model(evidence, ontology))
-        return html[html.index('id="q6-h"'):html.index('id="q7-h"')], html[html.index('id="q7-h"'):html.index('id="q5-h"')]
+        return html[html.index('id="q6-h"'):html.index('id="q7-h"')], html[html.index('id="q7-h"'):html.index('id="q8-h"')]
 
     def test_old_evidence_is_flagged_but_never_changes_the_stage(self):
         q6, q7 = self._questions_with_dates("2024-01-15")
@@ -90,7 +90,7 @@ class PublishedSite(unittest.TestCase):
         self.assertIn("operation after that date not reconfirmed", html)
 
     def test_recency_boundary_is_twelve_calendar_months(self):
-        cases = [("2025-10-18", None, False), ("2025-10-17", None, True),        # exactly 12 months / one day more
+        cases = [("2025-10-19", None, False), ("2025-10-18", None, True),        # exactly 12 months / one day more (as_of 2026-10-19)
                  ("2025-10", None, True),                                          # month-only date counts from its 1st
                  ("2027-02-28", "2028-02-29", False), ("2027-02-27", "2028-02-29", True)]  # leap-day as_of
         for date, as_of, stale in cases:
@@ -301,7 +301,10 @@ class ReferenceFirstPositioning(unittest.TestCase):
         self.assertNotIn("AI compute", text)
         self.assertIn("Which institutions are documented as connected to computing and data-centre infrastructure?", text)
         self.assertIn("basis: independent listing", text)
-        self.assertIn("records no AI workload on these systems", text)
+        # The only workload statement is the operator's own (MAI-EV-0041): shown with its source and limits.
+        self.assertIn("Reported AI workloads (operator-affiliated authors): fine-tuning of transformer-based large language models", text)
+        self.assertIn("they do not establish the scale, users or outcomes of AI use", text)
+        self.assertIn('href="/registry/evidence/#MAI-EV-0041"', examples)
         self.assertIn('href="/registry/evidence/#MAI-EV-0020"', examples)
         # Morocco AI 2030: inclusion rests on a presentation, and project status is not progress toward targets.
         self.assertIn("on the basis of the ministry's presentation", text)
@@ -327,9 +330,9 @@ class ReferenceFirstPositioning(unittest.TestCase):
         page = _visible((REPO / "methodology" / "index.html").read_text(encoding="utf-8"))
         self.assertIn("Corrections to previously published content", page)
         self.assertIn("Found in pre-release review (never published)", page)
-        allowed = {"date", "commit", "title", "version", "records", "entities", "relationships", "changes", "corrections", "review_fixes"}
+        allowed = {"date", "commit", "pull_request", "title", "version", "records", "entities", "relationships", "changes", "corrections", "review_fixes"}
         for c in log["entries"]:
-            self.assertLessEqual(set(c), allowed, c["commit"])
+            self.assertLessEqual(set(c), allowed, c.get("commit") or c.get("pull_request"))
 
     def test_changelog_matches_the_published_data(self):
         log = registry.load(REPO / "data" / "changelog.json")
@@ -341,8 +344,13 @@ class ReferenceFirstPositioning(unittest.TestCase):
         self.assertEqual(dates, sorted(dates, reverse=True))
         page = (REPO / "methodology" / "index.html").read_text(encoding="utf-8")
         for c in log["entries"]:
-            self.assertRegex(c["commit"], r"^[0-9a-f]{40}$")
-            self.assertIn(f'href="{log["repository"]}/commit/{c["commit"]}"', page)
+            if c.get("commit"):
+                self.assertRegex(c["commit"], r"^[0-9a-f]{40}$")
+                self.assertIn(f'href="{log["repository"]}/commit/{c["commit"]}"', page)
+            else:
+                self.assertIsInstance(c["pull_request"], int)
+                self.assertIn(f'href="{log["repository"]}/pull/{c["pull_request"]}"', page)
+        self.assertEqual(latest["date"], self.evidence["as_of"])
 
 
 GOOD_PAGE = """<!DOCTYPE html><html lang="en"><head>

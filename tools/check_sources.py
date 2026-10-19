@@ -38,7 +38,8 @@ TIMEOUT = 30
 DELAY_PER_HOST = 2.0  # seconds between requests to the same host
 MAX_BYTES = 25_000_000  # larger responses are truncated and reported
 MAX_SCRIPTS = 3  # same-host scripts read for a single-page application, when excerpts are missing
-CHALLENGE = re.compile(r"just a moment|cf-chl|captcha|access denied|accès refusé|please log in|must have access", re.I)
+CHALLENGE = re.compile(r"just a moment|cf-chl|captcha|access denied|accès refusé|please log in|must have access|"
+                       r"client challenge|enable javascript to proceed", re.I)
 
 
 class _Visible(HTMLParser):

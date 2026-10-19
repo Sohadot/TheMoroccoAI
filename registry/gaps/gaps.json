@@ -1,0 +1,561 @@
+{
+ "as_of": "2026-10-19",
+ "gaps": [
+  {
+   "assessed": "2026-10-19",
+   "entities": [
+    {
+     "id": "idarati-ai",
+     "name": "Idarati AI"
+    }
+   ],
+   "established": [
+    {
+     "evidence": [
+      "MAI-EV-0013",
+      "MAI-EV-0040"
+     ],
+     "text": "The ministry presented Idarati AI as an agentic AI assistant for administrative procedures."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0034",
+      "MAI-EV-0035",
+      "MAI-EV-0038"
+     ],
+     "text": "It was publicly available on the ministry's own services on 18 October 2026, and answered a test question through its public interface."
+    }
+   ],
+   "evidence_needed": [
+    "An operator's report of use (annual report, parliamentary answer, published usage statistics)",
+    "An independent evaluation of the service"
+   ],
+   "id": "GAP-01",
+   "open_wording": "No qualifying evidence is currently recorded in this registry.",
+   "question": "What documents actual use, adoption, accuracy, service outcomes or sustained operation of Idarati AI?",
+   "relationships": null,
+   "resolved_by": null,
+   "state": "open",
+   "unestablished": "How many people use it, its accuracy, its effect on administrative services, and whether it has operated continuously. Public availability on one date does not establish any of these."
+  },
+  {
+   "assessed": "2026-10-19",
+   "entities": [
+    {
+     "id": "morocco-ai-2030",
+     "name": "Morocco AI 2030"
+    }
+   ],
+   "established": [
+    {
+     "evidence": [
+      "MAI-EV-0011"
+     ],
+     "text": "The roadmap sets three 2030 targets: MAD 100 billion in added value to GDP, 50,000 direct and indirect jobs, and 200,000 trained and certified AI talents."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0040"
+     ],
+     "text": "The ministry's September 2026 presentation of the roadmap's \"main advances\" restated the targets and listed items presented (the AI marketplace, Idarati AI, a proof of concept of a national meta-application and e-wallet), without quantified progress towards the targets."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0013"
+     ],
+     "text": "Two projects are recorded as included in the roadmap, on the basis of that presentation."
+    }
+   ],
+   "evidence_needed": [
+    "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)"
+   ],
+   "id": "GAP-02",
+   "open_wording": "No qualifying evidence is currently recorded in this registry.",
+   "question": "What publicly documented measurements show progress toward the official targets of Morocco AI 2030?",
+   "relationships": null,
+   "resolved_by": null,
+   "state": "open",
+   "unestablished": "Any measured progress towards the value-added, jobs or talent targets. A project's status is not a measure of progress towards them."
+  },
+  {
+   "assessed": "2026-10-19",
+   "entities": [
+    {
+     "id": "toubkal-supercomputer",
+     "name": "Toubkal supercomputer"
+    }
+   ],
+   "established": [
+    {
+     "evidence": [
+      "MAI-EV-0020"
+     ],
+     "text": "Toubkal is listed in the June 2026 TOP500 as general-purpose high-performance computing; the listing documents capacity, not workloads or users."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0041"
+     ],
+     "text": "A peer-reviewed article by authors affiliated with its host university describes GPU partitions and states that fine-tuning of large language models has been run on it."
+    }
+   ],
+   "evidence_needed": [
+    "Published usage or allocation reports",
+    "Independent publications acknowledging Toubkal for specific AI models"
+   ],
+   "id": "GAP-03",
+   "open_wording": "No qualifying evidence is currently recorded in this registry.",
+   "question": "What independently documents AI workloads on the Toubkal supercomputer, and at what scale?",
+   "relationships": null,
+   "resolved_by": null,
+   "state": "open",
+   "unestablished": "Independent documentation of AI workloads, and the scale, users or projects of any AI use. The only workload statement recorded comes from the operator's own authors."
+  },
+  {
+   "assessed": "2026-10-19",
+   "entities": [
+    {
+     "id": "nexus-ai-factory",
+     "name": "Nexus AI Factory"
+    },
+    {
+     "id": "green-data-centres-agreement",
+     "name": "Sovereign green data-centre infrastructure agreement"
+    },
+    {
+     "id": "um6p-data-centre-partnership",
+     "name": "UM6P data-centre partnership convention"
+    }
+   ],
+   "established": [
+    {
+     "evidence": [
+      "MAI-EV-0006",
+      "MAI-EV-0007",
+      "MAI-EV-0019"
+     ],
+     "text": "Agreements on green data-centre infrastructure and on a data-centre partnership with UM6P were signed at the First National AI Conference."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0030"
+     ],
+     "text": "A memorandum on the Nexus AI Factory is reported by the press only."
+    }
+   ],
+   "evidence_needed": [
+    "Official project documentation (permits, commissioning notices)",
+    "Operator or independent confirmation that a facility is built and running"
+   ],
+   "id": "GAP-04",
+   "open_wording": "No qualifying evidence is currently recorded in this registry.",
+   "question": "Which announced or signed computing and data-centre initiatives have verifiable construction, commissioning or operation?",
+   "relationships": null,
+   "resolved_by": null,
+   "state": "open",
+   "unestablished": "Construction, commissioning or operation of any of these facilities."
+  },
+  {
+   "assessed": "2026-10-19",
+   "entities": [],
+   "established": [],
+   "evidence_needed": [
+    "Published texts of the conventions and memoranda",
+    "Official Bulletin publications where applicable"
+   ],
+   "id": "GAP-05",
+   "open_wording": "No qualifying evidence is currently recorded in this registry.",
+   "question": "Which institutional relationships are documented only through announcements, news reports or descriptions, not through a formal record?",
+   "relationships": [
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0028",
+      "MAI-EV-0027"
+     ],
+     "evidence_types": [
+      "case_study",
+      "organization_page"
+     ],
+     "id": "aiox-labs|created|deepecho",
+     "object": "deepecho",
+     "relationship": "created",
+     "subject": "aiox-labs"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0009"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "al-akhawayn-university|signatory_of|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "signatory_of",
+     "subject": "al-akhawayn-university"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0008"
+     ],
+     "evidence_types": [
+      "press_release"
+     ],
+     "id": "cgem|signatory_of|jazari-root",
+     "object": "jazari-root",
+     "relationship": "signatory_of",
+     "subject": "cgem"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0029",
+      "MAI-EV-0028"
+     ],
+     "evidence_types": [
+      "organization_page",
+      "case_study"
+     ],
+     "id": "deepecho|develops|deepecho-ultrasound-software",
+     "object": "deepecho-ultrasound-software",
+     "relationship": "develops",
+     "subject": "deepecho"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0033"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "deepecho|signatory_of|deepecho-public-health-evaluation",
+     "object": "deepecho-public-health-evaluation",
+     "relationship": "signatory_of",
+     "subject": "deepecho"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0012"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "jazari-network|includes|jazari-edutech",
+     "object": "jazari-edutech",
+     "relationship": "includes",
+     "subject": "jazari-network"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0012"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "jazari-network|includes|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "includes",
+     "subject": "jazari-network"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0010",
+      "MAI-EV-0012"
+     ],
+     "evidence_types": [
+      "news_dispatch",
+      "news_dispatch"
+     ],
+     "id": "jazari-network|includes|jazari-root",
+     "object": "jazari-root",
+     "relationship": "includes",
+     "subject": "jazari-network"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0012"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "jazari-network|includes|jazari-smart-city",
+     "object": "jazari-smart-city",
+     "relationship": "includes",
+     "subject": "jazari-network"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0001"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-digital-transition|launched|digital-morocco-2030",
+     "object": "digital-morocco-2030",
+     "relationship": "launched",
+     "subject": "ministry-digital-transition"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0004"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-digital-transition|organized|first-national-ai-conference-2025",
+     "object": "first-national-ai-conference-2025",
+     "relationship": "organized",
+     "subject": "ministry-digital-transition"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0012"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-digital-transition|presented|morocco-ai-2030",
+     "object": "morocco-ai-2030",
+     "relationship": "presented",
+     "subject": "ministry-digital-transition"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0009"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-digital-transition|signatory_of|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "signatory_of",
+     "subject": "ministry-digital-transition"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0030"
+     ],
+     "evidence_types": [
+      "press_article"
+     ],
+     "id": "ministry-digital-transition|signatory_of|nexus-ai-factory",
+     "object": "nexus-ai-factory",
+     "relationship": "signatory_of",
+     "subject": "ministry-digital-transition"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0009"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-economy-finance|signatory_of|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "signatory_of",
+     "subject": "ministry-economy-finance"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0033"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-health|operates|deepecho-public-health-evaluation",
+     "object": "deepecho-public-health-evaluation",
+     "relationship": "operates",
+     "subject": "ministry-health"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0033"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-health|signatory_of|deepecho-public-health-evaluation",
+     "object": "deepecho-public-health-evaluation",
+     "relationship": "signatory_of",
+     "subject": "ministry-health"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0009"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "ministry-industry-commerce|signatory_of|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "signatory_of",
+     "subject": "ministry-industry-commerce"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0012"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "morocco-ai-2030|implemented_through|jazari-network",
+     "object": "jazari-network",
+     "relationship": "implemented_through",
+     "subject": "morocco-ai-2030"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0013"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "morocco-ai-2030|includes|idarati-ai",
+     "object": "idarati-ai",
+     "relationship": "includes",
+     "subject": "morocco-ai-2030"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0013"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "morocco-ai-2030|includes|sovereign-ai-marketplace",
+     "object": "sovereign-ai-marketplace",
+     "relationship": "includes",
+     "subject": "morocco-ai-2030"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0030"
+     ],
+     "evidence_types": [
+      "press_article"
+     ],
+     "id": "nexus-core-systems|signatory_of|nexus-ai-factory",
+     "object": "nexus-ai-factory",
+     "relationship": "signatory_of",
+     "subject": "nexus-core-systems"
+    },
+    {
+     "classification": "ANNOUNCED PLAN",
+     "evidence": [
+      "MAI-EV-0036"
+     ],
+     "evidence_types": [
+      "press_release"
+     ],
+     "id": "swam|operates|swam-fraud-scoring",
+     "object": "swam-fraud-scoring",
+     "relationship": "operates",
+     "subject": "swam"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0009"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "uemf|signatory_of|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "signatory_of",
+     "subject": "uemf"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0016"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "um6p|created|ai-movement",
+     "object": "ai-movement",
+     "relationship": "created",
+     "subject": "um6p"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0028"
+     ],
+     "evidence_types": [
+      "case_study"
+     ],
+     "id": "um6p-ventures|invested_in|deepecho",
+     "object": "deepecho",
+     "relationship": "invested_in",
+     "subject": "um6p-ventures"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0009"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "umi|signatory_of|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "signatory_of",
+     "subject": "umi"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0015"
+     ],
+     "evidence_types": [
+      "press_release"
+     ],
+     "id": "unesco|designated|ai-movement",
+     "object": "ai-movement",
+     "relationship": "designated",
+     "subject": "unesco"
+    },
+    {
+     "classification": "VERIFIED FACT",
+     "evidence": [
+      "MAI-EV-0009"
+     ],
+     "evidence_types": [
+      "news_dispatch"
+     ],
+     "id": "usmba|signatory_of|jazari-industrie-x0",
+     "object": "jazari-industrie-x0",
+     "relationship": "signatory_of",
+     "subject": "usmba"
+    }
+   ],
+   "resolved_by": null,
+   "state": "open",
+   "unestablished": "The underlying instruments (signed conventions, memoranda, decrees or contracts) for the relationships listed below."
+  }
+ ],
+ "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. Each gap lists the records it was assessed against: when a new record concerns its entities, the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
+ "registry_version": "0.4.0"
+}

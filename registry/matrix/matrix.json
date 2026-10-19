@@ -1,0 +1,1575 @@
+{
+ "as_of": "2026-10-19",
+ "registry_version": "0.4.0",
+ "rows": [
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "case_study",
+     "id": "MAI-EV-0028",
+     "publication_date": "2023-05",
+     "retrieval_date": "2026-10-18",
+     "source_type": "investor_publication",
+     "source_url": "https://www.um6pventures.com/_assets/DeepEchoCaseStudy.pdf"
+    },
+    {
+     "evidence_type": "organization_page",
+     "id": "MAI-EV-0027",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "organization_website",
+     "source_url": "https://www.aiox-labs.com/"
+    }
+   ],
+   "id": "aiox-labs|created|deepecho",
+   "object": {
+    "id": "deepecho",
+    "lifecycle": null,
+    "name": "DeepEcho",
+    "stage": null,
+    "status_as_recorded": null,
+    "type": "company"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "created",
+   "relationship_label": "created",
+   "subject": {
+    "id": "aiox-labs",
+    "name": "AIOX Labs",
+    "type": "company"
+   }
+  },
+  {
+   "classification": "INDEPENDENT ANALYSIS",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Registry inference",
+   "evidence": [
+    {
+     "evidence_type": "model_card",
+     "id": "MAI-EV-0024",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "technical_repository",
+     "source_url": "https://huggingface.co/SI2M-Lab/DarijaBERT"
+    },
+    {
+     "evidence_type": "organization_page",
+     "id": "MAI-EV-0027",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "organization_website",
+     "source_url": "https://www.aiox-labs.com/"
+    }
+   ],
+   "id": "aiox-labs|develops|darijabert",
+   "object": {
+    "id": "darijabert",
+    "lifecycle": "released",
+    "name": "DarijaBERT",
+    "stage": "Released",
+    "status_as_recorded": "Released on Hugging Face.",
+    "type": "model"
+   },
+   "qualifications": [
+    "The DarijaBERT card names \"AIOX Lab\" and links to the AIOXLABS GitHub organisation; identifying it with AIOX Labs (aiox-labs.com) is by name, not stated by a source."
+   ],
+   "relationship": "develops",
+   "relationship_label": "develops",
+   "subject": {
+    "id": "aiox-labs",
+    "name": "AIOX Labs",
+    "type": "company"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0009",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    }
+   ],
+   "id": "al-akhawayn-university|signatory_of|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "al-akhawayn-university",
+    "name": "Al Akhawayn University in Ifrane",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Developed",
+   "evidence": [
+    {
+     "evidence_type": "model_card",
+     "id": "MAI-EV-0025",
+     "publication_date": "2025-03-05",
+     "retrieval_date": "2026-10-18",
+     "source_type": "technical_repository",
+     "source_url": "https://huggingface.co/atlasia/Al-Atlas-0.5B"
+    },
+    {
+     "evidence_type": "organization_page",
+     "id": "MAI-EV-0026",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "organization_website",
+     "source_url": "https://www.atlasia.ma/"
+    }
+   ],
+   "id": "atlasia|develops|al-atlas",
+   "object": {
+    "id": "al-atlas",
+    "lifecycle": "released",
+    "name": "Al-Atlas-0.5B",
+    "stage": "Released",
+    "status_as_recorded": "Released on Hugging Face.",
+    "type": "model"
+   },
+   "qualifications": [
+    "Attribution via AtlasIA's link to the atlasia Hugging Face organisation."
+   ],
+   "relationship": "develops",
+   "relationship_label": "develops",
+   "subject": {
+    "id": "atlasia",
+    "name": "AtlasIA",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "press_release",
+     "id": "MAI-EV-0008",
+     "publication_date": "2026-01-13",
+     "retrieval_date": "2026-10-18",
+     "source_type": "signatory_organization",
+     "source_url": "https://cgem.ma/activites/signature-de-la-convention-constitutive-du-gip-institut-jazari-root/"
+    }
+   ],
+   "id": "cgem|signatory_of|jazari-root",
+   "object": {
+    "id": "jazari-root",
+    "lifecycle": "announced",
+    "name": "Institut Jazari ROOT",
+    "stage": "Announced",
+    "status_as_recorded": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "cgem",
+    "name": "General Confederation of Moroccan Enterprises (CGEM)",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "regulatory_page",
+     "id": "MAI-EV-0017",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "regulator",
+     "source_url": "https://www.cndp.ma/loi-09-08/"
+    }
+   ],
+   "id": "cndp|lists_in_framework|law-09-08",
+   "object": {
+    "id": "law-09-08",
+    "lifecycle": null,
+    "name": "Law 09-08",
+    "stage": null,
+    "status_as_recorded": "Full title, promulgation references and amendment status not yet recorded (see evidence note).",
+    "type": "legal_instrument"
+   },
+   "qualifications": [],
+   "relationship": "lists_in_framework",
+   "relationship_label": "lists in its regulatory framework",
+   "subject": {
+    "id": "cndp",
+    "name": "National Commission for the Control of Personal Data Protection (CNDP)",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Developed",
+   "evidence": [
+    {
+     "evidence_type": "organization_page",
+     "id": "MAI-EV-0029",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "organization_website",
+     "source_url": "https://deepecho.io/"
+    },
+    {
+     "evidence_type": "case_study",
+     "id": "MAI-EV-0028",
+     "publication_date": "2023-05",
+     "retrieval_date": "2026-10-18",
+     "source_type": "investor_publication",
+     "source_url": "https://www.um6pventures.com/_assets/DeepEchoCaseStudy.pdf"
+    }
+   ],
+   "id": "deepecho|develops|deepecho-ultrasound-software",
+   "object": {
+    "id": "deepecho-ultrasound-software",
+    "lifecycle": "unresolved",
+    "name": "DeepEcho AI ultrasound software",
+    "stage": "Unresolved",
+    "status_as_recorded": "Unresolved: an associated US 510(k) clearance is documented (May 2025), but no clinical or commercial use in Morocco is documented, and the developer's own site gives an outdated regulatory status.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "develops",
+   "relationship_label": "develops",
+   "subject": {
+    "id": "deepecho",
+    "name": "DeepEcho",
+    "type": "company"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0033",
+     "publication_date": "2026-05-06",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/gitex-future-health-africa-morocco-signature-de-conventions-visant-renforcer-la-digitalisation-et"
+    }
+   ],
+   "id": "deepecho|signatory_of|deepecho-public-health-evaluation",
+   "object": {
+    "id": "deepecho-public-health-evaluation",
+    "lifecycle": "announced",
+    "name": "DeepEcho AI prenatal ultrasound evaluation in public health facilities",
+    "stage": "Announced",
+    "status_as_recorded": "Announced (convention signed May 2026). No source shows that the study or any facility deployment has started.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "deepecho",
+    "name": "DeepEcho",
+    "type": "company"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Developed",
+   "evidence": [
+    {
+     "evidence_type": "model_card",
+     "id": "MAI-EV-0024",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "technical_repository",
+     "source_url": "https://huggingface.co/SI2M-Lab/DarijaBERT"
+    }
+   ],
+   "id": "insea|develops|darijabert",
+   "object": {
+    "id": "darijabert",
+    "lifecycle": "released",
+    "name": "DarijaBERT",
+    "stage": "Released",
+    "status_as_recorded": "Released on Hugging Face.",
+    "type": "model"
+   },
+   "qualifications": [
+    "Through its SI2M laboratory."
+   ],
+   "relationship": "develops",
+   "relationship_label": "develops",
+   "subject": {
+    "id": "insea",
+    "name": "INSEA — Institut National de Statistique et d'Économie Appliquée",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0012",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "jazari-network|includes|jazari-edutech",
+   "object": {
+    "id": "jazari-edutech",
+    "lifecycle": "announced",
+    "name": "JAZARI EduTech",
+    "stage": "Announced",
+    "status_as_recorded": "Named only. No founding instrument documented in the registry.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Named as a component by the ministry; no founding instrument is documented.",
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "includes",
+   "relationship_label": "includes",
+   "subject": {
+    "id": "jazari-network",
+    "name": "JAZARI Institutes network",
+    "type": "initiative"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0012",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "jazari-network|includes|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "includes",
+   "relationship_label": "includes",
+   "subject": {
+    "id": "jazari-network",
+    "name": "JAZARI Institutes network",
+    "type": "initiative"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0010",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    },
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0012",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "jazari-network|includes|jazari-root",
+   "object": {
+    "id": "jazari-root",
+    "lifecycle": "announced",
+    "name": "Institut Jazari ROOT",
+    "stage": "Announced",
+    "status_as_recorded": "Constitutive convention signed 2026-01-12. Legal constitution (approval in the Bulletin Officiel) not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "includes",
+   "relationship_label": "includes",
+   "subject": {
+    "id": "jazari-network",
+    "name": "JAZARI Institutes network",
+    "type": "initiative"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0012",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "jazari-network|includes|jazari-smart-city",
+   "object": {
+    "id": "jazari-smart-city",
+    "lifecycle": "announced",
+    "name": "JAZARI Smart City",
+    "stage": "Announced",
+    "status_as_recorded": "Named only. No founding instrument documented in the registry.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Named as a component by the ministry; no founding instrument is documented.",
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "includes",
+   "relationship_label": "includes",
+   "subject": {
+    "id": "jazari-network",
+    "name": "JAZARI Institutes network",
+    "type": "initiative"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Developed",
+   "evidence": [
+    {
+     "evidence_type": "model_card",
+     "id": "MAI-EV-0022",
+     "publication_date": "2024-09-13",
+     "retrieval_date": "2026-10-18",
+     "source_type": "technical_repository",
+     "source_url": "https://huggingface.co/MBZUAI-Paris/Atlas-Chat-9B"
+    }
+   ],
+   "id": "mbzuai-france-lab|develops|atlas-chat",
+   "object": {
+    "id": "atlas-chat",
+    "lifecycle": "released",
+    "name": "Atlas-Chat",
+    "stage": "Released",
+    "status_as_recorded": "Released on Hugging Face.",
+    "type": "model"
+   },
+   "qualifications": [],
+   "relationship": "develops",
+   "relationship_label": "develops",
+   "subject": {
+    "id": "mbzuai-france-lab",
+    "name": "MBZUAI France Lab",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0001",
+     "publication_date": "2024-09-25",
+     "retrieval_date": "2026-10-18",
+     "source_type": "state_news_agency",
+     "source_url": "https://www.mapexpress.ma/actualite/activite-gouvernementale/rabat-lancement-officiel-strategie-nationale-maroc-digital-2030/"
+    }
+   ],
+   "id": "ministry-digital-transition|launched|digital-morocco-2030",
+   "object": {
+    "id": "digital-morocco-2030",
+    "lifecycle": null,
+    "name": "Digital Morocco 2030",
+    "stage": null,
+    "status_as_recorded": "Launched 2024-09-25. Targets run to 2030.",
+    "type": "initiative"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "launched",
+   "relationship_label": "launched",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Operated",
+   "evidence": [
+    {
+     "evidence_type": "live_service_observation",
+     "id": "MAI-EV-0034",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://ai.mmsp.gov.ma/"
+    },
+    {
+     "evidence_type": "live_service_observation",
+     "id": "MAI-EV-0035",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.idarati.ma/"
+    },
+    {
+     "evidence_type": "live_service_observation",
+     "id": "MAI-EV-0038",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://chatbot.idarati.ma/"
+    }
+   ],
+   "id": "ministry-digital-transition|operates|idarati-ai",
+   "object": {
+    "id": "idarati-ai",
+    "lifecycle": "operational",
+    "name": "Idarati AI",
+    "stage": "Operational (public availability; use not documented)",
+    "status_as_recorded": "Operational on the basis of public availability: the operator's own services showed it live and responding on 2026-10-18. How many people use it, its accuracy and its outcomes are not documented, and operation after that date has not been reconfirmed.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Published and run under the ministry's name on its own services; how many people use it is not documented."
+   ],
+   "relationship": "operates",
+   "relationship_label": "operates",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Operated",
+   "evidence": [
+    {
+     "evidence_type": "live_service_observation",
+     "id": "MAI-EV-0034",
+     "publication_date": null,
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://ai.mmsp.gov.ma/"
+    }
+   ],
+   "id": "ministry-digital-transition|operates|sovereign-ai-marketplace",
+   "object": {
+    "id": "sovereign-ai-marketplace",
+    "lifecycle": "operational",
+    "name": "Sovereign AI marketplace",
+    "stage": "Operational (public availability; use not documented)",
+    "status_as_recorded": "Operational digital platform, on the basis of public availability observed on 2026-10-18.",
+    "type": "project"
+   },
+   "qualifications": [],
+   "relationship": "operates",
+   "relationship_label": "operates",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0004",
+     "publication_date": "2025-07-01",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/inaugural-national-ai-conference-kicks-rabat"
+    }
+   ],
+   "id": "ministry-digital-transition|organized|first-national-ai-conference-2025",
+   "object": {
+    "id": "first-national-ai-conference-2025",
+    "lifecycle": null,
+    "name": "First National AI Conference (Assises nationales de l'IA)",
+    "stage": null,
+    "status_as_recorded": "Held 2025-07-01 to 2025-07-02, Rabat.",
+    "type": "event"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "organized",
+   "relationship_label": "organised",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0012",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "ministry-digital-transition|presented|morocco-ai-2030",
+   "object": {
+    "id": "morocco-ai-2030",
+    "lifecycle": null,
+    "name": "Morocco AI 2030",
+    "stage": null,
+    "status_as_recorded": "Under implementation according to the ministry (September 2026). Targets run to 2030.",
+    "type": "initiative"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "presented",
+   "relationship_label": "presented",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "official_report",
+     "id": "MAI-EV-0006",
+     "publication_date": "2025-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_publication",
+     "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf"
+    }
+   ],
+   "id": "ministry-digital-transition|signatory_of|green-data-centres-agreement",
+   "object": {
+    "id": "green-data-centres-agreement",
+    "lifecycle": "announced",
+    "name": "Sovereign green data-centre infrastructure agreement",
+    "stage": "Announced",
+    "status_as_recorded": "Agreement signed July 2025. No facility documented.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0009",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    }
+   ],
+   "id": "ministry-digital-transition|signatory_of|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "official_report",
+     "id": "MAI-EV-0005",
+     "publication_date": "2025-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_publication",
+     "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf"
+    },
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0019",
+     "publication_date": "2025-07-03",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-seals-several-agreements-promote-ai"
+    }
+   ],
+   "id": "ministry-digital-transition|signatory_of|jazari-institute-nador",
+   "object": {
+    "id": "jazari-institute-nador",
+    "lifecycle": "announced",
+    "name": "Al Jazari Institute, Province of Nador",
+    "stage": "Announced",
+    "status_as_recorded": "Memorandum of understanding signed 2 July 2025. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "press_article",
+     "id": "MAI-EV-0030",
+     "publication_date": "2026-04-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "secondary_press",
+     "source_url": "https://lobservateur.info/article/117888/economie/gitex-2026-nexus-ai-factory-un-mega-projet-a-12-mmdh-pour-lia-et-le-calcul-intensif"
+    }
+   ],
+   "id": "ministry-digital-transition|signatory_of|nexus-ai-factory",
+   "object": {
+    "id": "nexus-ai-factory",
+    "lifecycle": "announced",
+    "name": "Nexus AI Factory",
+    "stage": "Announced",
+    "status_as_recorded": "Announced (memorandum, April 2026). Nothing built according to the recorded sources.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Reported by secondary press; the ministry's release could not be retrieved.",
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "official_report",
+     "id": "MAI-EV-0007",
+     "publication_date": "2025-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_publication",
+     "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf"
+    }
+   ],
+   "id": "ministry-digital-transition|signatory_of|um6p-data-centre-partnership",
+   "object": {
+    "id": "um6p-data-centre-partnership",
+    "lifecycle": "announced",
+    "name": "UM6P data-centre partnership convention",
+    "stage": "Announced",
+    "status_as_recorded": "Convention signed July 2025.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-digital-transition",
+    "name": "Ministry of Digital Transition and Administration Reform",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0009",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    }
+   ],
+   "id": "ministry-economy-finance|signatory_of|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-economy-finance",
+    "name": "Ministry of Economy and Finance",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "official_report",
+     "id": "MAI-EV-0006",
+     "publication_date": "2025-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_publication",
+     "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf"
+    },
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0019",
+     "publication_date": "2025-07-03",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-seals-several-agreements-promote-ai"
+    }
+   ],
+   "id": "ministry-energy-transition|signatory_of|green-data-centres-agreement",
+   "object": {
+    "id": "green-data-centres-agreement",
+    "lifecycle": "announced",
+    "name": "Sovereign green data-centre infrastructure agreement",
+    "stage": "Announced",
+    "status_as_recorded": "Agreement signed July 2025. No facility documented.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-energy-transition",
+    "name": "Ministry of Energy Transition and Sustainable Development",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0033",
+     "publication_date": "2026-05-06",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/gitex-future-health-africa-morocco-signature-de-conventions-visant-renforcer-la-digitalisation-et"
+    }
+   ],
+   "id": "ministry-health|operates|deepecho-public-health-evaluation",
+   "object": {
+    "id": "deepecho-public-health-evaluation",
+    "lifecycle": "announced",
+    "name": "DeepEcho AI prenatal ultrasound evaluation in public health facilities",
+    "stage": "Announced",
+    "status_as_recorded": "Announced (convention signed May 2026). No source shows that the study or any facility deployment has started.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Planned deployment in public health facilities; not documented as started.",
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "operates",
+   "relationship_label": "operates",
+   "subject": {
+    "id": "ministry-health",
+    "name": "Ministry of Health and Social Protection",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0033",
+     "publication_date": "2026-05-06",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/gitex-future-health-africa-morocco-signature-de-conventions-visant-renforcer-la-digitalisation-et"
+    }
+   ],
+   "id": "ministry-health|signatory_of|deepecho-public-health-evaluation",
+   "object": {
+    "id": "deepecho-public-health-evaluation",
+    "lifecycle": "announced",
+    "name": "DeepEcho AI prenatal ultrasound evaluation in public health facilities",
+    "stage": "Announced",
+    "status_as_recorded": "Announced (convention signed May 2026). No source shows that the study or any facility deployment has started.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-health",
+    "name": "Ministry of Health and Social Protection",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0019",
+     "publication_date": "2025-07-03",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-seals-several-agreements-promote-ai"
+    },
+    {
+     "evidence_type": "official_report",
+     "id": "MAI-EV-0005",
+     "publication_date": "2025-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_publication",
+     "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf"
+    }
+   ],
+   "id": "ministry-higher-education|signatory_of|jazari-institute-nador",
+   "object": {
+    "id": "jazari-institute-nador",
+    "lifecycle": "announced",
+    "name": "Al Jazari Institute, Province of Nador",
+    "stage": "Announced",
+    "status_as_recorded": "Memorandum of understanding signed 2 July 2025. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-higher-education",
+    "name": "Ministry of Higher Education, Scientific Research and Innovation",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0009",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    }
+   ],
+   "id": "ministry-industry-commerce|signatory_of|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "ministry-industry-commerce",
+    "name": "Ministry of Industry and Commerce",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0012",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "morocco-ai-2030|implemented_through|jazari-network",
+   "object": {
+    "id": "jazari-network",
+    "lifecycle": null,
+    "name": "JAZARI Institutes network",
+    "stage": null,
+    "status_as_recorded": "Announced in January 2026. Signed founding instruments are documented for JAZARI ROOT and JAZARI Industrie X.0.",
+    "type": "initiative"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "implemented_through",
+   "relationship_label": "implemented through",
+   "subject": {
+    "id": "morocco-ai-2030",
+    "name": "Morocco AI 2030",
+    "type": "initiative"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0013",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "morocco-ai-2030|includes|idarati-ai",
+   "object": {
+    "id": "idarati-ai",
+    "lifecycle": "operational",
+    "name": "Idarati AI",
+    "stage": "Operational (public availability; use not documented)",
+    "status_as_recorded": "Operational on the basis of public availability: the operator's own services showed it live and responding on 2026-10-18. How many people use it, its accuracy and its outcomes are not documented, and operation after that date has not been reconfirmed.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "includes",
+   "relationship_label": "includes",
+   "subject": {
+    "id": "morocco-ai-2030",
+    "name": "Morocco AI 2030",
+    "type": "initiative"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0013",
+     "publication_date": "2026-09-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-moves-ai-strategy-implementation-targets-mad-100-bln-gdp-value-2030"
+    }
+   ],
+   "id": "morocco-ai-2030|includes|sovereign-ai-marketplace",
+   "object": {
+    "id": "sovereign-ai-marketplace",
+    "lifecycle": "operational",
+    "name": "Sovereign AI marketplace",
+    "stage": "Operational (public availability; use not documented)",
+    "status_as_recorded": "Operational digital platform, on the basis of public availability observed on 2026-10-18.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "includes",
+   "relationship_label": "includes",
+   "subject": {
+    "id": "morocco-ai-2030",
+    "name": "Morocco AI 2030",
+    "type": "initiative"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "press_article",
+     "id": "MAI-EV-0030",
+     "publication_date": "2026-04-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "secondary_press",
+     "source_url": "https://lobservateur.info/article/117888/economie/gitex-2026-nexus-ai-factory-un-mega-projet-a-12-mmdh-pour-lia-et-le-calcul-intensif"
+    }
+   ],
+   "id": "nexus-core-systems|signatory_of|nexus-ai-factory",
+   "object": {
+    "id": "nexus-ai-factory",
+    "lifecycle": "announced",
+    "name": "Nexus AI Factory",
+    "stage": "Announced",
+    "status_as_recorded": "Announced (memorandum, April 2026). Nothing built according to the recorded sources.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Reported by secondary press; the ministry's release could not be retrieved.",
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "nexus-core-systems",
+    "name": "Nexus Core Systems",
+    "type": "company"
+   }
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Announced or planned",
+   "evidence": [
+    {
+     "evidence_type": "press_release",
+     "id": "MAI-EV-0036",
+     "publication_date": "2026-03-26",
+     "retrieval_date": "2026-10-18",
+     "source_type": "organization_website",
+     "source_url": "https://hps-subsidiary-switch.cdn.prismic.io/hps-subsidiary-switch/acUDZ5GXnQHGY-_Z_VisaxSWAM.pdf"
+    }
+   ],
+   "id": "swam|operates|swam-fraud-scoring",
+   "object": {
+    "id": "swam-fraud-scoring",
+    "lifecycle": "announced",
+    "name": "AI-based real-time fraud scoring on Morocco's national card switch",
+    "stage": "Announced",
+    "status_as_recorded": "Announced (March 2026, future tense). No source shows the integration is live.",
+    "type": "project"
+   },
+   "qualifications": [
+    "Integration announced in the future tense.",
+    "Not verified as delivered.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "operates",
+   "relationship_label": "operates",
+   "subject": {
+    "id": "swam",
+    "name": "Switch Al Maghrib (SWAM)",
+    "type": "company"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0009",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    }
+   ],
+   "id": "uemf|signatory_of|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "uemf",
+    "name": "Euro-Mediterranean University of Fès",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0016",
+     "publication_date": "2024-06-03",
+     "retrieval_date": "2026-10-18",
+     "source_type": "state_news_agency",
+     "source_url": "https://www.mapexpress.ma/actualite/societe-et-regions/ai-movement-centre-international-dintelligence-artificielle-precurseur-au-maroc-en-afrique/"
+    }
+   ],
+   "id": "um6p|created|ai-movement",
+   "object": {
+    "id": "ai-movement",
+    "lifecycle": null,
+    "name": "AI Movement — International Center for Artificial Intelligence of Morocco",
+    "stage": null,
+    "status_as_recorded": null,
+    "type": "institution"
+   },
+   "qualifications": [
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "created",
+   "relationship_label": "created",
+   "subject": {
+    "id": "um6p",
+    "name": "Mohammed VI Polytechnic University (UM6P)",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "ranking_entry",
+     "id": "MAI-EV-0020",
+     "publication_date": "2026-06",
+     "retrieval_date": "2026-10-18",
+     "source_type": "independent_list",
+     "source_url": "https://top500.org/system/179908/"
+    }
+   ],
+   "id": "um6p|hosts|toubkal-supercomputer",
+   "object": {
+    "id": "toubkal-supercomputer",
+    "lifecycle": "operational",
+    "name": "Toubkal supercomputer",
+    "stage": "Operational",
+    "status_as_recorded": "Operational compute infrastructure, as listed in the June 2026 TOP500 (benchmark result unchanged since June 2021). Current utilisation not documented.",
+    "type": "project"
+   },
+   "qualifications": [],
+   "relationship": "hosts",
+   "relationship_label": "hosts",
+   "subject": {
+    "id": "um6p",
+    "name": "Mohammed VI Polytechnic University (UM6P)",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "includes-formal-record",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "official_report",
+     "id": "MAI-EV-0007",
+     "publication_date": "2025-09",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_publication",
+     "source_url": "https://www.mmsp.gov.ma/sites/default/files/2025-09/Rapport%20de%20Synthe%CC%80se%20ANG.pdf"
+    },
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0019",
+     "publication_date": "2025-07-03",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/en/news/morocco-seals-several-agreements-promote-ai"
+    }
+   ],
+   "id": "um6p|signatory_of|um6p-data-centre-partnership",
+   "object": {
+    "id": "um6p-data-centre-partnership",
+    "lifecycle": "announced",
+    "name": "UM6P data-centre partnership convention",
+    "stage": "Announced",
+    "status_as_recorded": "Convention signed July 2025.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "um6p",
+    "name": "Mohammed VI Polytechnic University (UM6P)",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "case_study",
+     "id": "MAI-EV-0028",
+     "publication_date": "2023-05",
+     "retrieval_date": "2026-10-18",
+     "source_type": "investor_publication",
+     "source_url": "https://www.um6pventures.com/_assets/DeepEchoCaseStudy.pdf"
+    }
+   ],
+   "id": "um6p-ventures|invested_in|deepecho",
+   "object": {
+    "id": "deepecho",
+    "lifecycle": null,
+    "name": "DeepEcho",
+    "stage": null,
+    "status_as_recorded": null,
+    "type": "company"
+   },
+   "qualifications": [
+    "Pre-seed round, as stated by the investor.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "invested_in",
+   "relationship_label": "invested in",
+   "subject": {
+    "id": "um6p-ventures",
+    "name": "UM6P Ventures",
+    "type": "company"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0009",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    }
+   ],
+   "id": "umi|signatory_of|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "umi",
+    "name": "Moulay Ismail University, Meknès",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Documented",
+   "evidence": [
+    {
+     "evidence_type": "press_release",
+     "id": "MAI-EV-0015",
+     "publication_date": "2024-07-04",
+     "retrieval_date": "2026-10-18",
+     "source_type": "intergovernmental_organization",
+     "source_url": "https://www.unesco.org/en/articles/new-milestone-artificial-intelligence-africa-first-unesco-affiliated-centre"
+    }
+   ],
+   "id": "unesco|designated|ai-movement",
+   "object": {
+    "id": "ai-movement",
+    "lifecycle": null,
+    "name": "AI Movement — International Center for Artificial Intelligence of Morocco",
+    "stage": null,
+    "status_as_recorded": null,
+    "type": "institution"
+   },
+   "qualifications": [
+    "Designation as a UNESCO Category 2 Centre.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "designated",
+   "relationship_label": "designated",
+   "subject": {
+    "id": "unesco",
+    "name": "UNESCO",
+    "type": "institution"
+   }
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "documentation_basis": "announcement-or-description",
+   "documented_as": "Signed",
+   "evidence": [
+    {
+     "evidence_type": "news_dispatch",
+     "id": "MAI-EV-0009",
+     "publication_date": "2026-03-11",
+     "retrieval_date": "2026-10-18",
+     "source_type": "government_portal",
+     "source_url": "https://www.maroc.ma/fr/actualites/fes-meknes-signature-dune-convention-pour-la-creation-dune-plateforme-nationale-de-recherche-de"
+    }
+   ],
+   "id": "usmba|signatory_of|jazari-industrie-x0",
+   "object": {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "name": "JAZARI Industrie X.0",
+    "stage": "Announced",
+    "status_as_recorded": "Founding convention signed 2026-03-10. Operational status not verified.",
+    "type": "project"
+   },
+   "qualifications": [
+    "A signature is recorded as a signature; delivery is not documented.",
+    "Documented only by announcements, news reports or descriptions (GAP-05)."
+   ],
+   "relationship": "signatory_of",
+   "relationship_label": "signatory of",
+   "subject": {
+    "id": "usmba",
+    "name": "Sidi Mohammed Ben Abdellah University, Fès",
+    "type": "institution"
+   }
+  }
+ ],
+ "scope": "Relationships recorded in this registry between organisations or initiatives and what they act on; not a complete map."
+}
