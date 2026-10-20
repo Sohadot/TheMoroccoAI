@@ -35,7 +35,7 @@
 <div class="page">
 <header class="page-head">
   <p class="breadcrumb"><a href="/registry/">Registry</a> / Data</p>
-  <p class="label">MAI-DATA — Registry v0.7.0 · as of 20 October 2026</p>
+  <p class="label">MAI-DATA — Registry v0.8.0 · as of 20 October 2026</p>
   <h1>Using the registry data</h1>
   <p class="lede">The registry is published as JSON files that can be read and checked without this site's code. This page describes the files and their identifiers, where each statement comes from, what null and absent values mean, how versions work, and which answers can be recomputed from the data.</p>
   <p class="notice"><strong>Rights.</strong> No content or data licence has been declared for the registry. Each record quotes a third-party source, and those quotations remain subject to their publishers' rights: nothing here grants a right to republish source material. TheMoroccoAI is independent and is not affiliated with the Government of Morocco or any institution it lists.</p>
@@ -95,7 +95,7 @@
 </section>
 <section aria-labelledby="d6-h">
   <h2 id="d6-h"><span class="section-number">06</span>Coverage and limits</h2>
-  <p class="prose">The registry holds what it has documented so far: 49 records, 65 entities and 78 relationships. It is not a complete map of Morocco's AI ecosystem, and an absent organisation, relationship or record is a gap in coverage. Public availability is not use, a signature or an announcement is not delivery, and a target is not an outcome. The <a href="/methodology/">methodology</a> sets out what the registry does not establish, and the <a href="/registry/gaps/">gap register</a> lists 7 questions it cannot yet answer. Whether others use the data, and how, is not measured.</p>
+  <p class="prose">The registry holds what it has documented so far: 58 records, 65 entities and 78 relationships. It is not a complete map of Morocco's AI ecosystem, and an absent organisation, relationship or record is a gap in coverage. Public availability is not use, a signature or an announcement is not delivery, and a target is not an outcome. The <a href="/methodology/">methodology</a> sets out what the registry does not establish, and the <a href="/registry/gaps/">gap register</a> lists 7 questions it cannot yet answer. Whether others use the data, and how, is not measured.</p>
 </section>
 <section aria-labelledby="d7-h">
   <h2 id="d7-h"><span class="section-number">07</span>Which answers can be recomputed</h2>
@@ -119,7 +119,7 @@
 <section aria-labelledby="d9-h">
   <h2 id="d9-h"><span class="section-number">09</span>Changes to the data contract</h2>
   <p class="prose">A breaking change makes data that a consumer accepted under one version fail under the next. Each is listed here, in the manifest (<code>breaking_changes</code>) and in the <a href="/methodology/#m6-h">changelog</a>. Old values are not accepted as aliases, so a consumer built for an earlier version fails rather than misreads the data.</p>
-  <p class="table-hint">Scroll the table sideways to see all 7 columns.</p><div class="table-wrap" role="region" aria-label="Breaking changes to the published data" tabindex="0"><table class="qtable"><thead><tr><th scope="col">Version</th><th scope="col">Field</th><th scope="col">Old value</th><th scope="col">New value</th><th scope="col">Why</th><th scope="col">Effect on an earlier consumer</th><th scope="col">Migration</th></tr></thead><tbody><tr><td>0.5.0</td><td><code>/registry/matrix/matrix.json</code> <code>rows[].documentation_basis</code></td><td><code>includes-formal-record</code></td><td><code>includes-non-announcement-record</code></td><td>The value marks a formal-act relationship that cites at least one record other than an announcement: an official report, a regulatory record, a repository, a publication, a ranking or a direct observation. The old name described these as formal records of the act, which for signatures read as the signed text; no such text is recorded for any signature. The rows it applies to are unchanged; only the name changed. In v0.7.0 it applies to 22 rows.</td><td>A consumer that compares this field with the old value fails: the v0.4.1 example consumer exits with status 1 and reports, for each row, &quot;has documentation_basis &#x27;includes-non-announcement-record&#x27;; the published data gives &#x27;includes-formal-record&#x27;&quot;.</td><td>Replace the old value with the new one, or read the names from derivation.documentation_basis.assignment in matrix.json, as the v0.5.0 example consumer does.</td></tr></tbody></table></div>
+  <p class="table-hint">Scroll the table sideways to see all 7 columns.</p><div class="table-wrap" role="region" aria-label="Breaking changes to the published data" tabindex="0"><table class="qtable"><thead><tr><th scope="col">Version</th><th scope="col">Field</th><th scope="col">Old value</th><th scope="col">New value</th><th scope="col">Why</th><th scope="col">Effect on an earlier consumer</th><th scope="col">Migration</th></tr></thead><tbody><tr><td>0.5.0</td><td><code>/registry/matrix/matrix.json</code> <code>rows[].documentation_basis</code></td><td><code>includes-formal-record</code></td><td><code>includes-non-announcement-record</code></td><td>The value marks a formal-act relationship that cites at least one record other than an announcement: an official report, a regulatory record, a repository, a publication, a ranking or a direct observation. The old name described these as formal records of the act, which for signatures read as the signed text; no such text is recorded for any signature. The rows it applies to are unchanged; only the name changed. In v0.8.0 it applies to 22 rows.</td><td>A consumer that compares this field with the old value fails: the v0.4.1 example consumer exits with status 1 and reports, for each row, &quot;has documentation_basis &#x27;includes-non-announcement-record&#x27;; the published data gives &#x27;includes-formal-record&#x27;&quot;.</td><td>Replace the old value with the new one, or read the names from derivation.documentation_basis.assignment in matrix.json, as the v0.5.0 example consumer does.</td></tr></tbody></table></div>
   <p class="prose">Other changes in v0.5.0 add to the data without changing what existing values mean: a sentence in the qualifications of every Signed row, a sixth gap (GAP-06), and the evidence type <code>signed_instrument</code> in the manifest's vocabularies. A consumer that compares qualifications or gap lists exactly will see the additions.</p>
 </section>
 <section aria-labelledby="d10-h">
@@ -131,7 +131,7 @@
 <footer>
   <div class="footer-inner">
     <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
-    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.7.0 · as of 20 October 2026</span>
+    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.8.0 · as of 20 October 2026</span>
     <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/">Data</a> · <a href="/acquisition/">Acquisition</a></span>
   </div>
 </footer>

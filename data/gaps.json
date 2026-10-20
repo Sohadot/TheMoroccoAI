@@ -69,6 +69,12 @@
           ]
         },
         {
+          "text": "The ministry's own release on the same presentation states the same three targets and, separately, an objective of 100,000 new digital talents trained each year by 2030. It gives no baseline, definition or count reached for either, and a yearly flow of people trained is a different measure from 200,000 talents trained and certified.",
+          "evidence": [
+            "MAI-EV-0058"
+          ]
+        },
+        {
           "text": "The ministry's September 2026 presentation of the roadmap's \"main advances\" restated the targets and listed items presented (the AI marketplace, Idarati AI, a proof of concept of a national meta-application and e-wallet), without quantified progress towards the targets.",
           "evidence": [
             "MAI-EV-0040"
@@ -81,9 +87,11 @@
           ]
         }
       ],
-      "unestablished": "Any measured progress towards the value-added, jobs or talent targets. A project's status is not a measure of progress towards them.",
+      "unestablished": "Any measured progress towards the value-added, jobs or talent targets, and any published baseline or definition for them; no budget line specific to the roadmap is recorded. A project's status, a count of training enrolments or a yearly training objective is not a measure of progress towards them.",
       "evidence_needed": [
-        "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)"
+        "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)",
+        "A published definition and baseline for each target: how talents are certified, and how jobs and value added are counted",
+        "Budget execution data for any programme dedicated to the roadmap"
       ],
       "checks": [],
       "assessed_records": [
@@ -92,10 +100,11 @@
         "MAI-EV-0012",
         "MAI-EV-0013",
         "MAI-EV-0018",
-        "MAI-EV-0040"
+        "MAI-EV-0040",
+        "MAI-EV-0058"
       ],
-      "assessed_fingerprint": "a0f5768748f67c38",
-      "assessed": "2026-10-19",
+      "assessed_fingerprint": "d19d376594d36ed8",
+      "assessed": "2026-10-20",
       "state": "open"
     },
     {
@@ -254,7 +263,7 @@
           ]
         },
         {
-          "text": "The Head of Government stated that public investment in digital technology rose from MAD 11 million in 2021 to more than MAD 1.7 billion in 2024. The registry has not checked these figures, and spending is an input, not a measure of the targets.",
+          "text": "The Head of Government stated that public investment in digital technology rose from MAD 11 million in 2021 to more than MAD 1.7 billion in 2024. The registry has not checked these figures or matched them to any budget execution figure, and spending is an input, not a measure of the targets.",
           "evidence": [
             "MAI-EV-0003"
           ]
@@ -272,13 +281,43 @@
             "MAI-EV-0049",
             "MAI-EV-0002"
           ]
+        },
+        {
+          "text": "Before the launch, the ministry's finance-law performance projects set other targets for its digital-transition programme: an overall EGDI rank of 75th by 2026 in the 2023 bill, then 85th by 2026 in the 2024 bill, against a 2022 value of 101; and jobs created of 190,000 by 2030 in the 2023 bill, then 270,000 by 2030 in the 2024 bill, defined as digital-economy jobs on formal contracts, whose 2022 value of 130,000 covers offshoring only. These are programme targets, not the strategy's, and the registry does not reconcile them with the strategy's 240,000 direct jobs or its Online Services Index objective.",
+          "evidence": [
+            "MAI-EV-0050",
+            "MAI-EV-0051",
+            "MAI-EV-0052",
+            "MAI-EV-0053",
+            "MAI-EV-0049"
+          ]
+        },
+        {
+          "text": "The 2026 finance law provides MAD 1,500,000,000 in payment appropriations for implementing the strategy. That is an authorisation to spend, not expenditure: no amount committed, disbursed or spent is recorded in this registry.",
+          "evidence": [
+            "MAI-EV-0054"
+          ]
+        },
+        {
+          "text": "The ministry reports more than 148,500 jobs in the offshoring sector at the end of 2024, and 22,649 new enrolments in digital training in 2024–2025 against 21,125 the year before. These are unverified ministry-reported outputs on definitions that differ from the strategy's objectives: offshoring jobs are not total digital jobs, and enrolments are neither graduates nor certified talents.",
+          "evidence": [
+            "MAI-EV-0055",
+            "MAI-EV-0056"
+          ]
+        },
+        {
+          "text": "The Cour des comptes reported 605 digitalised public services at the end of 2023, of which no more than 23 per cent were completely digitalised. This independent audit finding describes the position before the strategy's launch, not progress under it.",
+          "evidence": [
+            "MAI-EV-0057"
+          ]
         }
       ],
-      "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or online-services ranking objectives, and Morocco's rank on the Online Services Index in any edition. No project is recorded as included in the strategy, the investment figure is an unchecked statement about spending, and no edition of the United Nations survey later than 2024 had been published on the assessment date.",
+      "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or online-services ranking objectives; Morocco's rank on the Online Services Index in any edition; and any amount actually spent on the strategy. The recorded finance-law figures are targets and an allocation, the ministry's figures are unverified outputs on other definitions, and the Court's finding predates the strategy. No edition of the United Nations survey later than 2024 had been published on the assessment date.",
       "evidence_needed": [
-        "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)",
+        "An independent or official measurement, after September 2024, of the indicators the strategy names (direct jobs, contribution to GDP, digitalised public services, Online Services Index rank), with definitions and periods",
         "The United Nations ranking of countries on the Online Services Index, the index the ranking objective refers to, for 2022 and later editions",
-        "Finance-law documents for the stated investment figures"
+        "Budget execution data or the budget settlement law (loi de règlement) showing the amounts committed and spent on the strategy",
+        "A reconciliation, published by the ministry, of the strategy's objectives with its finance-law performance indicators"
       ],
       "checks": [],
       "assessed_records": [
@@ -287,9 +326,17 @@
         "MAI-EV-0003",
         "MAI-EV-0018",
         "MAI-EV-0046",
-        "MAI-EV-0049"
+        "MAI-EV-0049",
+        "MAI-EV-0050",
+        "MAI-EV-0051",
+        "MAI-EV-0052",
+        "MAI-EV-0053",
+        "MAI-EV-0054",
+        "MAI-EV-0055",
+        "MAI-EV-0056",
+        "MAI-EV-0057"
       ],
-      "assessed_fingerprint": "ddbac4d9fb7806a1",
+      "assessed_fingerprint": "7da8383cf1a1dc13",
       "assessed": "2026-10-20",
       "state": "open"
     },

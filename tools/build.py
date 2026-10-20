@@ -741,7 +741,7 @@ def render_questions(model):
 </section>
 <section aria-labelledby="q9-h">
   <h2 id="q9-h"><span class="section-number">Q9</span>What does the registry establish about national targets, and which outcomes remain unverified?</h2>
-  <p class="prose">Each official target as its source states it, the projects the strategy is recorded as including, and what the registry records about measured progress. Targets are never shown as outcomes, and a project's status is not progress toward a target.</p>
+  <p class="prose">Each official target as its source states it, the projects the strategy is recorded as including, and what the registry records about measured progress. Targets are never shown as outcomes, and a project's status is not progress toward a target. A strategy can have several target records: besides its own objectives, targets set in the responsible ministry's finance-law performance documents, some of which predate the strategy. Each row's source says which document set the target; where targets conflict, the conflict is recorded in the strategy's gap, not resolved.</p>
   {_table("Official targets and recorded progress", ["Strategy", "Official target", "Projects recorded as included (stage)", "Measured progress"], q9, "No official target recorded.")}
 </section>
 <section aria-labelledby="q5-h">

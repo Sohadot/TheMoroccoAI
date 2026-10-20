@@ -1,6 +1,6 @@
 {
   "registry": "TheMoroccoAI Evidence Registry",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "as_of": "2026-10-20",
   "publisher": "TheMoroccoAI.com (independent; not affiliated with the Government of Morocco)",
   "classifications": {
@@ -1085,6 +1085,198 @@
       "verification_status": "verified",
       "verification_note": "Ministry publication linked from its news page of 25 September 2024 presenting the strategy; the PDF file is dated 18 September 2024. The PDF is image-only: the excerpts were transcribed from the rendered pages (printed pages 8 and 11), and automated excerpt matching cannot be used for this record. The brochure labels the ranking \"EGDI*\", but its footnote defines it as the Online Services Index, a component of the EGDI; the national news agency's dispatch on the launch (MAI-EV-0002) describes the same objective as the e-government development index. The 113th place for 2022 is the strategy's figure: the United Nations page recorded here (MAI-EV-0046) gives Morocco's Online Service Index values but not its rank on that index, so the registry has not verified it. On the overall EGDI, Morocco ranked 101st in 2022. The brochure gives no target year for the 240,000 jobs. A target is not a measurement of progress.",
       "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0050",
+      "title": "Digital-transition performance project, 2023 finance bill: e-government ranking target",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (mmsp.gov.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2024-09/PDPFR2023_11.09.24.pdf",
+      "source_language": "fr",
+      "publication_date": "2024-09-11",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The performance project of the digital-transition programme (programme 429) for the 2023 finance bill sets, for indicator 429.1.1, Morocco's rank in the United Nations e-government development index (EGDI), a target of 75th by 2026, with forecasts of 93rd for 2024 and 2025; it gives 106 as the 2021 realisation and 101 in the 2023 bill column.",
+      "source_excerpts": [
+        "Indicateur 429.1.1 : CLASSEMENT DU MAROC SELON L’INDICATEUR DU DÉVELOPPEMENT DU GOUVERNEMENT ELECTRONIQUE (EGDI",
+        "Nombre 106 101 93 93 75 2026",
+        "Projet de Loi de Finances 2023"
+      ],
+      "classification": "OFFICIAL TARGET",
+      "target_year": 2026,
+      "verification_status": "verified",
+      "verification_note": "It belongs to the finance-law performance framework of the ministry's programme 429 (digital transition) and predates the launch of Digital Morocco 2030 in September 2024: its figures are the programme's targets, not targets stated as the strategy's, and they are recorded beside the strategy's own objectives (MAI-EV-0002, MAI-EV-0049) without reconciling them. The indicator is the overall EGDI rank, not the Online Services Index that the strategy's brochure names. The copy is the one posted on the ministry's site (PDF dated 11 September 2024; footer \"Projet de Loi de Finances 2023\"). The table row was transcribed from the rendered page (printed page 38): the PDF text layer separates the table's cells, so automated matching may not find it. The next performance project (MAI-EV-0052) sets 85th by 2026 for the same indicator. A target is not a measurement of progress.",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0051",
+      "title": "Digital-transition performance project, 2023 finance bill: jobs and digitalised-procedure targets",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (mmsp.gov.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2024-09/PDPFR2023_11.09.24.pdf",
+      "source_language": "fr",
+      "publication_date": "2024-09-11",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The same performance project sets, for indicator 429.2.1, the number of jobs created, 40,000 in the 2023 bill column, forecasts of 60,000 for 2024 and 80,000 for 2025, and a target of 190,000 for 2030; and for indicator 429.1.2, the number of digitalised procedures, 200, 500 and 800 for 2023 to 2025 and a target of 2,000 for 2030.",
+      "source_excerpts": [
+        "Indicateur 429.2.1 : NOMBRE DE POSTES D’EMPLOIS CRÉÉS",
+        "Nombre 40000 60000 80000 190000 2030",
+        "Indicateur 429.1.2 : NOMBRE DE PROCÉDURES DIGITALISÉES",
+        "Nombre 200 500 800 2000 2030"
+      ],
+      "classification": "OFFICIAL TARGET",
+      "target_year": 2030,
+      "verification_status": "verified",
+      "verification_note": "It belongs to the finance-law performance framework of the ministry's programme 429 (digital transition) and predates the launch of Digital Morocco 2030 in September 2024: its figures are the programme's targets, not targets stated as the strategy's, and they are recorded beside the strategy's own objectives (MAI-EV-0002, MAI-EV-0049) without reconciling them. The document leaves the indicators' methodological notes empty: it does not define a job created or its population. The rows were transcribed from the rendered page (printed page 39). The 190,000 jobs differ from the strategy's 240,000 direct jobs (MAI-EV-0049) and from the 270,000 set by the next performance project for a defined population (MAI-EV-0053). A target is not a measurement of progress.",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0052",
+      "title": "Digital-transition performance project, 2024 finance bill: e-government ranking target and baseline",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (mmsp.gov.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2024-09/PDPAR2024_11.09.24.pdf",
+      "source_language": "ar",
+      "publication_date": "2024-09-11",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The performance project of the digital-transition programme for the 2024 finance bill sets, for indicator 1.1.429, Morocco's rank in the United Nations e-government development index, a target of 85th by 2026, with forecasts of 93rd for 2024 and 2025; it gives 101 as the 2022 realisation and the latest known values as 110 in 2018, 106 in 2020 and 101 in 2022, with the United Nations as the source.",
+      "source_excerpts": [
+        "المؤشر 1.1.429 : ترتيب المغرب حسب مؤشر تنمية الحكومة الإلكترونية",
+        "عدد 101 101 93 93 85 85 2026",
+        "فحسب آخر اصدار لهذا المؤشر برسم سنة 2022 احتل المغرب الرتبة 101 عالميا من أصل 193 دولة.",
+        "آخر القيم المعروفة"
+      ],
+      "classification": "OFFICIAL TARGET",
+      "target_year": 2026,
+      "verification_status": "verified",
+      "verification_note": "It belongs to the finance-law performance framework of the ministry's programme 429 (digital transition) and predates the launch of Digital Morocco 2030 in September 2024: its figures are the programme's targets, not targets stated as the strategy's, and they are recorded beside the strategy's own objectives (MAI-EV-0002, MAI-EV-0049) without reconciling them. The indicator is the overall EGDI, which the document describes as the average of the online services, telecommunication infrastructure and human capital indices; it is not the Online Services Index that the strategy's brochure names (MAI-EV-0049). Its 2022 value of 101 matches the United Nations data (MAI-EV-0046). The PDF's Arabic text layer reverses word order, so the excerpts were transcribed from the rendered pages (printed pages 48, 49 and 100) and automated matching cannot be used; the table row is given in its column order (unit, 2022 realisation, 2023 finance law, 2024 bill, 2025 and 2026 forecasts, target, target year). The previous performance project (MAI-EV-0050) set 75th by 2026. A target is not a measurement of progress.",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0053",
+      "title": "Digital-transition performance project, 2024 finance bill: jobs-created target and definition",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (mmsp.gov.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/2024-09/PDPAR2024_11.09.24.pdf",
+      "source_language": "ar",
+      "publication_date": "2024-09-11",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The same performance project sets, for indicator 1.2.429, the number of jobs created, a target of 270,000 for 2030, with 40,000 in the 2023 finance law column and forecasts of 150,000 for 2024, 160,000 for 2025 and 170,000 for 2026. It defines the indicator as jobs created in the digital economy under formal contracts (freelance, fixed-term or permanent), covering offshoring, start-ups and digital small and medium enterprises, with figures from the national social security fund (CNSS), and notes that its 2022 realisation of 130,000 concerns the offshoring sector only.",
+      "source_excerpts": [
+        "المؤشر 1.2.429 : عدد مناصب الشغل المحدثة",
+        "عدد 130 000 40 000 150 000 160 000 170 000 270 000 2030",
+        "يقيس المؤشر عدد مناصب الشغل المحدثة في مجال الاقتصاد الرقمي في إطار قانوني (Freelance ، CDD ، CDI)",
+        "تجدر الإشارة إلى أن نسبة الإنجاز برسم سنة 2022 تتعلق بقطاع ترحيل الخدمات فقط."
+      ],
+      "classification": "OFFICIAL TARGET",
+      "target_year": 2030,
+      "verification_status": "verified",
+      "verification_note": "It belongs to the finance-law performance framework of the ministry's programme 429 (digital transition) and predates the launch of Digital Morocco 2030 in September 2024: its figures are the programme's targets, not targets stated as the strategy's, and they are recorded beside the strategy's own objectives (MAI-EV-0002, MAI-EV-0049) without reconciling them. Excerpts transcribed from the rendered pages (printed pages 51 and 52), because the Arabic text layer reverses word order. The 270,000 differ from the strategy's 240,000 direct jobs (MAI-EV-0049) and from the 190,000 of the previous performance project (MAI-EV-0051); the 2022 value covers a narrower population (offshoring only) than the indicator it starts. A target is not a measurement of progress.",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0054",
+      "title": "Finance law for 2026: investment appropriation for implementing the Maroc Digital strategy",
+      "source_organization": "Ministry of Economy and Finance (finances.gov.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.finances.gov.ma/Publication/db/2026/Morasse_2026_FR.pdf",
+      "source_language": "fr",
+      "publication_date": "2026-01-09",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The 2026 finance law's investment budget for the Ministry Delegate in charge of Digital Transition and Administration Reform provides, under programme 429 (digital transition), MAD 1,500,000,000 in payment appropriations for 2026 for project 20, \"Mise en œuvre de la stratégie Maroc Digital\".",
+      "source_excerpts": [
+        "LOI DE FINANCES POUR L'ANNEE 2026",
+        "BUDGET D'INVESTISSEMENT POUR L'ANNÉE BUDGETAIRE 2026",
+        "490 20 Mise en œuvre de la stratégie Maroc Digital 1 500 000 000"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Detailed budget of the 2026 finance law published by the Ministry of Economy and Finance (PDF dated 9 January 2026, after the law's adoption; its section headers read \"LOI DE FINANCES POUR L'ANNEE 2026\"), PDF page 343. The verified fact is the appropriation the law provides. A payment appropriation authorises spending in 2026; it is not expenditure, and it does not show that any amount was committed, disbursed or spent. Execution is shown only by budget execution reports or the budget settlement law (loi de règlement), which the registry has not obtained. The 2026 finance bill's presentation note describes the same envelope as dedicated to implementing the strategy. The project also has an operating line (MAD 14,230,000) that is not recorded here. The row was read with layout-preserving text extraction of PDF page 343; plain extraction separates the table's cells, so automated excerpt matching does not find it.",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0055",
+      "title": "Ministry 2025 report: offshoring-sector jobs at end-2024 (ministry-reported output)",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (mmsp.gov.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/publications/Bilan_MTNRA_2025_07092026.pdf",
+      "source_language": "ar",
+      "publication_date": "2026-09-07",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The ministry's 2025 activity report states that, by the end of 2024, jobs in the offshoring (services outsourcing) sector exceeded 148,500, a cumulative net increase of more than 18,500 compared with 2022.",
+      "source_excerpts": [
+        "مؤشرات قطاع ترحيل الخدمات",
+        "ومع نهاية سنة 2024، تجاوز عدد مناصب الشغل في القطاع 148500 منصب، مسجّلًا زيادة صافية تراكمية تفوق 18,500 منصب مقارنة بسنة 2022."
+      ],
+      "classification": "UNVERIFIED CLAIM",
+      "verification_status": "verified",
+      "verification_note": "A ministry-reported output: the registry has not checked it against an independent count, and the passage does not state its source. It is a count of jobs in the offshoring sector at the end of 2024, under the heading \"offshoring sector indicators\": it is not a count of total digital jobs, nor of the strategy's 240,000 direct jobs (MAI-EV-0049), nor of jobs created under the strategy since its launch, and the finance-law job indicators use other definitions and populations (MAI-EV-0051, MAI-EV-0053). Report PDF dated 7 September 2026; passage on printed page 32, transcribed from the rendered page because the PDF's Arabic text layer drops letter ligatures.",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0056",
+      "title": "Ministry 2025 report: new enrolments in digital training, 2024–2025 (ministry-reported output)",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (mmsp.gov.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.mmsp.gov.ma/sites/default/files/publications/Bilan_MTNRA_2025_07092026.pdf",
+      "source_language": "ar",
+      "publication_date": "2026-09-07",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The ministry's 2025 activity report states that 22,649 new students enrolled in digital training programmes in the 2024–2025 university year, compared with 21,125 in 2023–2024.",
+      "source_excerpts": [
+        "وعلى مستوى أعداد المسجلين، بلغ عدد الطلبة الجدد في التكوينات الرقمية خلال الموسم الجامعي 2024-2025 ما مجموعه 22.649 طالبًا، مقارنة بـ 21.125 طالبًا خلال موسم 2023-2024"
+      ],
+      "classification": "UNVERIFIED CLAIM",
+      "verification_status": "verified",
+      "verification_note": "A ministry-reported output: the registry has not checked it independently. It counts new enrolments in one university year, not graduates and not certified talents: it is not progress towards the 200,000 talents trained and certified of Morocco AI 2030 (MAI-EV-0011, MAI-EV-0058), nor towards the objective of 100,000 new digital talents trained each year (MAI-EV-0058). Report PDF dated 7 September 2026; passage on printed page 47, transcribed from the rendered page; the 2026 finance bill's presentation note gives the same two figures.",
+      "related_entities": ["digital-morocco-2030", "ministry-digital-transition"]
+    },
+    {
+      "evidence_id": "MAI-EV-0057",
+      "title": "Cour des comptes annual report 2023–2024 (main points): digitalised public services at end-2023",
+      "source_organization": "Cour des comptes (courdescomptes.ma)",
+      "source_type": "government_publication",
+      "source_url": "https://www.courdescomptes.ma/wp-content/uploads/2024/12/Axes-pricipaux_Rapport-annuel-de-la-Cour-des-comptes-au-titre-de-2023-2024.pdf",
+      "source_language": "fr",
+      "publication_date": "2024-11",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_report",
+      "claim": "The Cour des comptes' summary of its annual report for 2023–2024 states that the number of digitalised public services reached 605 at the end of 2023, that the share of completely digitalised services did not exceed 23 per cent of the services offered, and that this growth had not significantly simplified administrative procedures for users.",
+      "source_excerpts": [
+        "le chantier de la transformation digitale peine à avancer, comme en témoigne la faible mise en œuvre des programmes numériques.",
+        "Bien que le nombre de services publics digitalisés ait atteint 605 à fin 2023, cette évolution n'a pas eu d'impact significatif sur la simplification des procédures administratives pour les usagers, surtout que le pourcentage de services complètement digitalisés ne dépasse pas 23% du total des services offerts"
+      ],
+      "classification": "VERIFIED FACT",
+      "verification_status": "verified",
+      "verification_note": "Summary (\"Principaux axes\") of the annual report of the Cour des comptes, the State's supreme audit institution, which is independent of the ministry; dated November 2024 (PDF created 11 December 2024), printed page 13. The verified fact is what the Court states. The summary does not set out its method here (how services were counted, or what \"complètement digitalisés\" means), and the report's full chapter was not read. The figures describe the position at the end of 2023, before Digital Morocco 2030 was launched in September 2024: they are a pre-strategy baseline, not a measure of progress under the strategy.",
+      "related_entities": ["digital-morocco-2030", "public-administration"]
+    },
+    {
+      "evidence_id": "MAI-EV-0058",
+      "title": "Ministry release: Morocco AI 2030 targets and the annual digital-talent objective",
+      "source_organization": "Ministry of Digital Transition and Administration Reform (mmsp.gov.ma)",
+      "source_type": "government_portal",
+      "source_url": "https://www.mmsp.gov.ma/fr/actualites/madame-amal-el-fallah-seghrouchni-pr%C3%A9sid%C3%A9-le-8-septembre-2026-%C3%A0-rabat-une-pr%C3%A9sentation-consacr%C3%A9e-%C3%A0-l%E2%80%99%C3%A9tat-actuel-de-la-feuille-de-route-%C2%AB-maroc-pour-l%E2%80%99intelligence-artificielle-2030-%C2%BB",
+      "source_language": "fr",
+      "publication_date": "2026-09-08",
+      "retrieval_date": "2026-10-20",
+      "evidence_type": "official_announcement",
+      "claim": "The ministry's release on the state of the Morocco AI 2030 roadmap states its 2030 objectives of MAD 100 billion of value added to GDP, 50,000 direct and indirect jobs and 200,000 talents trained and certified, and, for human capital, the objective of 100,000 new digital talents trained each year by 2030.",
+      "source_excerpts": [
+        "À l’horizon 2030, la feuille de route fixe des objectifs consistant notamment à générer 100 milliards de dirhams de valeur ajoutée au produit intérieur brut, à créer 50 000 emplois directs et indirects, ainsi qu’à former et certifier 200 000 talents et compétences.",
+        "En matière de capital humain, les différents programmes visant à élargir la base des compétences nationales ont été présentés, avec l’objectif d’atteindre 100 000 nouveaux talents numériques formés chaque année à l’horizon 2030."
+      ],
+      "classification": "OFFICIAL TARGET",
+      "target_year": 2030,
+      "verification_status": "verified",
+      "verification_note": "Release by the ministry, dated 8 September 2026. Its three 2030 objectives match the national portal's report (MAI-EV-0011). The 100,000 new digital talents a year is a different measure from the 200,000 talents trained and certified: a yearly flow of people trained, not a cumulative count of certified talents. The release gives no baseline, definitions or count reached for either. A target is not a measurement of progress.",
+      "related_entities": ["morocco-ai-2030", "ministry-digital-transition"]
     }
   ]
 }

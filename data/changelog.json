@@ -4,6 +4,21 @@
   "entries": [
     {
       "date": "2026-10-20",
+      "pull_request": 10,
+      "title": "Registry v0.8.0: strategy measurement evidence for Digital Morocco 2030 and Morocco AI 2030",
+      "version": "0.8.0",
+      "records": 58,
+      "entities": 65,
+      "relationships": 78,
+      "changes": [
+        "Nine records, each read in its source: the ministry's finance-law performance projects for 2023 and 2024 (EGDI rank and jobs-created targets, MAI-EV-0050 to MAI-EV-0053); the 2026 finance law's MAD 1,500,000,000 appropriation for implementing the Maroc Digital strategy (MAI-EV-0054); two outputs reported by the ministry for 2024 and 2024–2025 (MAI-EV-0055, MAI-EV-0056); the Cour des comptes' finding on digitalised public services at the end of 2023 (MAI-EV-0057); and the ministry's release on the Morocco AI 2030 targets and its annual digital-talent objective (MAI-EV-0058).",
+        "Each figure keeps its own kind. Targets are OFFICIAL TARGET, with their source year, scope and indicator definition, and conflicting targets (75th or 85th EGDI rank by 2026; 190,000, 240,000 or 270,000 jobs) are recorded side by side, not reconciled. The 2026 appropriation is a VERIFIED FACT about the finance law, not expenditure. The ministry's offshoring jobs and training enrolments are UNVERIFIED CLAIM records, labelled as ministry-reported outputs on definitions that differ from the strategy's objectives. The Court's finding is a pre-strategy baseline, not progress.",
+        "GAP-02 and GAP-06 re-assessed against the new records; both remain open. No measured progress, and no actual expenditure, is recorded for either strategy.",
+        "No relationship, entity, predicate, lifecycle stage or schema changed."
+      ]
+    },
+    {
+      "date": "2026-10-20",
       "pull_request": 9,
       "title": "Registry v0.7.0: the online-services ranking corrected, JAZARI general assemblies and a per-institute operational-evidence gap",
       "version": "0.7.0",
