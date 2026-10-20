@@ -15,6 +15,7 @@ import re
 import shutil
 import sys
 from html import escape
+from html.parser import HTMLParser
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -427,6 +428,7 @@ def render_registry_index(model):
   <h2 id="data-h"><span class="section-number">05</span>Machine-readable data</h2>
   <p class="prose"><a href="/data/">Using the registry data</a> describes the files, identifiers, null values and versions, says which answers can be recomputed, and links to an example that checks the data independently.</p>
   <ul class="data-links">
+    <li><a href="/registry/state/">Reference state</a>: what the registry currently records (classifications, documented lifecycle stages, official target records and open gaps), generated from <a href="/registry/reference-state.json"><code>/registry/reference-state.json</code></a>.</li>
     <li><a href="/data/manifest.json"><code>/data/manifest.json</code></a>: the list of published JSON files, with the SHA-256 of each in this version.</li>
     <li><a href="/data/evidence.json"><code>/data/evidence.json</code></a>: every evidence record, with its source URL, dates, verbatim excerpts, classification and verification status.</li>
     <li><a href="/data/ontology.json"><code>/data/ontology.json</code></a>: entity types, domains, predicates, entities and typed relationships, each citing its evidence.</li>
@@ -1321,6 +1323,449 @@ def render_evidence_index(model):
                 body=body)
 
 
+# ─── REFERENCE STATE PAGE ───────────────────────────────────────────────
+
+# /registry/state/ presents /registry/reference-state.json. Every governed value on it is rendered from the snapshot
+# and carries data-ref (a JSON pointer into the snapshot; '#count' after a list's pointer is that list's length) and
+# data-value (the snapshot value as JSON). Names, titles and definitions are display lookups from the canonical files,
+# marked data-label="kind:key", for keys already present in the snapshot; they never decide what appears.
+STATE_PATH = "/registry/state/"
+# The page's methodology boundary, exact sentences. They are the only static text allowed to name what the page excludes.
+STATE_BOUNDARY = (
+    "Independent; not affiliated with the Government of Morocco.",
+    "This page describes what the registry records, not the totality of Morocco's AI ecosystem.",
+    "Absence from the registry is not evidence of absence.",
+    "A target is not a result.",
+    "Availability is not evidence of use.",
+    "Announced is not operational.",
+    "Conflicting official statements are not resolved by inference.",
+)
+# Static wording the page must never use: it would carry a judgment the snapshot does not encode.
+STATE_FORBIDDEN = re.compile(
+    r"(?i)\b(scores?|scoring|confiden\w*|completeness|maturity|readiness|rank(?:s|ed|ing)?|top\s+(?:organisations?|companies|actors)|"
+    r"leading|leaders?|progress|on track|behind|achieve\w*|targets? met|not met|cumulative|funders?|government actors?|"
+    r"regulatory actors?|first[- ]party|adopt\w*|in use|widely|not delivered|failed|failure|conflicts?|disagree\w*|"
+    r"evidence state|quality)\b")
+STATE_DIM_ORDER_KEY = "dimension_order"
+
+
+def _ptr(*parts):
+    return "/" + "/".join(str(p).replace("~", "~0").replace("/", "~1") for p in parts)
+
+
+def _sv(ptr, value, text=None):
+    """A governed value from the snapshot, with its pointer and raw value."""
+    shown = (("—" if value is None else str(value)) if text is None else text)
+    return (f'<span data-ref="{escape(ptr)}" data-value="{escape(json.dumps(value, ensure_ascii=False))}">'
+            f'{escape(shown)}</span>')
+
+
+def _sn(ptr, items):
+    """The length of a snapshot list."""
+    return f'<span data-ref="{escape(ptr)}#count" data-value="{len(items)}">{len(items)}</span>'
+
+
+def _lbl(kind, key, text, href=None):
+    inner = f'<span data-label="{escape(kind)}:{escape(key)}">{escape(text)}</span>'
+    return f'<a href="{href}">{inner}</a>' if href else inner
+
+
+def _ent(model, eid):
+    e = model.entities.get(eid)
+    return _lbl("entity", eid, e["name"], entity_url(eid)) if e else ""
+
+
+def _rec(ptr, rid):
+    return f'<a href="/registry/evidence/#{escape(rid)}">{_sv(ptr, rid)}</a>'
+
+
+def _gap(ptr, gid):
+    return f'<a href="/registry/gaps/#{escape(gid.lower())}">{_sv(ptr, gid)}</a>'
+
+
+def _recs(ptr, ids):
+    return " ".join(_rec(_ptr(*ptr, i), x) for i, x in enumerate(ids)) if ids else "None recorded here"
+
+
+def _stable(label, headers, rows, empty="None recorded here."):
+    if not rows:
+        return f'<p class="prose">{escape(empty)}</p>'
+    head = "".join(f'<th scope="col">{escape(h)}</th>' for h in headers)
+    body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
+    return (f'<p class="table-hint">Scroll the table sideways to see all columns.</p>'
+            f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
+            f'<table class="qtable"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
+
+
+def _lifecycle_cells(model, s, base, x):
+    return [_sv(_ptr(*base, "type"), x["type"], TYPE_SINGULAR[x["type"]]),
+            _sv(_ptr(*base, "project_kind"), x["project_kind"], KIND_LABELS[x["project_kind"]] if x["project_kind"] else "—"),
+            _sv(_ptr(*base, "lifecycle"), x["lifecycle"], LIFECYCLE_LABELS[x["lifecycle"]])]
+
+
+def render_state(model, s, gaps):
+    """/registry/state/ from the reference snapshot s. Membership, grouping, stages, classifications and counts come from
+    s only; model and gaps supply display names, titles, definitions and the display order of GAP-07's dimensions."""
+    ver = _sv("/registry_version", s["registry_version"], "v" + s["registry_version"])
+    as_of = _sv("/as_of", s["as_of"], human_date(s["as_of"]))
+    c = s["counts"]
+    stats = "".join(f'<div class="stat"><div class="stat-key">{escape(k)}</div><div class="stat-val">{v}</div></div>' for k, v in (
+        ("Evidence records", _sv("/counts/records", c["records"])), ("Entities", _sv("/counts/entities", c["entities"])),
+        ("Relationships", _sv("/counts/relationships", c["relationships"])), ("Open gaps", _sn("/open_gaps", s["open_gaps"]))))
+    classes = model.evidence["classifications"]
+
+    def counts_panel(heading, field, keys, render_key):
+        rows = "".join(f"<div><dt>{render_key(k)}</dt><dd>{_sv(_ptr('counts', field, k), c[field][k])}</dd></div>" for k in keys if k in c[field])
+        return f'<div class="state-panel"><h3>{escape(heading)}</h3><dl class="state-counts">{rows}</dl></div>'
+
+    order = lambda vocab, d: [k for k in vocab if k in d] + sorted(k for k in d if k not in vocab)
+    badge = lambda k: f'<span class="badge badge-{slug(k)}">{escape(k)}</span>'
+    composition = ('<div class="state-panels">'
+                   + counts_panel("Records by classification", "records_by_classification", order(classes, c["records_by_classification"]), badge)
+                   + counts_panel("Relationships by classification", "relationships_by_classification",
+                                  order(classes, c["relationships_by_classification"]), badge)
+                   + counts_panel("Entities by type", "entities_by_type", order(model.ontology["entity_types"], c["entities_by_type"]),
+                                  lambda k: escape(TYPE_SINGULAR.get(k, k)))
+                   + counts_panel("Records by verification status", "records_by_verification_status",
+                                  order(model.evidence["verification_statuses"], c["records_by_verification_status"]), lambda k: escape(k.capitalize()))
+                   + "</div>")
+
+    tally = [_lifecycle_cells(model, s, ("lifecycle", "by_type_and_kind", i), x) + [_sv(_ptr("lifecycle", "by_type_and_kind", i, "count"), x["count"])]
+             for i, x in enumerate(s["lifecycle"]["by_type_and_kind"])]
+    entries = []
+    for i, x in enumerate(s["lifecycle"]["entities"]):
+        base = ("lifecycle", "entities", i)
+        bases = " ".join(_sv(_ptr(*base, "status_bases", j), b, STATUS_BASIS_LABELS[b]) for j, b in enumerate(x["status_bases"])) or "None recorded here"
+        entries.append([_ent(model, x["id"]) + f' <code>{_sv(_ptr(*base, "id"), x["id"])}</code>'] + _lifecycle_cells(model, s, base, x)
+                       + [_recs((*base, "lifecycle_evidence"), x["lifecycle_evidence"]), bases])
+
+    ops = []
+    for i, x in enumerate(s["operational_or_pilot"]):
+        base = ("operational_or_pilot", i)
+        ops.append([
+            _ent(model, x["id"]) + f' <code>{_sv(_ptr(*base, "id"), x["id"])}</code>',
+            _sv(_ptr(*base, "type"), x["type"], TYPE_SINGULAR[x["type"]]),
+            _sv(_ptr(*base, "project_kind"), x["project_kind"], KIND_LABELS[x["project_kind"]] if x["project_kind"] else "—"),
+            _sv(_ptr(*base, "lifecycle"), x["lifecycle"], LIFECYCLE_LABELS[x["lifecycle"]]),
+            " ".join(_sv(_ptr(*base, "status_bases", j), b, STATUS_BASIS_LABELS[b]) for j, b in enumerate(x["status_bases"])) or "None recorded here",
+            _sv(_ptr(*base, "counts_as_ai_deployment"), x["counts_as_ai_deployment"], "Yes" if x["counts_as_ai_deployment"] else "No"),
+            "Status: " + _recs((*base, "status_evidence_records"), x["status_evidence_records"])
+            + "<br>Lifecycle evidence: " + _recs((*base, "lifecycle_evidence"), x["lifecycle_evidence"]),
+        ])
+    by_basis = "".join(
+        f'<li><strong>{escape(STATUS_BASIS_LABELS.get(b, b))}</strong>: '
+        + ", ".join(_ent(model, eid) + f' <code>{_sv(_ptr("operational_or_pilot_by_status_basis", b, j), eid)}</code>' for j, eid in enumerate(ids))
+        + "</li>" for b, ids in sorted(s["operational_or_pilot_by_status_basis"].items()))
+
+    kinds = order(list(model.ontology["project_kinds"]), s["announced_projects_by_kind"])
+    announced = "".join(
+        f'<div class="coverage-cell"><h3>{escape(KIND_LABELS.get(k, k))}</h3>'
+        f'<p class="coverage-count">{_sn(_ptr("announced_projects_by_kind", k), ids)} recorded as announced</p>'
+        + (("<ul>" + "".join(f'<li>{_ent(model, eid)} <code>{_sv(_ptr("announced_projects_by_kind", k, j), eid)}</code></li>' for j, eid in enumerate(ids)) + "</ul>")
+           if ids else '<p class="coverage-gap">None recorded here.</p>') + "</div>" for k, ids in ((k, s["announced_projects_by_kind"][k]) for k in kinds))
+
+    targets = []
+    for i, t in enumerate(s["official_targets"]):
+        rid = t["evidence_id"]
+        title = model.records[rid]["title"] if rid in model.records else ""
+        for j, ini in enumerate(t["initiatives"]):
+            b = ("official_targets", i, "initiatives", j)
+            targets.append([_rec(_ptr("official_targets", i, "evidence_id"), rid) if j == 0 else "",
+                            _lbl("record-title", rid, title) if j == 0 else "",
+                            _sv(_ptr("official_targets", i, "target_year"), t["target_year"]) if j == 0 else "",
+                            _ent(model, ini["id"]) + f' <code>{_sv(_ptr(*b, "id"), ini["id"])}</code>',
+                            _gap(_ptr(*b, "covering_gap"), ini["covering_gap"]) if ini["covering_gap"] else _sv(_ptr(*b, "covering_gap"), None, "None"),
+                            (f'<span class="badge badge-gap-{escape(ini["gap_state"])}">' + _sv(_ptr(*b, "gap_state"), ini["gap_state"], ini["gap_state"].capitalize()) + "</span>")
+                            if ini["gap_state"] else _sv(_ptr(*b, "gap_state"), None, "None")])
+
+    questions = {g["id"]: g["question"] for g in gaps["gaps"]}
+    open_rows = []
+    for i, g in enumerate(s["open_gaps"]):
+        b = ("open_gaps", i)
+        ents = ", ".join(_ent(model, e) + f' <code>{_sv(_ptr(*b, "entities", j), e)}</code>' for j, e in enumerate(g["entities"])) or "Relationships, not entities"
+        open_rows.append([_gap(_ptr(*b, "id"), g["id"]), _lbl("gap-question", g["id"], questions.get(g["id"], "")), ents,
+                          _sv(_ptr(*b, "assessed"), g["assessed"], human_date(g["assessed"])),
+                          f'<code>{_sv(_ptr(*b, "assessed_fingerprint"), g["assessed_fingerprint"])}</code>',
+                          _sv(_ptr(*b, "has_entity_assessments"), g["has_entity_assessments"], "Yes" if g["has_entity_assessments"] else "No")])
+    in_gaps = "".join(f'<li>{_ent(model, e)}: '
+                      + ", ".join(_gap(_ptr("entities_in_open_gaps", e, j), gid) for j, gid in enumerate(ids)) + "</li>"
+                      for e, ids in sorted(s["entities_in_open_gaps"].items()))
+    dim_order = (gaps.get("entity_assessment") or {}).get(STATE_DIM_ORDER_KEY) or []
+    assessments = ""
+    for i, block in enumerate(s["entity_assessments"]):
+        dims = [d for d in dim_order if any(d in a["dimensions"] for a in block["assessments"])]
+        dims += sorted({d for a in block["assessments"] for d in a["dimensions"]} - set(dims))
+        rows = []
+        notes = []
+        for j, a in enumerate(block["assessments"]):
+            b = ("entity_assessments", i, "assessments", j)
+            rows.append([_ent(model, a["entity"]) + f' <code>{_sv(_ptr(*b, "entity"), a["entity"])}</code>',
+                         _sv(_ptr(*b, "state"), a["state"], a["state"].capitalize())]
+                        + [_recs((*b, "dimensions", d), a["dimensions"].get(d, [])) if a["dimensions"].get(d) else "—" for d in dims])
+            if a.get("note"):
+                notes.append(f'<li>{_ent(model, a["entity"])}: {_sv(_ptr(*b, "note"), a["note"])}</li>')
+        assessments += (f'<details class="state-details"><summary>Per-entity assessment for {_sv(_ptr("entity_assessments", i, "gap"), block["gap"])}, '
+                        f'as recorded in the gap register</summary>'
+                        + _stable("Per-entity assessment", ["Entity", "State"] + [DIMENSION_LABELS.get(d, d) for d in dims], rows)
+                        + (f'<ul class="prose">{"".join(notes)}</ul>' if notes else "")
+                        + '<p class="prose">A dash means no qualifying record is recorded in this registry for that dimension, not that the thing does not exist.</p></details>')
+
+    def ids_block(field, heading, definition_key=None):
+        ids = s[field]
+        definition = (f'<p class="prose">{_lbl("classification", definition_key, classes[definition_key])}</p>' if definition_key else "")
+        items = "".join(f"<li>{_rec(_ptr(field, i), x)} {_lbl('record-title', x, model.records[x]['title']) if x in model.records else ''}</li>" for i, x in enumerate(ids))
+        return (f'<h3>{escape(heading)} ({_sn(_ptr(field), ids)})</h3>{definition}'
+                + (f'<ul class="prose">{items}</ul>' if ids else '<p class="prose">None recorded here.</p>'))
+
+    def rel_rows(field, with_class):
+        rows = []
+        for i, r in enumerate(s[field]):
+            b = (field, i)
+            pred = model.predicates.get(r["relationship"], {}).get("label", r["relationship"])
+            row = [_ent(model, r["subject"]) + f' <code>{_sv(_ptr(*b, "subject"), r["subject"])}</code>',
+                   _lbl("predicate", r["relationship"], pred) + f' <code>{_sv(_ptr(*b, "relationship"), r["relationship"])}</code>',
+                   _ent(model, r["object"]) + f' <code>{_sv(_ptr(*b, "object"), r["object"])}</code>']
+            if with_class:
+                row.append(f'<span class="badge badge-{slug(r["classification"])}">' + _sv(_ptr(*b, "classification"), r["classification"]) + "</span>")
+            row += [_recs((*b, "evidence"), r["evidence"]), f'<code>{_sv(_ptr(*b, "id"), r["id"])}</code>']
+            rows.append(row)
+        return rows
+
+    superseded = "".join(f'<li>{_rec(_ptr("superseded_records", i, "evidence_id"), x["evidence_id"])} is superseded by '
+                         + _recs(("superseded_records", i, "superseded_by"), x["superseded_by"]) + "</li>" for i, x in enumerate(s["superseded_records"]))
+    legend = "".join(f'<div class="legend-row"><span class="badge badge-{slug(k)}">{escape(k)}</span>'
+                     f'<span class="legend-def">{_lbl("classification", k, v)}</span><span></span></div>' for k, v in classes.items())
+    ul = [[_ent(model, x["id"]) + f' <code>{_sv(_ptr("unresolved_lifecycle", i, "id"), x["id"])}</code>',
+           _sv(_ptr("unresolved_lifecycle", i, "type"), x["type"], TYPE_SINGULAR[x["type"]]),
+           _sv(_ptr("unresolved_lifecycle", i, "project_kind"), x["project_kind"], KIND_LABELS[x["project_kind"]] if x["project_kind"] else "—"),
+           _recs(("unresolved_lifecycle", i, "lifecycle_evidence"), x["lifecycle_evidence"])] for i, x in enumerate(s["unresolved_lifecycle"])]
+    uo = [[_ent(model, x["id"]) + f' <code>{_sv(_ptr("unresolved_origin", i, "id"), x["id"])}</code>',
+           _recs(("unresolved_origin", i, "origin_evidence"), x["origin_evidence"])] for i, x in enumerate(s["unresolved_origin"])]
+    derived = "".join(f'<li><a href="{escape(x["path"])}"><code>{_sv(_ptr("derived_from", i, "path"), x["path"])}</code></a> '
+                      f'<code class="state-hash">{_sv(_ptr("derived_from", i, "sha256"), x["sha256"])}</code></li>' for i, x in enumerate(s["derived_from"]))
+    boundary = "".join(f"<li>{escape(x)}</li>" for x in STATE_BOUNDARY)
+
+    body = f"""<div class="state-page">
+<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Reference state</p>
+  <p class="label">MAI-STATE — Registry {ver} · as of {as_of}</p>
+  <h1>TheMoroccoAI Reference State</h1>
+  <p class="lede">What this registry currently records: how its records are classified, which lifecycle stage is documented for each project, model and dataset, which official targets it holds and which evidence questions remain open. Every value below is read from <a href="/registry/reference-state.json">reference-state.json</a>.</p>
+  <div class="notice state-boundary"><strong>Methodology boundary</strong> (as of {as_of})<ul>{boundary}</ul></div>
+</header>
+<section aria-labelledby="s1-h">
+  <h2 id="s1-h"><span class="section-number">01</span>Registry composition</h2>
+  <div class="stats state-stats">{stats}</div>
+  <p class="prose">Counts of what is recorded here. They describe the registry's coverage, not the size of anything in Morocco, and do not rate anything.</p>
+  {composition}
+</section>
+<section aria-labelledby="s2-h">
+  <h2 id="s2-h"><span class="section-number">02</span>Lifecycle reference</h2>
+  <p class="prose">Projects, models and datasets are the only entity types with a lifecycle stage; initiatives, institutions and companies have none. Entity type, project kind and lifecycle stage are separate facts, shown in separate columns.</p>
+  {_stable("Lifecycle stages by type and project kind", ["Type", "Project kind", "Lifecycle", "Count"], tally)}
+  <details class="state-details"><summary>Every recorded lifecycle entry ({_sn("/lifecycle/entities", s["lifecycle"]["entities"])})</summary>
+  {_stable("Every recorded lifecycle entry", ["Entity", "Type", "Project kind", "Lifecycle", "Lifecycle evidence", "Status basis of the stage"], entries)}
+  </details>
+</section>
+<section aria-labelledby="s3-h">
+  <h2 id="s3-h"><span class="section-number">03</span>Operational and pilot projects</h2>
+  <p class="prose">Operational does not automatically mean AI deployment. Only a project whose kind is AI application counts as one; compute infrastructure and digital platforms do not. The status basis says what the stage rests on. Availability is not evidence of use: public availability shows that a service was offered on a date, not how many people use it.</p>
+  {_stable("Operational and pilot projects", ["Project", "Type", "Project kind", "Lifecycle", "Status basis", "Counts as AI deployment", "Records"], ops)}
+  <h3>By status basis</h3>
+  <ul class="prose">{by_basis or "<li>None recorded here.</li>"}</ul>
+</section>
+<section aria-labelledby="s4-h">
+  <h2 id="s4-h"><span class="section-number">04</span>Announced projects</h2>
+  <p class="prose">Announced means no later lifecycle stage is recorded here. It describes the registry's records, not whether a project exists, started or was abandoned.</p>
+  <div class="coverage">{announced}</div>
+</section>
+<section aria-labelledby="s5-h">
+  <h2 id="s5-h"><span class="section-number">05</span>Official targets</h2>
+  <p class="prose">Each record classified as an official target, with the initiative it concerns and the evidence gap that covers that initiative. A target is not a result, and the state of its covering gap is not a measure of anything about the target: the gap's own text says what the registry establishes.</p>
+  {_stable("Official targets", ["Record", "Title", "Target year", "Initiative", "Covering gap", "Gap state"], targets)}
+</section>
+<section aria-labelledby="s6-h">
+  <h2 id="s6-h"><span class="section-number">06</span>Open evidence gaps</h2>
+  <p class="prose">An open gap identifies evidence still needed for a defined registry question. It does not prove that the underlying activity does not exist. An entity that no gap lists is not thereby fully documented.</p>
+  {_stable("Open evidence gaps", ["Gap", "Question", "Entities", "Assessed", "Data digest", "Per-entity assessment"], open_rows)}
+  <details class="state-details"><summary>Entities listed by open gaps ({_sn("/entities_in_open_gaps", list(s["entities_in_open_gaps"]))})</summary><ul class="prose">{in_gaps}</ul></details>
+  {assessments}
+</section>
+<section aria-labelledby="s7-h">
+  <h2 id="s7-h"><span class="section-number">07</span>Evidence transparency</h2>
+  <p class="prose">Each record carries one classification, which describes what its source documents. The lists below show where the registry's evidence stops short of a verified fact. They are boundaries of the evidence, not judgments of the records or of their sources.</p>
+  <div class="legend">{legend}</div>
+  {ids_block("records_unverified_claim", "Unverified claims", "UNVERIFIED CLAIM")}
+  {ids_block("records_announced_plan", "Announced plans", "ANNOUNCED PLAN")}
+  {ids_block("records_partially_verified", "Partially verified records")}
+  <h3>Superseded records ({_sn("/superseded_records", s["superseded_records"])})</h3>
+  <p class="prose">A superseded record stays published and can no longer set a lifecycle stage.</p>
+  {f'<ul class="prose">{superseded}</ul>' if superseded else '<p class="prose">None recorded here.</p>'}
+  <h3>Relationships inferred by the registry ({_sn("/independent_analysis_relationships", s["independent_analysis_relationships"])})</h3>
+  <p class="prose">{_lbl("classification", "INDEPENDENT ANALYSIS", classes["INDEPENDENT ANALYSIS"])}</p>
+  {_stable("Relationships inferred by the registry", ["Subject", "Relationship", "Object", "Records", "Identifier"], rel_rows("independent_analysis_relationships", False))}
+  <details class="state-details"><summary>Formal acts documented only by announcements, news reports or descriptions ({_sn("/announcement_only_relationships", s["announcement_only_relationships"])})</summary>
+  <p class="prose">How these relationships are documented in this registry, not whether they are true.</p>
+  {_stable("Formal acts documented only by announcements", ["Subject", "Relationship", "Object", "Classification", "Records", "Identifier"], rel_rows("announcement_only_relationships", True))}
+  </details>
+</section>
+<section aria-labelledby="s8-h">
+  <h2 id="s8-h"><span class="section-number">08</span>Unresolved cases</h2>
+  <p class="prose">Two different concepts, kept apart. An unresolved lifecycle means the recorded evidence does not establish a project's stage; an unresolved origin means it does not establish where a company is based. The reason for each is on the entity's page.</p>
+  <h3>Unresolved lifecycle stage</h3>
+  {_stable("Unresolved lifecycle stage", ["Entity", "Type", "Project kind", "Lifecycle evidence"], ul)}
+  <h3>Unresolved company origin</h3>
+  {_stable("Unresolved company origin", ["Company", "Origin evidence"], uo)}
+</section>
+<section aria-labelledby="s9-h">
+  <h2 id="s9-h"><span class="section-number">09</span>Machine-readable verification</h2>
+  <p class="prose">This page is generated from <a href="/registry/reference-state.json">/registry/reference-state.json</a>, which is derived from the canonical published JSON. Each reproducible projection there has a published rule; the files it was computed from are recorded with their hashes under <code>derived_from</code>; the <a href="/data/manifest.json">manifest</a> hashes the final published snapshot; and the <a href="/examples/registry_consumer.py">example consumer</a> independently recomputes every reproducible projection using only the published JSON. Hashes establish build consistency, not truth or authorship. <a href="/data/">Using the registry data</a> and the <a href="/methodology/">methodology</a> describe the rules.</p>
+  <h3>Canonical inputs</h3>
+  <ul class="prose">{derived}</ul>
+  <h3>Scope of the snapshot</h3>
+  <p class="prose">{_sv("/scope", s["scope"])} Documentation: <a href="{escape(s["documentation"])}"><code>{_sv("/documentation", s["documentation"])}</code></a></p>
+</section>
+</div>"""
+    jsonld = {"@context": "https://schema.org", "@type": "Dataset", "name": "TheMoroccoAI Reference State",
+              "description": "Projections of TheMoroccoAI registry's canonical data: what it records, how records are classified, documented lifecycle stages, official target records and open evidence gaps.",
+              "url": SITE + STATE_PATH, "version": s["registry_version"], "dateModified": s["as_of"], "isAccessibleForFree": True,
+              "creator": {"@type": "Organization", "name": "TheMoroccoAI", "url": SITE + "/"},
+              "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": SITE + "/registry/reference-state.json"}]}
+    return page(model, path=STATE_PATH, current="registry", title="Reference State — TheMoroccoAI",
+                description="What TheMoroccoAI registry currently records: classifications, documented lifecycle stages, official target records and open evidence gaps, generated from its machine-readable reference snapshot.",
+                body=body, jsonld=jsonld)
+
+
+class _StateParser(HTMLParser):
+    """The governed values, display lookups and remaining static text of /registry/state/'s main content."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.refs, self.labels, self.static = [], [], []
+        self.stack, self.in_main, self.skip, self.cur = [], False, 0, None
+        self.details, self.summaries = 0, 0
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == "main":
+            self.in_main = True
+        if not self.in_main:
+            return
+        if tag == "details":
+            self.details += 1
+        if tag == "summary":
+            self.summaries += 1
+        if tag in ("br", "img", "meta", "link", "input"):
+            return
+        kind = None
+        if "data-ref" in a:
+            kind = ("ref", a["data-ref"], a.get("data-value"))
+        elif "data-label" in a:
+            kind = ("label", a["data-label"])
+        elif "section-number" in (a.get("class") or "").split():
+            kind = ("number",)
+        self.stack.append((tag, kind))
+        if kind:
+            self.skip += 1
+            self.cur = [kind, ""] if self.skip == 1 else self.cur
+
+    def handle_endtag(self, tag):
+        if tag == "main":
+            self.in_main = False
+        if not self.in_main or not self.stack or tag in ("br", "img", "meta", "link", "input"):
+            return
+        t, kind = self.stack.pop()
+        if kind:
+            self.skip -= 1
+            if self.skip == 0:
+                k, text = self.cur
+                if k[0] == "ref":
+                    self.refs.append((k[1], k[2], text))
+                elif k[0] == "label":
+                    self.labels.append((k[1], text))
+                self.cur = None
+
+    def handle_data(self, data):
+        if not self.in_main:
+            return
+        if self.skip:
+            self.cur[1] += data
+        else:
+            self.static.append(data)
+
+
+def _resolve(s, pointer):
+    count = pointer.endswith("#count")
+    node = s
+    for part in (pointer[:-6] if count else pointer).split("/")[1:]:
+        part = part.replace("~1", "/").replace("~0", "~")
+        node = node[int(part)] if isinstance(node, list) else node[part]
+    return len(node) if count else node
+
+
+def _leaves(node, path=()):
+    if isinstance(node, dict):
+        for k, v in node.items():
+            yield from _leaves(v, (*path, k))
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from _leaves(v, (*path, i))
+    else:
+        yield _ptr(*path)
+
+
+def state_page_errors(html_text, s, model, gaps):
+    """Why /registry/state/ does not faithfully present the snapshot s, or uses wording the snapshot does not support."""
+    errors = []
+    p = _StateParser()
+    p.feed(html_text)
+    shown = set()
+    for ptr, raw, text in p.refs:
+        try:
+            value = _resolve(s, ptr)
+        except (KeyError, IndexError, ValueError, TypeError):
+            errors.append(f"state page: {ptr} is not in reference-state.json")
+            continue
+        if raw is None or json.loads(raw) != value:
+            errors.append(f"state page: {ptr} shows {raw!r}, but the snapshot holds {json.dumps(value, ensure_ascii=False)}")
+        if isinstance(value, int) and not isinstance(value, bool) and text.strip() != str(value):
+            errors.append(f"state page: {ptr} displays {text!r} for the count {value}")
+        shown.add(ptr)
+    for leaf in _leaves({k: v for k, v in s.items() if k != "derivation"}):
+        if leaf not in shown:
+            errors.append(f"state page: snapshot value {leaf} is not shown")
+    present = {str(v) for v in (_resolve(s, x) for x in _leaves({k: v for k, v in s.items() if k != "derivation"}))}
+    present |= set(s["counts"]["records_by_classification"]) | {k for x in s["entity_assessments"] for a in x["assessments"] for k in a["dimensions"]}
+    lookups = {"entity": lambda k: model.entities[k]["name"], "record-title": lambda k: model.records[k]["title"],
+               "gap-question": lambda k: next(g["question"] for g in gaps["gaps"] if g["id"] == k),
+               "classification": lambda k: model.evidence["classifications"][k], "predicate": lambda k: model.predicates[k]["label"]}
+    for label, text in p.labels:
+        kind, _, key = label.partition(":")
+        if kind not in lookups:
+            errors.append(f"state page: unknown display lookup {kind!r}")
+        elif key not in present:
+            errors.append(f"state page: display lookup {label} names something absent from the snapshot")
+        else:
+            try:
+                if text != lookups[kind](key):
+                    errors.append(f"state page: display lookup {label} does not match the canonical data")
+            except (KeyError, StopIteration):
+                errors.append(f"state page: display lookup {label} does not resolve")
+    static = " ".join(" ".join(p.static).split())
+    for sentence in STATE_BOUNDARY:
+        if sentence not in static:
+            errors.append(f"state page: boundary statement missing: {sentence}")
+        static = static.replace(sentence, " ")
+    if re.search(r"\d", static):
+        errors.append(f"state page: static text carries a number not read from the snapshot: {re.findall(r'.{0,30}\d.{0,30}', static)[:3]}")
+    m = STATE_FORBIDDEN.search(static)
+    if m:
+        errors.append(f"state page: wording {m.group(0)!r} carries a judgment the snapshot does not encode")
+    if p.summaries != p.details:
+        errors.append("state page: every details element needs a summary")
+    return errors
+
+
 # ─── DATA REFERENCE ───────────────────────────────────────────────────────
 
 RESOURCES = (
@@ -1481,7 +1926,7 @@ def render_data_reference(model, gaps, man):
   <h3 id="d7-q9">Q9: official targets and recorded progress</h3>
   {_table("Q9: what can be recomputed", ["Part of the answer", "Status", "From"], q9_rows, "")}
   <h3 id="d7-ref">Reference state</h3>
-  <p class="prose"><a href="/registry/reference-state.json">reference-state.json</a> publishes projections of the canonical data, each with its rule under <code>derivation</code> and the SHA-256 of the canonical files it was computed from (<code>derived_from</code>). It is computed from those files only; the manifest, which lists the reference state's own SHA-256, is generated after it. Every reference projection is reproducible from the published canonical data. Fixed contract metadata is explicitly labelled recorded-not-derivable. Where a field copies or counts a recorded editorial judgment (a classification, a lifecycle stage, a gap's state), its rule names that judgment under <code>rests_on</code>. It describes what this registry records, not Morocco's AI ecosystem.</p>
+  <p class="prose"><a href="/registry/reference-state.json">reference-state.json</a> publishes projections of the canonical data, each with its rule under <code>derivation</code> and the SHA-256 of the canonical files it was computed from (<code>derived_from</code>). It is computed from those files only; the manifest, which lists the reference state's own SHA-256, is generated after it. Every reference projection is reproducible from the published canonical data. Fixed contract metadata is explicitly labelled recorded-not-derivable. Where a field copies or counts a recorded editorial judgment (a classification, a lifecycle stage, a gap's state), its rule names that judgment under <code>rests_on</code>. It describes what this registry records, not Morocco's AI ecosystem. The <a href="/registry/state/">reference state page</a> presents it for reading.</p>
   {_table("Reference state: what can be recomputed", ["Field", "Status", "Rule"], ref_rows, "")}
   <p class="prose">It deliberately does not include:</p>
   <ul class="prose">{"".join(f"<li>{escape(x)}</li>" for x in ref["not_included"])}</ul>
@@ -1799,7 +2244,7 @@ def inject(html_text, blocks):
 
 
 def sitemap(model):
-    paths = (["/", "/registry/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/data/", "/methodology/", "/acquisition/"]
+    paths = (["/", "/registry/", "/registry/state/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/data/", "/methodology/", "/acquisition/"]
              + [entity_url(e) for e in sorted(model.entities)])
     urls = "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{model.as_of}</lastmod></url>\n" for p in paths)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
@@ -1833,6 +2278,7 @@ def outputs(model):
     }
     canonical = {p: (ROOT / p).read_bytes() for p in REFERENCE_INPUTS}
     files["registry/reference-state.json"] = _json(reference_state(model, gaps, canonical))
+    files["registry/state/index.html"] = render_state(model, json.loads(files["registry/reference-state.json"]), gaps)
     files["data/manifest.json"] = _json(manifest(model, files))
     files["data/index.html"] = render_data_reference(model, gaps, json.loads(files["data/manifest.json"]))
     for eid, e in model.entities.items():
@@ -1850,7 +2296,10 @@ def main(argv):
             print("ERROR", e)
         return 1
     files = outputs(Model(evidence, ontology))
-    errors = registry.validate_reference_state(json.loads(files["registry/reference-state.json"]), evidence, ontology)
+    snapshot = json.loads(files["registry/reference-state.json"])
+    errors = registry.validate_reference_state(snapshot, evidence, ontology)
+    errors += state_page_errors(files["registry/state/index.html"], snapshot, Model(evidence, ontology),
+                                registry.load(registry.ROOT / "data" / "gaps.json"))
     if errors:
         for e in errors:
             print("ERROR", e)
