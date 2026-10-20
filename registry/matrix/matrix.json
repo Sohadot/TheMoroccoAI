@@ -121,7 +121,7 @@
   "/data/evidence.json"
  ],
  "documentation": "/data/",
- "registry_version": "0.7.0",
+ "registry_version": "0.8.0",
  "rows": [
   {
    "classification": "VERIFIED FACT",

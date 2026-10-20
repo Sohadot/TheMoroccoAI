@@ -388,8 +388,12 @@ class EvidenceAcquisition(unittest.TestCase):
         self.assertIn("position at the start of the strategy, not progress", r["verification_note"])
         g = next(g for g in self.gaps["gaps"] if g["id"] == "GAP-06")
         self.assertIn("MAI-EV-0046", g["assessed_records"])
-        self.assertNotRegex(" ".join(x.get("statement", "") if isinstance(x, dict) else x for x in g["established"]),
-                            r"(?i)\b(progress|improved|achieved|on track)\b")
+        # Progress wording may appear only where a sentence negates it ("not progress under the strategy").
+        for gid in ("GAP-02", "GAP-06"):
+            for item in next(x for x in self.gaps["gaps"] if x["id"] == gid)["established"]:
+                for sentence in re.split(r"(?<=\.)\s+", item["text"]):
+                    if re.search(r"(?i)\b(progress|improved|achieved|on track)\b", sentence):
+                        self.assertRegex(sentence, r"(?i)\b(not|no|without|neither|nor)\b", f"{gid}: {sentence}")
 
     def test_arabic_excerpts_are_marked_right_to_left(self):
         page = (REPO / "registry" / "evidence" / "index.html").read_text(encoding="utf-8")

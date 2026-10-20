@@ -158,3 +158,85 @@ The first version of GAP-07 resolved an institute that does not operate only wit
 **Proposed for a later sprint (not implemented):** a lifecycle stage for "abandoned before operation", if the owner wants the distinction outside GAP-07 as well.
 
 `entity_assessments` was introduced in this unmerged PR, so the change breaks no published consumer. The v0.6.0 consumer still verifies the data.
+
+# Tier 2: strategy measurement evidence (registry v0.8.0)
+
+Approved scope: targets, allocations, ministry-reported outputs and independent findings for Digital Morocco 2030 and Morocco AI 2030, each kept in its own kind. No predicate, schema, entity, relationship or lifecycle change.
+
+## Evidence diff and classification
+
+| Record | Source (location) | Kind | Classification | Why |
+|---|---|---|---|---|
+| MAI-EV-0050 | Ministry's programme 429 performance project, 2023 finance bill (printed p.38) | Target: EGDI rank 75th by 2026; 2021 realisation 106 | OFFICIAL TARGET, `target_year` 2026 | Finance-law target. It predates the strategy and is the overall EGDI, not OSI. |
+| MAI-EV-0051 | Same document (p.39) | Targets: jobs created 190,000 by 2030; digitalised procedures 2,000 by 2030 | OFFICIAL TARGET, 2030 | The document leaves "job created" undefined. |
+| MAI-EV-0052 | Performance project, 2024 finance bill (pp.48, 49, 100; Arabic) | Target: EGDI 85th by 2026; 2022 realisation 101; UN values 110 / 106 / 101 | OFFICIAL TARGET, 2026 | Overall EGDI, the average of three indices. Arabic transcribed from page images. |
+| MAI-EV-0053 | Same document (pp.51–52) | Target: jobs created 270,000 by 2030; defined as digital-economy jobs on formal contracts (CNSS) | OFFICIAL TARGET, 2030 | Its 2022 realisation of 130,000 covers offshoring only. |
+| MAI-EV-0054 | 2026 finance law, detailed budget (PDF p.343) | Allocation: MAD 1,500,000,000 in payment appropriations, programme 429, project 20 "Mise en œuvre de la stratégie Maroc Digital" | VERIFIED FACT about the law | An authorisation to spend, not expenditure. Execution would need the loi de règlement. |
+| MAI-EV-0055 | Ministry activity report 2025 (printed p.32; Arabic) | Reported output: more than 148,500 offshoring-sector jobs at end-2024 | UNVERIFIED CLAIM | Ministry-reported and unchecked. Offshoring sector only, not total digital jobs. |
+| MAI-EV-0056 | Same report (p.47) | Reported output: 22,649 new digital-training enrolments in 2024–25 (21,125 in 2023–24) | UNVERIFIED CLAIM | Enrolments, not graduates or certified talents. |
+| MAI-EV-0057 | Cour des comptes, *Principaux axes* 2023–2024 (p.13) | Independent audit finding: 605 digitalised services at end-2023; no more than 23 per cent fully digitalised | VERIFIED FACT of the Court's statement | Pre-strategy baseline. The summary does not set out its method. |
+| MAI-EV-0058 | Ministry release, 8 Sept 2026 | Targets: MAD 100 bn, 50,000 jobs, 200,000 talents trained and certified; separately, 100,000 new digital talents a year | OFFICIAL TARGET, 2030 | The yearly flow is a different measure from the cumulative certified count. |
+
+## Indicator definitions and source conflicts (recorded, not reconciled)
+
+- **E-government ranking:**
+  - the strategy: 113th → 50th on the **Online Services Index** (MAI-EV-0049; the 113th is unverified);
+  - finance-law performance projects: **overall EGDI** 75th by 2026 (2023 bill) and 85th by 2026 (2024 bill);
+  - the UN: overall EGDI 101st (2022) and 90th (2024), plus OSI values without ranks (MAI-EV-0046).
+- **Jobs:**
+  - the strategy: 240,000 direct jobs, with no year in the brochure;
+  - 2023 bill: 190,000 jobs created by 2030, undefined;
+  - 2024 bill: 270,000 by 2030, digital-economy jobs on formal contracts, with a 2022 baseline that covers offshoring only;
+  - ministry report: 148,500 offshoring-sector jobs at end-2024, a stock and not jobs created.
+- **Talent:**
+  - Morocco AI 2030: 200,000 trained and certified;
+  - 100,000 new digital talents trained each year;
+  - ministry report: 22,649 new enrolments.
+- **Money:**
+  - MAD 1.5 bn appropriated for 2026;
+  - the Head of Government's MAD 1.7 bn (2024) stays an unchecked statement (MAI-EV-0003);
+  - no expenditure is recorded.
+
+## GAP-02 and GAP-06 re-assessment
+
+- **GAP-02** (Morocco AI 2030) adds the ministry's own statement of the targets and the separate annual talent objective. Neither has a baseline, definition or count reached. Still open.
+- **GAP-06** (Digital Morocco 2030) adds four statements:
+  - the conflicting finance-law targets, beside the strategy's own;
+  - the 2026 allocation, explicitly not expenditure;
+  - the two ministry-reported outputs, with the definitions that keep them apart from the objectives;
+  - the Court's pre-strategy finding.
+
+  "Not established" now names measured progress after the launch, the OSI rank, and any amount actually spent. "Evidence needed" asks for post-2024 measurements of the strategy's own indicators, the UN OSI ranking, budget execution data and a ministry reconciliation of objectives with indicators. Still open.
+- **Q9** now lists every target record per strategy: 8 rows, each showing no measured progress. Its introduction states that finance-law targets, some predating the strategy, appear with their source, and that conflicts are recorded in the gap.
+
+## Test correction found during Tier 2
+
+A Sprint 07 test meant to forbid progress wording in GAP-06 read a field named `statement`, which gap statements do not have, so it checked only empty strings. It now reads each statement's text, in GAP-02 and GAP-06, and allows progress wording only in a sentence that negates it.
+
+## Verification
+
+- **Gates:** validator 0 problems; build check 0 stale; two rebuilds after the commit change no file; `check_site` 74 pages, 0 problems.
+- **Tests:** 324 pass, 9 of them new in `tests/test_strategy_measurement.py`.
+- **Consumers:** the current consumer verifies v0.8.0 (58 records, 7 gaps), and so do the v0.6.0 and v0.7.0 consumers (the latter tested).
+- **Mutations:** 13 of 13 caught:
+  - outputs promoted to VERIFIED FACT (both);
+  - the allocation said to be spent, or its "not expenditure" removed;
+  - offshoring jobs equated with digital jobs;
+  - enrolments equated with certified talents;
+  - the audit finding read as progress;
+  - the targets silently reconciled;
+  - GAP-06 closed;
+  - the finance-law rank called OSI;
+  - a target year dropped;
+  - a GAP-06 number not found in its sources;
+  - the Q9 provenance sentence removed.
+- **Accessibility and layout:** questions, gaps, evidence, the two strategy pages, the ministry page, the public-administration page, data and methodology at 320, 375 and 1366 px: 0 axe violations, no page-level horizontal scroll.
+- **Source check:** MAI-EV-0057 and 0058 match in full. The other excerpts are table rows or Arabic passages, read from rendered pages because the PDF text layers split cells or reverse Arabic; each record's note says so.
+
+## Remaining limitations
+
+- No actual expenditure: the budget settlement law and execution reports were not obtained.
+- No measurement of the strategy's own indicators after its launch.
+- No UN OSI ranking.
+- Performance projects for 2025–2027 were not obtained, because the finance ministry's server reset connections.
+- The ministry's outputs remain unverified, and the Court's method is not stated in the summary.
