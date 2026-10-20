@@ -81,10 +81,13 @@ Tests forbid any current text that compares 113th with an overall EGDI edition, 
 - **Question:** which JAZARI institutes have documented governance, staff, premises, operational activity or outputs, beyond their founding agreements and legal approval?
 - **Scope:** ROOT, EduTech, Industrie X.0, Smart City and Nador. There is no Guelmim entity in this PR.
 - **Per-institute assessment.** `entity_assessments` is a new, additive field, defined once in `data/gaps.json` under `entity_assessment` and published in `registry/gaps/gaps.json`.
-  - **Dimensions:** legal approval, governance event, staffing, premises, operational activity, outputs, documented non-operation.
+  - **Dimensions:** legal approval, governance event, staffing, premises, operational activity, outputs, documented non-commencement, documented discontinuation.
   - **Qualifying records:** only a VERIFIED FACT about the institute can document a dimension. Announced plans, targets and descriptions of intent qualify for none.
   - **Operating path:** operational activity and outputs each have a record, staffing or premises has a record, and the stage is pilot or operational under the existing status rules.
-  - **Not-operating path:** documented non-operation has a record, and the stage is `discontinued`.
+  - **Not-commenced path:** documented non-commencement has a record (a dated record that the institute has not begun operating, or will not); no activity or outputs are recorded; and the stage is not pilot, operational or discontinued. No stage change is required.
+  - **Discontinued path:** documented discontinuation and operational activity each have a record, and the stage is `discontinued`. An institute that stopped before any activity meets the not-commenced path instead.
+  - **Unknown:** an institute that meets no path has an unknown operational status and stays open. Missing records never resolve an institute.
+  - **Conflicts:** records of both non-commencement and activity or outputs for the same institute are an error that forces re-assessment.
   - **Never sufficient:** a legal approval or a governance event never resolves an institute.
   - **Partial resolution:** a resolved institute stays listed, marked resolved, while the others remain open. The gap resolves only when every institute has.
   - **Enforced, not just documented.** The validator and the example consumer both enforce the paths:
@@ -132,3 +135,26 @@ The BO 7534 summary for ROOT reads « من جهة الدولة ممثلة في �
 - **Guelmim institute and founding members (Tier 3):** not recorded. That covers the EduTech and Smart City founding members and the Oriental Regional Council.
 - **`signatory_of` semantics:** unresolved. It affects the existing ministry signatures as well as the deferred ROOT relationships.
 - **MAI-EV-0049 excerpts:** transcribed from images, so automated matching is not possible.
+
+## 8. Review correction: non-commencement is not discontinuation
+
+The first version of GAP-07 resolved an institute that does not operate only with the stage `discontinued`. That conflated an institute that never began operating with one that stopped after operating.
+
+**Why the lifecycle vocabulary cannot carry this.** The project lifecycle stages are announced, in-development, pilot, operational, discontinued and unresolved.
+- `discontinued` is defined as "Documented as stopped or withdrawn".
+- `announced` and `in-development` describe plans, not a documented decision or statement that operation has not begun.
+- No stage means "never began operating".
+- Adding one would change the ontology for every project, which is outside this PR.
+
+**The bounded correction stays inside GAP-07, its validation and its published rules:**
+- The single non-operation dimension is split into **documented non-commencement** and **documented discontinuation**.
+- The resolution paths are **operating**, **not_commenced** and **discontinued**:
+  - *not_commenced* needs a non-commencement record, no recorded activity or outputs, and a stage other than pilot, operational or discontinued, so no stage change is forced;
+  - *discontinued* needs a discontinuation record, recorded activity and the `discontinued` stage.
+- An institute meeting no path has an **unknown** operational status and stays open; missing records never resolve.
+- Non-commencement recorded alongside activity or outputs is a conflict error.
+- A resolution records the status at the date of its records; a later record about the institute already forces re-assessment (assessed_records and fingerprint).
+
+**Proposed for a later sprint (not implemented):** a lifecycle stage for "abandoned before operation", if the owner wants the distinction outside GAP-07 as well.
+
+`entity_assessments` was introduced in this unmerged PR, so the change breaks no published consumer. The v0.6.0 consumer still verifies the data.

@@ -161,7 +161,8 @@ class PerInstituteGap(unittest.TestCase):
         for eid in INSTITUTES[:4]:
             d = self.assessment(g, eid)["dimensions"]
             self.assertEqual((d["legal_approval"], d["governance_event"]), (["MAI-EV-0047"], ["MAI-EV-0048"]))
-            self.assertFalse(any(d[k] for k in ("staffing", "premises", "operational_activity", "outputs", "documented_non_operation")))
+            self.assertFalse(any(d[k] for k in ("staffing", "premises", "operational_activity", "outputs",
+                                                "documented_non_commencement", "documented_discontinuation")))
         nador = self.assessment(g, "jazari-institute-nador")
         self.assertFalse(any(nador["dimensions"].values()))
         self.assertIn("which does not show that none exists", nador["note"])
@@ -202,16 +203,84 @@ class PerInstituteGap(unittest.TestCase):
             self.assessment(g, "jazari-root")["state"] = "open"
         self.assertTrue(any("now meet the operating resolution path" in e for e in self.errors(left_open, on)))
 
-    def test_documented_non_operation_needs_a_discontinued_stage(self):
+    def with_stage(self, eid, stage):
         on = copy.deepcopy(self.ontology)
+        next(e for e in on["entities"] if e["id"] == eid)["lifecycle"] = stage
+        return on
 
-        def ceased(g, o):
-            a = self.assessment(g, "jazari-smart-city")
-            a["dimensions"]["documented_non_operation"] = ["MAI-EV-0047"]
-            a["state"], a["resolved_by"] = "resolved", ["MAI-EV-0047"]
-        self.assertTrue(any("meet no resolution path" in e for e in self.errors(ceased, on)))
-        next(e for e in on["entities"] if e["id"] == "jazari-smart-city")["lifecycle"] = "discontinued"
-        self.assertEqual(self.errors(ceased, on), [])
+    @staticmethod
+    def cite(a, **dims):
+        for k, v in dims.items():
+            a["dimensions"][k] = v
+        a["state"], a["resolved_by"] = "resolved", sorted({x for v in dims.values() for x in v})
+
+    def test_non_commencement_resolves_without_forcing_discontinued(self):
+        def not_started(g, o):
+            self.cite(self.assessment(g, "jazari-smart-city"), documented_non_commencement=["MAI-EV-0048"])
+        self.assertEqual(self.errors(not_started), [])                        # stage stays announced
+        self.assertEqual(self.errors(not_started, self.with_stage("jazari-smart-city", "in-development")), [])
+        for stage in ("discontinued", "operational", "pilot"):
+            errs = self.errors(not_started, self.with_stage("jazari-smart-city", stage))
+            self.assertTrue(any("meet no resolution path" in e for e in errs), stage)
+
+    def test_discontinuation_needs_prior_activity_and_the_stage(self):
+        on = self.with_stage("jazari-smart-city", "discontinued")
+
+        def stopped_without_activity(g, o):
+            self.cite(self.assessment(g, "jazari-smart-city"), documented_discontinuation=["MAI-EV-0048"])
+        self.assertTrue(any("meet no resolution path" in e for e in self.errors(stopped_without_activity, on)))
+
+        def stopped_after_activity(g, o):
+            self.cite(self.assessment(g, "jazari-smart-city"), documented_discontinuation=["MAI-EV-0048"],
+                      operational_activity=["MAI-EV-0047"])
+        self.assertEqual(self.errors(stopped_after_activity, on), [])
+        self.assertTrue(any("meet no resolution path" in e for e in self.errors(stopped_after_activity)))  # stage announced
+
+    def test_non_commencement_and_activity_conflict(self):
+        def both(g, o):
+            a = self.assessment(g, "jazari-root")
+            a["dimensions"]["documented_non_commencement"] = ["MAI-EV-0047"]
+            a["dimensions"]["operational_activity"] = ["MAI-EV-0048"]
+        self.assertTrue(any("records conflict" in e for e in self.errors(both)))
+
+    def test_missing_records_leave_the_status_unknown(self):
+        g = self.gap07()
+        entities = {e["id"]: e for e in self.ontology["entities"]}
+        for a in g["entity_assessments"]:
+            self.assertIsNone(registry.resolution_path(a, entities[a["entity"]]), a["entity"])
+
+        def resolved_on_nothing(g, o):
+            a = self.assessment(g, "jazari-institute-nador")
+            a["state"], a["resolved_by"] = "resolved", []
+        errs = self.errors(resolved_on_nothing)
+        self.assertTrue(any("meet no resolution path" in e for e in errs))
+        self.assertTrue(any("must list in resolved_by" in e for e in errs))
+
+    def test_consumer_and_validator_agree_on_every_path(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("registry_consumer", REPO / "examples" / "registry_consumer.py")
+        consumer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(consumer)
+        cases = [
+            ("unknown", None, "jazari-root", "announced", {}),
+            ("operating", 'operating', "jazari-root", "operational", dict(operational_activity=["MAI-EV-0048"], outputs=["MAI-EV-0048"], staffing=["MAI-EV-0047"])),
+            ("operating without staff or premises", None, "jazari-root", "operational", dict(operational_activity=["MAI-EV-0048"], outputs=["MAI-EV-0048"])),
+            ("not commenced", 'not_commenced', "jazari-root", "announced", dict(documented_non_commencement=["MAI-EV-0048"])),
+            ("not commenced but discontinued", None, "jazari-root", "discontinued", dict(documented_non_commencement=["MAI-EV-0048"])),
+            ("not commenced with outputs", None, "jazari-root", "announced", dict(documented_non_commencement=["MAI-EV-0048"], outputs=["MAI-EV-0047"])),
+            ("discontinued after activity", 'discontinued', "jazari-root", "discontinued", dict(documented_discontinuation=["MAI-EV-0048"], operational_activity=["MAI-EV-0047"])),
+            ("discontinued without activity", None, "jazari-root", "discontinued", dict(documented_discontinuation=["MAI-EV-0048"])),
+        ]
+        for name, expected, eid, stage, dims in cases:
+            with self.subTest(name):
+                a = copy.deepcopy(next(x for x in self.gap07()["entity_assessments"] if x["entity"] == eid))
+                a["dimensions"].update(dims)
+                ent = dict(next(e for e in self.ontology["entities"] if e["id"] == eid), lifecycle=stage)
+                mine = registry.resolution_path(a, ent)
+                self.assertEqual(mine, expected)
+                reg = consumer.Registry.__new__(consumer.Registry)
+                reg.entities = {eid: ent}
+                self.assertEqual(consumer.Registry.resolution_path(reg, a), mine)
 
     def test_assessments_must_match_the_gaps_entities(self):
         def dropped(g, o):
@@ -226,7 +295,7 @@ class PerInstituteGap(unittest.TestCase):
         page = visible("registry/gaps/index.html")
         section = page[page.index("GAP-07"):]
         self.assertIn("Assessment by institute", section)
-        self.assertEqual(section.count("Not documented"), 4 * 5 + 7)
+        self.assertEqual(section.count("Not documented"), 4 * 6 + 8)
         published = json.loads((REPO / "registry" / "gaps" / "gaps.json").read_text(encoding="utf-8"))
         self.assertEqual(next(g for g in published["gaps"] if g["id"] == "GAP-07")["entity_assessments"], self.gap07()["entity_assessments"])
         self.assertEqual(published["entity_assessment"], self.gaps["entity_assessment"])
@@ -250,6 +319,15 @@ class ConsumerChecksTheAssessments(unittest.TestCase):
         code, out, err = self.run_copy(resolve)
         self.assertEqual(code, 1)
         self.assertIn("GAP-07: jazari-root is resolved but does not meet a resolution path", err)
+
+    def test_conflicting_non_commencement_and_activity_are_rejected(self):
+        def conflict(d):
+            a = next(a for a in next(g for g in d["gaps"] if g["id"] == "GAP-07")["entity_assessments"] if a["entity"] == "jazari-root")
+            a["dimensions"]["documented_non_commencement"] = ["MAI-EV-0047"]
+            a["dimensions"]["operational_activity"] = ["MAI-EV-0048"]
+        code, out, err = self.run_copy(conflict)
+        self.assertEqual(code, 1)
+        self.assertIn("GAP-07: jazari-root records both non-commencement and activity or outputs", err)
 
     def test_the_previous_consumer_still_verifies_this_version(self):
         old = subprocess.run(["git", "show", "48eac8a880e045459efff9e4cab29783cbbd23b7:examples/registry_consumer.py"],

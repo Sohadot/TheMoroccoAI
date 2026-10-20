@@ -84,18 +84,18 @@
    "sha256": "5548d4ea00cb732dd097569ce92d8760547a188b5d79ae4082b4aa07ed66cedb"
   },
   {
-   "bytes": 21640,
+   "bytes": 23410,
    "path": "/data/gaps.json",
    "purpose": "Evidence gaps: what is established (with records), what is not, what would resolve each, the records and data digest each assessment rests on, and the data checks re-run on every build.",
    "role": "canonical",
-   "sha256": "2ccb5f5bdbffe31779429ae0bcd0564047551293dd51372382ce2bf012cb532c"
+   "sha256": "9fa74b867f67a567041bc7f347722df68caf8ef480b4e9d060b2b08ebf00e0ee"
   },
   {
-   "bytes": 17507,
+   "bytes": 17789,
    "path": "/data/changelog.json",
    "purpose": "Published registry versions, corrections, and the commit or pull request behind each.",
    "role": "canonical",
-   "sha256": "d1a953492f3d26489cef12b059b010fbab42c1fd2a7dac802582457c15f78f91"
+   "sha256": "8fef214cc2f5b668e40d65f03e555b8bd7ae46cde7f4a41e63e3732b41188ba5"
   },
   {
    "bytes": 67398,
@@ -105,11 +105,11 @@
    "sha256": "0b28905aca9f2b0856546c8ccab59920f12f1ec069ad487bdbf27fe25f668f34"
   },
   {
-   "bytes": 27935,
+   "bytes": 30019,
    "path": "/registry/gaps/gaps.json",
    "purpose": "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json.",
    "role": "derived",
-   "sha256": "376e2c331140ae350c95e04b412ca912e8f4d5151ee60e4ca50d3dbd8e854ca2"
+   "sha256": "c97000ca13e81902e33bdfd4d7a74fb1f34e6c7f7c663503078539ca946b993b"
   }
  ],
  "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",

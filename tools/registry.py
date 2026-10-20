@@ -632,20 +632,29 @@ def gap_fingerprint(gap, evidence, ontology):
 
 
 ENTITY_ASSESSMENT_DIMENSIONS = ("legal_approval", "governance_event", "staffing", "premises", "operational_activity",
-                                "outputs", "documented_non_operation")
+                                "outputs", "documented_non_commencement", "documented_discontinuation")
+# The lifecycle vocabulary has no stage for an entity that never began operating, and "discontinued" means stopped
+# after activity; such an entity keeps a non-operating stage and is resolved on its non-commencement record alone.
+OPERATING_STAGES = ("pilot", "operational")
+NOT_COMMENCED_EXCLUDED_STAGES = ("pilot", "operational", "discontinued")
 
 
 def resolution_path(assessment, entity):
-    """The resolution path an entity's assessment meets, or None. A legal approval or a governance event never
-    resolves an entity: only documented operation (activity, outputs, and staff or premises, with an operating
-    stage) or documented non-operation (with a discontinued stage) does."""
+    """The resolution path an entity's assessment meets, or None (operational status unknown). A legal approval,
+    a governance event or missing records never resolve an entity: only documented operation (activity, outputs,
+    and staff or premises, with an operating stage), documented non-commencement (no recorded activity or outputs,
+    with a stage that is not operating or discontinued) or documented discontinuation after activity (with a
+    discontinued stage) does."""
     d = assessment.get("dimensions") or {}
     stage = entity.get("lifecycle")
     if d.get("operational_activity") and d.get("outputs") and (d.get("staffing") or d.get("premises")) \
-            and stage in ("pilot", "operational"):
+            and stage in OPERATING_STAGES:
         return "operating"
-    if d.get("documented_non_operation") and stage == "discontinued":
-        return "not_operating"
+    if d.get("documented_non_commencement") and not d.get("operational_activity") and not d.get("outputs") \
+            and stage not in NOT_COMMENCED_EXCLUDED_STAGES:
+        return "not_commenced"
+    if d.get("documented_discontinuation") and d.get("operational_activity") and stage == "discontinued":
+        return "discontinued"
     return None
 
 
@@ -656,7 +665,7 @@ def _check_entity_assessments(g, spec, records, entities):
     errors = []
     if tuple(spec.get("dimension_order") or ()) != ENTITY_ASSESSMENT_DIMENSIONS or set(spec.get("dimensions") or ()) != set(ENTITY_ASSESSMENT_DIMENSIONS) \
             or set(spec.get("states") or ()) != set(GAP_STATES) \
-            or not all(k in (spec.get("resolution") or {}) for k in ("operating", "not_operating", "rule")):
+            or not all(k in (spec.get("resolution") or {}) for k in ("operating", "not_commenced", "discontinued", "rule")):
         errors.append("gaps.json: entity_assessment must define the dimensions, their order, the states and the resolution paths")
     items = g.get("entity_assessments") or []
     if [a.get("entity") for a in items] != list(g.get("entities") or []):
@@ -679,6 +688,9 @@ def _check_entity_assessments(g, spec, records, entities):
                     errors.append(f"{at} {dim} cites {x}, which does not concern {e}")
                 elif r.get("classification") != "VERIFIED FACT":
                     errors.append(f"{at} {dim} cites {x}, a {r.get('classification')}: only a VERIFIED FACT documents a dimension")
+        if dims.get("documented_non_commencement") and (dims.get("operational_activity") or dims.get("outputs")):
+            errors.append(f"{at} records both non-commencement and activity or outputs; the records conflict and the entity "
+                          f"must be re-assessed")
         path = resolution_path(a, entities.get(e, {}))
         if a.get("state") == "resolved":
             if not path:

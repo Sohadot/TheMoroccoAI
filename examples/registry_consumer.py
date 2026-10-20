@@ -370,12 +370,16 @@ class Registry:
         return p
 
     def resolution_path(self, assessment):
-        """The resolution path an entity's assessment meets, as published in gaps.json (entity_assessment.resolution)."""
+        """The resolution path an entity's assessment meets, as published in gaps.json (entity_assessment.resolution);
+        None means its operational status is unknown in the registry."""
         d, stage = assessment["dimensions"], self.entities[assessment["entity"]].get("lifecycle")
         if d["operational_activity"] and d["outputs"] and (d["staffing"] or d["premises"]) and stage in ("pilot", "operational"):
             return "operating"
-        if d["documented_non_operation"] and stage == "discontinued":
-            return "not_operating"
+        if d["documented_non_commencement"] and not d["operational_activity"] and not d["outputs"] \
+                and stage not in ("pilot", "operational", "discontinued"):
+            return "not_commenced"
+        if d["documented_discontinuation"] and d["operational_activity"] and stage == "discontinued":
+            return "discontinued"
         return None
 
     def _check_entity_assessments(self, g):
@@ -394,6 +398,8 @@ class Registry:
                 r = self.records.get(x)
                 if r is None or a["entity"] not in r["related_entities"] or r["classification"] != "VERIFIED FACT":
                     p.append(f"{at} cites {x}, which is not a VERIFIED FACT record about it")
+            if a["dimensions"]["documented_non_commencement"] and (a["dimensions"]["operational_activity"] or a["dimensions"]["outputs"]):
+                p.append(f"{at} records both non-commencement and activity or outputs")
             path = self.resolution_path(a)
             if a["state"] == "resolved" and (not path or not a.get("resolved_by") or not set(a["resolved_by"]) <= cited):
                 p.append(f"{at} is resolved but does not meet a resolution path with the records it cites")
