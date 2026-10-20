@@ -1,6 +1,6 @@
 {
   "ontology": "TheMoroccoAI Ontology",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "as_of": "2026-10-20",
   "description": "Entities and relationships of Morocco's AI ecosystem, each tied to records in evidence.json. Chain: Institution → Initiative → Project → Evidence → Technology → Sector.",
   "entity_types": {
@@ -88,7 +88,7 @@
       "summary": "The government department that launched Digital Morocco 2030 in September 2024, organised the First National AI Conference in July 2025 and presented the Morocco AI 2030 roadmap in September 2026.",
       "status": "Named in sources up to September 2026. See the note on the October 2026 government.",
       "note": "The government appointed on 16 October 2026 includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform. The registry has not yet verified whether that ministry takes over this department's portfolio.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040", "MAI-EV-0044", "MAI-EV-0045", "MAI-EV-0047", "MAI-EV-0048", "MAI-EV-0049", "MAI-EV-0050", "MAI-EV-0051", "MAI-EV-0052", "MAI-EV-0053", "MAI-EV-0054", "MAI-EV-0055", "MAI-EV-0056", "MAI-EV-0058"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040", "MAI-EV-0044", "MAI-EV-0045", "MAI-EV-0047", "MAI-EV-0048", "MAI-EV-0049", "MAI-EV-0050", "MAI-EV-0051", "MAI-EV-0052", "MAI-EV-0053", "MAI-EV-0054", "MAI-EV-0055", "MAI-EV-0056", "MAI-EV-0058", "MAI-EV-0059", "MAI-EV-0060", "MAI-EV-0061", "MAI-EV-0063"]
     },
     {
       "id": "ministry-ai-digital-transformation",
@@ -224,9 +224,9 @@
       "name": "Digital Morocco 2030",
       "alt_names": ["Maroc Digital 2030", "Morocco Digital 2030"],
       "domain": "government-policy",
-      "summary": "National digital strategy launched on 25 September 2024. Its official targets include 240,000 direct jobs and a rise from 113th to 50th place worldwide on the United Nations ranking of online public services, which the strategy's brochure defines as the Online Services Index, a component of the e-government development index; the 113th place is the strategy's figure, not verified by the registry.",
+      "summary": "National digital strategy launched on 25 September 2024. Its official targets include 240,000 direct jobs and a rise from 113th to 50th place worldwide on the United Nations ranking of online public services, which the strategy's brochure defines as the Online Services Index, a component of the e-government development index; the 113th place is the strategy's figure, not verified by the registry. The finance ministry's note on the 2025 finance bill states the same objective as the top 50 on the overall e-government development index; the registry does not reconcile the two.",
       "status": "Launched 2024-09-25. Targets run to 2030.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018", "MAI-EV-0046", "MAI-EV-0049", "MAI-EV-0050", "MAI-EV-0051", "MAI-EV-0052", "MAI-EV-0053", "MAI-EV-0054", "MAI-EV-0055", "MAI-EV-0056", "MAI-EV-0057"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018", "MAI-EV-0046", "MAI-EV-0049", "MAI-EV-0050", "MAI-EV-0051", "MAI-EV-0052", "MAI-EV-0053", "MAI-EV-0054", "MAI-EV-0055", "MAI-EV-0056", "MAI-EV-0057", "MAI-EV-0059", "MAI-EV-0062", "MAI-EV-0063"]
     },
     {
       "id": "morocco-ai-2030",

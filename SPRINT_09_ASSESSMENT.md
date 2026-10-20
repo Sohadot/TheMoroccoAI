@@ -18,7 +18,7 @@
 | 2 | Digital Morocco 2030 indicators measured after launch | **NOT ESTABLISHED** for jobs, GDP contribution and the share of fully digitalised services. The only new figures are ministry-reported outputs on other definitions, which are FOUND BUT NON-COMPARABLE. |
 | 3 | Morocco AI 2030 indicators measured | **NOT ESTABLISHED.** Only targets exist; they are already recorded as MAI-EV-0058. |
 | 4 | Later documents reconciling the conflicting targets | **NOT ESTABLISHED.** One new conflict was found (EGDI top 50 against OSI 50th), plus one scope attribution (270,000 = offshoring sector) that is not a reconciliation. |
-| 5 | UN-published OSI rank for Morocco | **NOT ESTABLISHED.** The 2022 and 2024 survey annexes publish OSI values without a rank column. A rank can be derived from the values, but the UN does not publish one. |
+| 5 | UN-published OSI rank for Morocco | **NOT ESTABLISHED.** The 2022 and 2024 survey annexes publish OSI values without a rank column. The UN does not publish a rank on this index, and the registry does not compute one. |
 
 As the Sprint 09 brief requires, NOT ESTABLISHED is a statement about what this search covered. It is not evidence that no such data exists.
 
@@ -161,18 +161,9 @@ Not established. mmsp.gov.ma lists PDPs up to 2024 only. The PLF 2025 to 2027 pa
 
 **2024 technical appendix, table 7.** Same structure. Morocco: High OSI, 0.5618. **No rank column.** EGDI is ranked 90 (table 2.1) and EPI 102 (table 9).
 
-**Derived rank (computed here, not published by the UN).** Method: one plus the number of countries with a strictly higher OSI value, which is the competition ranking the UN uses for EGDI.
+**A rank computed from the published values.** During research a position was computed for each edition: one plus the number of the 193 countries with a strictly higher OSI value, the competition ranking the UN uses for EGDI. Each computation was repeated from a second table of the same edition. **The computed values are deliberately not reproduced in this document, the registry or the site**: they are a calculation, not a figure any source publishes, and recording them here would let them circulate as if they were. Anyone can repeat the calculation from the annex tables named above.
 
-| Year | Derived OSI rank | Countries | Check |
-|---|---|---|---|
-| 2022 | 113th | 193 | Same result from a separate parse of table A.8 |
-| 2024 | 100th | 193 | Same result from a separate parse of table 7 |
-
-There are no ties next to Morocco in either year.
-
-The 2022 derived rank equals the brochure's "113th (2022)" baseline, which suggests the ministry derived its baseline the same way. No source says so.
-
-**Recommendation: do not publish the derived rank.** Rule 1 requires an identified original source, and the registry would be publishing a figure no source publishes. GAP-06 can instead say, citing the annexes, that the UN publishes OSI values without ranks.
+**Decision (owner, Tier 2): no derived rank is published.** Rule 1 requires an identified original source. The registry publishes only what the UN does: OSI values without ranks. MAI-EV-0046 and GAP-06 say that the annex tables contain no UN rank on this index, and that the registry does not compute one.
 
 ---
 
@@ -264,7 +255,7 @@ These would be MAI-EV-0059 onward. Figures are as read from the page images.
   - a project code is never compared across years where its label differs;
   - TGR and settlement-law bases are never combined;
   - the EGDI and OSI statements of the 50th objective stay side by side;
-  - no OSI rank appears without "derived" or "not published", and none is published at all;
+  - no derived OSI rank is published anywhere;
   - the two enrolment figures both appear.
 - The Q9 row count rises from 8 to 10 (C4 and C5), and the test is data-derived.
 - Gap and entity counts are unchanged: 63 records, 65 entities, 78 relationships, 7 gaps. No new predicate, schema or entity.
@@ -318,3 +309,82 @@ These would be MAI-EV-0059 onward. Figures are as read from the page images.
 - PLF 2027 note URL (404)
 - RAP URLs on mmsp.gov.ma (404)
 - the UN data-centre download (an ASP.NET postback, not attempted)
+
+---
+
+# Tier 2: execution evidence (registry v0.9.0)
+
+**Owner decision:** Option A approved. C2 and C3 relate to `ministry-digital-transition` only. No strategy attribution. Derived OSI ranks are not published, in the registry or in this document. GAP-02 and GAP-06 stay open. No change to schema, predicates, entities, relationships or lifecycle.
+
+## Records
+
+| ID | Proposal | Kind | Related entities |
+|---|---|---|---|
+| MAI-EV-0059 | C1: LF 2025, project 20, MAD 1,500,000,000 CP | VERIFIED FACT, allocation | digital-morocco-2030, ministry-digital-transition |
+| MAI-EV-0060 | C2: loi de règlement 2024 (law 04.26, BO 7533), ministry investment expenditure | VERIFIED FACT, expenditure (ministry total) | ministry-digital-transition only |
+| MAI-EV-0061 | C3: TGR annual report 2025, ministry investment execution | VERIFIED FACT, provisional execution (ministry total) | ministry-digital-transition only |
+| MAI-EV-0062 | C4: PLF 2025 note, top 50 on the EGDI by 2030 | OFFICIAL TARGET 2030 | digital-morocco-2030 |
+| MAI-EV-0063 | C5: Circular 2025/15, offshoring targets, as the Bilan 2025 presents them | OFFICIAL TARGET 2030 | digital-morocco-2030, ministry-digital-transition |
+
+**Note changes:**
+- **MAI-EV-0056 (C6, a correction):** records the PLF 2026 note's two enrolment figures, 22,649 and 22,258, without resolving them.
+- **MAI-EV-0046:** records that the 2022 and 2024 UN annex tables publish OSI values without a rank column, and that the registry does not compute one.
+- **Re-check of the BO 7533 row:** the 2024 figures were re-read from the enacted text, BO p.5160, not only the bill.
+
+## Gaps
+
+**GAP-06** has a new fingerprint, `cdb898ad5ad8dfc7`, and three changes:
+
+*New statements:*
+- the 2025 and 2026 appropriations are not added together, and the 2024 project code designated a different line;
+- the EGDI top-50 statement, placed directly after the brochure's OSI objective and unreconciled;
+- the offshoring attribution of 270,000, unreconciled.
+
+*Extended statement:* the UN statement now says the annex tables give values without a rank column.
+
+*Unestablished text:*
+- it now names "a rank on the Online Services Index published by the United Nations", where it previously said "Morocco's rank on the Online Services Index in any edition";
+- it states that budget execution is recorded only as ministry-level totals, which are not spending on the strategy.
+
+The execution records cannot be cited by GAP-06: the validator requires a gap's evidence to concern its entities. That enforces the owner's decision structurally.
+
+**GAP-02:** re-assessed, no change.
+
+## Protection
+
+`tests/test_execution_evidence.py` has 11 tests, covering:
+- each record's kind;
+- ministry execution never related to, cited for, or worded as spending on a strategy;
+- appropriations never summed;
+- project 20 never compared across years;
+- the TGR and settlement-law bases never combined;
+- the EGDI and OSI statements adjacent;
+- the offshoring figure not treated as a reconciliation;
+- both enrolment figures kept;
+- no OSI rank beyond those the sources state, in any data, page or root Markdown document;
+- counts and Q9 (10 target rows);
+- the v0.8.0 consumer verifies v0.9.0.
+
+**Mutation checks:** 11 of 11 caught, either by the validator or by these tests. The mutations were:
+- C2 linked to the strategy;
+- C2 cited in GAP-06;
+- a cumulative MAD 3 bn figure;
+- a derived rank, in two wordings;
+- the enrolment conflict dropped;
+- the EGDI statement dropped;
+- the offshoring figure "reconciled";
+- ministry money described as spent on the strategy;
+- the two execution bases combined;
+- project 20 compared with 2024.
+
+## Results
+
+- 63 records, 65 entities, 78 relationships, 7 gaps (all open).
+- Validator: 0 problems. Build check: 0 stale files. Site check: 74 pages, 0 problems. 335 tests pass.
+- Consumers v0.6.0, v0.7.0, v0.8.0 and current all verify v0.9.0.
+- Accessibility (axe, WCAG 2.1 AA, at 320, 375 and 1366 px): 0 violations and no page-level horizontal scroll on the nine changed page types.
+- Live excerpt check:
+  - MAI-EV-0061 matches.
+  - MAI-EV-0059's table row is unmatched, like MAI-EV-0054's, because plain extraction splits the cells.
+  - MAI-EV-0060, MAI-EV-0062 and MAI-EV-0063 are unmatched because their text layers are rotated tables, outlines or broken Arabic ligatures.
+  - Each note discloses this, and each was verified visually.

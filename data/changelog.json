@@ -4,6 +4,26 @@
   "entries": [
     {
       "date": "2026-10-20",
+      "pull_request": 11,
+      "title": "Registry v0.9.0: budget execution evidence and conflicting target statements for Digital Morocco 2030",
+      "version": "0.9.0",
+      "records": 63,
+      "entities": 65,
+      "relationships": 78,
+      "changes": [
+        "Five records, each read from a rendered page of its source: the 2025 finance law's MAD 1,500,000,000 appropriation for implementing the Maroc Digital strategy (MAI-EV-0059); the investment expenditure of the Ministry Delegate in charge of Digital Transition in the budget settlement law for 2024 (MAI-EV-0060) and in the Treasury's report on 2025 execution (MAI-EV-0061); the finance ministry's statement of the strategy's ranking objective on the overall e-government development index (MAI-EV-0062); and the offshoring-sector targets of Circular 2025/15 as the ministry's 2025 report presents them (MAI-EV-0063).",
+        "Allocation and expenditure are kept apart. The 2025 and 2026 appropriations are separate authorisations, not expenditure, and are not added together. The two execution records are ministry-level totals related to the ministry only, not to the strategy: the settlement law and the Treasury's report give no programme or project breakdown, and in the 2024 finance law the strategy's project code designated a different line. The settlement-law and Treasury bases are not combined.",
+        "Conflicts are recorded, not resolved: the ranking objective is stated on the Online Services Index by the strategy's brochure and on the overall e-government development index by the finance ministry's note; the 270,000 jobs figure is attributed by a 2025 ministry report to the offshoring sector, without a stated relation to the strategy's 240,000 direct jobs; and the 2026 finance bill's presentation note gives two figures for new enrolments in digital training in 2024–2025 (MAI-EV-0056).",
+        "The United Nations survey's 2022 and 2024 annex tables publish Online Services Index values without a rank column; the registry records that no United Nations rank on that index is published in them and does not compute one (MAI-EV-0046, GAP-06).",
+        "GAP-06 re-assessed against the new records and GAP-02 re-assessed without change; both remain open. No measured progress, and no expenditure on either strategy, is recorded.",
+        "No relationship, entity, predicate, lifecycle stage or schema changed."
+      ],
+      "corrections": [
+        "MAI-EV-0056 said that the 2026 finance bill's presentation note gives the same two enrolment figures as the ministry's report. It does in its section on the strategy, but its higher-education section gives 22,258 new students for 2024–2025 for the same programme; the note now records both figures without resolving them."
+      ]
+    },
+    {
+      "date": "2026-10-20",
       "pull_request": 10,
       "title": "Registry v0.8.0: strategy measurement evidence for Digital Morocco 2030 and Morocco AI 2030",
       "version": "0.8.0",
