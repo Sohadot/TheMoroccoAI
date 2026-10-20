@@ -1039,10 +1039,7 @@ def gap_derivation():
 # The canonical files the reference state is computed from. It never reads the manifest, which lists the
 # reference state's own hash: the manifest is generated afterwards, so there is no cycle.
 REFERENCE_INPUTS = ("data/evidence.json", "data/ontology.json", "data/gaps.json")
-REFERENCE_SCOPE = ("Projections of the canonical registry data, each computed by a published rule. It describes what this registry "
-                   "records, not Morocco's AI ecosystem: an absent entity, record or stage is a gap in coverage. It carries no score, "
-                   "no aggregate evidence state, no conflict list and no measure of progress; it never changes a classification, "
-                   "a lifecycle stage or a gap's state.")
+REFERENCE_SCOPE = registry.REFERENCE_SCOPE
 _EDITORIAL = {
     "classification": "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)",
     "verification_status": "Each record's verification_status (recorded, not derivable)",
@@ -1056,18 +1053,27 @@ _EDITORIAL = {
 
 
 def reference_derivation():
-    """The rule for every field of reference-state.json, published with it so that a consumer can recompute each field
-    from evidence.json, ontology.json and gaps.json without this code."""
+    """The rule for every field of reference-state.json, published with it so that a consumer can recompute each
+    reproducible field from evidence.json, ontology.json and gaps.json without this code, and validate fixed contract metadata."""
     def field(rule, *rests_on):
         return {"provenance": "reproducible", "rule": rule, "rests_on": [_EDITORIAL[k] for k in rests_on]}
+
+    def recorded(rule):
+        return {"provenance": "recorded-not-derivable", "rule": rule, "rests_on": []}
+
     return {
         "provenance_values": {
             "reproducible": ("Recomputed from the canonical files by the rule given. The values it copies or counts may themselves be "
                              "recorded editorial judgments; rests_on names them."),
-            "recorded-not-derivable": "Copied from a recorded judgment that no rule derives. No field of this file has this provenance.",
+            "recorded-not-derivable": ("Fixed contract metadata recorded with this file; not derived from the canonical registry files. "
+                                      "A consumer validates the published value against the approved contract statement rather than recomputing it."),
         },
         "conventions": ("Lists are ordered as each rule states; ids compare as strings. Object keys are written sorted. An empty list "
                         "means none is recorded in this registry, not that none exists. null means the field does not apply."),
+        "scope": recorded("The approved fixed scope statement for this file. It is contract metadata published with the snapshot; it is "
+                          "not derived from evidence.json, ontology.json or gaps.json, and a change to those files never changes it."),
+        "documentation": recorded("The fixed path of the data reference page (/data/). It is contract metadata published with the snapshot; "
+                                  "it is not derived from evidence.json, ontology.json or gaps.json."),
         "registry_version": field("evidence.json version."),
         "as_of": field("evidence.json as_of."),
         "derived_from": field("For each file in this order, " + ", ".join("/" + p for p in REFERENCE_INPUTS) + ": its path and the SHA-256 "
@@ -1197,7 +1203,8 @@ def reference_state(model, gaps, canonical):
                 for r in sorted((r for r in on["relationships"] if r["classification"] == "INDEPENDENT ANALYSIS"),
                                 key=lambda r: (r["subject"], r["predicate"], r["object"]))]
     return {
-        "registry_version": ev["version"], "as_of": ev["as_of"], "scope": REFERENCE_SCOPE, "documentation": "/data/",
+        "registry_version": ev["version"], "as_of": ev["as_of"], "scope": REFERENCE_SCOPE,
+        "documentation": registry.REFERENCE_DOCUMENTATION,
         "derived_from": [{"path": "/" + p, "sha256": hashlib.sha256(canonical[p]).hexdigest()} for p in REFERENCE_INPUTS],
         "derivation": reference_derivation(),
         "counts": {
@@ -1474,7 +1481,7 @@ def render_data_reference(model, gaps, man):
   <h3 id="d7-q9">Q9: official targets and recorded progress</h3>
   {_table("Q9: what can be recomputed", ["Part of the answer", "Status", "From"], q9_rows, "")}
   <h3 id="d7-ref">Reference state</h3>
-  <p class="prose"><a href="/registry/reference-state.json">reference-state.json</a> publishes projections of the canonical data, each with its rule under <code>derivation</code> and the SHA-256 of the canonical files it was computed from (<code>derived_from</code>). It is computed from those files only; the manifest, which lists the reference state's own SHA-256, is generated after it. Every field is reproducible. Where a field copies or counts a recorded editorial judgment (a classification, a lifecycle stage, a gap's state), its rule names that judgment under <code>rests_on</code>. It describes what this registry records, not Morocco's AI ecosystem.</p>
+  <p class="prose"><a href="/registry/reference-state.json">reference-state.json</a> publishes projections of the canonical data, each with its rule under <code>derivation</code> and the SHA-256 of the canonical files it was computed from (<code>derived_from</code>). It is computed from those files only; the manifest, which lists the reference state's own SHA-256, is generated after it. Every reference projection is reproducible from the published canonical data. Fixed contract metadata is explicitly labelled recorded-not-derivable. Where a field copies or counts a recorded editorial judgment (a classification, a lifecycle stage, a gap's state), its rule names that judgment under <code>rests_on</code>. It describes what this registry records, not Morocco's AI ecosystem.</p>
   {_table("Reference state: what can be recomputed", ["Field", "Status", "Rule"], ref_rows, "")}
   <p class="prose">It deliberately does not include:</p>
   <ul class="prose">{"".join(f"<li>{escape(x)}</li>" for x in ref["not_included"])}</ul>
@@ -1483,7 +1490,7 @@ def render_data_reference(model, gaps, man):
   <h2 id="d8-h"><span class="section-number">08</span>Checking the data yourself</h2>
   <p class="prose"><a href="/{CONSUMER}"><code>/{CONSUMER}</code></a> (also in the <a href="{repo}/blob/main/{CONSUMER}" rel="noopener">repository</a>) reads only the published JSON. It uses the Python 3.10+ standard library and does not import this site's code. It stops with an error if a reference is missing, a value is undefined or the files do not belong to the same build.</p>
   <ul class="prose">
-    <li><code>python3 registry_consumer.py verify</code>: checks the manifest and every reference. It also recomputes the matrix, the GAP-05 list, each gap's data checks and digest, and every field of reference-state.json, and compares them with the published files.</li>
+    <li><code>python3 registry_consumer.py verify</code>: checks the manifest and every reference. It also recomputes the matrix, the GAP-05 list, each gap's data checks and digest, and every reproducible field of reference-state.json, validates its fixed contract metadata, and compares them with the published files.</li>
     <li><code>python3 registry_consumer.py relationship ministry-digital-transition operates idarati-ai</code>: a relationship, its classification, and each supporting record with its source, dates and limits.</li>
     <li><code>python3 registry_consumer.py gap GAP-03</code>: what a gap establishes and does not, with the result of its data checks.</li>
     <li><code>python3 registry_consumer.py q8</code> and <code>q9</code>: the reproducible parts of those answers.</li>

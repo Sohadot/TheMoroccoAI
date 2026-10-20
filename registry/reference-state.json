@@ -240,6 +240,11 @@
    "rests_on": [],
    "rule": "For each file in this order, /data/evidence.json, /data/ontology.json, /data/gaps.json: its path and the SHA-256 of its bytes as published. These are the only inputs. The manifest is not an input: it is generated after this file and lists this file's own SHA-256."
   },
+  "documentation": {
+   "provenance": "recorded-not-derivable",
+   "rests_on": [],
+   "rule": "The fixed path of the data reference page (/data/). It is contract metadata published with the snapshot; it is not derived from evidence.json, ontology.json or gaps.json."
+  },
   "entities_in_open_gaps": {
    "provenance": "reproducible",
    "rests_on": [
@@ -319,7 +324,7 @@
    "rule": "For each status_basis that occurs in operational_or_pilot status_evidence_records, the sorted ids of the entities with a status record on that basis. Keys are the bases (an entity can appear under more than one)."
   },
   "provenance_values": {
-   "recorded-not-derivable": "Copied from a recorded judgment that no rule derives. No field of this file has this provenance.",
+   "recorded-not-derivable": "Fixed contract metadata recorded with this file; not derived from the canonical registry files. A consumer validates the published value against the approved contract statement rather than recomputing it.",
    "reproducible": "Recomputed from the canonical files by the rule given. The values it copies or counts may themselves be recorded editorial judgments; rests_on names them."
   },
   "records_announced_plan": {
@@ -347,6 +352,11 @@
    "provenance": "reproducible",
    "rests_on": [],
    "rule": "evidence.json version."
+  },
+  "scope": {
+   "provenance": "recorded-not-derivable",
+   "rests_on": [],
+   "rule": "The approved fixed scope statement for this file. It is contract metadata published with the snapshot; it is not derived from evidence.json, ontology.json or gaps.json, and a change to those files never changes it."
   },
   "superseded_records": {
    "provenance": "reproducible",

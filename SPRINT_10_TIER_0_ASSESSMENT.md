@@ -283,12 +283,13 @@ The licence (7) and ministry continuity (8) do not block Tier 1 and are schedule
   - the build refuses to write when the snapshot fails validation;
   - the `/data/` §07 table is generated from the published derivation.
 - `tools/registry.py`:
-  - `REFERENCE_FIELDS` and `validate_reference_state()`;
+  - `REFERENCE_FIELDS`, `REFERENCE_RECORDED`, `REFERENCE_UNDERIVED` (only `derivation`) and `validate_reference_state()`;
   - it refuses fields outside the contract, missing rules, an undefined provenance, and field names that would carry a score, aggregate state, conflict, progress, rank, sum, domain role, first-party class or indicator;
+  - it requires `scope` and `documentation` to equal the approved fixed values with `recorded-not-derivable` provenance, and every other payload field to be `reproducible`;
   - it checks the integrity of the lifecycle, status basis and AI-deployment projections.
 - `examples/registry_consumer.py`:
-  - `reference_state()` recomputes every field from `evidence.json`, `ontology.json` and `gaps.json`, using the published raw bytes for `derived_from`;
-  - `_check_reference()` compares every field and requires a reproducible rule for each;
+  - `reference_state()` independently recomputes every reproducible field from `evidence.json`, `ontology.json` and `gaps.json`, using the published raw bytes for `derived_from`;
+  - `_check_reference()` compares every reproducible field, requires a reproducible rule for each, and validates fixed contract metadata (`scope`, `documentation`) as recorded-not-derivable;
   - standard library only, no import of `tools/`.
 - **Version metadata:** `data/evidence.json` and `data/ontology.json` move to 0.10.0, and `data/changelog.json` gains the v0.10.0 entry.
 - **Generated pages and files** changed only through the version, counts and the new `/data/` table.
@@ -305,7 +306,8 @@ The licence (7) and ministry continuity (8) do not block Tier 1 and are schedule
 | Field | Content | Provenance |
 |---|---|---|
 | `registry_version`, `as_of` | From `evidence.json` | reproducible |
-| `scope`, `documentation`, `derivation` | Fixed statement, link, and the rules | (contract text) |
+| `scope`, `documentation` | Approved fixed scope statement and `/data/` | recorded-not-derivable |
+| `derivation` | The published rules (structural self-description; exempt from requiring a rule for itself) | (structural) |
 | `derived_from` | Path and SHA-256 of `/data/evidence.json`, `/data/ontology.json`, `/data/gaps.json` | reproducible |
 | `counts` | records, entities, relationships; by classification (records and relationships), by verification status, entities by type | reproducible |
 | `superseded_records` | evidence_id and superseded_by | reproducible |
@@ -354,8 +356,8 @@ The licence (7) and ministry continuity (8) do not block Tier 1 and are schedule
   - deterministic byte-identical generation;
   - direct canonical-input hashes;
   - no manifest/snapshot cycle;
-  - a reproducible rule for every field;
-  - consumer recomputation parity, and the consumer rejecting a snapshot that does not follow;
+  - a published provenance rule for every field (`reproducible` for projections; `recorded-not-derivable` for `scope` and `documentation`);
+  - consumer recomputation of every reproducible field, validation of fixed contract metadata, and rejection of snapshots that do not follow (including scope/documentation mutations);
   - v0.6.0, v0.7.0, v0.8.0 and v0.9.0 consumers verifying v0.10.0;
   - lifecycle and status-basis integrity, with a synthetic case for bases from records that don't declare the stage;
   - no initiative in any lifecycle list;
@@ -367,16 +369,16 @@ The licence (7) and ministry continuity (8) do not block Tier 1 and are schedule
   - no forbidden field names or judgment words in values, and no aggregate state;
   - no domain or role, and no numbers beyond counts and target years;
   - no ordinal and no summed appropriation;
-  - the validator refusing out-of-contract snapshots.
-- **Full suite:** 357 tests pass.
+  - the validator refusing out-of-contract snapshots, including changed or mislabelled `scope`/`documentation`.
+- **Full suite:** 357 tests (355 non-layout + 2 layout). After the recorded-metadata correction the non-layout suite is 355 OK; layout needs a Chromium profile on the runner.
 - **Validator:** 0 problems.
 - **Build check:** 0 stale files.
 - **Site check:** 74 pages, 0 problems.
 - **Determinism:** two consecutive rebuilds are identical, and the snapshot is byte-identical under four different hash seeds.
 - **Manifest:** all 7 resource hashes match their files.
-- **Consumers:** the current consumer recomputes and verifies the snapshot. The v0.6.0 (`2803167`), v0.7.0 (`0d0fa8f`), v0.8.0 (`59c4221`) and v0.9.0 (`8ffc6d0`) consumers verify v0.10.0. They fetch and hash the new resource without interpreting it.
+- **Consumers:** the current consumer recomputes every reproducible field, validates fixed contract metadata, and verifies the snapshot. The v0.6.0 (`2803167`), v0.7.0 (`0d0fa8f`), v0.8.0 (`59c4221`) and v0.9.0 (`8ffc6d0`) consumers verify v0.10.0. They fetch and hash the new resource without interpreting it.
 
-**Mutations: 23 of 23 caught.** All 23 were applied to the generator. Each was caught by the build's validator, the new tests or the consumer:
+**Mutations: caught by the build's validator, the new tests or the consumer** (including the recorded-metadata correction):
 - adding a conflicts field, or a conflict count;
 - adding progress or a "met" flag on targets;
 - a confidence score;
@@ -396,11 +398,16 @@ The licence (7) and ministry continuity (8) do not block Tier 1 and are schedule
 - unsorted lifecycle order;
 - the two unresolved concepts merged;
 - a rule removed;
-- provenance relabelled.
+- provenance relabelled;
+- changed `scope`;
+- changed `documentation`;
+- missing provenance entry for `scope` or `documentation`;
+- falsely marking `scope` or `documentation` as reproducible.
 
 ## Design limitations found during implementation
 
-- **Provenance.** "Reproducible" describes the projection. Every field also rests on recorded editorial judgments (classifications, lifecycle stages, gap states), named under `rests_on`. That is the honest boundary, and the reason pre-v1 gate item 3 remains open.
+- **Provenance.** "Reproducible" describes the projection. Every projection also rests on recorded editorial judgments (classifications, lifecycle stages, gap states), named under `rests_on`. Fixed contract metadata (`scope`, `documentation`) is explicitly labelled `recorded-not-derivable` and is not derived from the canonical files. That is the honest boundary, and the reason pre-v1 gate item 3 remains open for fields beyond this snapshot.
+- **`covering_gap` file-order selection.** `official_targets[].initiatives[].covering_gap` selects the first gap in `data/gaps.json` file order whose entities include the initiative. That is deterministic and unambiguous with today's data, so it is not a Tier 1 blocker. Before v1.0, if a targeted initiative is later covered by more than one gap, the contract must not rely on file-order selection to identify a target-progress gap; that semantic should be governed. Do not redesign it in this release.
 - **Forger model.** A forger who rewrites a canonical file must now also rewrite the snapshot's `derived_from`. The snapshot does not stop forgery, since the hashes are not a signature, but an incomplete forgery now fails verification.
 - **Status bases.** On current data every status record declares its entity's stage, so the rule "bases from declaring records only" is checked by a synthetic case rather than by the published data.
 - **Key order.** JSON object keys are written sorted, so the display order of GAP-07's dimensions comes from `entity_assessment.dimension_order` in `/registry/gaps/gaps.json`, not from key order.

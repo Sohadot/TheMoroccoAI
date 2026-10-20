@@ -801,14 +801,22 @@ def validate_gaps(gaps, evidence, ontology):
 
 
 # The fields of registry/reference-state.json. Anything else is refused: the file carries only projections that a
-# published rule derives from the canonical data.
+# published rule derives from the canonical data, plus fixed contract metadata labelled recorded-not-derivable.
 REFERENCE_FIELDS = ("registry_version", "as_of", "scope", "documentation", "derived_from", "derivation", "counts",
                     "superseded_records", "lifecycle", "operational_or_pilot", "operational_or_pilot_by_status_basis",
                     "announced_projects_by_kind", "unresolved_lifecycle", "unresolved_origin", "official_targets", "open_gaps",
                     "entities_in_open_gaps", "entity_assessments", "announcement_only_relationships",
                     "independent_analysis_relationships", "records_unverified_claim", "records_announced_plan",
                     "records_partially_verified")
-REFERENCE_UNDERIVED = ("scope", "documentation", "derivation")
+# The structural self-description container: it holds the rules and is exempt from requiring a derivation rule for itself.
+REFERENCE_UNDERIVED = ("derivation",)
+# Fixed contract metadata: recorded with the file, not derived from the canonical registry files.
+REFERENCE_RECORDED = ("scope", "documentation")
+REFERENCE_DOCUMENTATION = "/data/"
+REFERENCE_SCOPE = ("Projections of the canonical registry data, each computed by a published rule. It describes what this registry "
+                   "records, not Morocco's AI ecosystem: an absent entity, record or stage is a gap in coverage. It carries no score, "
+                   "no aggregate evidence state, no conflict list and no measure of progress; it never changes a classification, "
+                   "a lifecycle stage or a gap's state.")
 REFERENCE_SUBFIELDS = {"counts": ("records", "entities", "relationships", "records_by_classification", "records_by_verification_status",
                                   "relationships_by_classification", "entities_by_type"),
                        "lifecycle": ("entities", "by_type_and_kind")}
@@ -833,6 +841,10 @@ def validate_reference_state(snapshot, evidence, ontology):
         errors.append(f"{where} field {k!r} is not part of the published contract")
     for k in sorted(set(REFERENCE_FIELDS) - keys):
         errors.append(f"{where} field {k!r} is missing")
+    if snapshot.get("scope") != REFERENCE_SCOPE:
+        errors.append(f"{where} scope must equal the approved fixed scope statement")
+    if snapshot.get("documentation") != REFERENCE_DOCUMENTATION:
+        errors.append(f"{where} documentation must equal {REFERENCE_DOCUMENTATION!r}")
     derivation = snapshot.get("derivation") or {}
     for k in REFERENCE_FIELDS:
         if k in REFERENCE_UNDERIVED:
@@ -844,6 +856,10 @@ def validate_reference_state(snapshot, evidence, ontology):
                 errors.append(f"{where} {path} has no published derivation rule")
             elif rule.get("provenance") not in REFERENCE_PROVENANCE:
                 errors.append(f"{where} {path} provenance must be one of {', '.join(REFERENCE_PROVENANCE)}")
+            elif k in REFERENCE_RECORDED and rule.get("provenance") != "recorded-not-derivable":
+                errors.append(f"{where} {path} must have provenance recorded-not-derivable")
+            elif k not in REFERENCE_RECORDED and rule.get("provenance") != "reproducible":
+                errors.append(f"{where} {path} must have provenance reproducible")
     for k, sub in REFERENCE_SUBFIELDS.items():
         if set(snapshot.get(k) or {}) != set(sub):
             errors.append(f"{where} {k} must hold exactly {', '.join(sub)}")

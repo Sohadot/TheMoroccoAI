@@ -91,11 +91,11 @@
    "sha256": "cfb855054a969b23f779ebb2353e3b3ac8362207f6f5e530c76e74ac7292c670"
   },
   {
-   "bytes": 24344,
+   "bytes": 24512,
    "path": "/data/changelog.json",
    "purpose": "Published registry versions, corrections, and the commit or pull request behind each.",
    "role": "canonical",
-   "sha256": "00d44741254a3661f3e0c1537d7dcc717cee5bd770efaa477e15378dd6de2be9"
+   "sha256": "daf11a458de79ee925fb11e74f462ab812a35193fb644ebb4ca6c740a4a30084"
   },
   {
    "bytes": 67399,
@@ -112,11 +112,11 @@
    "sha256": "3a555d6688c0059aa21dc56cb77749706693712c61ecb407af87b6b0e93a79b7"
   },
   {
-   "bytes": 31921,
+   "bytes": 32609,
    "path": "/registry/reference-state.json",
    "purpose": "Reference projections of the canonical data (counts, lifecycle and status-basis projections, official target records with their covering gap, open gaps, entity assessments, announcement-only and inferred relationships), each with its published rule and the SHA-256 of the canonical files it was computed from. No scores, conflicts or progress.",
    "role": "derived",
-   "sha256": "80ecb8066927b4debbd831a63809a03d058ac2e6df43cb1638445764e22a613c"
+   "sha256": "5dd390da1c5ca3c740fc280d22662147da03cccfca0730ff8967ab6a614a1852"
   }
  ],
  "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",

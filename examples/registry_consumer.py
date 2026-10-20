@@ -13,7 +13,9 @@
 
 It starts from /data/manifest.json, fetches each file listed there and checks its SHA-256, then checks every
 reference and recomputes what the derived files claim, using only the rules published in matrix.json,
-gaps.json and reference-state.json ("derivation") and documented at /data/. It does not import the site's code. Every command runs these
+gaps.json and reference-state.json ("derivation") and documented at /data/. For reference-state.json it
+recomputes every reproducible field and validates fixed contract metadata labelled recorded-not-derivable;
+it does not recompute those metadata fields. It does not import the site's code. Every command runs these
 checks first and stops if the data is inconsistent.
 
 Exit status: 0 when the data is consistent; 1 when it is not (each problem is printed); 2 when a file cannot be
@@ -417,9 +419,16 @@ class Registry:
 
     # ─── Reference answers ───────────────────────────────────────────────────
 
+    # Approved fixed contract metadata for reference-state.json. Validated, not recomputed from the canonical files.
+    REFERENCE_SCOPE = ("Projections of the canonical registry data, each computed by a published rule. It describes what this registry "
+                       "records, not Morocco's AI ecosystem: an absent entity, record or stage is a gap in coverage. It carries no score, "
+                       "no aggregate evidence state, no conflict list and no measure of progress; it never changes a classification, "
+                       "a lifecycle stage or a gap's state.")
+    REFERENCE_DOCUMENTATION = "/data/"
+
     def reference_state(self):
         """Every reproducible field of reference-state.json, recomputed from evidence.json, ontology.json and gaps.json by the
-        rules published in its derivation. The manifest is not used."""
+        rules published in its derivation. Fixed contract metadata (scope, documentation) is not recomputed. The manifest is not used."""
         ev, on, gaps = self.evidence, self.ontology, self.gaps
         recs = ev["records"]
 
@@ -499,12 +508,14 @@ class Registry:
         }
 
     def _check_reference(self):
-        """reference-state.json must hold exactly the fields this consumer recomputes (plus its scope, documentation and
-        derivation), each with a published rule, and each equal to its recomputed value."""
+        """reference-state.json must hold exactly the fields this consumer recomputes (plus derivation and fixed contract
+        metadata), each reproducible field equal to its recomputed value, and scope/documentation equal to the approved
+        recorded-not-derivable contract statements."""
         p = []
         pub, mine = self.reference, self.reference_state()
-        meta = {"scope", "documentation", "derivation"}
-        for k in sorted(set(pub) - set(mine) - meta):
+        structural = {"derivation"}
+        recorded = {"scope", "documentation"}
+        for k in sorted(set(pub) - set(mine) - structural - recorded):
             p.append(f"reference-state.json: field {k!r} is not one this consumer can recompute; it is not interpreted")
         for k in sorted(set(mine) - set(pub)):
             p.append(f"reference-state.json: field {k!r} is missing")
@@ -521,6 +532,16 @@ class Registry:
         for k in sorted(set(mine) & set(pub)):
             if pub[k] != mine[k]:
                 p.append(f"reference-state.json: {k} does not follow from the canonical files by its published rule")
+        if pub.get("scope") != self.REFERENCE_SCOPE:
+            p.append("reference-state.json: scope does not equal the approved fixed scope statement")
+        if pub.get("documentation") != self.REFERENCE_DOCUMENTATION:
+            p.append("reference-state.json: documentation does not equal '/data/'")
+        for path in ("scope", "documentation"):
+            r = rules.get(path)
+            if not isinstance(r, dict) or not r.get("rule"):
+                p.append(f"reference-state.json: {path} has no published recorded-not-derivable provenance entry")
+            elif r.get("provenance") != "recorded-not-derivable":
+                p.append(f"reference-state.json: {path} must be labelled recorded-not-derivable, not recomputed")
         return p
 
     def stage(self, eid):

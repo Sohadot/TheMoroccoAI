@@ -1,5 +1,6 @@
-"""Sprint 10 Tier 1: /registry/reference-state.json. Projections of the canonical data by published rules, recomputed by
-the example consumer; no score, aggregate state, conflict, progress, sum, computed rank, first-party class or domain role."""
+"""Sprint 10 Tier 1: /registry/reference-state.json. Reproducible projections of the canonical data by published rules,
+recomputed by the example consumer; fixed contract metadata labelled recorded-not-derivable. No score, aggregate state,
+conflict, progress, sum, computed rank, first-party class or domain role."""
 import copy
 import hashlib
 import json
@@ -94,14 +95,19 @@ class ReferenceState(unittest.TestCase):
         a = build.reference_state(model, self.gaps, canonical)
         self.assertNotIn("manifest", json.dumps(a["derived_from"]))
 
-    def test_every_field_has_a_reproducible_rule(self):
+    def test_every_field_has_a_published_provenance_rule(self):
         d = self.s["derivation"]
         self.assertEqual(set(self.s), set(registry.REFERENCE_FIELDS))
+        self.assertEqual(registry.REFERENCE_UNDERIVED, ("derivation",))
+        self.assertEqual(set(registry.REFERENCE_RECORDED), {"scope", "documentation"})
+        self.assertEqual(self.s["scope"], registry.REFERENCE_SCOPE)
+        self.assertEqual(self.s["documentation"], registry.REFERENCE_DOCUMENTATION)
         for k in registry.REFERENCE_FIELDS:
             if k in registry.REFERENCE_UNDERIVED:
                 continue
             for path in ([f"{k}.{x}" for x in registry.REFERENCE_SUBFIELDS[k]] if k in registry.REFERENCE_SUBFIELDS else [k]):
-                self.assertEqual(d[path]["provenance"], "reproducible", path)
+                expected = "recorded-not-derivable" if k in registry.REFERENCE_RECORDED else "reproducible"
+                self.assertEqual(d[path]["provenance"], expected, path)
                 self.assertTrue(d[path]["rule"].strip(), path)
         self.assertEqual(registry.validate_reference_state(self.s, self.evidence, self.ontology), [])
 
@@ -117,10 +123,11 @@ class ReferenceState(unittest.TestCase):
 
     # ─── Consumer parity and compatibility ─────────────────────────────────
 
-    def test_consumer_recomputes_every_field(self):
+    def test_consumer_recomputes_reproducible_fields_and_validates_metadata(self):
         reg = consumer.Registry(str(REPO))
         mine = reg.reference_state()
-        self.assertEqual(set(mine) | set(registry.REFERENCE_UNDERIVED), set(self.s))
+        self.assertEqual(set(mine) | set(registry.REFERENCE_UNDERIVED) | set(registry.REFERENCE_RECORDED), set(self.s))
+        self.assertFalse(set(registry.REFERENCE_RECORDED) & set(mine))
         for k, v in mine.items():
             self.assertEqual(self.s[k], v, k)
         self.assertEqual(reg.verify(), [])
@@ -131,7 +138,13 @@ class ReferenceState(unittest.TestCase):
                 (lambda s: s["operational_or_pilot"][0].update(counts_as_ai_deployment=False), "operational_or_pilot does not follow"),
                 (lambda s: s.update(confidence=0.9), "field 'confidence' is not one this consumer can recompute"),
                 (lambda s: s["derived_from"][0].update(sha256="0" * 64), "derived_from does not follow"),
-                (lambda s: s["derivation"]["open_gaps"].update(provenance="recorded-not-derivable"), "open_gaps is not marked reproducible")):
+                (lambda s: s["derivation"]["open_gaps"].update(provenance="recorded-not-derivable"), "open_gaps is not marked reproducible"),
+                (lambda s: s.update(scope="mutated scope statement"), "scope does not equal the approved fixed scope statement"),
+                (lambda s: s.update(documentation="/elsewhere/"), "documentation does not equal '/data/'"),
+                (lambda s: s["derivation"].pop("scope"), "scope has no published recorded-not-derivable provenance entry"),
+                (lambda s: s["derivation"].pop("documentation"), "documentation has no published recorded-not-derivable provenance entry"),
+                (lambda s: s["derivation"]["scope"].update(provenance="reproducible"), "scope must be labelled recorded-not-derivable"),
+                (lambda s: s["derivation"]["documentation"].update(provenance="reproducible"), "documentation must be labelled recorded-not-derivable")):
             reg.reference = copy.deepcopy(self.s)
             mutate(reg.reference)
             self.assertTrue(any(expected in p for p in reg._check_reference()), expected)
@@ -290,6 +303,12 @@ class ReferenceState(unittest.TestCase):
                 {**s["operational_or_pilot"][0], "id": "digital-morocco-2030"}),
             "platform as AI": lambda s: next(x for x in s["operational_or_pilot"] if x["id"] == "sovereign-ai-marketplace").update(counts_as_ai_deployment=True),
             "status record not declaring": lambda s: s["operational_or_pilot"][0]["status_evidence_records"].append("MAI-EV-0013"),
+            "changed scope": lambda s: s.update(scope="mutated scope statement"),
+            "changed documentation": lambda s: s.update(documentation="/elsewhere/"),
+            "missing scope provenance": lambda s: s["derivation"].pop("scope"),
+            "missing documentation provenance": lambda s: s["derivation"].pop("documentation"),
+            "scope marked reproducible": lambda s: s["derivation"]["scope"].update(provenance="reproducible"),
+            "documentation marked reproducible": lambda s: s["derivation"]["documentation"].update(provenance="reproducible"),
         }
         for name, change in cases.items():
             s = copy.deepcopy(self.s)
