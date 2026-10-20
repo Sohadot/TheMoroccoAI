@@ -1550,7 +1550,7 @@ def render_state(model, s, gaps):
   <p class="breadcrumb"><a href="/registry/">Registry</a> / Reference state</p>
   <p class="label">MAI-STATE — Registry {ver} · as of {as_of}</p>
   <h1>TheMoroccoAI Reference State</h1>
-  <p class="lede">What this registry currently records: how its records are classified, which lifecycle stage is documented for each project, model and dataset, which official targets it holds and which evidence questions remain open. Every value below is read from <a href="/registry/reference-state.json">reference-state.json</a>.</p>
+  <p class="lede">What this registry currently records: how its records are classified, which lifecycle stage is documented for each project, model and dataset, which official targets it holds and which evidence questions remain open. Every governed value below is read from <a href="/registry/reference-state.json">reference-state.json</a>; human-readable names, titles and definitions are presentation lookups from the canonical registry files.</p>
   <div class="notice state-boundary"><strong>Methodology boundary</strong> (as of {as_of})<ul>{boundary}</ul></div>
 </header>
 <section aria-labelledby="s1-h">

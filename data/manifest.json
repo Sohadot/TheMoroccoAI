@@ -91,11 +91,11 @@
    "sha256": "cfb855054a969b23f779ebb2353e3b3ac8362207f6f5e530c76e74ac7292c670"
   },
   {
-   "bytes": 26229,
+   "bytes": 26246,
    "path": "/data/changelog.json",
    "purpose": "Published registry versions, corrections, and the commit or pull request behind each.",
    "role": "canonical",
-   "sha256": "6fbb9dce029a189d918c9c80753691293d7ee94a749ad61acd0f149a06610f77"
+   "sha256": "d2215edc535c604f521d72bcdb1461ad23221fc345adf1d78717b4cb142f5e9f"
   },
   {
    "bytes": 67399,

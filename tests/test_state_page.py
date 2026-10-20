@@ -158,6 +158,17 @@ class StatePage(unittest.TestCase):
         lying_text = self.html.replace('data-ref="/counts/records" data-value="63">63<', 'data-ref="/counts/records" data-value="63">64<')
         self.assertTrue(any("displays" in e for e in self.errors(lying_text)))
 
+    def test_provenance_wording_separates_governed_values_from_lookups(self):
+        # The page may not claim that every value comes from the snapshot: names, titles and definitions are canonical lookups.
+        text = re.sub(r"\s+([;,.])", r"\1", main_text(self.html))
+        self.assertIn("Every governed value below is read from reference-state.json; human-readable names, titles and definitions "
+                      "are presentation lookups from the canonical registry files.", text)
+        self.assertNotRegex(text, r"(?i)\bevery value (below|on (this|the) page)\b")
+        self.assertNotRegex(text, r"(?i)\ball values? (below |on (this|the) page )?(is|are) (read )?from")
+        v0101 = next(e for e in json.loads((REPO / "data" / "changelog.json").read_text(encoding="utf-8"))["entries"] if e["version"] == "0.10.1")
+        self.assertTrue(any(c.startswith("Every governed value on the page is read from the snapshot") for c in v0101["changes"]))
+        self.assertFalse(any("Every value on the page" in c for c in v0101["changes"]))
+
     def test_required_disclaimers_are_present(self):
         # Pinned here, independently of build.STATE_BOUNDARY, so that removing one from the build cannot pass silently.
         required = ["Independent; not affiliated with the Government of Morocco.",
