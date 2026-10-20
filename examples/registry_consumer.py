@@ -361,8 +361,46 @@ class Registry:
                 continue
             if triggered and g["state"] == "open":
                 p.append(f"{gid}: open, but the data no longer satisfies: {'; '.join(triggered)}")
+            if "entity_assessments" in g or d.get("entity_assessments"):
+                if d.get("entity_assessments") != g.get("entity_assessments"):
+                    p.append(f"registry/gaps/gaps.json: {gid} entity_assessments differ from data/gaps.json")
+                p += self._check_entity_assessments(g)
         for gid in sorted(set(derived) - {g["id"] for g in self.gaps["gaps"]}):
             p.append(f"registry/gaps/gaps.json: {gid} is not in data/gaps.json")
+        return p
+
+    def resolution_path(self, assessment):
+        """The resolution path an entity's assessment meets, as published in gaps.json (entity_assessment.resolution)."""
+        d, stage = assessment["dimensions"], self.entities[assessment["entity"]].get("lifecycle")
+        if d["operational_activity"] and d["outputs"] and (d["staffing"] or d["premises"]) and stage in ("pilot", "operational"):
+            return "operating"
+        if d["documented_non_operation"] and stage == "discontinued":
+            return "not_operating"
+        return None
+
+    def _check_entity_assessments(self, g):
+        spec, p = self.gap_register["entity_assessment"], []
+        gid = g["id"]
+        if [a["entity"] for a in g["entity_assessments"]] != g["entities"]:
+            p.append(f"{gid}: entity_assessments do not list the gap's entities in order")
+        for a in g["entity_assessments"]:
+            at = f"{gid}: {a['entity']}"
+            if a["state"] not in spec["states"]:
+                p.append(f"{at} has undefined state {a['state']!r}")
+            if set(a["dimensions"]) != set(spec["dimension_order"]) or set(spec["dimensions"]) != set(spec["dimension_order"]):
+                p.append(f"{at} does not list exactly the defined dimensions")
+            cited = {x for xs in a["dimensions"].values() for x in xs}
+            for x in sorted(cited):
+                r = self.records.get(x)
+                if r is None or a["entity"] not in r["related_entities"] or r["classification"] != "VERIFIED FACT":
+                    p.append(f"{at} cites {x}, which is not a VERIFIED FACT record about it")
+            path = self.resolution_path(a)
+            if a["state"] == "resolved" and (not path or not a.get("resolved_by") or not set(a["resolved_by"]) <= cited):
+                p.append(f"{at} is resolved but does not meet a resolution path with the records it cites")
+            if a["state"] == "open" and path:
+                p.append(f"{at} is open but meets the {path} resolution path")
+        if g["state"] == "resolved" and any(a["state"] != "resolved" for a in g["entity_assessments"]):
+            p.append(f"{gid}: resolved while an entity it assesses is open")
         return p
 
     # ─── Reference answers ───────────────────────────────────────────────────
@@ -484,6 +522,13 @@ def show_gap(reg, gid):
     out += ["", "NOT ESTABLISHED", f"  {g['unestablished']}"]
     if g["state"] == "open":
         out.append(f"  {reg.gaps['open_wording']}")
+    if g.get("entity_assessments"):
+        out += ["", "BY ENTITY (records per dimension; none recorded = '-')"]
+        for a in g["entity_assessments"]:
+            order = reg.gap_register["entity_assessment"]["dimension_order"]
+            out.append(f"  {a['entity']} [{a['state']}]: " + "; ".join(f"{k} {', '.join(a['dimensions'][k]) or '-'}" for k in order))
+            if a.get("note"):
+                out.append(f"      {a['note']}")
     out += ["", "EVIDENCE THAT WOULD RESOLVE IT"] + [f"  - {x}" for x in g["evidence_needed"]]
     out += ["", "WHAT THE DATA CAN CONFIRM"]
     fp = reg.fingerprint(g)

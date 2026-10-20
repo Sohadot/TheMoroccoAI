@@ -247,9 +247,10 @@
           ]
         },
         {
-          "text": "Its official 2030 objectives include 240,000 direct jobs with a contribution to GDP, digitalised public services, and a rise from 113th to 50th place in the e-government development index.",
+          "text": "Its official 2030 objectives include 240,000 direct jobs with a contribution to GDP, digitalised public services, and a rise from 113th to 50th place worldwide on the ranking of online public services. The strategy's brochure defines that ranking as the United Nations Online Services Index (OSI), a component of the e-government development index (EGDI), and gives 113th as Morocco's 2022 position on it; the national news agency's dispatch calls it the e-government development index.",
           "evidence": [
-            "MAI-EV-0002"
+            "MAI-EV-0002",
+            "MAI-EV-0049"
           ]
         },
         {
@@ -265,17 +266,18 @@
           ]
         },
         {
-          "text": "The United Nations ranked Morocco 101st in the e-government development index in 2022 and 90th in 2024; no edition shows the 113th place given as the strategy's starting point. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy.",
+          "text": "On the overall e-government development index, the United Nations ranked Morocco 101st in 2022 and 90th in 2024. On the Online Services Index, its page gives Morocco's value (0.47210 in 2022, 0.56184 in 2024) but not its rank, so the strategy's 113th place for 2022 is the strategy's figure and has not been verified against a United Nations ranking. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy.",
           "evidence": [
             "MAI-EV-0046",
+            "MAI-EV-0049",
             "MAI-EV-0002"
           ]
         }
       ],
-      "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or e-government ranking objectives. No project is recorded as included in the strategy, the investment figure is an unchecked statement about spending, and no edition of the United Nations index later than 2024 had been published on the assessment date.",
+      "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or online-services ranking objectives, and Morocco's rank on the Online Services Index in any edition. No project is recorded as included in the strategy, the investment figure is an unchecked statement about spending, and no edition of the United Nations survey later than 2024 had been published on the assessment date.",
       "evidence_needed": [
         "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)",
-        "The next edition of the United Nations E-Government Survey, the index the ranking objective refers to",
+        "The United Nations ranking of countries on the Online Services Index, the index the ranking objective refers to, for 2022 and later editions",
         "Finance-law documents for the stated investment figures"
       ],
       "checks": [],
@@ -284,11 +286,193 @@
         "MAI-EV-0002",
         "MAI-EV-0003",
         "MAI-EV-0018",
-        "MAI-EV-0046"
+        "MAI-EV-0046",
+        "MAI-EV-0049"
       ],
-      "assessed_fingerprint": "51e9e488d464f232",
-      "assessed": "2026-10-19",
+      "assessed_fingerprint": "ddbac4d9fb7806a1",
+      "assessed": "2026-10-20",
+      "state": "open"
+    },
+    {
+      "id": "GAP-07",
+      "question": "Which JAZARI institutes have documented governance, staff, premises, operational activity or outputs, beyond their founding agreements and legal approval?",
+      "entities": [
+        "jazari-root",
+        "jazari-edutech",
+        "jazari-industrie-x0",
+        "jazari-smart-city",
+        "jazari-institute-nador"
+      ],
+      "established": [
+        {
+          "text": "The founding conventions of JAZARI ROOT, JAZARI EduTech, JAZARI Industrie X.0 and JAZARI Smart City were approved by joint orders published in Bulletin Officiel 7534 of 13 August 2026; the gazette publishes summaries of the conventions, not their signed texts.",
+          "evidence": [
+            "MAI-EV-0047"
+          ]
+        },
+        {
+          "text": "The ministry states that the general assemblies of these four institutes were held in Rabat on 8 September 2026, chaired by the minister; the release names no director, board, budget, staff or premises.",
+          "evidence": [
+            "MAI-EV-0048"
+          ]
+        },
+        {
+          "text": "A memorandum of understanding for an Al Jazari institute in the Province of Nador was signed on 2 July 2025.",
+          "evidence": [
+            "MAI-EV-0005",
+            "MAI-EV-0019"
+          ]
+        }
+      ],
+      "unestablished": "For each institute: staff, premises in use, operational activity and its outputs, or a documented end of activity. For the Nador institute, also any legal act establishing it and any governance event. Legal approval, a general assembly, or a ministry's description of a move to operational implementation is not operation.",
+      "evidence_needed": [
+        "For each institute, records of staff or premises in use, together with dated activity carried out by the institute and its outputs, from the institute itself or from an official or independent source",
+        "Or, for an institute, a record that it has ceased or will not operate",
+        "For the Nador institute, the legal act establishing it, if one has been adopted"
+      ],
+      "checks": [
+        {
+          "type": "lifecycle_in",
+          "entities": [
+            "jazari-root",
+            "jazari-edutech",
+            "jazari-industrie-x0",
+            "jazari-smart-city",
+            "jazari-institute-nador"
+          ],
+          "stages": [
+            "announced"
+          ]
+        }
+      ],
+      "entity_assessments": [
+        {
+          "entity": "jazari-root",
+          "state": "open",
+          "dimensions": {
+            "legal_approval": [
+              "MAI-EV-0047"
+            ],
+            "governance_event": [
+              "MAI-EV-0048"
+            ],
+            "staffing": [],
+            "premises": [],
+            "operational_activity": [],
+            "outputs": [],
+            "documented_non_operation": []
+          }
+        },
+        {
+          "entity": "jazari-edutech",
+          "state": "open",
+          "dimensions": {
+            "legal_approval": [
+              "MAI-EV-0047"
+            ],
+            "governance_event": [
+              "MAI-EV-0048"
+            ],
+            "staffing": [],
+            "premises": [],
+            "operational_activity": [],
+            "outputs": [],
+            "documented_non_operation": []
+          }
+        },
+        {
+          "entity": "jazari-industrie-x0",
+          "state": "open",
+          "dimensions": {
+            "legal_approval": [
+              "MAI-EV-0047"
+            ],
+            "governance_event": [
+              "MAI-EV-0048"
+            ],
+            "staffing": [],
+            "premises": [],
+            "operational_activity": [],
+            "outputs": [],
+            "documented_non_operation": []
+          }
+        },
+        {
+          "entity": "jazari-smart-city",
+          "state": "open",
+          "dimensions": {
+            "legal_approval": [
+              "MAI-EV-0047"
+            ],
+            "governance_event": [
+              "MAI-EV-0048"
+            ],
+            "staffing": [],
+            "premises": [],
+            "operational_activity": [],
+            "outputs": [],
+            "documented_non_operation": []
+          }
+        },
+        {
+          "entity": "jazari-institute-nador",
+          "state": "open",
+          "dimensions": {
+            "legal_approval": [],
+            "governance_event": [],
+            "staffing": [],
+            "premises": [],
+            "operational_activity": [],
+            "outputs": [],
+            "documented_non_operation": []
+          },
+          "note": "A memorandum of understanding for the institute was signed on 2 July 2025 (MAI-EV-0005, MAI-EV-0019). No legal act establishing it is recorded in this registry; Bulletin Officiel 7534 contains none, which does not show that none exists."
+        }
+      ],
+      "assessed_records": [
+        "MAI-EV-0005",
+        "MAI-EV-0008",
+        "MAI-EV-0009",
+        "MAI-EV-0010",
+        "MAI-EV-0012",
+        "MAI-EV-0019",
+        "MAI-EV-0047",
+        "MAI-EV-0048"
+      ],
+      "assessed_fingerprint": "d088b8596a699577",
+      "assessed": "2026-10-20",
       "state": "open"
     }
-  ]
+  ],
+  "entity_assessment": {
+    "note": "A gap may assess each of its entities separately (entity_assessments). Each assessment lists, for every evidence dimension, the records that document it for that entity; an empty list means no qualifying record is recorded in this registry. An entity is resolved when its records meet one of the resolution paths below; it stays in the gap's scope, marked resolved, while other entities remain open. The gap is resolved only when every entity is.",
+    "dimensions": {
+      "legal_approval": "A legal act establishing the entity, such as a joint order approving its founding convention.",
+      "governance_event": "A meeting of a governing body, or the appointment of a named officer or board member.",
+      "staffing": "Staff recruited or in post, named or counted.",
+      "premises": "Premises opened, occupied or in use.",
+      "operational_activity": "Dated activity carried out by the entity itself: programmes run, calls launched, services delivered.",
+      "outputs": "Dated outputs of that activity: projects funded, people trained, systems or publications delivered.",
+      "documented_non_operation": "A record that the entity has ceased, been dissolved, or will not operate."
+    },
+    "dimension_order": [
+      "legal_approval",
+      "governance_event",
+      "staffing",
+      "premises",
+      "operational_activity",
+      "outputs",
+      "documented_non_operation"
+    ],
+    "qualifying_records": "A record cited under a dimension must be a VERIFIED FACT whose related_entities include the entity. Announced plans, targets and descriptions of intent do not qualify for any dimension.",
+    "resolution": {
+      "operating": "operational_activity and outputs each cite at least one record, staffing or premises cites at least one record, and the entity's lifecycle is pilot or operational under the registry's status rules.",
+      "not_operating": "documented_non_operation cites at least one record and the entity's lifecycle is discontinued.",
+      "rule": "A legal approval or a governance event never resolves an entity on its own. An entity marked resolved must meet a path and list the records that meet it in resolved_by; an entity that meets a path but is still marked open must be re-assessed."
+    },
+    "states": [
+      "open",
+      "resolved"
+    ]
+  }
 }

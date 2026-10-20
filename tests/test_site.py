@@ -90,7 +90,10 @@ class PublishedSite(unittest.TestCase):
         self.assertIn("operation after that date not reconfirmed", html)
 
     def test_recency_boundary_is_twelve_calendar_months(self):
-        cases = [("2025-10-19", None, False), ("2025-10-18", None, True),        # exactly 12 months / one day more (as_of 2026-10-19)
+        registry_date = datetime.date.fromisoformat(registry.load_all()[0]["as_of"])
+        year_before = registry_date.replace(year=registry_date.year - 1)
+        cases = [(year_before.isoformat(), None, False),                          # exactly 12 months before the registry date
+                 ((year_before - datetime.timedelta(days=1)).isoformat(), None, True),  # one day more
                  ("2025-10", None, True),                                          # month-only date counts from its 1st
                  ("2027-02-28", "2028-02-29", False), ("2027-02-27", "2028-02-29", True)]  # leap-day as_of
         for date, as_of, stale in cases:

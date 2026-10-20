@@ -272,7 +272,7 @@ class ConsumerCompatibility(unittest.TestCase):
         code, out, err = self.run_consumer(REPO, "verify")
         self.assertEqual(code, 0, err)
         self.assertIn(f"registry {registry.load_all()[0]['version']}", out)
-        self.assertIn("6 gaps", out)
+        self.assertIn(f"{len(json.loads((REPO / 'data' / 'gaps.json').read_text(encoding='utf-8'))['gaps'])} gaps", out)
 
     def test_consumer_takes_basis_names_from_the_data(self):
         # Renaming a basis value consistently in matrix.json and gaps.json must not break the consumer.

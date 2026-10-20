@@ -1,5 +1,5 @@
 {
- "as_of": "2026-10-19",
+ "as_of": "2026-10-20",
  "derivation": {
   "assessed_fingerprint": {
    "entity_fields": [
@@ -33,7 +33,8 @@
    "no_status_basis": "Triggered when a record in the entity's lifecycle_evidence has a status_basis listed in the check's bases.",
    "rule": "The checks and digests are in /data/gaps.json. A check type not listed here is an error, not a check to skip. A check holds when it is not triggered; a triggered check is an error only while the gap is open. An open gap must be re-assessed, and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."
   },
-  "computed_relationships": "A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), in the matrix's row order, each entry giving id, subject, relationship, object, classification, evidence (ids) and evidence_types (in the same order). Its count is stated as N of M: N is the length of relationships and M, published as formal_act_relationships, the number of matrix rows whose relationship type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these are all such relationships in ontology.json. The list measures documentation, not truth, and may include relationships already classified as announced plans."
+  "computed_relationships": "A gap with a computed_relationships check (list announcement_only) lists the matrix rows whose documentation_basis is announcement-or-description under the rules in /registry/matrix/matrix.json (derivation.documentation_basis), in the matrix's row order, each entry giving id, subject, relationship, object, classification, evidence (ids) and evidence_types (in the same order). Its count is stated as N of M: N is the length of relationships and M, published as formal_act_relationships, the number of matrix rows whose relationship type is a formal act. Every formal-act relationship type joins types inside the matrix's row selection, so these are all such relationships in ontology.json. The list measures documentation, not truth, and may include relationships already classified as announced plans.",
+  "entity_assessments": "A gap with entity_assessments is assessed per entity, under the definitions in entity_assessment: one assessment per entity, in the gap's entity order, each listing the records cited for every dimension in the defined order. A cited record must exist, be a VERIFIED FACT and list the entity in related_entities. The dimensions are listed in dimension_order, the order in which they are displayed. An entity meets the operating path when operational_activity and outputs each cite a record, staffing or premises cites a record, and its lifecycle is pilot or operational; it meets the not_operating path when documented_non_operation cites a record and its lifecycle is discontinued. An entity is resolved exactly when it meets a path, with resolved_by listing records it cites; an open entity that meets a path, a resolved one that meets none, and a resolved gap with an open entity are errors. An empty list means no qualifying record is recorded in this registry, not that the thing does not exist."
  },
  "derived_from": [
   "/data/gaps.json",
@@ -41,6 +42,37 @@
   "/data/evidence.json"
  ],
  "documentation": "/data/",
+ "entity_assessment": {
+  "dimension_order": [
+   "legal_approval",
+   "governance_event",
+   "staffing",
+   "premises",
+   "operational_activity",
+   "outputs",
+   "documented_non_operation"
+  ],
+  "dimensions": {
+   "documented_non_operation": "A record that the entity has ceased, been dissolved, or will not operate.",
+   "governance_event": "A meeting of a governing body, or the appointment of a named officer or board member.",
+   "legal_approval": "A legal act establishing the entity, such as a joint order approving its founding convention.",
+   "operational_activity": "Dated activity carried out by the entity itself: programmes run, calls launched, services delivered.",
+   "outputs": "Dated outputs of that activity: projects funded, people trained, systems or publications delivered.",
+   "premises": "Premises opened, occupied or in use.",
+   "staffing": "Staff recruited or in post, named or counted."
+  },
+  "note": "A gap may assess each of its entities separately (entity_assessments). Each assessment lists, for every evidence dimension, the records that document it for that entity; an empty list means no qualifying record is recorded in this registry. An entity is resolved when its records meet one of the resolution paths below; it stays in the gap's scope, marked resolved, while other entities remain open. The gap is resolved only when every entity is.",
+  "qualifying_records": "A record cited under a dimension must be a VERIFIED FACT whose related_entities include the entity. Announced plans, targets and descriptions of intent do not qualify for any dimension.",
+  "resolution": {
+   "not_operating": "documented_non_operation cites at least one record and the entity's lifecycle is discontinued.",
+   "operating": "operational_activity and outputs each cite at least one record, staffing or premises cites at least one record, and the entity's lifecycle is pilot or operational under the registry's status rules.",
+   "rule": "A legal approval or a governance event never resolves an entity on its own. An entity marked resolved must meet a path and list the records that meet it in resolved_by; an entity that meets a path but is still marked open must be re-assessed."
+  },
+  "states": [
+   "open",
+   "resolved"
+  ]
+ },
  "gaps": [
   {
    "assessed": "2026-10-19",
@@ -50,6 +82,7 @@
      "name": "Idarati AI"
     }
    ],
+   "entity_assessments": null,
    "established": [
     {
      "evidence": [
@@ -88,6 +121,7 @@
      "name": "Morocco AI 2030"
     }
    ],
+   "entity_assessments": null,
    "established": [
     {
      "evidence": [
@@ -128,6 +162,7 @@
      "name": "Toubkal supercomputer"
     }
    ],
+   "entity_assessments": null,
    "established": [
     {
      "evidence": [
@@ -184,6 +219,7 @@
      "name": "UM6P data-centre partnership convention"
     }
    ],
+   "entity_assessments": null,
    "established": [
     {
      "evidence": [
@@ -223,6 +259,7 @@
   {
    "assessed": "2026-10-19",
    "entities": [],
+   "entity_assessments": null,
    "established": [],
    "evidence_needed": [
     "Published texts of the conventions and memoranda",
@@ -390,13 +427,14 @@
    "unestablished": "Any record other than an announcement, news report or description for each relationship listed below. Relationships not listed cite at least one other kind of record, such as an official report or a technical repository. For eight signatures of the JAZARI ROOT and JAZARI Industrie X.0 conventions, that record is the Bulletin Officiel's publication of the conventions' approval by joint order, with a summary naming their parties; the other signatures not listed rest on an official report of the signing. Neither is the signed text, which this registry does not record for any signature. This measures how each relationship is documented in this registry, not whether it is true."
   },
   {
-   "assessed": "2026-10-19",
+   "assessed": "2026-10-20",
    "entities": [
     {
      "id": "digital-morocco-2030",
      "name": "Digital Morocco 2030"
     }
    ],
+   "entity_assessments": null,
    "established": [
     {
      "evidence": [
@@ -406,9 +444,10 @@
     },
     {
      "evidence": [
-      "MAI-EV-0002"
+      "MAI-EV-0002",
+      "MAI-EV-0049"
      ],
-     "text": "Its official 2030 objectives include 240,000 direct jobs with a contribution to GDP, digitalised public services, and a rise from 113th to 50th place in the e-government development index."
+     "text": "Its official 2030 objectives include 240,000 direct jobs with a contribution to GDP, digitalised public services, and a rise from 113th to 50th place worldwide on the ranking of online public services. The strategy's brochure defines that ranking as the United Nations Online Services Index (OSI), a component of the e-government development index (EGDI), and gives 113th as Morocco's 2022 position on it; the national news agency's dispatch calls it the e-government development index."
     },
     {
      "evidence": [
@@ -425,14 +464,15 @@
     {
      "evidence": [
       "MAI-EV-0046",
+      "MAI-EV-0049",
       "MAI-EV-0002"
      ],
-     "text": "The United Nations ranked Morocco 101st in the e-government development index in 2022 and 90th in 2024; no edition shows the 113th place given as the strategy's starting point. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy."
+     "text": "On the overall e-government development index, the United Nations ranked Morocco 101st in 2022 and 90th in 2024. On the Online Services Index, its page gives Morocco's value (0.47210 in 2022, 0.56184 in 2024) but not its rank, so the strategy's 113th place for 2022 is the strategy's figure and has not been verified against a United Nations ranking. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy."
     }
    ],
    "evidence_needed": [
     "Official indicator reporting on the targets (ministry progress report, budget documents, national statistics)",
-    "The next edition of the United Nations E-Government Survey, the index the ranking objective refers to",
+    "The United Nations ranking of countries on the Online Services Index, the index the ranking objective refers to, for 2022 and later editions",
     "Finance-law documents for the stated investment figures"
    ],
    "formal_act_relationships": null,
@@ -442,11 +482,154 @@
    "relationships": null,
    "resolved_by": null,
    "state": "open",
-   "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or e-government ranking objectives. No project is recorded as included in the strategy, the investment figure is an unchecked statement about spending, and no edition of the United Nations index later than 2024 had been published on the assessment date."
+   "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or online-services ranking objectives, and Morocco's rank on the Online Services Index in any edition. No project is recorded as included in the strategy, the investment figure is an unchecked statement about spending, and no edition of the United Nations survey later than 2024 had been published on the assessment date."
+  },
+  {
+   "assessed": "2026-10-20",
+   "entities": [
+    {
+     "id": "jazari-root",
+     "name": "Institut Jazari ROOT"
+    },
+    {
+     "id": "jazari-edutech",
+     "name": "JAZARI EduTech"
+    },
+    {
+     "id": "jazari-industrie-x0",
+     "name": "JAZARI Industrie X.0"
+    },
+    {
+     "id": "jazari-smart-city",
+     "name": "JAZARI Smart City"
+    },
+    {
+     "id": "jazari-institute-nador",
+     "name": "Al Jazari Institute, Province of Nador"
+    }
+   ],
+   "entity_assessments": [
+    {
+     "dimensions": {
+      "documented_non_operation": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-root",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_non_operation": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-edutech",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_non_operation": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-industrie-x0",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_non_operation": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-smart-city",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_non_operation": [],
+      "governance_event": [],
+      "legal_approval": [],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-institute-nador",
+     "note": "A memorandum of understanding for the institute was signed on 2 July 2025 (MAI-EV-0005, MAI-EV-0019). No legal act establishing it is recorded in this registry; Bulletin Officiel 7534 contains none, which does not show that none exists.",
+     "state": "open"
+    }
+   ],
+   "established": [
+    {
+     "evidence": [
+      "MAI-EV-0047"
+     ],
+     "text": "The founding conventions of JAZARI ROOT, JAZARI EduTech, JAZARI Industrie X.0 and JAZARI Smart City were approved by joint orders published in Bulletin Officiel 7534 of 13 August 2026; the gazette publishes summaries of the conventions, not their signed texts."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0048"
+     ],
+     "text": "The ministry states that the general assemblies of these four institutes were held in Rabat on 8 September 2026, chaired by the minister; the release names no director, board, budget, staff or premises."
+    },
+    {
+     "evidence": [
+      "MAI-EV-0005",
+      "MAI-EV-0019"
+     ],
+     "text": "A memorandum of understanding for an Al Jazari institute in the Province of Nador was signed on 2 July 2025."
+    }
+   ],
+   "evidence_needed": [
+    "For each institute, records of staff or premises in use, together with dated activity carried out by the institute and its outputs, from the institute itself or from an official or independent source",
+    "Or, for an institute, a record that it has ceased or will not operate",
+    "For the Nador institute, the legal act establishing it, if one has been adopted"
+   ],
+   "formal_act_relationships": null,
+   "id": "GAP-07",
+   "open_wording": "No qualifying evidence is currently recorded in this registry.",
+   "question": "Which JAZARI institutes have documented governance, staff, premises, operational activity or outputs, beyond their founding agreements and legal approval?",
+   "relationships": null,
+   "resolved_by": null,
+   "state": "open",
+   "unestablished": "For each institute: staff, premises in use, operational activity and its outputs, or a documented end of activity. For the Nador institute, also any legal act establishing it and any governance event. Legal approval, a general assembly, or a ministry's description of a move to operational implementation is not operation."
   }
  ],
  "note": "Open evidence questions. A gap records what this registry establishes and what it does not; it is a limit of the registry's coverage, not a finding that something does not exist. A gap is opened when a reference question asks something the records cannot answer; every strategy with an official target has a gap on its measured progress, which the build checks. Each gap stores the records it was assessed against and a digest of the data it rests on: when that data changes (a new or edited record, a changed stage, attribute or relationship), the build fails until the gap is re-assessed. Checks are re-run on every build against the canonical data.",
- "registry_version": "0.6.0",
+ "registry_version": "0.7.0",
  "states": {
   "open": "The question cannot yet be answered from the records in this registry. It is a limit of coverage, not a finding that the evidence or the thing asked about does not exist.",
   "resolved": "Records in this registry now answer the question; resolved_by lists them."
