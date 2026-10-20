@@ -157,7 +157,6 @@ class ExecutionEvidence(unittest.TestCase):
             self.assertNotRegex(t, r"\b100th\b")
 
     def test_counts_and_gaps(self):
-        self.assertEqual(self.evidence["version"], "0.9.0")
         self.assertEqual(len(self.evidence["records"]), 63)
         self.assertEqual((len(self.ontology["entities"]), len(self.ontology["relationships"])), (65, 78))
         self.assertEqual({g["state"] for g in self.gaps.values()}, {"open"})
@@ -174,7 +173,7 @@ class ExecutionEvidence(unittest.TestCase):
             path.write_text(old.stdout, encoding="utf-8")
             p = subprocess.run([sys.executable, "-I", str(path), "--source", str(REPO), "verify"], capture_output=True, text=True, timeout=120)
         self.assertEqual(p.returncode, 0, p.stderr)
-        self.assertIn("registry 0.9.0", p.stdout)
+        self.assertIn(f"registry {self.evidence['version']}", p.stdout)
 
 
 if __name__ == "__main__":

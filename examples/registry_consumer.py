@@ -12,8 +12,8 @@
                                 a directory is read as a local copy of the site
 
 It starts from /data/manifest.json, fetches each file listed there and checks its SHA-256, then checks every
-reference and recomputes what the derived files claim, using only the rules published in matrix.json and
-gaps.json ("derivation") and documented at /data/. It does not import the site's code. Every command runs these
+reference and recomputes what the derived files claim, using only the rules published in matrix.json,
+gaps.json and reference-state.json ("derivation") and documented at /data/. It does not import the site's code. Every command runs these
 checks first and stops if the data is inconsistent.
 
 Exit status: 0 when the data is consistent; 1 when it is not (each problem is printed); 2 when a file cannot be
@@ -44,12 +44,15 @@ class Registry:
         self.problems = []
         self.manifest = json.loads(self._fetch(MANIFEST))
         self.files = {}
+        self.raw = {}
         for res in self.manifest["resources"]:
             raw = self._fetch(res["path"])
+            self.raw[res["path"]] = raw
             if hashlib.sha256(raw).hexdigest() != res["sha256"]:
                 self.problems.append(f"{res['path']}: SHA-256 differs from the manifest; the file comes from another build or was altered")
             self.files[res["path"]] = json.loads(raw)
-        need = ("/data/evidence.json", "/data/ontology.json", "/data/gaps.json", "/registry/matrix/matrix.json", "/registry/gaps/gaps.json")
+        need = ("/data/evidence.json", "/data/ontology.json", "/data/gaps.json", "/registry/matrix/matrix.json", "/registry/gaps/gaps.json",
+                "/registry/reference-state.json")
         missing = [p for p in need if p not in self.files]
         if missing:
             raise FetchError(f"the manifest does not list {', '.join(missing)}")
@@ -58,6 +61,7 @@ class Registry:
         self.gaps = self.files["/data/gaps.json"]
         self.matrix = self.files["/registry/matrix/matrix.json"]
         self.gap_register = self.files["/registry/gaps/gaps.json"]
+        self.reference = self.files["/registry/reference-state.json"]
         self.records = {r["evidence_id"]: r for r in self.evidence["records"]}
         self.entities = {e["id"]: e for e in self.ontology["entities"]}
         self.relationships = self.ontology["relationships"]
@@ -89,6 +93,7 @@ class Registry:
             p += self._check_support()
             p += self._check_matrix()
             p += self._check_gaps()
+            p += self._check_reference()
         return p
 
     def _check_versions(self):
@@ -96,7 +101,8 @@ class Registry:
         found = [("evidence.json", self.evidence.get("version"), self.evidence.get("as_of")),
                  ("ontology.json", self.ontology.get("version"), self.ontology.get("as_of")),
                  ("matrix.json", self.matrix.get("registry_version"), self.matrix.get("as_of")),
-                 ("registry/gaps/gaps.json", self.gap_register.get("registry_version"), self.gap_register.get("as_of"))]
+                 ("registry/gaps/gaps.json", self.gap_register.get("registry_version"), self.gap_register.get("as_of")),
+                 ("reference-state.json", self.reference.get("registry_version"), self.reference.get("as_of"))]
         return [f"{name}: version {fv} as of {fa}, but the manifest is version {v} as of {a}" for name, fv, fa in found if (fv, fa) != (v, a)]
 
     def _check_definitions(self):
@@ -410,6 +416,112 @@ class Registry:
         return p
 
     # ─── Reference answers ───────────────────────────────────────────────────
+
+    def reference_state(self):
+        """Every reproducible field of reference-state.json, recomputed from evidence.json, ontology.json and gaps.json by the
+        rules published in its derivation. The manifest is not used."""
+        ev, on, gaps = self.evidence, self.ontology, self.gaps
+        recs = ev["records"]
+
+        def declaring(e):
+            return [x for x in e.get("lifecycle_evidence") or [] if self.records[x].get("status_evidence") == e["lifecycle"]]
+
+        def bases(ids):
+            return sorted({self.records[x]["status_basis"] for x in ids if self.records[x].get("status_basis")})
+
+        lifecycle = [{"id": e["id"], "type": e["type"], "project_kind": e.get("project_kind"), "lifecycle": e["lifecycle"],
+                      "lifecycle_evidence": list(e.get("lifecycle_evidence") or []), "status_bases": bases(declaring(e))}
+                     for e in sorted(on["entities"], key=lambda e: e["id"]) if e["type"] in ("project", "model", "dataset")]
+        combos = {}
+        for x in lifecycle:
+            k = (x["type"], x["project_kind"], x["lifecycle"])
+            combos[k] = combos.get(k, 0) + 1
+        operating = [{**x, "status_evidence_records": declaring(self.entities[x["id"]]), "counts_as_ai_deployment": x["project_kind"] == "ai-application"}
+                     for x in lifecycle if x["lifecycle"] in ("operational", "pilot")]
+        by_basis = {}
+        for x in operating:
+            for b in bases(x["status_evidence_records"]):
+                by_basis.setdefault(b, []).append(x["id"])
+        open_gaps = [g for g in gaps["gaps"] if g["state"] == "open"]
+        in_gaps = {}
+        for g in open_gaps:
+            for e in g["entities"]:
+                in_gaps.setdefault(e, []).append(g["id"])
+        targets = []
+        for r in sorted((r for r in recs if r["classification"] == "OFFICIAL TARGET"), key=lambda r: r["evidence_id"]):
+            inits = []
+            for i in (e for e in r["related_entities"] if self.entities[e]["type"] == "initiative"):
+                gap = next((g for g in gaps["gaps"] if i in g["entities"]), None)
+                inits.append({"id": i, "covering_gap": gap["id"] if gap else None, "gap_state": gap["state"] if gap else None})
+            targets.append({"evidence_id": r["evidence_id"], "target_year": r["target_year"], "initiatives": inits})
+
+        def triple(r):
+            return f"{r['subject']}|{r['predicate']}|{r['object']}"
+
+        return {
+            "registry_version": ev["version"], "as_of": ev["as_of"],
+            "derived_from": [{"path": path, "sha256": hashlib.sha256(self.raw[path]).hexdigest()}
+                             for path in ("/data/evidence.json", "/data/ontology.json", "/data/gaps.json")],
+            "counts": {
+                "records": len(recs), "entities": len(on["entities"]), "relationships": len(self.relationships),
+                "records_by_classification": {c: sum(1 for r in recs if r["classification"] == c) for c in ev["classifications"]},
+                "records_by_verification_status": {s: sum(1 for r in recs if r["verification_status"] == s) for s in ev["verification_statuses"]},
+                "relationships_by_classification": {c: sum(1 for r in self.relationships if r["classification"] == c) for c in ev["classifications"]},
+                "entities_by_type": {t: sum(1 for e in on["entities"] if e["type"] == t) for t in on["entity_types"]},
+            },
+            "superseded_records": [{"evidence_id": r["evidence_id"], "superseded_by": list(r["superseded_by"])}
+                                   for r in sorted(recs, key=lambda r: r["evidence_id"]) if r.get("superseded_by")],
+            "lifecycle": {"entities": lifecycle,
+                          "by_type_and_kind": [{"type": t, "project_kind": k, "lifecycle": s, "count": n}
+                                               for (t, k, s), n in sorted(combos.items(), key=lambda kv: (kv[0][0], kv[0][1] or "", kv[0][2]))]},
+            "operational_or_pilot": operating,
+            "operational_or_pilot_by_status_basis": by_basis,
+            "announced_projects_by_kind": {k: sorted(e["id"] for e in on["entities"] if e["type"] == "project" and e.get("project_kind") == k
+                                                     and e.get("lifecycle") == "announced") for k in on["project_kinds"]},
+            "unresolved_lifecycle": [{"id": x["id"], "type": x["type"], "project_kind": x["project_kind"], "lifecycle_evidence": x["lifecycle_evidence"]}
+                                     for x in lifecycle if x["lifecycle"] == "unresolved"],
+            "unresolved_origin": [{"id": e["id"], "origin_evidence": list(e.get("origin_evidence") or [])}
+                                  for e in sorted(on["entities"], key=lambda e: e["id"]) if e["type"] == "company" and e.get("origin") == "unresolved"],
+            "official_targets": targets,
+            "open_gaps": [{"id": g["id"], "entities": list(g["entities"]), "assessed": g["assessed"], "assessed_fingerprint": g.get("assessed_fingerprint"),
+                           "has_entity_assessments": bool(g.get("entity_assessments"))} for g in open_gaps],
+            "entities_in_open_gaps": in_gaps,
+            "entity_assessments": [{"gap": g["id"], "assessments": g["entity_assessments"]} for g in gaps["gaps"] if g.get("entity_assessments")],
+            "announcement_only_relationships": [{"id": r["id"], "subject": r["subject"], "relationship": r["relationship"], "object": r["object"],
+                                                 "classification": r["classification"], "evidence": r["evidence"]} for r in self.announcement_only()],
+            "independent_analysis_relationships": [{"id": triple(r), "subject": r["subject"], "relationship": r["predicate"], "object": r["object"],
+                                                    "evidence": list(r["evidence"])}
+                                                   for r in sorted((r for r in self.relationships if r["classification"] == "INDEPENDENT ANALYSIS"),
+                                                                   key=lambda r: (r["subject"], r["predicate"], r["object"]))],
+            "records_unverified_claim": sorted(r["evidence_id"] for r in recs if r["classification"] == "UNVERIFIED CLAIM"),
+            "records_announced_plan": sorted(r["evidence_id"] for r in recs if r["classification"] == "ANNOUNCED PLAN"),
+            "records_partially_verified": sorted(r["evidence_id"] for r in recs if r["verification_status"] == "partial"),
+        }
+
+    def _check_reference(self):
+        """reference-state.json must hold exactly the fields this consumer recomputes (plus its scope, documentation and
+        derivation), each with a published rule, and each equal to its recomputed value."""
+        p = []
+        pub, mine = self.reference, self.reference_state()
+        meta = {"scope", "documentation", "derivation"}
+        for k in sorted(set(pub) - set(mine) - meta):
+            p.append(f"reference-state.json: field {k!r} is not one this consumer can recompute; it is not interpreted")
+        for k in sorted(set(mine) - set(pub)):
+            p.append(f"reference-state.json: field {k!r} is missing")
+        rules = pub.get("derivation") or {}
+        allowed = set(rules.get("provenance_values") or {})
+        for k in sorted(set(mine)):
+            paths = [f"{k}.{s}" for s in mine[k]] if k in ("counts", "lifecycle") else [k]
+            for path in paths:
+                r = rules.get(path)
+                if not isinstance(r, dict) or not r.get("rule") or r.get("provenance") not in allowed:
+                    p.append(f"reference-state.json: {path} has no published rule with a defined provenance")
+                elif r["provenance"] != "reproducible":
+                    p.append(f"reference-state.json: {path} is not marked reproducible, but this consumer recomputes it")
+        for k in sorted(set(mine) & set(pub)):
+            if pub[k] != mine[k]:
+                p.append(f"reference-state.json: {k} does not follow from the canonical files by its published rule")
+        return p
 
     def stage(self, eid):
         """An entity's lifecycle stage with the basis its status records declare, e.g. 'operational (public-availability-observed)'."""

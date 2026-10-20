@@ -306,7 +306,11 @@ class DefectsAreDetected(unittest.TestCase):
     def test_hashes_are_not_a_signature(self):
         # The limit, stated on /data/ and by the consumer: whoever can rewrite the files can re-sign the manifest.
         # A consistent edit with a re-signed manifest passes; only the cited sources establish accuracy.
+        # Since v0.10.0 the reference state records the canonical files' SHA-256, so the forger rewrites it too.
         self.copy.edit("/data/evidence.json", lambda d: d["records"][0].update(title="Altered and re-signed"))
+        digest = hashlib.sha256((self.copy.root / "data" / "evidence.json").read_bytes()).hexdigest()
+        self.copy.edit("/registry/reference-state.json",
+                       lambda d: next(x for x in d["derived_from"] if x["path"] == "/data/evidence.json").update(sha256=digest))
         code, out, err = self.copy.verify()
         self.assertEqual(code, 0, err)
         self.assertIn("the hashes are not a signature", out)
