@@ -383,11 +383,11 @@
  "derived_from": [
   {
    "path": "/data/evidence.json",
-   "sha256": "76a3e8b67a3387c77ffcece9c98a1fc2385fd3b74c4f08d9ed813bfdb3bb283b"
+   "sha256": "5b2554f3e060707fec4d1472edafc4b2326bb431a8e091a6c6b0ecf496ea9145"
   },
   {
    "path": "/data/ontology.json",
-   "sha256": "1fe5c5b2fdf877abb62c9d45749d0901f46ec2255a9ed83e7ba1a5b97b7189e6"
+   "sha256": "c685da3810fc40adb68e73e7421a3d84f2946fa0f9ff5ccdf1d41e0d9d455921"
   },
   {
    "path": "/data/gaps.json",
@@ -1087,7 +1087,7 @@
   "MAI-EV-0055",
   "MAI-EV-0056"
  ],
- "registry_version": "0.10.0",
+ "registry_version": "0.10.1",
  "scope": "Projections of the canonical registry data, each computed by a published rule. It describes what this registry records, not Morocco's AI ecosystem: an absent entity, record or stage is a gap in coverage. It carries no score, no aggregate evidence state, no conflict list and no measure of progress; it never changes a classification, a lifecycle stage or a gap's state.",
  "superseded_records": [
   {
