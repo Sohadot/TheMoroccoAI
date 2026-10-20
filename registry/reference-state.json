@@ -1,0 +1,1119 @@
+{
+ "announced_projects_by_kind": {
+  "agreement": [
+   "green-data-centres-agreement",
+   "um6p-data-centre-partnership"
+  ],
+  "ai-application": [
+   "deepecho-public-health-evaluation",
+   "swam-fraud-scoring"
+  ],
+  "compute-infrastructure": [
+   "nexus-ai-factory"
+  ],
+  "digital-platform": [],
+  "institute": [
+   "jazari-edutech",
+   "jazari-industrie-x0",
+   "jazari-institute-nador",
+   "jazari-root",
+   "jazari-smart-city"
+  ]
+ },
+ "announcement_only_relationships": [
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0028",
+    "MAI-EV-0027"
+   ],
+   "id": "aiox-labs|created|deepecho",
+   "object": "deepecho",
+   "relationship": "created",
+   "subject": "aiox-labs"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0029",
+    "MAI-EV-0028"
+   ],
+   "id": "deepecho|develops|deepecho-ultrasound-software",
+   "object": "deepecho-ultrasound-software",
+   "relationship": "develops",
+   "subject": "deepecho"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0033"
+   ],
+   "id": "deepecho|signatory_of|deepecho-public-health-evaluation",
+   "object": "deepecho-public-health-evaluation",
+   "relationship": "signatory_of",
+   "subject": "deepecho"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0030",
+    "MAI-EV-0044"
+   ],
+   "id": "ministry-digital-transition|signatory_of|nexus-ai-factory",
+   "object": "nexus-ai-factory",
+   "relationship": "signatory_of",
+   "subject": "ministry-digital-transition"
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "evidence": [
+    "MAI-EV-0033"
+   ],
+   "id": "ministry-health|operates|deepecho-public-health-evaluation",
+   "object": "deepecho-public-health-evaluation",
+   "relationship": "operates",
+   "subject": "ministry-health"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0033"
+   ],
+   "id": "ministry-health|signatory_of|deepecho-public-health-evaluation",
+   "object": "deepecho-public-health-evaluation",
+   "relationship": "signatory_of",
+   "subject": "ministry-health"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0030",
+    "MAI-EV-0044"
+   ],
+   "id": "nexus-core-systems|signatory_of|nexus-ai-factory",
+   "object": "nexus-ai-factory",
+   "relationship": "signatory_of",
+   "subject": "nexus-core-systems"
+  },
+  {
+   "classification": "ANNOUNCED PLAN",
+   "evidence": [
+    "MAI-EV-0036"
+   ],
+   "id": "swam|operates|swam-fraud-scoring",
+   "object": "swam-fraud-scoring",
+   "relationship": "operates",
+   "subject": "swam"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0016"
+   ],
+   "id": "um6p|created|ai-movement",
+   "object": "ai-movement",
+   "relationship": "created",
+   "subject": "um6p"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0028"
+   ],
+   "id": "um6p-ventures|invested_in|deepecho",
+   "object": "deepecho",
+   "relationship": "invested_in",
+   "subject": "um6p-ventures"
+  },
+  {
+   "classification": "VERIFIED FACT",
+   "evidence": [
+    "MAI-EV-0015"
+   ],
+   "id": "unesco|designated|ai-movement",
+   "object": "ai-movement",
+   "relationship": "designated",
+   "subject": "unesco"
+  }
+ ],
+ "as_of": "2026-10-20",
+ "counts": {
+  "entities": 65,
+  "entities_by_type": {
+   "company": 5,
+   "dataset": 1,
+   "event": 1,
+   "initiative": 3,
+   "institution": 19,
+   "legal_instrument": 1,
+   "model": 3,
+   "project": 14,
+   "sector": 8,
+   "technology": 10
+  },
+  "records": 63,
+  "records_by_classification": {
+   "ANNOUNCED PLAN": 4,
+   "INDEPENDENT ANALYSIS": 0,
+   "OFFICIAL TARGET": 10,
+   "UNVERIFIED CLAIM": 3,
+   "VERIFIED FACT": 46
+  },
+  "records_by_verification_status": {
+   "partial": 1,
+   "verified": 62
+  },
+  "relationships": 78,
+  "relationships_by_classification": {
+   "ANNOUNCED PLAN": 23,
+   "INDEPENDENT ANALYSIS": 4,
+   "OFFICIAL TARGET": 2,
+   "UNVERIFIED CLAIM": 0,
+   "VERIFIED FACT": 49
+  }
+ },
+ "derivation": {
+  "announced_projects_by_kind": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each entity's lifecycle stage and lifecycle_evidence (recorded, not derivable; the validator checks that a stage beyond announced cites a VERIFIED FACT declaring it)"
+   ],
+   "rule": "For each key of ontology.json project_kinds, the sorted ids of projects whose lifecycle is announced; an empty list when none. Announced means no record declaring a later stage is recorded here, not that the project was not delivered."
+  },
+  "announcement_only_relationships": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "The relationships and their cited records (recorded, not derivable)",
+    "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)"
+   ],
+   "rule": "The list published as relationships by the gap whose check is computed_relationships (announcement_only) in /registry/gaps/gaps.json, recomputed by the rules in /registry/matrix/matrix.json derivation.documentation_basis: id, subject, relationship, object, classification and evidence, in matrix row order."
+  },
+  "as_of": {
+   "provenance": "reproducible",
+   "rests_on": [],
+   "rule": "evidence.json as_of."
+  },
+  "conventions": "Lists are ordered as each rule states; ids compare as strings. Object keys are written sorted. An empty list means none is recorded in this registry, not that none exists. null means the field does not apply.",
+  "counts.entities": {
+   "provenance": "reproducible",
+   "rests_on": [],
+   "rule": "The number of entities in ontology.json."
+  },
+  "counts.entities_by_type": {
+   "provenance": "reproducible",
+   "rests_on": [],
+   "rule": "For each key of ontology.json entity_types, the number of entities of that type; 0 when none."
+  },
+  "counts.records": {
+   "provenance": "reproducible",
+   "rests_on": [],
+   "rule": "The number of records in evidence.json."
+  },
+  "counts.records_by_classification": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)"
+   ],
+   "rule": "For each key of evidence.json classifications, the number of records with that classification, superseded records included; 0 when none."
+  },
+  "counts.records_by_verification_status": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's verification_status (recorded, not derivable)"
+   ],
+   "rule": "For each key of evidence.json verification_statuses, the number of records with that verification_status; 0 when none."
+  },
+  "counts.relationships": {
+   "provenance": "reproducible",
+   "rests_on": [],
+   "rule": "The number of relationships in ontology.json."
+  },
+  "counts.relationships_by_classification": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)"
+   ],
+   "rule": "For each key of evidence.json classifications, the number of relationships in ontology.json with that classification; 0 when none."
+  },
+  "derived_from": {
+   "provenance": "reproducible",
+   "rests_on": [],
+   "rule": "For each file in this order, /data/evidence.json, /data/ontology.json, /data/gaps.json: its path and the SHA-256 of its bytes as published. These are the only inputs. The manifest is not an input: it is generated after this file and lists this file's own SHA-256."
+  },
+  "documentation": {
+   "provenance": "recorded-not-derivable",
+   "rests_on": [],
+   "rule": "The fixed path of the data reference page (/data/). It is contract metadata published with the snapshot; it is not derived from evidence.json, ontology.json or gaps.json."
+  },
+  "entities_in_open_gaps": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each gap's entities, state, assessed date, assessed_fingerprint and entity_assessments (recorded in data/gaps.json, not derivable; the build re-checks them)"
+   ],
+   "rule": "For each entity listed by an open gap, the ids of the open gaps listing it, in file order. Keys are entity ids. An entity not listed is not thereby complete."
+  },
+  "entity_assessments": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each gap's entities, state, assessed date, assessed_fingerprint and entity_assessments (recorded in data/gaps.json, not derivable; the build re-checks them)"
+   ],
+   "rule": "For every gap with entity_assessments, in file order: gap and assessments, a verbatim copy of the gap's entity_assessments as published in data/gaps.json and /registry/gaps/gaps.json, including any note. Their keys are written sorted; the display order of the dimensions is entity_assessment.dimension_order in /registry/gaps/gaps.json."
+  },
+  "independent_analysis_relationships": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "The relationships and their cited records (recorded, not derivable)",
+    "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)"
+   ],
+   "rule": "Every relationship classified INDEPENDENT ANALYSIS: id (subject|predicate|object), subject, relationship, object and evidence (its order kept), sorted by (subject, relationship, object). Each is an inference by the registry, labelled as such."
+  },
+  "lifecycle.by_type_and_kind": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each entity's lifecycle stage and lifecycle_evidence (recorded, not derivable; the validator checks that a stage beyond announced cites a VERIFIED FACT declaring it)"
+   ],
+   "rule": "lifecycle.entities counted by (type, project_kind, lifecycle): one entry per combination that occurs, with its count, sorted by type, then project_kind (null first), then lifecycle."
+  },
+  "lifecycle.entities": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each entity's lifecycle stage and lifecycle_evidence (recorded, not derivable; the validator checks that a stage beyond announced cites a VERIFIED FACT declaring it)",
+    "Each status record's status_basis (recorded, not derivable; the validator checks it against the operator and source rules)"
+   ],
+   "rule": "Every entity whose type has a lifecycle (project, model, dataset): id, type, project_kind (null for types without one), lifecycle, lifecycle_evidence (its order kept) and status_bases, the sorted distinct status_basis values of its lifecycle_evidence records whose status_evidence equals its lifecycle (empty when none). Sorted by id."
+  },
+  "not_included": [
+   "Any score, confidence or completeness measure, and any single evidence state per entity.",
+   "Any list or count of conflicts between sources: conflicts are recorded in gap statements and record notes, not in a governed field.",
+   "Any measure, count or statement of progress towards a target, of targets met or not met, or of indicators.",
+   "Any sum of amounts, including appropriations for different years.",
+   "Any rank computed by the registry, including a rank on the Online Services Index.",
+   "Any classification of entities by first-party sources.",
+   "domain, or any role, function or status of an actor inferred from it.",
+   "Free-text summaries, notes or statuses, except the notes inside the verbatim copy of entity_assessments; each entity's reasons are in ontology.json."
+  ],
+  "official_targets": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)",
+    "Each gap's entities, state, assessed date, assessed_fingerprint and entity_assessments (recorded in data/gaps.json, not derivable; the build re-checks them)"
+   ],
+   "rule": "Every record classified OFFICIAL TARGET, superseded or not, sorted by evidence_id: evidence_id, target_year and initiatives. initiatives lists each entity of type initiative among the record's related_entities, in that order, with covering_gap (the first gap in data/gaps.json order whose entities include it; null when none) and gap_state (that gap's state; null when none). Nothing here states whether a target was met: a gap's text, not this file, records what the registry establishes about progress."
+  },
+  "open_gaps": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each gap's entities, state, assessed date, assessed_fingerprint and entity_assessments (recorded in data/gaps.json, not derivable; the build re-checks them)"
+   ],
+   "rule": "Every gap in data/gaps.json whose state is open, in file order: id, entities (their order kept), assessed, assessed_fingerprint (null when the gap has no entities) and has_entity_assessments."
+  },
+  "operational_or_pilot": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each entity's lifecycle stage and lifecycle_evidence (recorded, not derivable; the validator checks that a stage beyond announced cites a VERIFIED FACT declaring it)",
+    "Each status record's status_basis (recorded, not derivable; the validator checks it against the operator and source rules)"
+   ],
+   "rule": "The entries of lifecycle.entities whose lifecycle is operational or pilot, with status_evidence_records (the entity's lifecycle_evidence records whose status_evidence equals its lifecycle, in lifecycle_evidence order) and counts_as_ai_deployment, true exactly when project_kind is ai-application: under ontology.json project_kinds, compute infrastructure is not by itself an AI application and a digital platform never counts as an AI deployment. Initiatives have no lifecycle and never appear. Sorted by id. A basis of public-availability-observed shows that a service was offered on a date, not that it is used."
+  },
+  "operational_or_pilot_by_status_basis": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each entity's lifecycle stage and lifecycle_evidence (recorded, not derivable; the validator checks that a stage beyond announced cites a VERIFIED FACT declaring it)",
+    "Each status record's status_basis (recorded, not derivable; the validator checks it against the operator and source rules)"
+   ],
+   "rule": "For each status_basis that occurs in operational_or_pilot status_evidence_records, the sorted ids of the entities with a status record on that basis. Keys are the bases (an entity can appear under more than one)."
+  },
+  "provenance_values": {
+   "recorded-not-derivable": "Fixed contract metadata recorded with this file; not derived from the canonical registry files. A consumer validates the published value against the approved contract statement rather than recomputing it.",
+   "reproducible": "Recomputed from the canonical files by the rule given. The values it copies or counts may themselves be recorded editorial judgments; rests_on names them."
+  },
+  "records_announced_plan": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)"
+   ],
+   "rule": "The sorted evidence_ids of records classified ANNOUNCED PLAN."
+  },
+  "records_partially_verified": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's verification_status (recorded, not derivable)"
+   ],
+   "rule": "The sorted evidence_ids of records whose verification_status is partial."
+  },
+  "records_unverified_claim": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)"
+   ],
+   "rule": "The sorted evidence_ids of records classified UNVERIFIED CLAIM."
+  },
+  "registry_version": {
+   "provenance": "reproducible",
+   "rests_on": [],
+   "rule": "evidence.json version."
+  },
+  "scope": {
+   "provenance": "recorded-not-derivable",
+   "rests_on": [],
+   "rule": "The approved fixed scope statement for this file. It is contract metadata published with the snapshot; it is not derived from evidence.json, ontology.json or gaps.json, and a change to those files never changes it."
+  },
+  "superseded_records": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each record's superseded_by (recorded, not derivable)"
+   ],
+   "rule": "Every record with a non-empty superseded_by: evidence_id and superseded_by (its order kept), sorted by evidence_id. A superseded record stays published and cannot set a lifecycle stage."
+  },
+  "unresolved_lifecycle": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each entity's lifecycle stage and lifecycle_evidence (recorded, not derivable; the validator checks that a stage beyond announced cites a VERIFIED FACT declaring it)"
+   ],
+   "rule": "Every entity whose lifecycle is unresolved: id, type, project_kind and lifecycle_evidence, sorted by id. The reason is in the entity's note in ontology.json. This concerns the lifecycle stage only."
+  },
+  "unresolved_origin": {
+   "provenance": "reproducible",
+   "rests_on": [
+    "Each company's origin and origin_evidence (recorded, not derivable)"
+   ],
+   "rule": "Every company whose origin is unresolved: id and origin_evidence, sorted by id. This concerns the company's origin only and is unrelated to unresolved_lifecycle."
+  }
+ },
+ "derived_from": [
+  {
+   "path": "/data/evidence.json",
+   "sha256": "76a3e8b67a3387c77ffcece9c98a1fc2385fd3b74c4f08d9ed813bfdb3bb283b"
+  },
+  {
+   "path": "/data/ontology.json",
+   "sha256": "1fe5c5b2fdf877abb62c9d45749d0901f46ec2255a9ed83e7ba1a5b97b7189e6"
+  },
+  {
+   "path": "/data/gaps.json",
+   "sha256": "cfb855054a969b23f779ebb2353e3b3ac8362207f6f5e530c76e74ac7292c670"
+  }
+ ],
+ "documentation": "/data/",
+ "entities_in_open_gaps": {
+  "digital-morocco-2030": [
+   "GAP-06"
+  ],
+  "green-data-centres-agreement": [
+   "GAP-04"
+  ],
+  "idarati-ai": [
+   "GAP-01"
+  ],
+  "jazari-edutech": [
+   "GAP-07"
+  ],
+  "jazari-industrie-x0": [
+   "GAP-07"
+  ],
+  "jazari-institute-nador": [
+   "GAP-07"
+  ],
+  "jazari-root": [
+   "GAP-07"
+  ],
+  "jazari-smart-city": [
+   "GAP-07"
+  ],
+  "morocco-ai-2030": [
+   "GAP-02"
+  ],
+  "nexus-ai-factory": [
+   "GAP-04"
+  ],
+  "toubkal-supercomputer": [
+   "GAP-03"
+  ],
+  "um6p-data-centre-partnership": [
+   "GAP-04"
+  ]
+ },
+ "entity_assessments": [
+  {
+   "assessments": [
+    {
+     "dimensions": {
+      "documented_discontinuation": [],
+      "documented_non_commencement": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-root",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_discontinuation": [],
+      "documented_non_commencement": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-edutech",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_discontinuation": [],
+      "documented_non_commencement": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-industrie-x0",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_discontinuation": [],
+      "documented_non_commencement": [],
+      "governance_event": [
+       "MAI-EV-0048"
+      ],
+      "legal_approval": [
+       "MAI-EV-0047"
+      ],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-smart-city",
+     "state": "open"
+    },
+    {
+     "dimensions": {
+      "documented_discontinuation": [],
+      "documented_non_commencement": [],
+      "governance_event": [],
+      "legal_approval": [],
+      "operational_activity": [],
+      "outputs": [],
+      "premises": [],
+      "staffing": []
+     },
+     "entity": "jazari-institute-nador",
+     "note": "A memorandum of understanding for the institute was signed on 2 July 2025 (MAI-EV-0005, MAI-EV-0019). No legal act establishing it is recorded in this registry; Bulletin Officiel 7534 contains none, which does not show that none exists.",
+     "state": "open"
+    }
+   ],
+   "gap": "GAP-07"
+  }
+ ],
+ "independent_analysis_relationships": [
+  {
+   "evidence": [
+    "MAI-EV-0024",
+    "MAI-EV-0027"
+   ],
+   "id": "aiox-labs|develops|darijabert",
+   "object": "darijabert",
+   "relationship": "develops",
+   "subject": "aiox-labs"
+  },
+  {
+   "evidence": [
+    "MAI-EV-0033",
+    "MAI-EV-0029"
+   ],
+   "id": "deepecho-public-health-evaluation|related_to|deepecho-ultrasound-software",
+   "object": "deepecho-ultrasound-software",
+   "relationship": "related_to",
+   "subject": "deepecho-public-health-evaluation"
+  },
+  {
+   "evidence": [
+    "MAI-EV-0018",
+    "MAI-EV-0011"
+   ],
+   "id": "first-national-ai-conference-2025|informs|morocco-ai-2030",
+   "object": "morocco-ai-2030",
+   "relationship": "informs",
+   "subject": "first-national-ai-conference-2025"
+  },
+  {
+   "evidence": [
+    "MAI-EV-0005",
+    "MAI-EV-0012"
+   ],
+   "id": "jazari-institute-nador|related_to|jazari-network",
+   "object": "jazari-network",
+   "relationship": "related_to",
+   "subject": "jazari-institute-nador"
+  }
+ ],
+ "lifecycle": {
+  "by_type_and_kind": [
+   {
+    "count": 1,
+    "lifecycle": "released",
+    "project_kind": null,
+    "type": "dataset"
+   },
+   {
+    "count": 3,
+    "lifecycle": "released",
+    "project_kind": null,
+    "type": "model"
+   },
+   {
+    "count": 2,
+    "lifecycle": "announced",
+    "project_kind": "agreement",
+    "type": "project"
+   },
+   {
+    "count": 2,
+    "lifecycle": "announced",
+    "project_kind": "ai-application",
+    "type": "project"
+   },
+   {
+    "count": 1,
+    "lifecycle": "operational",
+    "project_kind": "ai-application",
+    "type": "project"
+   },
+   {
+    "count": 1,
+    "lifecycle": "unresolved",
+    "project_kind": "ai-application",
+    "type": "project"
+   },
+   {
+    "count": 1,
+    "lifecycle": "announced",
+    "project_kind": "compute-infrastructure",
+    "type": "project"
+   },
+   {
+    "count": 1,
+    "lifecycle": "operational",
+    "project_kind": "compute-infrastructure",
+    "type": "project"
+   },
+   {
+    "count": 1,
+    "lifecycle": "operational",
+    "project_kind": "digital-platform",
+    "type": "project"
+   },
+   {
+    "count": 5,
+    "lifecycle": "announced",
+    "project_kind": "institute",
+    "type": "project"
+   }
+  ],
+  "entities": [
+   {
+    "id": "al-atlas",
+    "lifecycle": "released",
+    "lifecycle_evidence": [
+     "MAI-EV-0025"
+    ],
+    "project_kind": null,
+    "status_bases": [],
+    "type": "model"
+   },
+   {
+    "id": "atlas-chat",
+    "lifecycle": "released",
+    "lifecycle_evidence": [
+     "MAI-EV-0022"
+    ],
+    "project_kind": null,
+    "status_bases": [],
+    "type": "model"
+   },
+   {
+    "id": "darija-sft-mixture",
+    "lifecycle": "released",
+    "lifecycle_evidence": [
+     "MAI-EV-0023"
+    ],
+    "project_kind": null,
+    "status_bases": [],
+    "type": "dataset"
+   },
+   {
+    "id": "darijabert",
+    "lifecycle": "released",
+    "lifecycle_evidence": [
+     "MAI-EV-0024"
+    ],
+    "project_kind": null,
+    "status_bases": [],
+    "type": "model"
+   },
+   {
+    "id": "deepecho-public-health-evaluation",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0033"
+    ],
+    "project_kind": "ai-application",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "deepecho-ultrasound-software",
+    "lifecycle": "unresolved",
+    "lifecycle_evidence": [
+     "MAI-EV-0029",
+     "MAI-EV-0032",
+     "MAI-EV-0033"
+    ],
+    "project_kind": "ai-application",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "green-data-centres-agreement",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0006",
+     "MAI-EV-0019"
+    ],
+    "project_kind": "agreement",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "idarati-ai",
+    "lifecycle": "operational",
+    "lifecycle_evidence": [
+     "MAI-EV-0034",
+     "MAI-EV-0035",
+     "MAI-EV-0038"
+    ],
+    "project_kind": "ai-application",
+    "status_bases": [
+     "public-availability-observed"
+    ],
+    "type": "project"
+   },
+   {
+    "id": "jazari-edutech",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0012"
+    ],
+    "project_kind": "institute",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "jazari-industrie-x0",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0009"
+    ],
+    "project_kind": "institute",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "jazari-institute-nador",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0005",
+     "MAI-EV-0019"
+    ],
+    "project_kind": "institute",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "jazari-root",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0008",
+     "MAI-EV-0010"
+    ],
+    "project_kind": "institute",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "jazari-smart-city",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0012"
+    ],
+    "project_kind": "institute",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "nexus-ai-factory",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0030"
+    ],
+    "project_kind": "compute-infrastructure",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "sovereign-ai-marketplace",
+    "lifecycle": "operational",
+    "lifecycle_evidence": [
+     "MAI-EV-0034"
+    ],
+    "project_kind": "digital-platform",
+    "status_bases": [
+     "public-availability-observed"
+    ],
+    "type": "project"
+   },
+   {
+    "id": "swam-fraud-scoring",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0036"
+    ],
+    "project_kind": "ai-application",
+    "status_bases": [],
+    "type": "project"
+   },
+   {
+    "id": "toubkal-supercomputer",
+    "lifecycle": "operational",
+    "lifecycle_evidence": [
+     "MAI-EV-0020"
+    ],
+    "project_kind": "compute-infrastructure",
+    "status_bases": [
+     "independent-listing"
+    ],
+    "type": "project"
+   },
+   {
+    "id": "um6p-data-centre-partnership",
+    "lifecycle": "announced",
+    "lifecycle_evidence": [
+     "MAI-EV-0007",
+     "MAI-EV-0019"
+    ],
+    "project_kind": "agreement",
+    "status_bases": [],
+    "type": "project"
+   }
+  ]
+ },
+ "official_targets": [
+  {
+   "evidence_id": "MAI-EV-0002",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2030
+  },
+  {
+   "evidence_id": "MAI-EV-0011",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-02",
+     "gap_state": "open",
+     "id": "morocco-ai-2030"
+    }
+   ],
+   "target_year": 2030
+  },
+  {
+   "evidence_id": "MAI-EV-0049",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2030
+  },
+  {
+   "evidence_id": "MAI-EV-0050",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2026
+  },
+  {
+   "evidence_id": "MAI-EV-0051",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2030
+  },
+  {
+   "evidence_id": "MAI-EV-0052",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2026
+  },
+  {
+   "evidence_id": "MAI-EV-0053",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2030
+  },
+  {
+   "evidence_id": "MAI-EV-0058",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-02",
+     "gap_state": "open",
+     "id": "morocco-ai-2030"
+    }
+   ],
+   "target_year": 2030
+  },
+  {
+   "evidence_id": "MAI-EV-0062",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2030
+  },
+  {
+   "evidence_id": "MAI-EV-0063",
+   "initiatives": [
+    {
+     "covering_gap": "GAP-06",
+     "gap_state": "open",
+     "id": "digital-morocco-2030"
+    }
+   ],
+   "target_year": 2030
+  }
+ ],
+ "open_gaps": [
+  {
+   "assessed": "2026-10-19",
+   "assessed_fingerprint": "072120842339cd82",
+   "entities": [
+    "idarati-ai"
+   ],
+   "has_entity_assessments": false,
+   "id": "GAP-01"
+  },
+  {
+   "assessed": "2026-10-20",
+   "assessed_fingerprint": "d19d376594d36ed8",
+   "entities": [
+    "morocco-ai-2030"
+   ],
+   "has_entity_assessments": false,
+   "id": "GAP-02"
+  },
+  {
+   "assessed": "2026-10-19",
+   "assessed_fingerprint": "b3c140f9f6cf0450",
+   "entities": [
+    "toubkal-supercomputer"
+   ],
+   "has_entity_assessments": false,
+   "id": "GAP-03"
+  },
+  {
+   "assessed": "2026-10-19",
+   "assessed_fingerprint": "eb7e3a0314ac921e",
+   "entities": [
+    "nexus-ai-factory",
+    "green-data-centres-agreement",
+    "um6p-data-centre-partnership"
+   ],
+   "has_entity_assessments": false,
+   "id": "GAP-04"
+  },
+  {
+   "assessed": "2026-10-19",
+   "assessed_fingerprint": null,
+   "entities": [],
+   "has_entity_assessments": false,
+   "id": "GAP-05"
+  },
+  {
+   "assessed": "2026-10-20",
+   "assessed_fingerprint": "cdb898ad5ad8dfc7",
+   "entities": [
+    "digital-morocco-2030"
+   ],
+   "has_entity_assessments": false,
+   "id": "GAP-06"
+  },
+  {
+   "assessed": "2026-10-20",
+   "assessed_fingerprint": "d088b8596a699577",
+   "entities": [
+    "jazari-root",
+    "jazari-edutech",
+    "jazari-industrie-x0",
+    "jazari-smart-city",
+    "jazari-institute-nador"
+   ],
+   "has_entity_assessments": true,
+   "id": "GAP-07"
+  }
+ ],
+ "operational_or_pilot": [
+  {
+   "counts_as_ai_deployment": true,
+   "id": "idarati-ai",
+   "lifecycle": "operational",
+   "lifecycle_evidence": [
+    "MAI-EV-0034",
+    "MAI-EV-0035",
+    "MAI-EV-0038"
+   ],
+   "project_kind": "ai-application",
+   "status_bases": [
+    "public-availability-observed"
+   ],
+   "status_evidence_records": [
+    "MAI-EV-0034",
+    "MAI-EV-0035",
+    "MAI-EV-0038"
+   ],
+   "type": "project"
+  },
+  {
+   "counts_as_ai_deployment": false,
+   "id": "sovereign-ai-marketplace",
+   "lifecycle": "operational",
+   "lifecycle_evidence": [
+    "MAI-EV-0034"
+   ],
+   "project_kind": "digital-platform",
+   "status_bases": [
+    "public-availability-observed"
+   ],
+   "status_evidence_records": [
+    "MAI-EV-0034"
+   ],
+   "type": "project"
+  },
+  {
+   "counts_as_ai_deployment": false,
+   "id": "toubkal-supercomputer",
+   "lifecycle": "operational",
+   "lifecycle_evidence": [
+    "MAI-EV-0020"
+   ],
+   "project_kind": "compute-infrastructure",
+   "status_bases": [
+    "independent-listing"
+   ],
+   "status_evidence_records": [
+    "MAI-EV-0020"
+   ],
+   "type": "project"
+  }
+ ],
+ "operational_or_pilot_by_status_basis": {
+  "independent-listing": [
+   "toubkal-supercomputer"
+  ],
+  "public-availability-observed": [
+   "idarati-ai",
+   "sovereign-ai-marketplace"
+  ]
+ },
+ "records_announced_plan": [
+  "MAI-EV-0010",
+  "MAI-EV-0013",
+  "MAI-EV-0030",
+  "MAI-EV-0036"
+ ],
+ "records_partially_verified": [
+  "MAI-EV-0017"
+ ],
+ "records_unverified_claim": [
+  "MAI-EV-0003",
+  "MAI-EV-0055",
+  "MAI-EV-0056"
+ ],
+ "registry_version": "0.10.0",
+ "scope": "Projections of the canonical registry data, each computed by a published rule. It describes what this registry records, not Morocco's AI ecosystem: an absent entity, record or stage is a gap in coverage. It carries no score, no aggregate evidence state, no conflict list and no measure of progress; it never changes a classification, a lifecycle stage or a gap's state.",
+ "superseded_records": [
+  {
+   "evidence_id": "MAI-EV-0029",
+   "superseded_by": [
+    "MAI-EV-0032",
+    "MAI-EV-0039"
+   ]
+  }
+ ],
+ "unresolved_lifecycle": [
+  {
+   "id": "deepecho-ultrasound-software",
+   "lifecycle_evidence": [
+    "MAI-EV-0029",
+    "MAI-EV-0032",
+    "MAI-EV-0033"
+   ],
+   "project_kind": "ai-application",
+   "type": "project"
+  }
+ ],
+ "unresolved_origin": [
+  {
+   "id": "um6p-ventures",
+   "origin_evidence": []
+  }
+ ]
+}

@@ -1034,6 +1034,212 @@ def gap_derivation():
     }
 
 
+# ─── REFERENCE STATE ─────────────────────────────────────────────────────
+
+# The canonical files the reference state is computed from. It never reads the manifest, which lists the
+# reference state's own hash: the manifest is generated afterwards, so there is no cycle.
+REFERENCE_INPUTS = ("data/evidence.json", "data/ontology.json", "data/gaps.json")
+REFERENCE_SCOPE = registry.REFERENCE_SCOPE
+_EDITORIAL = {
+    "classification": "Each record's and relationship's classification (recorded in the canonical files; an editorial judgment checked by the validator, not derivable)",
+    "verification_status": "Each record's verification_status (recorded, not derivable)",
+    "superseded_by": "Each record's superseded_by (recorded, not derivable)",
+    "lifecycle": "Each entity's lifecycle stage and lifecycle_evidence (recorded, not derivable; the validator checks that a stage beyond announced cites a VERIFIED FACT declaring it)",
+    "status_basis": "Each status record's status_basis (recorded, not derivable; the validator checks it against the operator and source rules)",
+    "origin": "Each company's origin and origin_evidence (recorded, not derivable)",
+    "gaps": "Each gap's entities, state, assessed date, assessed_fingerprint and entity_assessments (recorded in data/gaps.json, not derivable; the build re-checks them)",
+    "relationships": "The relationships and their cited records (recorded, not derivable)",
+}
+
+
+def reference_derivation():
+    """The rule for every field of reference-state.json, published with it so that a consumer can recompute each
+    reproducible field from evidence.json, ontology.json and gaps.json without this code, and validate fixed contract metadata."""
+    def field(rule, *rests_on):
+        return {"provenance": "reproducible", "rule": rule, "rests_on": [_EDITORIAL[k] for k in rests_on]}
+
+    def recorded(rule):
+        return {"provenance": "recorded-not-derivable", "rule": rule, "rests_on": []}
+
+    return {
+        "provenance_values": {
+            "reproducible": ("Recomputed from the canonical files by the rule given. The values it copies or counts may themselves be "
+                             "recorded editorial judgments; rests_on names them."),
+            "recorded-not-derivable": ("Fixed contract metadata recorded with this file; not derived from the canonical registry files. "
+                                      "A consumer validates the published value against the approved contract statement rather than recomputing it."),
+        },
+        "conventions": ("Lists are ordered as each rule states; ids compare as strings. Object keys are written sorted. An empty list "
+                        "means none is recorded in this registry, not that none exists. null means the field does not apply."),
+        "scope": recorded("The approved fixed scope statement for this file. It is contract metadata published with the snapshot; it is "
+                          "not derived from evidence.json, ontology.json or gaps.json, and a change to those files never changes it."),
+        "documentation": recorded("The fixed path of the data reference page (/data/). It is contract metadata published with the snapshot; "
+                                  "it is not derived from evidence.json, ontology.json or gaps.json."),
+        "registry_version": field("evidence.json version."),
+        "as_of": field("evidence.json as_of."),
+        "derived_from": field("For each file in this order, " + ", ".join("/" + p for p in REFERENCE_INPUTS) + ": its path and the SHA-256 "
+                              "of its bytes as published. These are the only inputs. The manifest is not an input: it is generated after this "
+                              "file and lists this file's own SHA-256."),
+        "counts.records_by_classification": field("For each key of evidence.json classifications, the number of records with that "
+                                                  "classification, superseded records included; 0 when none.", "classification"),
+        "counts.records_by_verification_status": field("For each key of evidence.json verification_statuses, the number of records with "
+                                                       "that verification_status; 0 when none.", "verification_status"),
+        "counts.relationships_by_classification": field("For each key of evidence.json classifications, the number of relationships in "
+                                                        "ontology.json with that classification; 0 when none.", "classification"),
+        "counts.entities_by_type": field("For each key of ontology.json entity_types, the number of entities of that type; 0 when none."),
+        "counts.records": field("The number of records in evidence.json."),
+        "counts.entities": field("The number of entities in ontology.json."),
+        "counts.relationships": field("The number of relationships in ontology.json."),
+        "superseded_records": field("Every record with a non-empty superseded_by: evidence_id and superseded_by (its order kept), sorted "
+                                    "by evidence_id. A superseded record stays published and cannot set a lifecycle stage.", "superseded_by"),
+        "lifecycle.entities": field("Every entity whose type has a lifecycle (project, model, dataset): id, type, project_kind (null "
+                                    "for types without one), lifecycle, lifecycle_evidence (its order kept) and status_bases, the sorted "
+                                    "distinct status_basis values of its lifecycle_evidence records whose status_evidence equals its lifecycle "
+                                    "(empty when none). Sorted by id.", "lifecycle", "status_basis"),
+        "lifecycle.by_type_and_kind": field("lifecycle.entities counted by (type, project_kind, lifecycle): one entry per combination "
+                                            "that occurs, with its count, sorted by type, then project_kind (null first), then lifecycle.",
+                                            "lifecycle"),
+        "operational_or_pilot": field("The entries of lifecycle.entities whose lifecycle is operational or pilot, with "
+                                      "status_evidence_records (the entity's lifecycle_evidence records whose status_evidence equals its lifecycle, "
+                                      "in lifecycle_evidence order) and counts_as_ai_deployment, true exactly when project_kind is ai-application: "
+                                      "under ontology.json project_kinds, compute infrastructure is not by itself an AI application and a digital "
+                                      "platform never counts as an AI deployment. Initiatives have no lifecycle and never appear. Sorted by id. "
+                                      "A basis of public-availability-observed shows that a service was offered on a date, not that it is used.",
+                                      "lifecycle", "status_basis"),
+        "operational_or_pilot_by_status_basis": field("For each status_basis that occurs in operational_or_pilot status_evidence_records, "
+                                                      "the sorted ids of the entities with a status record on that basis. Keys are the "
+                                                      "bases (an entity can appear under more than one).", "lifecycle", "status_basis"),
+        "announced_projects_by_kind": field("For each key of ontology.json project_kinds, the sorted ids of projects whose lifecycle is "
+                                            "announced; an empty list when none. Announced means no record declaring a later stage is "
+                                            "recorded here, not that the project was not delivered.", "lifecycle"),
+        "unresolved_lifecycle": field("Every entity whose lifecycle is unresolved: id, type, project_kind and lifecycle_evidence, "
+                                      "sorted by id. The reason is in the entity's note in ontology.json. This concerns the lifecycle "
+                                      "stage only.", "lifecycle"),
+        "unresolved_origin": field("Every company whose origin is unresolved: id and origin_evidence, sorted by id. This concerns the "
+                                   "company's origin only and is unrelated to unresolved_lifecycle.", "origin"),
+        "official_targets": field("Every record classified OFFICIAL TARGET, superseded or not, sorted by evidence_id: evidence_id, "
+                                  "target_year and initiatives. initiatives lists each entity of type initiative among the record's "
+                                  "related_entities, in that order, with covering_gap (the first gap in data/gaps.json order whose entities "
+                                  "include it; null when none) and gap_state (that gap's state; null when none). Nothing here states "
+                                  "whether a target was met: a gap's text, not this file, records what the registry establishes about "
+                                  "progress.", "classification", "gaps"),
+        "open_gaps": field("Every gap in data/gaps.json whose state is open, in file order: id, entities (their order kept), assessed, "
+                           "assessed_fingerprint (null when the gap has no entities) and has_entity_assessments.", "gaps"),
+        "entities_in_open_gaps": field("For each entity listed by an open gap, the ids of the open gaps listing it, in file order. Keys "
+                                       "are entity ids. An entity not listed is not thereby complete.", "gaps"),
+        "entity_assessments": field("For every gap with entity_assessments, in file order: gap and assessments, a verbatim copy of the "
+                                    "gap's entity_assessments as published in data/gaps.json and /registry/gaps/gaps.json, including any note. Their keys are written "
+                                    "sorted; the display order of the dimensions is entity_assessment.dimension_order in /registry/gaps/gaps.json.", "gaps"),
+        "announcement_only_relationships": field("The list published as relationships by the gap whose check is computed_relationships "
+                                                 "(announcement_only) in /registry/gaps/gaps.json, recomputed by the rules in "
+                                                 "/registry/matrix/matrix.json derivation.documentation_basis: id, subject, relationship, "
+                                                 "object, classification and evidence, in matrix row order.", "relationships", "classification"),
+        "independent_analysis_relationships": field("Every relationship classified INDEPENDENT ANALYSIS: id (subject|predicate|object), "
+                                                    "subject, relationship, object and evidence (its order kept), sorted by (subject, "
+                                                    "relationship, object). Each is an inference by the registry, labelled as such.",
+                                                    "relationships", "classification"),
+        "records_unverified_claim": field("The sorted evidence_ids of records classified UNVERIFIED CLAIM.", "classification"),
+        "records_announced_plan": field("The sorted evidence_ids of records classified ANNOUNCED PLAN.", "classification"),
+        "records_partially_verified": field("The sorted evidence_ids of records whose verification_status is partial.", "verification_status"),
+        "not_included": [
+            "Any score, confidence or completeness measure, and any single evidence state per entity.",
+            "Any list or count of conflicts between sources: conflicts are recorded in gap statements and record notes, not in a governed field.",
+            "Any measure, count or statement of progress towards a target, of targets met or not met, or of indicators.",
+            "Any sum of amounts, including appropriations for different years.",
+            "Any rank computed by the registry, including a rank on the Online Services Index.",
+            "Any classification of entities by first-party sources.",
+            "domain, or any role, function or status of an actor inferred from it.",
+            "Free-text summaries, notes or statuses, except the notes inside the verbatim copy of entity_assessments; each entity's reasons are in ontology.json.",
+        ],
+    }
+
+
+def _status_records(model, e):
+    return [x for x in e.get("lifecycle_evidence") or [] if model.records[x].get("status_evidence") == e["lifecycle"]]
+
+
+def reference_state(model, gaps, canonical):
+    """The reference snapshot: projections of the canonical data by the rules in reference_derivation. canonical maps each
+    REFERENCE_INPUTS path to its published bytes; the manifest is never read."""
+    ev, on = model.evidence, model.ontology
+    classes, statuses = list(ev["classifications"]), list(ev["verification_statuses"])
+    lifecycle = []
+    for e in sorted((e for e in on["entities"] if e["type"] in registry.LIFECYCLE_TYPES), key=lambda e: e["id"]):
+        lifecycle.append({"id": e["id"], "type": e["type"], "project_kind": e.get("project_kind"), "lifecycle": e["lifecycle"],
+                          "lifecycle_evidence": list(e.get("lifecycle_evidence") or []),
+                          "status_bases": sorted({model.records[x]["status_basis"] for x in _status_records(model, e)
+                                                  if model.records[x].get("status_basis")})})
+    combos = {}
+    for x in lifecycle:
+        k = (x["type"], x["project_kind"], x["lifecycle"])
+        combos[k] = combos.get(k, 0) + 1
+    by_kind = [{"type": t, "project_kind": k, "lifecycle": s, "count": n}
+               for (t, k, s), n in sorted(combos.items(), key=lambda kv: (kv[0][0], kv[0][1] or "", kv[0][2]))]
+    operating = []
+    for x in lifecycle:
+        if x["lifecycle"] in registry.OPERATING_STAGES:
+            operating.append({**x, "status_evidence_records": _status_records(model, model.entities[x["id"]]),
+                              "counts_as_ai_deployment": x["project_kind"] == "ai-application"})
+    by_basis = {}
+    for x in operating:
+        for b in sorted({model.records[r]["status_basis"] for r in x["status_evidence_records"] if model.records[r].get("status_basis")}):
+            by_basis.setdefault(b, []).append(x["id"])
+    open_gaps = [g for g in gaps["gaps"] if g["state"] == "open"]
+    in_gaps = {}
+    for g in open_gaps:
+        for e in g["entities"]:
+            in_gaps.setdefault(e, []).append(g["id"])
+    targets = []
+    for r in sorted((r for r in ev["records"] if r["classification"] == "OFFICIAL TARGET"), key=lambda r: r["evidence_id"]):
+        inits = []
+        for i in (e for e in r["related_entities"] if model.entities[e]["type"] == "initiative"):
+            gap = next((g for g in gaps["gaps"] if i in g["entities"]), None)
+            inits.append({"id": i, "covering_gap": gap["id"] if gap else None, "gap_state": gap["state"] if gap else None})
+        targets.append({"evidence_id": r["evidence_id"], "target_year": r["target_year"], "initiatives": inits})
+    announcement_only = [{"id": f'{r["subject"]}|{r["predicate"]}|{r["object"]}', "subject": r["subject"], "relationship": r["predicate"],
+                          "object": r["object"], "classification": r["classification"], "evidence": list(r["evidence"])}
+                         for r in sorted(registry.announcement_only(on, ev), key=lambda r: (r["subject"], r["predicate"], r["object"]))]
+    inferred = [{"id": f'{r["subject"]}|{r["predicate"]}|{r["object"]}', "subject": r["subject"], "relationship": r["predicate"],
+                 "object": r["object"], "evidence": list(r["evidence"])}
+                for r in sorted((r for r in on["relationships"] if r["classification"] == "INDEPENDENT ANALYSIS"),
+                                key=lambda r: (r["subject"], r["predicate"], r["object"]))]
+    return {
+        "registry_version": ev["version"], "as_of": ev["as_of"], "scope": REFERENCE_SCOPE,
+        "documentation": registry.REFERENCE_DOCUMENTATION,
+        "derived_from": [{"path": "/" + p, "sha256": hashlib.sha256(canonical[p]).hexdigest()} for p in REFERENCE_INPUTS],
+        "derivation": reference_derivation(),
+        "counts": {
+            "records": len(ev["records"]), "entities": len(on["entities"]), "relationships": len(on["relationships"]),
+            "records_by_classification": {c: sum(1 for r in ev["records"] if r["classification"] == c) for c in classes},
+            "records_by_verification_status": {s: sum(1 for r in ev["records"] if r["verification_status"] == s) for s in statuses},
+            "relationships_by_classification": {c: sum(1 for r in on["relationships"] if r["classification"] == c) for c in classes},
+            "entities_by_type": {t: sum(1 for e in on["entities"] if e["type"] == t) for t in on["entity_types"]},
+        },
+        "superseded_records": [{"evidence_id": r["evidence_id"], "superseded_by": list(r["superseded_by"])}
+                               for r in sorted(ev["records"], key=lambda r: r["evidence_id"]) if r.get("superseded_by")],
+        "lifecycle": {"entities": lifecycle, "by_type_and_kind": by_kind},
+        "operational_or_pilot": operating,
+        "operational_or_pilot_by_status_basis": by_basis,
+        "announced_projects_by_kind": {k: sorted(e["id"] for e in on["entities"] if e["type"] == "project"
+                                                 and e.get("project_kind") == k and e.get("lifecycle") == "announced")
+                                       for k in on["project_kinds"]},
+        "unresolved_lifecycle": [{"id": x["id"], "type": x["type"], "project_kind": x["project_kind"], "lifecycle_evidence": x["lifecycle_evidence"]}
+                                 for x in lifecycle if x["lifecycle"] == "unresolved"],
+        "unresolved_origin": [{"id": e["id"], "origin_evidence": list(e.get("origin_evidence") or [])}
+                              for e in sorted(on["entities"], key=lambda e: e["id"]) if e["type"] == "company" and e.get("origin") == "unresolved"],
+        "official_targets": targets,
+        "open_gaps": [{"id": g["id"], "entities": list(g["entities"]), "assessed": g["assessed"],
+                       "assessed_fingerprint": g.get("assessed_fingerprint"), "has_entity_assessments": bool(g.get("entity_assessments"))}
+                      for g in open_gaps],
+        "entities_in_open_gaps": in_gaps,
+        "entity_assessments": [{"gap": g["id"], "assessments": g["entity_assessments"]} for g in gaps["gaps"] if g.get("entity_assessments")],
+        "announcement_only_relationships": announcement_only,
+        "independent_analysis_relationships": inferred,
+        "records_unverified_claim": sorted(r["evidence_id"] for r in ev["records"] if r["classification"] == "UNVERIFIED CLAIM"),
+        "records_announced_plan": sorted(r["evidence_id"] for r in ev["records"] if r["classification"] == "ANNOUNCED PLAN"),
+        "records_partially_verified": sorted(r["evidence_id"] for r in ev["records"] if r["verification_status"] == "partial"),
+    }
+
+
 def render_gaps(model, gaps):
     items = gap_register(model, gaps)
     arts = []
@@ -1124,6 +1330,7 @@ RESOURCES = (
     ("data/changelog.json", "canonical", "Published registry versions, corrections, and the commit or pull request behind each."),
     ("registry/matrix/matrix.json", "derived", "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row."),
     ("registry/gaps/gaps.json", "derived", "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json."),
+    ("registry/reference-state.json", "derived", "Reference projections of the canonical data (counts, lifecycle and status-basis projections, official target records with their covering gap, open gaps, entity assessments, announcement-only and inferred relationships), each with its published rule and the SHA-256 of the canonical files it was computed from. No scores, conflicts or progress."),
 )
 CONSUMER = "examples/registry_consumer.py"
 # Changes that make data valid under one version invalid under another. Each is listed in the manifest, on /data/
@@ -1199,6 +1406,9 @@ def render_data_reference(model, gaps, man):
         ["That no recorded evidence measures progress towards the targets of Morocco AI 2030 or Digital Morocco 2030", "Editorial assessment", "GAP-02 and GAP-06 are open because an editor judged that their assessed records quantify no progress: for Morocco AI 2030 these include the ministry's presentation of main advances (MAI-EV-0040); for Digital Morocco 2030, a statement about digital spending (MAI-EV-0003), which is an unchecked input figure, not progress. No data check backs this judgment; a consumer can confirm that the data it rests on has not changed since (its digest) but cannot re-derive the judgment"],
         ["That every strategy with an official target has a gap on its progress", "Reproducible", "The build refuses to publish an initiative related to an OFFICIAL TARGET record that no gap's entities include"],
     ]
+    ref = reference_derivation()
+    ref_rows = [[f"<code>{escape(k)}</code>", escape(v["provenance"].replace("-", " ").capitalize()), escape(v["rule"])]
+                for k, v in ref.items() if isinstance(v, dict) and "provenance" in v]
     body = f"""<header class="page-head">
   <p class="breadcrumb"><a href="/registry/">Registry</a> / Data</p>
   <p class="label">MAI-DATA — Registry v{escape(ver)} · as of {escape(human_date(model.as_of))}</p>
@@ -1270,12 +1480,17 @@ def render_data_reference(model, gaps, man):
   {_table("Q8: what can be recomputed", ["Part of the answer", "Status", "From"], q8_rows, "")}
   <h3 id="d7-q9">Q9: official targets and recorded progress</h3>
   {_table("Q9: what can be recomputed", ["Part of the answer", "Status", "From"], q9_rows, "")}
+  <h3 id="d7-ref">Reference state</h3>
+  <p class="prose"><a href="/registry/reference-state.json">reference-state.json</a> publishes projections of the canonical data, each with its rule under <code>derivation</code> and the SHA-256 of the canonical files it was computed from (<code>derived_from</code>). It is computed from those files only; the manifest, which lists the reference state's own SHA-256, is generated after it. Every reference projection is reproducible from the published canonical data. Fixed contract metadata is explicitly labelled recorded-not-derivable. Where a field copies or counts a recorded editorial judgment (a classification, a lifecycle stage, a gap's state), its rule names that judgment under <code>rests_on</code>. It describes what this registry records, not Morocco's AI ecosystem.</p>
+  {_table("Reference state: what can be recomputed", ["Field", "Status", "Rule"], ref_rows, "")}
+  <p class="prose">It deliberately does not include:</p>
+  <ul class="prose">{"".join(f"<li>{escape(x)}</li>" for x in ref["not_included"])}</ul>
 </section>
 <section aria-labelledby="d8-h">
   <h2 id="d8-h"><span class="section-number">08</span>Checking the data yourself</h2>
   <p class="prose"><a href="/{CONSUMER}"><code>/{CONSUMER}</code></a> (also in the <a href="{repo}/blob/main/{CONSUMER}" rel="noopener">repository</a>) reads only the published JSON. It uses the Python 3.10+ standard library and does not import this site's code. It stops with an error if a reference is missing, a value is undefined or the files do not belong to the same build.</p>
   <ul class="prose">
-    <li><code>python3 registry_consumer.py verify</code>: checks the manifest and every reference. It also recomputes the matrix, the GAP-05 list, each gap's data checks and digest, and compares them with the published files.</li>
+    <li><code>python3 registry_consumer.py verify</code>: checks the manifest and every reference. It also recomputes the matrix, the GAP-05 list, each gap's data checks and digest, and every reproducible field of reference-state.json, validates its fixed contract metadata, and compares them with the published files.</li>
     <li><code>python3 registry_consumer.py relationship ministry-digital-transition operates idarati-ai</code>: a relationship, its classification, and each supporting record with its source, dates and limits.</li>
     <li><code>python3 registry_consumer.py gap GAP-03</code>: what a gap establishes and does not, with the result of its data checks.</li>
     <li><code>python3 registry_consumer.py q8</code> and <code>q9</code>: the reproducible parts of those answers.</li>
@@ -1616,6 +1831,8 @@ def outputs(model):
         "acquisition/index.html": render_acquisition(model),
         "sitemap.xml": sitemap(model),
     }
+    canonical = {p: (ROOT / p).read_bytes() for p in REFERENCE_INPUTS}
+    files["registry/reference-state.json"] = _json(reference_state(model, gaps, canonical))
     files["data/manifest.json"] = _json(manifest(model, files))
     files["data/index.html"] = render_data_reference(model, gaps, json.loads(files["data/manifest.json"]))
     for eid, e in model.entities.items():
@@ -1633,6 +1850,11 @@ def main(argv):
             print("ERROR", e)
         return 1
     files = outputs(Model(evidence, ontology))
+    errors = registry.validate_reference_state(json.loads(files["registry/reference-state.json"]), evidence, ontology)
+    if errors:
+        for e in errors:
+            print("ERROR", e)
+        return 1
     expected_dirs = {str(Path(p).parent) for p in files if p.startswith("registry/")}
     stale_dirs = [d for d in (ROOT / "registry").glob("*/") if str(d.relative_to(ROOT)) not in expected_dirs] \
         if (ROOT / "registry").exists() else []

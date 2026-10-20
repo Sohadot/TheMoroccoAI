@@ -800,6 +800,97 @@ def validate_gaps(gaps, evidence, ontology):
     return errors
 
 
+# The fields of registry/reference-state.json. Anything else is refused: the file carries only projections that a
+# published rule derives from the canonical data, plus fixed contract metadata labelled recorded-not-derivable.
+REFERENCE_FIELDS = ("registry_version", "as_of", "scope", "documentation", "derived_from", "derivation", "counts",
+                    "superseded_records", "lifecycle", "operational_or_pilot", "operational_or_pilot_by_status_basis",
+                    "announced_projects_by_kind", "unresolved_lifecycle", "unresolved_origin", "official_targets", "open_gaps",
+                    "entities_in_open_gaps", "entity_assessments", "announcement_only_relationships",
+                    "independent_analysis_relationships", "records_unverified_claim", "records_announced_plan",
+                    "records_partially_verified")
+# The structural self-description container: it holds the rules and is exempt from requiring a derivation rule for itself.
+REFERENCE_UNDERIVED = ("derivation",)
+# Fixed contract metadata: recorded with the file, not derived from the canonical registry files.
+REFERENCE_RECORDED = ("scope", "documentation")
+REFERENCE_DOCUMENTATION = "/data/"
+REFERENCE_SCOPE = ("Projections of the canonical registry data, each computed by a published rule. It describes what this registry "
+                   "records, not Morocco's AI ecosystem: an absent entity, record or stage is a gap in coverage. It carries no score, "
+                   "no aggregate evidence state, no conflict list and no measure of progress; it never changes a classification, "
+                   "a lifecycle stage or a gap's state.")
+REFERENCE_SUBFIELDS = {"counts": ("records", "entities", "relationships", "records_by_classification", "records_by_verification_status",
+                                  "relationships_by_classification", "entities_by_type"),
+                       "lifecycle": ("entities", "by_type_and_kind")}
+REFERENCE_PROVENANCE = ("reproducible", "recorded-not-derivable")
+# Key names that would carry a judgment the data does not encode: a score, an aggregate state, a conflict, progress,
+# a computed rank, a sum, a role inferred from domain, or first-party classification.
+REFERENCE_FORBIDDEN_KEY = re.compile(r"score|confiden|complete|evidence_state|conflict|progress|achiev|met\b|rank|sum\b|total|"
+                                     r"cumulative|domain|role|function|funder|regulator|first_party|indicator|summary", re.IGNORECASE)
+# Maps keyed by identifiers (entity ids, status bases, classifications, types, kinds), whose keys are data, not field names.
+REFERENCE_ID_KEYED = ("entities_in_open_gaps", "operational_or_pilot_by_status_basis", "announced_projects_by_kind",
+                      "records_by_classification", "records_by_verification_status", "relationships_by_classification",
+                      "entities_by_type", "assessments", "dimensions")
+
+
+def validate_reference_state(snapshot, evidence, ontology):
+    """The reference snapshot must hold exactly its published fields, each with a rule, no field name that would carry
+    a judgment the data does not encode, and projections that never upgrade the canonical data."""
+    errors = []
+    where = "reference-state.json:"
+    keys = set(snapshot)
+    for k in sorted(keys - set(REFERENCE_FIELDS)):
+        errors.append(f"{where} field {k!r} is not part of the published contract")
+    for k in sorted(set(REFERENCE_FIELDS) - keys):
+        errors.append(f"{where} field {k!r} is missing")
+    if snapshot.get("scope") != REFERENCE_SCOPE:
+        errors.append(f"{where} scope must equal the approved fixed scope statement")
+    if snapshot.get("documentation") != REFERENCE_DOCUMENTATION:
+        errors.append(f"{where} documentation must equal {REFERENCE_DOCUMENTATION!r}")
+    derivation = snapshot.get("derivation") or {}
+    for k in REFERENCE_FIELDS:
+        if k in REFERENCE_UNDERIVED:
+            continue
+        paths = [f"{k}.{s}" for s in REFERENCE_SUBFIELDS[k]] if k in REFERENCE_SUBFIELDS else [k]
+        for path in paths:
+            rule = derivation.get(path)
+            if not isinstance(rule, dict) or not str(rule.get("rule", "")).strip():
+                errors.append(f"{where} {path} has no published derivation rule")
+            elif rule.get("provenance") not in REFERENCE_PROVENANCE:
+                errors.append(f"{where} {path} provenance must be one of {', '.join(REFERENCE_PROVENANCE)}")
+            elif k in REFERENCE_RECORDED and rule.get("provenance") != "recorded-not-derivable":
+                errors.append(f"{where} {path} must have provenance recorded-not-derivable")
+            elif k not in REFERENCE_RECORDED and rule.get("provenance") != "reproducible":
+                errors.append(f"{where} {path} must have provenance reproducible")
+    for k, sub in REFERENCE_SUBFIELDS.items():
+        if set(snapshot.get(k) or {}) != set(sub):
+            errors.append(f"{where} {k} must hold exactly {', '.join(sub)}")
+
+    def scan(value, path):
+        if isinstance(value, dict):
+            for key, v in value.items():
+                if path.split(".")[-1] not in REFERENCE_ID_KEYED and REFERENCE_FORBIDDEN_KEY.search(str(key)):
+                    errors.append(f"{where} field name {path}.{key} is not allowed: the registry does not encode what it would carry")
+                scan(v, f"{path}.{key}")
+        elif isinstance(value, list):
+            for v in value:
+                scan(v, path)
+
+    scan({k: v for k, v in snapshot.items() if k != "derivation"}, "")
+    entities = {e["id"]: e for e in ontology.get("entities") or []}
+    records = {r["evidence_id"]: r for r in evidence.get("records") or []}
+    for x in snapshot.get("operational_or_pilot") or []:
+        e = entities.get(x.get("id"))
+        if not e or e.get("type") not in LIFECYCLE_TYPES or e.get("lifecycle") not in OPERATING_STAGES or x.get("lifecycle") != e.get("lifecycle"):
+            errors.append(f"{where} operational_or_pilot lists {x.get('id')!r}, which has no operational or pilot lifecycle")
+            continue
+        if x.get("counts_as_ai_deployment") is not (e.get("project_kind") == "ai-application"):
+            errors.append(f"{where} {x['id']} counts_as_ai_deployment must be true exactly for project_kind ai-application")
+        declaring = [r for r in x.get("status_evidence_records") or [] if records.get(r, {}).get("status_evidence") == e["lifecycle"]
+                     and records[r].get("classification") == "VERIFIED FACT" and r in (e.get("lifecycle_evidence") or [])]
+        if not declaring or len(declaring) != len(x.get("status_evidence_records") or []):
+            errors.append(f"{where} {x['id']} status_evidence_records must be VERIFIED FACT lifecycle_evidence declaring '{e['lifecycle']}'")
+    return errors
+
+
 def validate(evidence, ontology, today=None):
     return validate_evidence(evidence, today) + validate_ontology(ontology, evidence)
 
