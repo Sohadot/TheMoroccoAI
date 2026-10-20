@@ -1,7 +1,7 @@
 {
   "ontology": "TheMoroccoAI Ontology",
-  "version": "0.6.0",
-  "as_of": "2026-10-19",
+  "version": "0.7.0",
+  "as_of": "2026-10-20",
   "description": "Entities and relationships of Morocco's AI ecosystem, each tied to records in evidence.json. Chain: Institution → Initiative → Project → Evidence → Technology → Sector.",
   "entity_types": {
     "institution": "A public body, university, research centre, regulator, business association, open-source initiative or international organisation.",
@@ -88,7 +88,7 @@
       "summary": "The government department that launched Digital Morocco 2030 in September 2024, organised the First National AI Conference in July 2025 and presented the Morocco AI 2030 roadmap in September 2026.",
       "status": "Named in sources up to September 2026. See the note on the October 2026 government.",
       "note": "The government appointed on 16 October 2026 includes a Minister of Artificial Intelligence, Digital Transformation and Administration Reform. The registry has not yet verified whether that ministry takes over this department's portfolio.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040", "MAI-EV-0044", "MAI-EV-0045", "MAI-EV-0047"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0004", "MAI-EV-0005", "MAI-EV-0006", "MAI-EV-0007", "MAI-EV-0008", "MAI-EV-0009", "MAI-EV-0010", "MAI-EV-0011", "MAI-EV-0012", "MAI-EV-0013", "MAI-EV-0019", "MAI-EV-0030", "MAI-EV-0034", "MAI-EV-0035", "MAI-EV-0038", "MAI-EV-0040", "MAI-EV-0044", "MAI-EV-0045", "MAI-EV-0047", "MAI-EV-0048", "MAI-EV-0049"]
     },
     {
       "id": "ministry-ai-digital-transformation",
@@ -224,9 +224,9 @@
       "name": "Digital Morocco 2030",
       "alt_names": ["Maroc Digital 2030", "Morocco Digital 2030"],
       "domain": "government-policy",
-      "summary": "National digital strategy launched on 25 September 2024. Its official targets include 240,000 direct jobs in 2030 and a rise from 113th to 50th place in the e-government development index.",
+      "summary": "National digital strategy launched on 25 September 2024. Its official targets include 240,000 direct jobs and a rise from 113th to 50th place worldwide on the United Nations ranking of online public services, which the strategy's brochure defines as the Online Services Index, a component of the e-government development index; the 113th place is the strategy's figure, not verified by the registry.",
       "status": "Launched 2024-09-25. Targets run to 2030.",
-      "evidence": ["MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018", "MAI-EV-0046"]
+      "evidence": ["MAI-EV-0001", "MAI-EV-0002", "MAI-EV-0003", "MAI-EV-0018", "MAI-EV-0046", "MAI-EV-0049"]
     },
     {
       "id": "morocco-ai-2030",
@@ -268,11 +268,11 @@
       "alt_names": ["JAZARI ROOT"],
       "domain": "research-academia",
       "summary": "Institute planned as a public-interest group (GIP) and described by the ministry as the technical and strategic core of the JAZARI network, around e-government, smart rural and mountain zones, and major sporting events. CGEM and several ministerial departments signed its constitutive convention on 12 January 2026.",
-      "status": "Constitutive convention signed 2026-01-12 and approved by joint order of 16 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
+      "status": "Constitutive convention signed 2026-01-12 and approved by joint order of 16 July 2026, published in Bulletin Officiel 7534 (13 August 2026). The ministry states that its general assembly was held on 8 September 2026 (MAI-EV-0048); no director, board, staff, premises or activity is documented. Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0008", "MAI-EV-0010"],
-      "evidence": ["MAI-EV-0008", "MAI-EV-0010", "MAI-EV-0012", "MAI-EV-0047"]
+      "evidence": ["MAI-EV-0008", "MAI-EV-0010", "MAI-EV-0012", "MAI-EV-0047", "MAI-EV-0048"]
     },
     {
       "id": "jazari-industrie-x0",
@@ -281,11 +281,11 @@
       "alt_names": ["Institut Al-Jazari pour l'Industrie"],
       "domain": "research-academia",
       "summary": "Al-Jazari institute for smart industry. A convention for its creation was signed in Fès on 10 March 2026 by three ministries and the four universities of the Fès-Meknès region. Its stated focus is AI, the Internet of Things, advanced robotics and industrial data analytics.",
-      "status": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
+      "status": "Founding convention signed 2026-03-10 and approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). The ministry states that its general assembly was held on 8 September 2026 (MAI-EV-0048); no director, board, staff, premises or activity is documented. Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0009"],
-      "evidence": ["MAI-EV-0009", "MAI-EV-0012", "MAI-EV-0047"]
+      "evidence": ["MAI-EV-0009", "MAI-EV-0012", "MAI-EV-0047", "MAI-EV-0048"]
     },
     {
       "id": "jazari-smart-city",
@@ -294,11 +294,11 @@
       "alt_names": [],
       "domain": "research-academia",
       "summary": "Named by the ministry in September 2026 as one of the components of the JAZARI Institutes network.",
-      "status": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
+      "status": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). The ministry states that its general assembly was held on 8 September 2026 (MAI-EV-0048); no director, board, staff, premises or activity is documented. Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0012"],
-      "evidence": ["MAI-EV-0012", "MAI-EV-0047"]
+      "evidence": ["MAI-EV-0012", "MAI-EV-0047", "MAI-EV-0048"]
     },
     {
       "id": "jazari-edutech",
@@ -307,11 +307,11 @@
       "alt_names": [],
       "domain": "research-academia",
       "summary": "Named by the ministry in September 2026 as one of the components of the JAZARI Institutes network.",
-      "status": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). Operation is not documented.",
+      "status": "Named by the ministry; its founding convention as a public-interest group was approved by joint order of 22 July 2026, published in Bulletin Officiel 7534 (13 August 2026). The ministry states that its general assembly was held on 8 September 2026 (MAI-EV-0048); no director, board, staff, premises or activity is documented. Operation is not documented.",
       "project_kind": "institute",
       "lifecycle": "announced",
       "lifecycle_evidence": ["MAI-EV-0012"],
-      "evidence": ["MAI-EV-0012", "MAI-EV-0047"]
+      "evidence": ["MAI-EV-0012", "MAI-EV-0047", "MAI-EV-0048"]
     },
     {
       "id": "jazari-institute-nador",

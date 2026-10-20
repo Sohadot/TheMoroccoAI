@@ -8,7 +8,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 import registry  # noqa: E402
 
-TODAY = datetime.date(2026, 10, 19)
+# Validate as on the registry date, so that records retrieved on that date are not "in the future".
+TODAY = datetime.date.fromisoformat(registry.load_all()[0]["as_of"])
 
 
 class RepositoryData(unittest.TestCase):

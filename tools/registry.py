@@ -631,6 +631,80 @@ def gap_fingerprint(gap, evidence, ontology):
     return hashlib.sha256(json.dumps(data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 
 
+ENTITY_ASSESSMENT_DIMENSIONS = ("legal_approval", "governance_event", "staffing", "premises", "operational_activity",
+                                "outputs", "documented_non_commencement", "documented_discontinuation")
+# The lifecycle vocabulary has no stage for an entity that never began operating, and "discontinued" means stopped
+# after activity; such an entity keeps a non-operating stage and is resolved on its non-commencement record alone.
+OPERATING_STAGES = ("pilot", "operational")
+NOT_COMMENCED_EXCLUDED_STAGES = ("pilot", "operational", "discontinued")
+
+
+def resolution_path(assessment, entity):
+    """The resolution path an entity's assessment meets, or None (operational status unknown). A legal approval,
+    a governance event or missing records never resolve an entity: only documented operation (activity, outputs,
+    and staff or premises, with an operating stage), documented non-commencement (no recorded activity or outputs,
+    with a stage that is not operating or discontinued) or documented discontinuation after activity (with a
+    discontinued stage) does."""
+    d = assessment.get("dimensions") or {}
+    stage = entity.get("lifecycle")
+    if d.get("operational_activity") and d.get("outputs") and (d.get("staffing") or d.get("premises")) \
+            and stage in OPERATING_STAGES:
+        return "operating"
+    if d.get("documented_non_commencement") and not d.get("operational_activity") and not d.get("outputs") \
+            and stage not in NOT_COMMENCED_EXCLUDED_STAGES:
+        return "not_commenced"
+    if d.get("documented_discontinuation") and d.get("operational_activity") and stage == "discontinued":
+        return "discontinued"
+    return None
+
+
+def _check_entity_assessments(g, spec, records, entities):
+    """A gap assessed per entity: one assessment per entity, in order, citing only verified records about that
+    entity; an entity is resolved exactly when its records meet a resolution path, and the gap only when all are."""
+    where = f"{g.get('id', '?')}:"
+    errors = []
+    if tuple(spec.get("dimension_order") or ()) != ENTITY_ASSESSMENT_DIMENSIONS or set(spec.get("dimensions") or ()) != set(ENTITY_ASSESSMENT_DIMENSIONS) \
+            or set(spec.get("states") or ()) != set(GAP_STATES) \
+            or not all(k in (spec.get("resolution") or {}) for k in ("operating", "not_commenced", "discontinued", "rule")):
+        errors.append("gaps.json: entity_assessment must define the dimensions, their order, the states and the resolution paths")
+    items = g.get("entity_assessments") or []
+    if [a.get("entity") for a in items] != list(g.get("entities") or []):
+        errors.append(f"{where} entity_assessments must list exactly the gap's entities, in the same order")
+    for a in items:
+        e = a.get("entity")
+        at = f"{where} {e}:"
+        if a.get("state") not in GAP_STATES:
+            errors.append(f"{at} state must be one of {', '.join(GAP_STATES)}")
+        dims = a.get("dimensions") or {}
+        if set(dims) != set(ENTITY_ASSESSMENT_DIMENSIONS):
+            errors.append(f"{at} dimensions must be exactly {', '.join(ENTITY_ASSESSMENT_DIMENSIONS)}")
+        cited = {x for xs in dims.values() for x in xs or []}
+        for dim, xs in dims.items():
+            for x in xs or []:
+                r = records.get(x)
+                if r is None:
+                    errors.append(f"{at} {dim} cites missing evidence {x}")
+                elif e not in (r.get("related_entities") or []):
+                    errors.append(f"{at} {dim} cites {x}, which does not concern {e}")
+                elif r.get("classification") != "VERIFIED FACT":
+                    errors.append(f"{at} {dim} cites {x}, a {r.get('classification')}: only a VERIFIED FACT documents a dimension")
+        if dims.get("documented_non_commencement") and (dims.get("operational_activity") or dims.get("outputs")):
+            errors.append(f"{at} records both non-commencement and activity or outputs; the records conflict and the entity "
+                          f"must be re-assessed")
+        path = resolution_path(a, entities.get(e, {}))
+        if a.get("state") == "resolved":
+            if not path:
+                errors.append(f"{at} is resolved but its records meet no resolution path; a legal approval or a governance "
+                              f"event does not resolve an institute")
+            if not a.get("resolved_by") or not set(a["resolved_by"]) <= cited:
+                errors.append(f"{at} a resolved entity must list in resolved_by the records it cites that resolve it")
+        elif path:
+            errors.append(f"{at} is open but its records now meet the {path} resolution path; re-assess it")
+    if g.get("state") == "resolved" and any(a.get("state") != "resolved" for a in items):
+        errors.append(f"{where} is resolved while an entity it assesses is still open")
+    return errors
+
+
 def validate_gaps(gaps, evidence, ontology):
     """Gaps must cite real records about their entities, keep open and resolved wording apart, and be
     re-assessed whenever the canonical data moves under them."""
@@ -690,6 +764,8 @@ def validate_gaps(gaps, evidence, ontology):
                 errors.append(f"{where} data this gap rests on has changed since it was assessed (fingerprint "
                               f"{g.get('assessed_fingerprint')}, now {current}); re-assess the gap, then update its text, "
                               f"assessed date and assessed_fingerprint (python3 tools/registry.py --gap-fingerprints)")
+        if "entity_assessments" in g:
+            errors += _check_entity_assessments(g, gaps.get("entity_assessment") or {}, records, entities)
         if g.get("state") == "resolved":
             if not g.get("resolved_by") or any(x not in records for x in g["resolved_by"]):
                 errors.append(f"{where} a resolved gap must cite the existing records that resolve it (resolved_by)")

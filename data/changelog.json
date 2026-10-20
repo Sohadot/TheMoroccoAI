@@ -3,6 +3,27 @@
   "repository": "https://github.com/Sohadot/TheMoroccoAI",
   "entries": [
     {
+      "date": "2026-10-20",
+      "pull_request": 9,
+      "title": "Registry v0.7.0: the online-services ranking corrected, JAZARI general assemblies and a per-institute operational-evidence gap",
+      "version": "0.7.0",
+      "records": 49,
+      "entities": 65,
+      "relationships": 78,
+      "changes": [
+        "Two records, each read in full from its source: the ministry's release on the general assemblies of four JAZARI institutes held on 8 September 2026 (MAI-EV-0048), and the official Digital Morocco 2030 brochure (MAI-EV-0049).",
+        "The general assemblies are recorded as a governance event in the status of JAZARI ROOT, EduTech, Industrie X.0 and Smart City. No stage changed: a general assembly, and the ministry's description of a move to operational implementation, are not operation.",
+        "Evidence gap GAP-07 asks which JAZARI institutes have documented governance, staff, premises, operational activity or outputs. It is assessed per institute (ROOT, EduTech, Industrie X.0, Smart City, Nador) across eight evidence dimensions, with three published resolution paths that keep documented operation, documented non-commencement and documented discontinuation after operation apart; an institute that meets none has an unknown operational status. A legal approval, a governance event or missing records cannot resolve an institute, an institute that never operated is not recorded as discontinued, and an institute can be resolved while the others stay open. The validator and the example consumer check these rules.",
+        "GAP-06 re-assessed against the brochure; it remains open.",
+        "Not changed: the further ROOT signatories named in Bulletin Officiel 7534 are not added. The summary makes the State the party, represented by the undersigned officeholders (one of them the president of the CNDP, acting on the State's side); the signatory_of relationship has no published definition that distinguishes signing as the State's representative from signing as a party, so adding them would present each ministry and the CNDP as a contracting party in its own right."
+      ],
+      "corrections": [
+        "The Digital Morocco 2030 ranking objective (113th to 50th) was described as the e-government development index (EGDI), following the national news agency's dispatch, and compared with Morocco's overall EGDI ranks. The strategy's own brochure defines it as the United Nations Online Services Index (OSI), a component of the EGDI, with 113th as the 2022 position. MAI-EV-0002, MAI-EV-0046, GAP-06 and the Digital Morocco 2030 summary now keep the strategy's claimed OSI position, the United Nations' OSI values (which come without a rank) and the overall EGDI ranks apart. The 113th OSI place is the strategy's figure and has not been verified.",
+        "MAI-EV-0008 said the Bulletin Officiel text approving the JAZARI ROOT convention had not been located; it now points to MAI-EV-0047, which records it.",
+        "MAI-EV-0047 said that no act concerns the Al Jazari institute in Nador; the statement is now limited to Bulletin Officiel 7534 and does not imply that no other act exists."
+      ]
+    },
+    {
       "date": "2026-10-19",
       "pull_request": 8,
       "title": "Registry v0.6.0: legal establishment of four JAZARI institutes, Toubkal workloads, infrastructure signings and the e-government index",
@@ -20,7 +41,7 @@
       ],
       "corrections": [
         "The registry attributed the GemMaroc fine-tuning runs to \"Belkasmi et al.\", copying the Toubkal article; that article's own reference is the GemMaroc preprint by Skiredj et al., and the preprint does not say where the runs were made. The Toubkal attribute, MAI-EV-0041 and GAP-03 now say so.",
-        "The Digital Morocco 2030 ranking objective's starting point of 113th is now noted as the source's figure: no United Nations edition ranks Morocco 113th; it ranked 101st in 2022 and 90th in 2024.",
+        "The Digital Morocco 2030 ranking objective's starting point of 113th is now noted as the source's figure: no United Nations edition ranks Morocco 113th; it ranked 101st in 2022 and 90th in 2024. (Corrected in v0.7.0: those are overall EGDI ranks, while the strategy defines its ranking as the Online Services Index component; see the v0.7.0 corrections.)",
         "The status of JAZARI Smart City and JAZARI EduTech said that no founding convention was documented; their founding conventions were approved in July 2026."
       ],
       "review_fixes": [

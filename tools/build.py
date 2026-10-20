@@ -965,6 +965,7 @@ def gap_register(model, gaps):
         item["established"] = g["established"]
         item["open_wording"] = gaps["open_wording"] if g["state"] == "open" else None
         item["resolved_by"] = g.get("resolved_by")
+        item["entity_assessments"] = g.get("entity_assessments")
         item["relationships"] = None
         item["formal_act_relationships"] = None
         if any(c["type"] == "computed_relationships" for c in g.get("checks") or []):
@@ -976,6 +977,12 @@ def gap_register(model, gaps):
                 for r in sorted(registry.announcement_only(model.ontology, model.evidence), key=lambda r: (r["subject"], r["predicate"], r["object"]))]
         out.append(item)
     return out
+
+
+DIMENSION_LABELS = {"legal_approval": "Legal approval", "governance_event": "Governance event", "staffing": "Staffing",
+                    "premises": "Premises", "operational_activity": "Operational activity", "outputs": "Outputs",
+                    "documented_non_commencement": "Documented non-commencement",
+                    "documented_discontinuation": "Documented discontinuation"}
 
 
 def gap_derivation():
@@ -998,6 +1005,18 @@ def gap_derivation():
                      "and the build refuses to publish it, when a check is triggered, when its digest no longer matches, or when a record "
                      "whose related_entities include one of its entities is missing from its assessed_records (whatever that record's dates)."),
         },
+        "entity_assessments": ("A gap with entity_assessments is assessed per entity, under the definitions in entity_assessment: "
+                               "one assessment per entity, in the gap's entity order, each listing the records cited for every dimension "
+                               "in the defined order. A cited record must exist, be a VERIFIED FACT and list the entity in related_entities. "
+                               "The dimensions are listed in dimension_order, the order in which they are displayed. An entity meets the operating path when operational_activity and outputs each cite a record, staffing or premises "
+                               "cites a record, and its lifecycle is pilot or operational; it meets the not_commenced path when "
+                               "documented_non_commencement cites a record, operational_activity and outputs cite none, and its lifecycle is not "
+                               "pilot, operational or discontinued; it meets the discontinued path when documented_discontinuation and "
+                               "operational_activity each cite a record and its lifecycle is discontinued. An entity that meets no path has an "
+                               "unknown operational status. Non-commencement recorded together with activity or outputs is an error. An entity is resolved exactly when "
+                               "it meets a path, with resolved_by listing records it cites; an open entity that meets a path, a resolved one "
+                               "that meets none, and a resolved gap with an open entity are errors. An empty list means no qualifying record "
+                               "is recorded in this registry, not that the thing does not exist."),
         "assessed_fingerprint": {
             "record_fields": list(registry.GAP_RECORD_FIELDS),
             "entity_fields": list(registry.GAP_ENTITY_FIELDS),
@@ -1026,6 +1045,23 @@ def render_gaps(model, gaps):
         open_line = f' <strong>{escape(g["open_wording"])}</strong>' if g["open_wording"] else ""
         resolved = f'<p class="prose">Resolved by: {_ev_links(g["resolved_by"])}</p>' if g["resolved_by"] else ""
         table = ""
+        if g["entity_assessments"]:
+            dims = gaps["entity_assessment"]["dimension_order"]
+            rows = []
+            for a in g["entity_assessments"]:
+                cells = [_ev_links(a["dimensions"][d]) if a["dimensions"][d] else '<span class="ev-meta">Not documented</span>' for d in dims]
+                state = "Resolved: " + _ev_links(a["resolved_by"]) if a["state"] == "resolved" else "Open"
+                rows.append([_ent_link(model, a["entity"])] + cells + [state])
+            notes = "".join(f'<li>{_ent_link(model, a["entity"])}: {escape(a["note"])}</li>' for a in g["entity_assessments"] if a.get("note"))
+            defs = "".join(f"<li><strong>{escape(DIMENSION_LABELS[d])}</strong>: {escape(gaps['entity_assessment']['dimensions'][d])}</li>"
+                           for d in dims)
+            res = gaps["entity_assessment"]["resolution"]
+            table = (f'<h3>Assessment by institute</h3><p class="prose">{escape(gaps["entity_assessment"]["note"])}</p>'
+                     + _table("Evidence recorded for each institute, by dimension",
+                              ["Institute"] + [DIMENSION_LABELS[d] for d in dims] + ["State"], rows, "")
+                     + (f'<ul class="prose">{notes}</ul>' if notes else "")
+                     + f'<ul class="prose">{defs}</ul>'
+                     + f'<p class="prose">{escape(gaps["entity_assessment"]["qualifying_records"])} An institute resolves when it is documented as operating ({escape(res["operating"].rstrip("."))}), as not having commenced operation ({escape(res["not_commenced"].rstrip("."))}), or as discontinued after operating ({escape(res["discontinued"].rstrip("."))}); otherwise its operational status is unknown and it stays open. {escape(res["rule"])}</p>')
         if g["relationships"]:
             rows = [[_ent_link(model, r["subject"]), escape(model.predicates[r["relationship"]]["label"]), _ent_link(model, r["object"]),
                      badge(r["classification"]), _ev_links(r["evidence"]) + " <span class=\"ev-meta\">" + escape(", ".join(sorted(set(t.replace("_", " ") for t in r["evidence_types"])))) + "</span>"]
@@ -1220,6 +1256,7 @@ def render_data_reference(model, gaps, man):
     <li>Fetch the manifest first and compare each file's SHA-256. A mismatch means the file came from a different build, for example while a new version propagates through caches; fetch again later.</li>
     <li>The hashes are published by the same site as the files. They show that the files you fetched belong to one build and were not changed after it; they are not a signature, and they do not show who published the files or that their content is accurate. Accuracy rests on the cited sources, which each record links to.</li>
     <li>When the data a gap rests on changes, the build fails until the gap is re-assessed. Each gap in data/gaps.json stores the records it was assessed against and a digest of that data (<code>assessed_fingerprint</code>), which a consumer can recompute.</li>
+    <li>A gap with <code>entity_assessments</code> is assessed per entity: for each entity, the records documenting each evidence dimension defined in <code>entity_assessment</code> (legal approval, governance event, staffing, premises, operational activity, outputs, documented non-commencement, documented discontinuation). Only a VERIFIED FACT about the entity can document a dimension. An entity resolves only through a published resolution path (documented operation, documented non-commencement, or documented discontinuation after operation), never on a legal approval, a governance event or missing records, and stays listed while the others remain open; the gap resolves when every entity has. An empty dimension means no qualifying record is recorded here, not that the thing does not exist.</li>
   </ul>
 </section>
 <section aria-labelledby="d6-h">
@@ -1572,7 +1609,8 @@ def outputs(model):
         "registry/gaps/index.html": render_gaps(model, gaps),
         "registry/gaps/gaps.json": _json({"registry_version": model.evidence["version"], "as_of": model.as_of, "note": gaps["note"],
                                           "derived_from": ["/data/gaps.json", "/data/ontology.json", "/data/evidence.json"],
-                                          "states": gaps["states"], "documentation": "/data/", "derivation": gap_derivation(),
+                                          "states": gaps["states"], "entity_assessment": gaps.get("entity_assessment"),
+                                          "documentation": "/data/", "derivation": gap_derivation(),
                                           "gaps": gap_register(model, gaps)}),
         "methodology/index.html": render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json")),
         "acquisition/index.html": render_acquisition(model),
