@@ -263,6 +263,13 @@
           ]
         },
         {
+          "text": "The finance ministry's presentation note to the 2025 finance bill, published after the launch, states the same objective as a place in the world's top 50 on the overall e-government development index, not on the Online Services Index named in the brochure. The note does not explain the difference; the two statements are recorded side by side and the registry does not reconcile them.",
+          "evidence": [
+            "MAI-EV-0062",
+            "MAI-EV-0049"
+          ]
+        },
+        {
           "text": "The Head of Government stated that public investment in digital technology rose from MAD 11 million in 2021 to more than MAD 1.7 billion in 2024. The registry has not checked these figures or matched them to any budget execution figure, and spending is an input, not a measure of the targets.",
           "evidence": [
             "MAI-EV-0003"
@@ -275,7 +282,7 @@
           ]
         },
         {
-          "text": "On the overall e-government development index, the United Nations ranked Morocco 101st in 2022 and 90th in 2024. On the Online Services Index, its page gives Morocco's value (0.47210 in 2022, 0.56184 in 2024) but not its rank, so the strategy's 113th place for 2022 is the strategy's figure and has not been verified against a United Nations ranking. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy.",
+          "text": "On the overall e-government development index, the United Nations ranked Morocco 101st in 2022 and 90th in 2024. On the Online Services Index, its page gives Morocco's value (0.47210 in 2022, 0.56184 in 2024) but not its rank, so the strategy's 113th place for 2022 is the strategy's figure and has not been verified against a United Nations ranking. The 2024 edition, published in the year of the launch, measures the starting position, not progress under the strategy. The survey's 2022 and 2024 annex tables likewise publish the index's values without a rank column, so there is no United Nations rank on it for the registry to record.",
           "evidence": [
             "MAI-EV-0046",
             "MAI-EV-0049",
@@ -293,8 +300,15 @@
           ]
         },
         {
-          "text": "The 2026 finance law provides MAD 1,500,000,000 in payment appropriations for implementing the strategy. That is an authorisation to spend, not expenditure: no amount committed, disbursed or spent is recorded in this registry.",
+          "text": "A 2025 ministry report presents a circular on the offshoring sector with objectives of 270,000 direct jobs by 2030, from 130,000 in 2022. It attributes that figure to the offshoring sector; it does not state how the figure relates to the strategy's direct-jobs objective or to the earlier finance-law targets, and the registry does not reconcile them.",
           "evidence": [
+            "MAI-EV-0063"
+          ]
+        },
+        {
+          "text": "The 2025 and 2026 finance laws each provide MAD 1,500,000,000 in payment appropriations for implementing the strategy, under project 20 of programme 429, a code that designated a different line in the 2024 finance law. Each is an authorisation to spend in its own year, not expenditure, and the two are not added together: no amount committed, disbursed or spent on the strategy is recorded in this registry. Budget execution is published only as ministry-level totals, which are recorded for the ministry, not for the strategy.",
+          "evidence": [
+            "MAI-EV-0059",
             "MAI-EV-0054"
           ]
         },
@@ -312,11 +326,11 @@
           ]
         }
       ],
-      "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or online-services ranking objectives; Morocco's rank on the Online Services Index in any edition; and any amount actually spent on the strategy. The recorded finance-law figures are targets and an allocation, the ministry's figures are unverified outputs on other definitions, and the Court's finding predates the strategy. No edition of the United Nations survey later than 2024 had been published on the assessment date.",
+      "unestablished": "Any measured progress, after the strategy's launch, towards the jobs, GDP-contribution, public-services or online-services ranking objectives; a rank on the Online Services Index published by the United Nations, whose 2022 and 2024 tables give values only; and any amount actually spent on the strategy: budget execution is recorded only as ministry-level totals, which are not spending on the strategy. The recorded finance-law figures are targets and allocations, the ministry's figures are unverified outputs or targets on other definitions, and the Court's finding predates the strategy. No edition of the United Nations survey later than 2024 had been published on the assessment date.",
       "evidence_needed": [
         "An independent or official measurement, after September 2024, of the indicators the strategy names (direct jobs, contribution to GDP, digitalised public services, Online Services Index rank), with definitions and periods",
-        "The United Nations ranking of countries on the Online Services Index, the index the ranking objective refers to, for 2022 and later editions",
-        "Budget execution data or the budget settlement law (loi de règlement) showing the amounts committed and spent on the strategy",
+        "A rank on the Online Services Index published by the United Nations, the index the ranking objective refers to; the 2022 and 2024 editions publish its values without ranks",
+        "Budget execution data at programme or project level, or a budget settlement law (loi de règlement) with that detail, showing the amounts committed and spent on the strategy's budget line",
         "A reconciliation, published by the ministry, of the strategy's objectives with its finance-law performance indicators"
       ],
       "checks": [],
@@ -334,9 +348,12 @@
         "MAI-EV-0054",
         "MAI-EV-0055",
         "MAI-EV-0056",
-        "MAI-EV-0057"
+        "MAI-EV-0057",
+        "MAI-EV-0059",
+        "MAI-EV-0062",
+        "MAI-EV-0063"
       ],
-      "assessed_fingerprint": "7da8383cf1a1dc13",
+      "assessed_fingerprint": "cdb898ad5ad8dfc7",
       "assessed": "2026-10-20",
       "state": "open"
     },
