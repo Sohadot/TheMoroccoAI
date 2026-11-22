@@ -1,5 +1,82 @@
 {
- "version": "2026-11-22",
- "note": "Controlled terminology (TMA-DEC-007). Each term id names canonical vocabulary (for example classification:VERIFIED FACT); its English form is the canonical value. Target-language labels are added only after terminology review; none is approved yet. 'forbidden' lists renderings that would strengthen, weaken or imply official status.",
- "terms": []
+ "version": "2026-11-22.1",
+ "note": "Controlled terminology (TMA-DEC-007). Each term id names canonical vocabulary (for example classification:VERIFIED FACT); its English form is the canonical value. Target-language labels are added only after terminology review; none is approved yet. 'forbidden' lists renderings that would strengthen, weaken or imply official status. 'concepts' (Sprint 19B-5) lists the site's recurring editorial terms, which are not canonical research vocabulary: a term 'concept:<id>' takes its English form from there, and that form must occur in the English catalog. Labels are added only once a registered human reviewer approves them; candidate labels stay outside the repository.",
+ "terms": [],
+ "concepts": [
+  {
+   "id": "artificial-intelligence",
+   "en": "artificial intelligence",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "ai-ecosystem",
+   "en": "AI ecosystem",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "independent-evidence-registry",
+   "en": "independent evidence registry",
+   "added": "2026-11-22",
+   "note": "Must never read as an official, government or endorsed registry."
+  },
+  {
+   "id": "registry",
+   "en": "registry",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "evidence-record",
+   "en": "evidence record",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "verbatim-excerpt",
+   "en": "verbatim excerpt",
+   "added": "2026-11-22",
+   "note": "Excerpts themselves are never translated (TMA-DEC-007 Q6)."
+  },
+  {
+   "id": "evidence-gap",
+   "en": "evidence gap",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "public-institution",
+   "en": "public institution",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "public-availability",
+   "en": "public availability",
+   "added": "2026-11-22",
+   "note": "Public availability is not evidence of use: the rendering must not imply use."
+  },
+  {
+   "id": "not-affiliated",
+   "en": "not affiliated",
+   "added": "2026-11-22",
+   "note": "Disclosure wording: the negation must be explicit."
+  },
+  {
+   "id": "ownership",
+   "en": "ownership",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "methodology",
+   "en": "methodology",
+   "added": "2026-11-22"
+  },
+  {
+   "id": "limits",
+   "en": "limits",
+   "added": "2026-11-22",
+   "note": "Research limitations: what the registry does not establish."
+  },
+  {
+   "id": "changelog",
+   "en": "changelog",
+   "added": "2026-11-22"
+  }
+ ]
 }

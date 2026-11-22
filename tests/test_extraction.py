@@ -30,7 +30,7 @@ import check_site  # noqa: E402
 import i18n  # noqa: E402
 import registry  # noqa: E402
 from test_multilingual import synthetic  # noqa: E402
-from i18n_fixtures import approved_label, approved_unit, register_reviewers  # noqa: E402
+from i18n_fixtures import acknowledge_warnings, approved_label, approved_unit, register_reviewers  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 TODAY = datetime.date(2026, 11, 22)
@@ -214,14 +214,17 @@ class ExtractedRegistryFixture(unittest.TestCase):
         self.model = model()
         self.req = build.page_requirements(self.model, self.SPEC, self.root)
         self.sources = i18n.Sources(self.root)
+        # Term-linked messages use their term's approved label, as the approved-terminology check requires.
+        self.term_of = {m["id"]: m["term"] for m in self.read("en/messages.json")["messages"] if "term" in m}
         self.messages = sorted(set(self.req["messages"]) | build.LOCALIZATION_ONLY_MESSAGES)
         for lang in ("ar", "fr"):
             self.write(f"{lang}/messages.json", {"language": lang, "units": [self.unit(mid, lang) for mid in self.messages]})
             self.write(f"{lang}/content.json", {"language": lang, "units": [self.unit(cid, lang) for cid in self.req["content"]]})
         g = self.read("glossary.json")
-        g["terms"] = [{"id": t, "translations": {lang: approved_label(t, synthetic(t.split(":")[1], lang), lang=lang) for lang in ("ar", "fr")}}
+        g["terms"] = [{"id": t, "translations": {lang: approved_label(t, self.label(t, lang), lang=lang) for lang in ("ar", "fr")}}
                       for t in self.req["terms"]]
         self.write("glossary.json", g)
+        acknowledge_warnings(self.root)
 
     def source(self, uid):
         return self.sources.message(uid) if ":" not in uid else self.sources.content(uid)[0]
@@ -231,7 +234,13 @@ class ExtractedRegistryFixture(unittest.TestCase):
         """A distinct, digit-free marker per unit, so a test can remove exactly one unit's text."""
         return "".join(chr(ord("a") + int(c, 16) % 26) for c in i18n.fingerprint(uid)[:8])
 
+    def label(self, term, lang):
+        """A synthetic glossary label, distinct per term."""
+        return synthetic(i18n.english_form(term) or term.split(":")[1], lang) + " " + self.tag(term)
+
     def text(self, uid, lang):
+        if uid in self.term_of:
+            return self.label(self.term_of[uid], lang) + " " + self.tag(uid)
         return synthetic(self.source(uid), lang) + " " + self.tag(uid)
 
     def unit(self, uid, lang, source=None, **over):
@@ -253,6 +262,7 @@ class ExtractedRegistryFixture(unittest.TestCase):
         cat = self.read(f"{lang}/{kind}.json")
         cat["units"] = [self.unit(u["id"], lang, **over) if u["id"] == uid else u for u in cat["units"]]
         self.write(f"{lang}/{kind}.json", cat)
+        acknowledge_warnings(self.root)
 
     def localize(self):
         return build.localize(self.model, [self.SPEC], root=self.root, today=TODAY)
@@ -302,7 +312,7 @@ class RealPageThroughTheEngine(ExtractedRegistryFixture):
     def test_validator_accepts_the_synthetic_catalogs(self):
         errors, report = i18n.validate(self.root, today=TODAY)
         self.assertEqual(errors, [])
-        self.assertEqual(report, {"stale": [], "orphaned": []})
+        self.assertEqual(report, {"stale": [], "orphaned": [], "unacknowledged": []})
 
 
 class NegativeRegressions(ExtractedRegistryFixture):
@@ -421,6 +431,8 @@ class NegativeRegressions(ExtractedRegistryFixture):
         g = self.read("glossary.json")
         g["terms"] = [t for t in g["terms"] if t["id"] != "entity_type:institution"]
         self.write("glossary.json", g)
+        self.assertNotGenerated("has no approved, current translation")  # approvals no longer match the warnings shown
+        acknowledge_warnings(self.root)  # isolate the missing term itself
         self.assertNotGenerated("glossary term 'entity_type:institution'")
 
     def test_term_link_must_name_canonical_vocabulary(self):

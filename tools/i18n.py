@@ -29,6 +29,9 @@ import sys
 import unicodedata
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import semantic  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 
 LANGUAGE_STATES = ("authoritative", "in-preparation", "published", "withdrawn")
@@ -92,7 +95,11 @@ CONTENT_FIELDS = {
 CONTENT_ID = re.compile(r"^(evidence|ontology|gaps|classification|domain|predicate|changelog|attribute):([^:]+):([a-z_]+)$")
 # Canonical vocabulary a glossary term may name: '<vocabulary>:<canonical value>'.
 GLOSSARY_VOCABULARIES = ("classification", "verification_status", "entity_type", "lifecycle", "project_kind",
-                         "origin", "domain", "predicate")
+                         "origin", "domain", "predicate", "concept")
+# Editorial concepts (Sprint 19B-5) are not canonical research vocabulary: they are the site's recurring terms
+# ('AI ecosystem', 'evidence gap'), defined in glossary.json 'concepts' with their English form, which must occur
+# in the English catalog. A concept term's source is that English form.
+CONCEPT_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def nfc(text):
@@ -311,6 +318,10 @@ class Sources:
         self.records = {r["evidence_id"]: r for r in self.evidence["records"]}
         self.entities = {e["id"]: e for e in self.ontology["entities"]}
         self.gap_items = {g["id"]: g for g in self.gaps["gaps"]}
+        catalog = _load(root / "i18n" / "en" / "messages.json") if (root / "i18n" / "en" / "messages.json").exists() else {}
+        self.term_links = {m["id"]: m["term"] for m in catalog.get("messages", []) if "term" in m}
+        glossary = root / "i18n" / "glossary.json"
+        self.concepts = concept_forms(_load(glossary)) if glossary.exists() else {}
 
     def message(self, unit_id):
         return self.messages.get(unit_id)
@@ -558,7 +569,10 @@ def _approval_problems(u, lang, reviewers, today, where):
         return [f"{where}: APPROVED unit has no human approval record"]
     errors = []
     allowed = {"unit", "language", "reviewer", "decision", "reviewed_at", "policy", "source_sha256",
-               "translation_sha256", "glossary_version", "escalation"}
+               "translation_sha256", "glossary_version", "escalation", "acknowledged_warnings"}
+    ack = a.get("acknowledged_warnings", [])
+    if not isinstance(ack, list) or not all(isinstance(x, str) for x in ack):
+        errors.append(f"{where}: approval.acknowledged_warnings must list the semantic warning codes the reviewer saw")
     # Replay: an approval names the exact unit and language it was given for, besides both fingerprints.
     if a.get("unit") != u.get("id"):
         errors.append(f"{where}: the approval names unit {a.get('unit')!r}, not this unit (an approval cannot be reused)")
@@ -618,11 +632,11 @@ def _approved_current(u, text):
     return isinstance(text, str) and a.get("translation_sha256") == fingerprint(text)
 
 
-def validate_catalog(lang, kind, catalog, sources, forbidden, today, reviewers=None):
+def validate_catalog(lang, kind, catalog, sources, forbidden, today, reviewers=None, terms=None):
     """Returns (errors, report). report lists stale and orphaned units: they are not errors, so English
     publishing never waits for translation (TMA-DEC-007 Q4), but they are never renderable."""
     path = f"i18n/{lang}/{kind}.json"
-    errors, report, seen = [], {"stale": [], "orphaned": []}, set()
+    errors, report, seen = [], {"stale": [], "orphaned": [], "unacknowledged": []}, set()
     if catalog.get("language") != lang or not isinstance(catalog.get("units"), list):
         return [f"{path}: must declare language {lang!r} and a 'units' list"], report
     for u in catalog["units"]:
@@ -667,6 +681,11 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today, reviewers=N
             continue
         if isinstance(u.get("text"), str):
             errors += _parity_problems(u["text"], source, where)
+            if u.get("status") == "APPROVED":
+                found = semantic.findings(source, u["text"], lang, terms, linked_forms(sources, uid))
+                errors += [f"{where}: semantic {m}" for m in semantic.error_messages(found)]
+                if not _warnings_acknowledged(u, found):
+                    report["unacknowledged"].append(f"{lang}:{uid}")
         if isinstance(u.get("source_sha256"), str) and u["source_sha256"] != fingerprint(source):
             report["stale"].append(f"{lang}:{uid}")
         elif u.get("status") == "APPROVED" and isinstance(u.get("approval"), dict) and not _approved_current(u, u.get("text")):
@@ -674,15 +693,69 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today, reviewers=N
     return errors, report
 
 
-def _term_unit(term_id, entry):
-    """A glossary label as an approvable unit: its source is the canonical term value."""
-    return dict(entry, id=term_id, text=entry.get("label"), source_sha256=fingerprint(term_id.partition(":")[2]))
+def _warnings_acknowledged(u, found):
+    """The approval lists exactly the semantic warnings the reviewer was shown for this source and text."""
+    ack = (u.get("approval") or {}).get("acknowledged_warnings", [])
+    return isinstance(ack, list) and sorted(ack) == semantic.warning_codes(found)
 
 
-def validate_glossary(glossary, sources, languages, reviewers=None, today=None):
+def concept_forms(glossary):
+    """{concept id: English form} from glossary.json 'concepts'."""
+    return {c["id"]: c["en"] for c in glossary.get("concepts", []) if isinstance(c, dict) and "id" in c and "en" in c}
+
+
+def term_source(term_id, concepts=None):
+    """The English source of a glossary term: the canonical value, or a concept's English form."""
+    vocab, _, value = term_id.partition(":")
+    return (concepts or {}).get(value, value) if vocab == "concept" else value
+
+
+def english_form(term_id, concepts=None):
+    """How a glossary term appears in English prose, for the approved-terminology check; None where the canonical
+    value is not a prose form (domains, predicates, origins)."""
+    vocab, _, value = term_id.partition(":")
+    if vocab == "concept":
+        return (concepts or {}).get(value)
+    if vocab in ("classification", "entity_type", "lifecycle", "project_kind", "verification_status"):
+        return value.lower().replace("_", " ").replace("-", " ")
+    return None
+
+
+def _term_unit(term_id, entry, concepts=None):
+    """A glossary label as an approvable unit: its source is the canonical term value (or the concept's form)."""
+    return dict(entry, id=term_id, text=entry.get("label"), source_sha256=fingerprint(term_source(term_id, concepts)))
+
+
+def validate_concepts(glossary, english_text):
+    errors, seen = [], set()
+    if not isinstance(glossary.get("concepts", []), list):
+        return ["i18n/glossary.json: 'concepts' must be a list"]
+    for c in glossary.get("concepts", []):
+        cid = c.get("id") if isinstance(c, dict) else None
+        where = f"i18n/glossary.json concept {cid!r}"
+        if not isinstance(cid, str) or not CONCEPT_ID.match(cid):
+            errors.append(f"{where}: id must be a lower-case slug such as 'ai-ecosystem'")
+        if cid in seen:
+            errors.append(f"{where}: duplicate concept id")
+        seen.add(cid)
+        en = c.get("en") if isinstance(c, dict) else None
+        if not isinstance(en, str) or not en.strip():
+            errors.append(f"{where}: needs its English form 'en'")
+        elif not re.search(rf"(?i)(?<![\w-]){re.escape(en)}(?![\w-])", english_text):
+            errors.append(f"{where}: English form {en!r} does not occur in the English catalog")
+        if not isinstance(c.get("added"), str) or not re.match(r"^\d{4}-\d{2}-\d{2}$", c.get("added") or ""):
+            errors.append(f"{where}: needs the date it was added ('added')")
+        if set(c) - {"id", "en", "added", "note"}:
+            errors.append(f"{where}: unexpected fields")
+    return errors
+
+
+def validate_glossary(glossary, sources, languages, reviewers=None, today=None, english_text=""):
     errors, seen, forbidden = [], set(), {lang: [] for lang in languages}
     if not isinstance(glossary.get("version"), str) or not isinstance(glossary.get("terms"), list):
         return ["i18n/glossary.json: needs a 'version' string and a 'terms' list"], forbidden
+    errors += validate_concepts(glossary, english_text)
+    concepts = concept_forms(glossary)
     for term in glossary["terms"]:
         tid = term.get("id")
         where = f"i18n/glossary.json {tid!r}"
@@ -690,7 +763,8 @@ def validate_glossary(glossary, sources, languages, reviewers=None, today=None):
             errors.append(f"{where}: duplicate term id")
         seen.add(tid)
         vocab, _, value = (tid or "").partition(":")
-        if vocab not in GLOSSARY_VOCABULARIES or value not in sources.vocabulary(vocab):
+        known = set(concepts) if vocab == "concept" else (sources.vocabulary(vocab) if vocab in GLOSSARY_VOCABULARIES else set())
+        if vocab not in GLOSSARY_VOCABULARIES or value not in known:
             errors.append(f"{where}: does not name canonical vocabulary (expected e.g. 'classification:VERIFIED FACT')")
         for lang, entry in term.get("translations", {}).items():
             if lang not in languages:
@@ -700,7 +774,7 @@ def validate_glossary(glossary, sources, languages, reviewers=None, today=None):
             if entry.get("status") not in COMMITTABLE_STATUSES:
                 errors.append(f"{where}.{lang}: status {entry.get('status')!r} is not approved")
             else:
-                unit = _term_unit(tid, entry)
+                unit = _term_unit(tid, entry, concepts)
                 errors += _draft_problems(unit, f"{where}.{lang}")
                 errors += _approval_problems(unit, lang, reviewers or {}, today or datetime.date.today(), f"{where}.{lang}")
             for variant in entry.get("forbidden", []):
@@ -714,7 +788,7 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
     """Validate i18n/. Returns (errors, report); report = {'stale': [...], 'orphaned': [...]}."""
     root = Path(root)
     today = today or datetime.date.today()
-    report = {"stale": [], "orphaned": []}
+    report = {"stale": [], "orphaned": [], "unacknowledged": []}
     base = root / "i18n"
     try:
         registry = _load(base / "languages.json")
@@ -741,7 +815,8 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
     reviewers = load_reviewers(root)
     for kind in ("changelog", "attribute"):
         errors += load_identity(kind, root, ontology=sources.ontology)[2]
-    gerrors, forbidden = validate_glossary(glossary, sources, targets, reviewers, today)
+    english_text = " ".join(m.get("text", "") for m in english.get("messages", []))
+    gerrors, forbidden = validate_glossary(glossary, sources, targets, reviewers, today, english_text)
     errors += gerrors
     for lang in targets:
         for kind in ("messages", "content"):
@@ -753,10 +828,11 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
             except ValueError as exc:
                 errors.append(f"i18n/{lang}/{kind}.json: invalid JSON ({exc})")
                 continue
-            cerrors, creport = validate_catalog(lang, kind, catalog, sources, forbidden[lang], today, reviewers)
+            cerrors, creport = validate_catalog(lang, kind, catalog, sources, forbidden[lang], today, reviewers,
+                                                term_forms(lang, root, today))
             errors += cerrors
-            report["stale"] += creport["stale"]
-            report["orphaned"] += creport["orphaned"]
+            for key in report:
+                report[key] += creport[key]
     for lang_dir in sorted(p.name for p in base.iterdir() if p.is_dir()):
         if lang_dir != "en" and lang_dir not in targets:
             errors.append(f"i18n/{lang_dir}/: language is not registered in i18n/languages.json")
@@ -775,6 +851,7 @@ def renderable_texts(lang, root=ROOT, evidence=None, ontology=None, gaps=None, t
     today = today or datetime.date.today()
     sources = Sources(root, evidence, ontology, gaps)
     reviewers = load_reviewers(root)
+    terms = term_forms(lang, root, today)
     out = {}
     for kind in ("messages", "content"):
         path = root / "i18n" / lang / f"{kind}.json"
@@ -787,6 +864,9 @@ def renderable_texts(lang, root=ROOT, evidence=None, ontology=None, gaps=None, t
                     or _draft_problems(u, uid) or _approval_problems(u, lang, reviewers, today, uid)
                     or not _approved_current(u, text) or _text_problems(text, uid) or _parity_problems(text, source, uid)):
                 continue
+            found = semantic.findings(source, text, lang, terms, linked_forms(sources, uid))
+            if semantic.error_messages(found) or not _warnings_acknowledged(u, found):
+                continue  # a semantic error, or a warning the human approval did not acknowledge
             out[uid] = text
     return out
 
@@ -799,17 +879,33 @@ def approved_terms(lang, root=ROOT, today=None):
     """{term id: label} of glossary terms whose label in `lang` is well formed and human-approved (TMA-DEC-008)
     for exactly that label."""
     out, reviewers, today = {}, load_reviewers(root), today or datetime.date.today()
-    for term in _load(Path(root) / "i18n" / "glossary.json").get("terms", []):
+    glossary = _load(Path(root) / "i18n" / "glossary.json")
+    concepts = concept_forms(glossary)
+    for term in glossary.get("terms", []):
         entry = term.get("translations", {}).get(lang)
         if not entry or entry.get("status") not in COMMITTABLE_STATUSES or _text_problems(entry.get("label"), ""):
             continue
-        unit = _term_unit(term["id"], entry)
+        unit = _term_unit(term["id"], entry, concepts)
         if any(v and v.lower() in entry["label"].lower() for v in entry.get("forbidden", [])) \
                 or _draft_problems(unit, "") or _approval_problems(unit, lang, reviewers, today, "") \
                 or not _approved_current(unit, entry["label"]):
             continue
         out[term["id"]] = entry["label"]
     return out
+
+
+def linked_forms(sources, uid):
+    """English forms of the glossary term a catalog message is linked to (its 'term'), if any."""
+    term = sources.term_links.get(uid)
+    form = english_form(term, sources.concepts) if term else None
+    return (form,) if form else ()
+
+
+def term_forms(lang, root=ROOT, today=None):
+    """{English prose form: approved label in `lang`} for the approved-terminology check (semantic TERM_MISSING)."""
+    concepts = concept_forms(_load(Path(root) / "i18n" / "glossary.json"))
+    return {form: label for tid, label in approved_terms(lang, root, today).items()
+            if (form := english_form(tid, concepts))}
 
 
 class Untranslated(Exception):
@@ -900,8 +996,9 @@ if __name__ == "__main__":
     problems, rep = validate()
     for p in problems:
         print("ERROR", p)
-    for key in ("stale", "orphaned"):
+    for key in ("stale", "orphaned", "unacknowledged"):
         for uid in rep[key]:
             print(key.upper(), uid, "(not renderable; English is unaffected)")
-    print(f"{len(problems)} problem(s); {len(rep['stale'])} stale, {len(rep['orphaned'])} orphaned translation unit(s)")
+    print(f"{len(problems)} problem(s); {len(rep['stale'])} stale, {len(rep['orphaned'])} orphaned, "
+          f"{len(rep['unacknowledged'])} with unacknowledged semantic warnings")
     sys.exit(1 if problems else 0)

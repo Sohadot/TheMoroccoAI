@@ -5,10 +5,12 @@ synthetic, the approvals are fabricated to exercise the gates, and none of it is
 or a real translation. The committed registry i18n/reviewers.json is empty, so none of these records would be
 accepted in the repository.
 """
+import datetime
 import json
 from pathlib import Path
 
 import i18n
+import semantic
 
 SYNTHETIC_DECISION = "TMA-DEC-900"  # exists only in the temporary decision log written below
 REGISTERED_ON = "2026-11-01"
@@ -39,6 +41,8 @@ def approval(source_text, text, unit=None, language=None, **over):
     a = {"unit": unit, "language": language, "reviewer": "synthetic-reviewer-01", "decision": "approved", "reviewed_at": REVIEWED_AT,
          "policy": i18n.GOVERNANCE_POLICY, "source_sha256": i18n.fingerprint(source_text),
          "translation_sha256": i18n.fingerprint(text), "glossary_version": GLOSSARY_VERSION}
+    if language in ("ar", "fr"):  # the reviewer is shown the semantic warnings and acknowledges them
+        a["acknowledged_warnings"] = semantic.warning_codes(semantic.findings(source_text, text, language))
     a.update(over)
     return a
 
@@ -61,3 +65,24 @@ def approved_label(term_id, label, forbidden=(), lang="ar", **over):
              "approval": approval(value, label, term_id, lang)}
     entry.update(over)
     return entry
+
+
+def acknowledge_warnings(root, today=datetime.date(2026, 11, 22)):
+    """Record in each SYNTHETIC approval the semantic warnings its text raises with the temporary root's approved
+    glossary, as a reviewer acknowledges what the review package showed. Fixtures only."""
+    root = Path(root)
+    sources = i18n.Sources(root)
+    for lang in ("ar", "fr"):
+        terms = i18n.term_forms(lang, root, today)
+        for kind in ("messages", "content"):
+            path = root / "i18n" / lang / f"{kind}.json"
+            if not path.exists():
+                continue
+            data = json.loads(path.read_text(encoding="utf-8"))
+            for u in data.get("units", []):
+                a = u.get("approval")
+                source = sources.message(u["id"]) if kind == "messages" else sources.content(u["id"])[0]
+                if isinstance(a, dict) and source is not None and isinstance(u.get("text"), str):
+                    found = semantic.findings(source, u["text"], lang, terms, i18n.linked_forms(sources, u["id"]))
+                    a["acknowledged_warnings"] = semantic.warning_codes(found)
+            path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
