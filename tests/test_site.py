@@ -308,7 +308,7 @@ class ReferenceFirstPositioning(unittest.TestCase):
         self.assertIn("Owner's view of potential (not established)", text)
         self.assertIn("no interest from any specific party is implied", text)
         self.assertIn("No price, traffic or revenue figures are published", text)
-        self.assertIn("no institution has adopted or designated it", text)
+        self.assertIn("No institution has adopted or designated it", text)
         self.assertIn(check_site.DISCLAIMER, text)
 
     def test_every_page_links_to_acquisition_quietly(self):
