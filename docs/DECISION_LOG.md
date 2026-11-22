@@ -16,7 +16,7 @@ This public log records governance decisions, not completed implementation or ex
 - Date: 2026-11-22
 - Domain: Research usability / privacy
 - Decision status: Accepted
-- Implementation status: Pending
+- Implementation status: Implemented in PR #14; deployment and independent validation pending
 - External validation status: Not performed
 - Decision: Introduce /evaluation/ with an introductory (~5 minute) and specialist (~15–20 minute) independent research evaluation. The first release is static, privacy-minimizing, and requires no login, tracking service or third-party form provider.
 - Rationale: Obtain independently interpretable evidence of research usability without conflating participation, completion or opinions with external validation.
@@ -55,6 +55,6 @@ This public log records governance decisions, not completed implementation or ex
 - Date: 2026-11-22
 - Domain: Information security
 - Decision status: Accepted
-- Implementation status: Pending
+- Implementation status: Implemented in documentation; Drive access restrictions require owner verification
 - Decision: Public GitHub is the source of truth for non-sensitive implementation, tests and decisions. Restricted operational notes, private scoring criteria, non-public evaluation responses and commercial negotiation material belong in a separately access-controlled private workspace, such as Google Drive.
 - Constraints: No credentials in Drive documents; use a secrets manager. No participant data without informed consent, a retention policy and restricted access. Never place sensitive data in a public PR, issue or commit history.
