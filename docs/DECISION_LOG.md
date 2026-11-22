@@ -6,7 +6,7 @@ This public log records governance decisions, not completed implementation or ex
 - Date: 2026-11-22
 - Domain: Governance / public representation
 - Decision status: Accepted
-- Implementation status: Implemented in PR #15 (merged); wording consistency, footer synchronization and regression gates completed in PR #16 (draft, not merged); external review pending
+- Implementation status: Implemented in PR #15 (merged as f096de6); wording consistency, footer synchronization and regression gates completed in PR #16 (merged as bbb5d1a); external review pending
 - Decision: State that TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot, and is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external sources do not imply endorsement or participation.
 - Rationale: Distinguish ownership, editorial independence, source provenance and institutional authority.
 - Constraints: Do not claim ownership of third-party source materials or assert an unverified corporate legal form.
