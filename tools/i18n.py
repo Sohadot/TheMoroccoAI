@@ -28,9 +28,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 LANGUAGE_STATES = ("authoritative", "in-preparation", "published", "withdrawn")
-# Languages tools/build.py can render. Empty until Sprint 19B-2: no localized page or route exists, so no
-# language may be marked 'published'.
-RENDERING_LANGUAGES = frozenset()
+# Languages tools/build.py can render (Sprint 19B-2). Rendering is not publication: a page is generated in one
+# of these languages only when the language is 'published' in i18n/languages.json and the page is eligible
+# (every unit it uses approved, reviewed and current; page gates passed). ary and zgh have no renderer.
+RENDERING_LANGUAGES = frozenset({"ar", "fr"})
 UNIT_STATUSES = ("draft", "terminology-checked", "parity-reviewed", "linguistically-reviewed", "approved")
 # Every file on main is publicly served, so catalogs on main hold approved units only (Arch §6.3). A
 # translation pull request therefore stays red until both reviews are recorded: that is intended.
@@ -96,11 +97,7 @@ def t(message_id, **values):
     global _EN
     if _EN is None:
         _EN = english_messages()
-    text = _EN[message_id]
-    names = set(PLACEHOLDER.findall(text))
-    if names != set(values):
-        raise KeyError(f"{message_id}: placeholders {sorted(names)} but values {sorted(values)}")
-    return PLACEHOLDER.sub(lambda m: str(values[m.group(1)]), text)
+    return fill(_EN[message_id], values, message_id)
 
 
 # ─── Source resolution ────────────────────────────────────────────────────
@@ -172,7 +169,7 @@ def validate_languages(registry):
         return ["i18n/languages.json: 'languages' must be a non-empty list"]
     for i, lang in enumerate(langs):
         where = f"i18n/languages.json[{i}]"
-        missing = {"code", "bcp47", "script", "dir", "native_name", "state", "route"} - set(lang)
+        missing = {"code", "bcp47", "script", "dir", "native_name", "state", "route", "og_locale"} - set(lang)
         if missing:
             errors.append(f"{where}: missing {sorted(missing)}")
             continue
@@ -186,6 +183,8 @@ def validate_languages(registry):
             errors.append(f"{where}: script must be an ISO 15924 code such as 'Arab'")
         if lang["dir"] not in ("ltr", "rtl"):
             errors.append(f"{where}: dir must be 'ltr' or 'rtl'")
+        if not re.match(r"^[a-z]{2,3}_[A-Z]{2}$", lang["og_locale"]) or lang["og_locale"].split("_")[0] != code:
+            errors.append(f"{where}: og_locale {lang['og_locale']!r} must look like '{code}_MA'")
         if lang["state"] not in LANGUAGE_STATES:
             errors.append(f"{where}: unknown state {lang['state']!r}")
         errors += _text_problems(lang["native_name"], f"{where}.native_name")
@@ -389,21 +388,95 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
 
 # ─── Publication eligibility ─────────────────────────────────────────────
 
-def renderable_units(lang, root=ROOT, evidence=None, ontology=None, gaps=None):
-    """Ids of units in `lang` that may be rendered: approved, review recorded, and matching the current
-    English source. Stale, orphaned and unapproved units are never renderable (no grace period, Q4)."""
+def renderable_texts(lang, root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
+    """{id: text} of the units in `lang` that may be rendered. A unit is renderable only if it is approved,
+    its review is complete and independent of the drafter, its text passes every text and parity rule, and
+    its fingerprint matches the current English source. Stale, orphaned, unapproved or invalid units are never
+    renderable (no grace period, Q4), whether or not the validator was run."""
     root = Path(root)
+    today = today or datetime.date.today()
     sources = Sources(root, evidence, ontology, gaps)
-    out = set()
+    out = {}
     for kind in ("messages", "content"):
         path = root / "i18n" / lang / f"{kind}.json"
         if not path.exists():
             continue
         for u in _load(path).get("units", []):
-            source = sources.message(u.get("id")) if kind == "messages" else sources.content(u.get("id", ""))[0]
-            if source is not None and u.get("status") == "approved" and u.get("source_sha256") == fingerprint(source):
-                out.add(u["id"])
+            uid, text = u.get("id"), u.get("text")
+            source = sources.message(uid) if kind == "messages" else sources.content(uid or "")[0]
+            if (source is None or u.get("status") != "approved" or u.get("source_sha256") != fingerprint(source)
+                    or _review_problems(u.get("review"), uid, today) or _text_problems(text, uid)
+                    or _parity_problems(text, source, uid)):
+                continue
+            out[uid] = text
     return out
+
+
+def renderable_units(lang, root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
+    return set(renderable_texts(lang, root, evidence, ontology, gaps, today))
+
+
+def approved_terms(lang, root=ROOT):
+    """{term id: label} of glossary terms with an approved, well-formed label in `lang`."""
+    out = {}
+    for term in _load(Path(root) / "i18n" / "glossary.json").get("terms", []):
+        entry = term.get("translations", {}).get(lang)
+        if entry and entry.get("status") in COMMITTABLE_STATUSES and not _text_problems(entry.get("label"), "") \
+                and not any(v and v.lower() in entry["label"].lower() for v in entry.get("forbidden", [])):
+            out[term["id"]] = entry["label"]
+    return out
+
+
+class Untranslated(Exception):
+    """A page needs a unit or term that has no approved, current translation: the page is not eligible."""
+
+
+def fill(template, values, message_id="", transform=str):
+    """Replace {name} placeholders; the placeholder set must equal the values given. `transform` is applied
+    to the template text outside placeholders (for example HTML escaping), never to the values."""
+    names = set(PLACEHOLDER.findall(template))
+    if names != set(values):
+        raise KeyError(f"{message_id}: placeholders {sorted(names)} but values {sorted(values)}")
+    parts, last = [], 0
+    for m in PLACEHOLDER.finditer(template):
+        parts += [transform(template[last:m.start()]), str(values[m.group(1)])]
+        last = m.end()
+    return "".join(parts + [transform(template[last:])])
+
+
+class Translator:
+    """Strict lookup for one language while rendering. English reads the source catalog; any other language
+    reads only renderable units and approved glossary terms, and raises Untranslated otherwise (no English
+    fallback). Every id looked up is recorded, so a page's required units are exactly those it used."""
+
+    def __init__(self, lang, root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
+        self.lang, self.used, self.terms_used = lang, [], []
+        self.english = english_messages(root)
+        if lang == "en":
+            self.texts, self.terms = self.english, None
+        else:
+            self.texts = renderable_texts(lang, root, evidence, ontology, gaps, today)
+            self.terms = approved_terms(lang, root)
+
+    def template(self, message_id):
+        self.used.append(message_id)
+        if message_id not in self.texts:
+            if message_id not in self.english:
+                raise KeyError(f"unknown message id {message_id!r}")
+            raise Untranslated(f"{self.lang}: message {message_id!r} has no approved, current translation")
+        return self.texts[message_id]
+
+    def text(self, message_id, **values):
+        return fill(self.template(message_id), values, message_id)
+
+    def term(self, term_id, english):
+        """Glossary-controlled label: the canonical English value for 'en', else the approved label."""
+        self.terms_used.append(term_id)
+        if self.lang == "en":
+            return english
+        if term_id not in self.terms:
+            raise Untranslated(f"{self.lang}: glossary term {term_id!r} has no approved label")
+        return self.terms[term_id]
 
 
 def page_eligibility(lang, unit_ids, root=ROOT, evidence=None, ontology=None, gaps=None):

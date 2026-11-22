@@ -1,8 +1,8 @@
 {
  "note": "Language registry for the translation layer (TMA-DEC-007). English is the sole authoritative research language. 'in-preparation' languages have no published route: nothing is generated for them until a renderer exists and every unit a page needs is approved and current. Darija (ary, Arabic script) and Standard Moroccan Amazigh (zgh, Tifinagh) are future priorities and are added here only when their terminology, fonts and review capacity exist. Spanish is a possible later language with no publication commitment.",
  "languages": [
-  {"code": "en", "bcp47": "en", "script": "Latn", "dir": "ltr", "native_name": "English", "state": "authoritative", "route": "/"},
-  {"code": "ar", "bcp47": "ar", "script": "Arab", "dir": "rtl", "native_name": "العربية", "state": "in-preparation", "route": "/ar/"},
-  {"code": "fr", "bcp47": "fr", "script": "Latn", "dir": "ltr", "native_name": "Français", "state": "in-preparation", "route": "/fr/"}
+  {"code": "en", "bcp47": "en", "script": "Latn", "dir": "ltr", "native_name": "English", "state": "authoritative", "route": "/", "og_locale": "en_GB"},
+  {"code": "ar", "bcp47": "ar", "script": "Arab", "dir": "rtl", "native_name": "العربية", "state": "in-preparation", "route": "/ar/", "og_locale": "ar_MA"},
+  {"code": "fr", "bcp47": "fr", "script": "Latn", "dir": "ltr", "native_name": "Français", "state": "in-preparation", "route": "/fr/", "og_locale": "fr_MA"}
  ]
 }

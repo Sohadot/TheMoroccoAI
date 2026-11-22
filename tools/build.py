@@ -8,6 +8,8 @@ Generated outputs (committed, because GitHub Pages serves the repository as-is):
     sitemap.xml, and the marked blocks inside index.html.
 Standard library only.
 """
+import collections
+import contextlib
 import datetime
 import hashlib
 import json
@@ -103,23 +105,104 @@ def badge(classification):
     return f'<span class="badge badge-{slug(classification)}">{escape(classification)}</span>'
 
 
+# ─── LANGUAGE CONTEXT (TMA-DEC-007) ────────────────────────────────────────
+# Every page is rendered inside a context: its language, a strict translator for that language, and the
+# hreflang clusters (English path -> languages in which that page is generated). English is the default
+# context and has no clusters until a translation is published, so English output is unchanged by this layer.
+
+def load_languages(root=ROOT):
+    data = json.loads((Path(root) / "i18n" / "languages.json").read_text(encoding="utf-8"))
+    return {x["code"]: x for x in data["languages"]}
+
+
+class RenderContext:
+    def __init__(self, lang="en", root=ROOT, clusters=None, translator=None, languages=None, today=None):
+        self.root = Path(root)
+        self.languages = languages or load_languages(root)
+        self.lang, self.info = lang, self.languages[lang]
+        self.dir = self.info["dir"]
+        self.tr = translator or i18n.Translator(lang, root, today=today)
+        self.clusters = clusters or {}
+
+
+_CTX = None
+
+
+def _ctx():
+    global _CTX
+    if _CTX is None:
+        _CTX = RenderContext()
+    return _CTX
+
+
+@contextlib.contextmanager
+def rendering(ctx):
+    global _CTX
+    previous, _CTX = _CTX, ctx
+    try:
+        yield ctx
+    finally:
+        _CTX = previous
+
+
 def msg(message_id, **values):
-    """English interface text from i18n/en/messages.json, HTML-escaped as element text."""
-    return escape(i18n.t(message_id, **values), quote=False)
+    """Catalog text in the current language, HTML-escaped as element text (values included)."""
+    return escape(_ctx().tr.text(message_id, **values), quote=False)
+
+
+def msg_html(message_id, **html):
+    """Catalog text with {name} placeholders replaced by HTML built by the generator (links, isolated
+    identifiers). The catalog text is escaped; the HTML values are inserted as they are."""
+    return i18n.fill(_ctx().tr.template(message_id), html, message_id, transform=lambda t: escape(t, quote=False))
+
+
+def iso(fragment):
+    """Left-to-right isolation for identifiers, URLs, codes and version strings inside right-to-left text."""
+    return fragment if _ctx().dir == "ltr" else f'<bdi dir="ltr">{fragment}</bdi>'
+
+
+def route(lang, path):
+    """Public path of an English path in `lang`: '/methodology/' -> '/ar/methodology/'. English keeps '/'."""
+    return path if lang == "en" else f"/{lang}{path}"
+
+
+def output_path(lang, path):
+    return route(lang, path).lstrip("/") + ("index.html" if path.endswith("/") else "")
+
+
+def local_href(href):
+    """(target, falls_back_to_english): the same-language page when it is generated in the current language,
+    otherwise the English page. English pages link exactly as before."""
+    ctx = _ctx()
+    if ctx.lang == "en" or not href.startswith("/"):
+        return href, False
+    base, sep, fragment = href.partition("#")
+    if ctx.lang in ctx.clusters.get(base, ()):
+        return route(ctx.lang, base) + sep + fragment, False
+    return href, True
+
+
+def link(href, label_html):
+    """An internal link; on a localized page a link to a page that is not translated goes to English and says so."""
+    target, english = local_href(href)
+    if not english:
+        return f'<a href="{target}">{label_html}</a>'
+    return f'<a href="{target}" hreflang="en">{label_html} <span class="lang-note">{msg("shell.in_english")}</span></a>'
 
 
 def human_date(value):
-    """'20 October 2026' or 'October 2026'. Month names come from the English catalog, never from strftime or
-    the process locale, so the output is the same on every platform (and can later be localized)."""
+    """'20 October 2026' or 'October 2026' in the current language. Month names come from the catalog, never
+    from strftime or the process locale, so the output is the same on every platform."""
+    tr = _ctx().tr
     if not value:
-        return i18n.t("date.not_stated")
+        return tr.text("date.not_stated")
     parts = value.split("-")
     year, month = int(parts[0]), int(parts[1])
     datetime.date(year, month, int(parts[2]) if len(parts) > 2 else 1)  # rejects impossible dates, as before
-    name = i18n.t(f"date.month.{month:02d}")
+    name = tr.text(f"date.month.{month:02d}")
     if len(parts) > 2:
-        return i18n.t("date.day_month_year", day=int(parts[2]), month=name, year=year)
-    return i18n.t("date.month_year", month=name, year=year)
+        return tr.text("date.day_month_year", day=int(parts[2]), month=name, year=year)
+    return tr.text("date.month_year", month=name, year=year)
 
 
 def entity_url(eid):
@@ -171,9 +254,9 @@ OWNERSHIP_STATEMENT = i18n.t("disclosure.ownership_statement")
 def footer(model):
     """Site footer shared by every generated page; /evaluation/ (hand-maintained) must carry it verbatim."""
     note = " · ".join([msg("footer.owner_note"), msg("footer.disclaimer"),
-                       msg("footer.registry_version", version=model.evidence["version"]),
+                       msg_html("footer.registry_version", version=iso(escape(model.evidence["version"], quote=False))),
                        msg("footer.as_of", date=human_date(model.as_of))])
-    links = " · ".join(f'<a href="{href}">{msg(key)}</a>' for href, key in (
+    links = " · ".join(link(href, msg(key)) for href, key in (
         ("/methodology/#ownership-h", "footer.link.ownership"), ("/methodology/", "footer.link.methodology"),
         ("/data/", "footer.link.data"), ("/evaluation/", "footer.link.evaluation"),
         ("/acquisition/", "footer.link.acquisition")))
@@ -187,8 +270,46 @@ def footer(model):
 """
 
 
+def language_switcher(path, cluster):
+    """Links to the languages in which this page is generated, in their own names. Plain links: no script,
+    no redirect. Absent unless the page exists in at least two languages."""
+    ctx = _ctx()
+    if len(cluster) < 2:
+        return ""
+    items = []
+    for code in cluster:
+        info = ctx.languages[code]
+        current = ' aria-current="true"' if code == ctx.lang else ""
+        items.append(f'<li><a href="{route(code, path)}" lang="{info["bcp47"]}" dir="{info["dir"]}" '
+                     f'hreflang="{info["bcp47"]}"{current}>{escape(info["native_name"])}</a></li>')
+    return f'  <ul class="lang-switch" aria-label="{escape(ctx.tr.text("shell.lang.label"))}">{"".join(items)}</ul>\n'
+
+
 def page(model, *, path, title, description, body, jsonld=None, current=""):
-    canonical = SITE + path
+    ctx = _ctx()
+    lang, info = ctx.lang, ctx.info
+    canonical = SITE + route(lang, path)
+    cluster = ctx.clusters.get(path, ())
+    seo = notice = ""
+    if len(cluster) > 1:
+        # Reciprocal alternates among the generated equivalents only; x-default is the English page.
+        seo = "".join(f'<link rel="alternate" hreflang="{ctx.languages[c]["bcp47"]}" href="{SITE}{route(c, path)}">\n'
+                      for c in cluster)
+        seo += f'<link rel="alternate" hreflang="x-default" href="{SITE}{path}">\n'
+        seo += f'<meta property="og:locale" content="{info["og_locale"]}">\n'
+        seo += "".join(f'<meta property="og:locale:alternate" content="{ctx.languages[c]["og_locale"]}">\n'
+                       for c in cluster if c != lang)
+        if jsonld:
+            jsonld = dict(jsonld, inLanguage=info["bcp47"])
+            if lang == "en":
+                jsonld["workTranslation"] = [{"@id": SITE + route(c, path)} for c in cluster if c != "en"]
+            else:
+                jsonld["translationOfWork"] = {"@id": SITE + path}
+                if "url" in jsonld:
+                    jsonld["url"] = canonical
+    if lang != "en":
+        english = f'<a href="{path}" hreflang="en">{msg("shell.translation_notice.english")}</a>'
+        notice = f'<p class="translation-notice" role="note">{msg_html("shell.translation_notice", english=english)}</p>\n'
     ld = ""
     if jsonld:
         ld = '<script type="application/ld+json">' + json.dumps(jsonld, ensure_ascii=False, indent=1).replace("</", "<\\/") + "</script>\n"
@@ -196,10 +317,13 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
     def nav_link(href, label, key, cls=""):
         cur = ' aria-current="page"' if key == current else ""
         c = f' class="{cls}"' if cls else ""
-        return f'<li><a href="{href}"{c}{cur}>{label}</a></li>'
+        target, english = local_href(href)
+        hl = ' hreflang="en"' if english else ""
+        return f'<li><a href="{target}"{hl}{c}{cur}>{label}</a></li>'
 
+    home, home_english = local_href("/")
     return f"""<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="{info["bcp47"]}" dir="{info["dir"]}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -211,7 +335,7 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
 <meta property="og:title" content="{escape(title)}">
 <meta property="og:description" content="{escape(description)}">
 <meta property="og:url" content="{canonical}">
-<meta name="twitter:card" content="summary">
+{seo}<meta name="twitter:card" content="summary">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="/assets/registry.css">
@@ -219,8 +343,8 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
 <body>
 <a class="skip-link" href="#content">{msg("shell.skip_link")}</a>
 <div class="zellige-bg" aria-hidden="true"></div>
-<nav class="site-nav" aria-label="{escape(i18n.t("shell.nav.label"))}">
-  <a class="nav-mark" href="/">{SIGIL}<span class="nav-name">TheMoroccoAI</span></a>
+<nav class="site-nav" aria-label="{escape(ctx.tr.text("shell.nav.label"))}">
+  <a class="nav-mark" href="{home}"{' hreflang="en"' if home_english else ""}>{SIGIL}<span class="nav-name">TheMoroccoAI</span></a>
   <ul class="nav-links">
     {nav_link("/registry/", msg("shell.nav.registry"), "registry")}
     {nav_link("/registry/questions/", msg("shell.nav.questions"), "questions", "nav-optional")}
@@ -230,10 +354,10 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
     {nav_link("/methodology/", msg("shell.nav.methodology"), "methodology", "nav-optional")}
     {nav_link("/acquisition/", msg("shell.nav.acquisition"), "acquisition", "nav-optional")}
   </ul>
-</nav>
+{language_switcher(path, cluster)}</nav>
 <main id="content">
 <div class="page">
-{body}
+{notice}{body}
 </div>
 </main>
 {footer(model)}</body>
@@ -2278,9 +2402,216 @@ def inject(html_text, blocks):
     return html_text
 
 
-def sitemap(model):
+# ─── LOCALIZED PAGES (TMA-DEC-007) ─────────────────────────────────────────
+
+class PageSpec:
+    """A page that can be rendered in another language: its English path and a render function that takes the
+    model and builds every piece of its text from the catalogs (msg, msg_html, human_date, translator terms)."""
+
+    def __init__(self, path, render):
+        self.path, self.render = path, render
+
+
+# Pages registered for localization. A page joins only once all of its text comes from the catalogs, so that a
+# localized rendering contains no English prose. None does yet: the registry index and methodology bodies are
+# extracted in Sprint 19B-3. With this empty, nothing is localized and English output is unchanged.
+LOCALIZABLE_PAGES = ()
+
+# Shell units that only localized pages use (switcher, translation notice, fallback marker).
+LOCALIZATION_ONLY_MESSAGES = {"shell.lang.label", "shell.translation_notice", "shell.translation_notice.english",
+                              "shell.in_english"}
+# Language route prefixes that must never hold a file the build did not generate (withdrawn translations).
+RESERVED_LANGUAGE_DIRS = ("ar", "fr", "ary", "zgh", "es")
+
+
+def publishable_languages(languages):
+    """Languages a page may be generated in: published in i18n/languages.json and with a renderer."""
+    return [c for c, x in languages.items()
+            if c != "en" and x["state"] == "published" and c in i18n.RENDERING_LANGUAGES]
+
+
+class _PageFacts(HTMLParser):
+    """What the publication gates compare between a localized page and its English source."""
+    ISOLATING = {"bdi", "code", "script", "style"}
+    TOKEN = re.compile(r"MAI-[A-Z0-9]+(?:-[A-Z0-9]+)*|https?://\S+|\bv\d+(?:\.\d+)+")
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.lang = self.dir = self.canonical = None
+        self.title, self.description = "", None
+        self.text, self.unisolated, self.hrefs, self.badges, self.classes, self.alternates = [], [], [], [], set(), []
+        self.stack, self._title = [], False
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == "html":
+            self.lang, self.dir = a.get("lang"), a.get("dir")
+        elif tag == "title":
+            self._title = True
+        elif tag == "meta" and a.get("name") == "description":
+            self.description = a.get("content")
+        elif tag == "link" and a.get("rel") == "canonical":
+            self.canonical = a.get("href")
+        elif tag == "link" and a.get("rel") == "alternate" and a.get("hreflang"):
+            self.alternates.append((a["hreflang"], a.get("href")))
+        if tag == "a" and a.get("href"):
+            self.hrefs.append(a["href"])
+        for c in (a.get("class") or "").split():
+            self.classes.add(c)
+            if c.startswith("badge-"):
+                self.badges.append(c)
+        if tag not in ("meta", "link", "br", "img", "input", "hr", "source"):
+            isolated = tag in self.ISOLATING or a.get("dir") == "ltr" or (self.stack and self.stack[-1])
+            self.stack.append(bool(isolated))
+
+    def handle_endtag(self, tag):
+        if tag == "title":
+            self._title = False
+        if tag not in ("meta", "link", "br", "img", "input", "hr", "source") and self.stack:
+            self.stack.pop()
+
+    def handle_data(self, data):
+        if self._title:
+            self.title += data
+            return
+        if self.stack and self.stack[-1] and not data.strip():
+            return
+        self.text.append(data)
+        if not (self.stack and self.stack[-1]):
+            self.unisolated += self.TOKEN.findall(data)
+
+
+def _facts(html):
+    f = _PageFacts()
+    f.feed(html)
+    f.visible = re.sub(r"\s+", " ", " ".join(f.text))
+    return f
+
+
+def localized_page_errors(lang, path, html, english_html, used, english_used, languages, translator):
+    """Publication gates for one localized page against the English page it translates. Any error makes the
+    page ineligible: it is not generated, listed, switched to or referenced by hreflang."""
+    info, loc, en = languages[lang], _facts(html), _facts(english_html)
+    errors = []
+    if loc.lang != info["bcp47"] or loc.dir != info["dir"]:
+        errors.append(f'<html lang="{loc.lang}" dir="{loc.dir}"> should be lang="{info["bcp47"]}" dir="{info["dir"]}"')
+    if loc.canonical != SITE + route(lang, path):
+        errors.append(f"canonical {loc.canonical} should be the page itself, {SITE + route(lang, path)}")
+    if not loc.title.strip() or not (loc.description or "").strip():
+        errors.append("missing localized title or meta description")
+    ids = lambda f: collections.Counter(re.findall(r"MAI-[A-Z0-9]+(?:-[A-Z0-9]+)*", f.visible))
+    if ids(loc) != ids(en):
+        errors.append(f"evidence or entity identifiers differ from English: {sorted(((ids(en) - ids(loc)) + (ids(loc) - ids(en))).elements())}")
+    external = lambda f: sorted(h for h in f.hrefs if h.startswith("http") and not h.startswith(SITE))
+    if external(loc) != external(en):
+        errors.append("source URLs differ from English")
+    digits = lambda f: collections.Counter(re.findall(r"\d+", f.visible))
+    if digits(loc) != digits(en):
+        errors.append(f"numbers or dates differ from English: {sorted(((digits(en) - digits(loc)) + (digits(loc) - digits(en))).elements())}")
+    if loc.badges != en.badges:
+        errors.append("classification codes differ from English")
+    en_ids, loc_ids = set(english_used), set(used)
+    if en_ids - loc_ids or loc_ids - en_ids - LOCALIZATION_ONLY_MESSAGES:
+        errors.append(f"rendered a different set of messages from English (qualifiers or text missing or added): "
+                      f"{sorted((en_ids - loc_ids) | (loc_ids - en_ids - LOCALIZATION_ONLY_MESSAGES))}")
+    texts = translator.texts
+    for mid in ("footer.owner_note", "footer.disclaimer"):
+        if mid in texts and texts[mid] not in loc.visible:
+            errors.append(f"missing localized disclosure {mid}")
+    if "translation-notice" not in loc.classes:
+        errors.append("missing translation notice (English prevails)")
+    if OWNERSHIP_STATEMENT in en.visible and texts.get("disclosure.ownership_statement", "\0") not in loc.visible:
+        errors.append("missing localized ownership and independence statement")
+    if info["dir"] == "rtl" and loc.unisolated:
+        errors.append(f"identifiers, URLs or versions not isolated in right-to-left text: {loc.unisolated[:5]}")
+    for mid, english in translator.english.items():
+        if len(english.split()) >= 3 and texts.get(mid) != english and english in loc.visible:
+            errors.append(f"English text left untranslated: {mid}")
+    return errors
+
+
+def localize(model, pages=None, root=ROOT, today=None):
+    """Render every registered page in every publishable language and keep only eligible ones.
+    Returns (files, clusters, report): files maps output paths such as 'ar/methodology/index.html' to HTML;
+    clusters maps English paths to the languages a page is generated in (English first); report explains each
+    page that was not generated. Pass 1 decides eligibility; pass 2 renders with the final clusters."""
+    pages = LOCALIZABLE_PAGES if pages is None else pages
+    languages = load_languages(root)
+    targets = publishable_languages(languages)
+    eligible, report = {}, []
+    for spec in pages:
+        en_ctx = RenderContext("en", root, languages=languages, today=today)
+        with rendering(en_ctx):
+            english_html = spec.render(model)
+        for lang in targets:
+            tr = i18n.Translator(lang, root, today=today)
+            ctx = RenderContext(lang, root, clusters={spec.path: ["en", lang]}, translator=tr, languages=languages)
+            try:
+                with rendering(ctx):
+                    html = spec.render(model)
+            except i18n.Untranslated as exc:
+                report.append(f"{lang}{spec.path}: not generated: {exc}")
+                continue
+            errors = localized_page_errors(lang, spec.path, html, english_html, tr.used, en_ctx.tr.used, languages, tr)
+            if errors:
+                report += [f"{lang}{spec.path}: not generated: {e}" for e in errors]
+                continue
+            eligible.setdefault(spec.path, {"en"}).add(lang)
+    clusters = {path: [c for c in languages if c in langs] for path, langs in eligible.items()}
+    files = {}
+    for spec in pages:
+        for lang in clusters.get(spec.path, [])[1:]:
+            with rendering(RenderContext(lang, root, clusters=clusters, languages=languages, today=today)):
+                files[output_path(lang, spec.path)] = spec.render(model)
+    return files, clusters, report
+
+
+def cluster_errors(files, languages):
+    """Site-wide hreflang rules on the generated output: alternates only among generated pages, reciprocal,
+    including the page itself, with x-default on the English page; every page canonical to itself."""
+    errors, alternates = [], {}
+    for p, html in files.items():
+        if p.endswith(".html"):
+            f = _facts(html)
+            if f.alternates:
+                alternates[p] = f
+    url_to_file = {SITE + "/" + p[:-len("index.html")]: p for p in files if p.endswith("index.html")}
+    for p, f in alternates.items():
+        own = SITE + "/" + p[:-len("index.html")]
+        cluster = {lang: href for lang, href in f.alternates}
+        if f.canonical != own or own not in cluster.values():
+            errors.append(f"{p}: must be canonical to itself and list itself among its alternates")
+        english = {href for lang, href in f.alternates if lang == "en"}
+        if cluster.get("x-default") not in english:
+            errors.append(f"{p}: x-default must point to the English page")
+        for lang, href in f.alternates:
+            target = url_to_file.get(href)
+            if target is None:
+                errors.append(f"{p}: hreflang {lang} points to a page that is not generated: {href}")
+            elif target not in alternates or sorted(alternates[target].alternates) != sorted(f.alternates):
+                errors.append(f"{p}: hreflang {lang} is not reciprocal with {target}")
+        codes = {lang.split("-")[0] for lang in cluster if lang != "x-default"}
+        unpublished = codes - {"en"} - set(publishable_languages(languages))
+        if unpublished:
+            errors.append(f"{p}: hreflang to unpublished languages {sorted(unpublished)}")
+    return errors
+
+
+def withdrawn_files(root, files):
+    """Files under a language route that the build did not generate: withdrawn or stale translations, which
+    must not stay publicly served (GitHub Pages serves every committed file)."""
+    out = []
+    for code in RESERVED_LANGUAGE_DIRS:
+        base = Path(root) / code
+        if base.exists():
+            out += sorted(str(f.relative_to(root)) for f in base.rglob("*") if f.is_file()
+                          and str(f.relative_to(root)) not in files)
+    return out
+
+
+def sitemap(model, localized=()):
     paths = (["/", "/registry/", "/registry/state/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/data/", "/methodology/", "/acquisition/"]
-             + [entity_url(e) for e in sorted(model.entities)])
+             + [entity_url(e) for e in sorted(model.entities)] + list(localized))
     urls = "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{model.as_of}</lastmod></url>\n" for p in paths)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
 
@@ -2289,7 +2620,24 @@ def _json(data):
     return json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
 
 
-def outputs(model):
+def outputs(model, localizable=None):
+    return build_outputs(model, localizable)[0]
+
+
+def build_outputs(model, localizable=None):
+    """All generated files and the localization report. Localized pages are decided first, so that English
+    pages carry hreflang alternates only for translations that are actually generated (none today)."""
+    localized, clusters, report = localize(model, localizable)
+    languages = load_languages()
+    localized_paths = [route(lang, path) for lang in languages for path, langs in clusters.items()
+                       if lang != "en" and lang in langs]
+    with rendering(RenderContext("en", clusters=clusters, languages=languages)):
+        files = _english_outputs(model, localized_paths)
+    files.update(localized)
+    return files, report
+
+
+def _english_outputs(model, localized_paths):
     gaps = registry.load(registry.ROOT / "data" / "gaps.json")
     files = {
         "registry/index.html": render_registry_index(model),
@@ -2309,7 +2657,7 @@ def outputs(model):
                                           "gaps": gap_register(model, gaps)}),
         "methodology/index.html": render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json")),
         "acquisition/index.html": render_acquisition(model),
-        "sitemap.xml": sitemap(model),
+        "sitemap.xml": sitemap(model, localized_paths),
     }
     canonical = {p: (ROOT / p).read_bytes() for p in REFERENCE_INPUTS}
     files["registry/reference-state.json"] = _json(reference_state(model, gaps, canonical))
@@ -2330,11 +2678,14 @@ def main(argv):
         for e in errors:
             print("ERROR", e)
         return 1
-    files = outputs(Model(evidence, ontology))
+    files, report = build_outputs(Model(evidence, ontology))
+    for line in report:
+        print("TRANSLATION", line)
     snapshot = json.loads(files["registry/reference-state.json"])
     errors = registry.validate_reference_state(snapshot, evidence, ontology)
     errors += state_page_errors(files["registry/state/index.html"], snapshot, Model(evidence, ontology),
                                 registry.load(registry.ROOT / "data" / "gaps.json"))
+    errors += cluster_errors(files, load_languages())
     if errors:
         for e in errors:
             print("ERROR", e)
@@ -2345,12 +2696,22 @@ def main(argv):
     if check:
         stale = [p for p, c in files.items() if not (ROOT / p).exists() or (ROOT / p).read_text(encoding="utf-8") != c]
         stale += [str(d.relative_to(ROOT)) + "/ (orphaned)" for d in stale_dirs]
+        stale += [p + " (withdrawn translation: delete it)" for p in withdrawn_files(ROOT, files)]
         for p in stale:
             print("STALE", p)
         print(f"{len(files)} generated files checked, {len(stale)} stale")
         return 1 if stale else 0
     for d in stale_dirs:
         shutil.rmtree(d)
+    for p in withdrawn_files(ROOT, files):
+        (ROOT / p).unlink()
+        print("WITHDRAWN", p)
+    for code in RESERVED_LANGUAGE_DIRS:
+        for d in sorted((ROOT / code).rglob("*"), reverse=True) if (ROOT / code).exists() else []:
+            if d.is_dir() and not any(d.iterdir()):
+                d.rmdir()
+        if (ROOT / code).exists() and not any((ROOT / code).iterdir()):
+            (ROOT / code).rmdir()
     for p, c in files.items():
         target = ROOT / p
         target.parent.mkdir(parents=True, exist_ok=True)

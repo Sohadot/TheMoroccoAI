@@ -59,6 +59,7 @@ class Page(HTMLParser):
         self.meta, self.canonical, self.lang, self.title = {}, None, None, ""
         self.h1, self.svgs_unlabelled, self.empty_links, self.styles = 0, 0, [], []
         self.alternates = []
+        self.dir = None
         self.text = []
         self._in_title = self._in_style = False
         self._link_stack = []
@@ -69,6 +70,7 @@ class Page(HTMLParser):
             (self.dup_ids if a["id"] in self.ids else self.ids).add(a["id"])
         if tag == "html":
             self.lang = a.get("lang")
+            self.dir = a.get("dir")
         elif tag == "title":
             self._in_title = True
         elif tag == "style":
@@ -303,8 +305,15 @@ def check_languages(parsed):
     for code in sorted((set(RESERVED_LANGUAGE_ROUTES) | registered) - {"en"} - published):
         if (ROOT / code).exists():
             errors.append(f"{code}/: route for a language that is not published (no placeholder or unfinished pages)")
+    languages = {x["code"]: x for x in json.loads(path.read_text(encoding="utf-8"))["languages"]} if path.exists() else {}
+    clusters = {}
     for f, page in parsed.items():
         where = f.relative_to(ROOT).as_posix()
+        top = where.split("/")[0]
+        if top in published and top in languages:
+            want = languages[top]
+            if page.lang != want["bcp47"] or page.dir != want["dir"]:
+                errors.append(f"{where}: <html lang/dir> should be {want['bcp47']!r}/{want['dir']!r} under /{top}/")
         for lang, href in page.alternates:
             code = lang.split("-")[0].lower()
             if lang != "x-default" and code != "en" and code not in published:
@@ -313,6 +322,18 @@ def check_languages(parsed):
             r = resolve(f, href)
             if r is None or not r[0].exists():
                 errors.append(f"{where}: hreflang {lang!r} points to a missing page {href}")
+        if page.alternates:
+            clusters[f] = sorted(page.alternates)
+    for f, alts in clusters.items():
+        where = f.relative_to(ROOT).as_posix()
+        if "x-default" not in {lang for lang, _ in alts}:
+            errors.append(f"{where}: hreflang cluster has no x-default")
+        if SITE + url_path(f) not in {href for _, href in alts}:
+            errors.append(f"{where}: hreflang cluster does not include the page itself")
+        for lang, href in alts:
+            r = resolve(f, href)
+            if r and r[0] in parsed and clusters.get(r[0]) != alts:
+                errors.append(f"{where}: hreflang {lang!r} is not reciprocal with {r[0].relative_to(ROOT).as_posix()}")
     return errors
 
 
