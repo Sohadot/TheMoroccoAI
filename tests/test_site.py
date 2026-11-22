@@ -369,6 +369,44 @@ class ReferenceFirstPositioning(unittest.TestCase):
             self.assertIn('href="/acquisition/"', html, f)
             self.assertNotIn("nav-acquire", html, f)
 
+    def _evaluate_block(self):
+        method = _section(self.home, "method")
+        start = method.index('<div class="evaluate-block" id="evaluate">')
+        return method[start:]
+
+    def test_homepage_invites_independent_evaluation_from_the_method_section(self):
+        block = self._evaluate_block()
+        # One plain link, no script-driven navigation, no forced new tab.
+        links = re.findall(r"<a\b[^>]*>", block)
+        self.assertEqual(links, ['<a class="btn-evaluate" href="/evaluation/">'])
+        self.assertNotIn("onclick", block)
+        self.assertNotIn("<button", block)
+        self.assertIn("Start independent evaluation", _visible(block))
+        # Placed after the editorial rules, before the owner's thesis and acquisition note.
+        self.assertLess(self.home.index('class="posture-block"'), self.home.index('id="evaluate"'))
+        self.assertLess(self.home.index('id="evaluate"'), self.home.index('id="thesis"'))
+        self.assertEqual(self.home.count('href="/evaluation/"'), 2, "one invitation plus the footer link")
+
+    def test_evaluation_invitation_is_voluntary_and_claims_no_validation(self):
+        text = _visible(self._evaluate_block())
+        self.assertIn("voluntary", text)
+        self.assertIn("Participation does not imply endorsement, affiliation or institutional recognition", text)
+        self.assertIn("no external validation of the registry has been performed", text)
+        for claim in ("validated by", "endorsed by", "certified", "accredited", "officially", "in partnership with",
+                      "government-approved", "results show", "evaluators found"):
+            self.assertNotIn(claim, text.lower(), claim)
+        self.assertIn("not affiliated with the government of morocco", _visible(_section(self.home, "top")).lower())
+
+    def test_evaluation_invitation_matches_the_evaluation_page(self):
+        text = _visible(self._evaluate_block())
+        page = _visible((REPO / "evaluation" / "index.html").read_text(encoding="utf-8"))
+        self.assertIn("about 5 minutes", text)
+        self.assertIn("Approximately 5 minutes", page)
+        self.assertIn("15–20 minutes", text)
+        self.assertIn("15–20 minutes", page)
+        self.assertIn("No account, tracking", page)
+        self.assertIn("Preparing a report does not send it anywhere", page)
+
     def test_independence_is_unmistakable_on_the_homepage(self):
         hero = _visible(_section(self.home, "top"))
         self.assertIn("Not affiliated with the Government of Morocco", hero)
