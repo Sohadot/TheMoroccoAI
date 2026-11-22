@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Independent Research Evaluation — TheMoroccoAI</title>
+<meta name="description" content="Evaluate the usability of TheMoroccoAI independently through introductory and specialist evidence research tasks, without accounts, tracking, or automatic submission.">
+<link rel="canonical" href="https://themoroccoai.com/evaluation/">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TheMoroccoAI">
+<meta property="og:title" content="Independent Research Evaluation — TheMoroccoAI">
+<meta property="og:description" content="Independent introductory and specialist research usability evaluation.">
+<meta property="og:url" content="https://themoroccoai.com/evaluation/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/registry.css">
+<link rel="stylesheet" href="/assets/evaluation.css">
+<script src="/assets/evaluation.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+<div class="zellige-bg" aria-hidden="true"></div>
+<nav class="site-nav" aria-label="Primary">
+  <a class="nav-mark" href="/"><svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/><polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/><circle cx="14" cy="14" r="2.5" fill="#b8892a"/></svg><span class="nav-name">TheMoroccoAI</span></a>
+  <ul class="nav-links">
+    <li><a href="/registry/">Registry</a></li>
+    <li><a href="/registry/questions/" class="nav-optional">Questions</a></li>
+    <li><a href="/registry/matrix/" class="nav-optional">Matrix</a></li>
+    <li><a href="/registry/gaps/" class="nav-optional">Gaps</a></li>
+    <li><a href="/registry/evidence/" class="nav-optional">Evidence</a></li>
+    <li><a href="/methodology/" class="nav-optional">Methodology</a></li>
+    <li><a href="/acquisition/" class="nav-optional" >Acquisition</a></li>
+  </ul>
+</nav>
+<main id="content">
+<div class="page">
+<header class="page-head">
+<p class="label">MAI-IRE — Independent research evaluation</p>
+<h1>Independent Research Evaluation</h1>
+<p class="lede">Assess how well this independent reference supports your own evidence-based research. Choose an introductory or specialist task. No account, tracking, scoring, or automatic submission.</p>
+<p class="notice"><strong>Independence and ownership.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. Not affiliated with the Government of Morocco or endorsed by or operated on behalf of any government, public institution, or third-party organization or company. References to external sources do not imply their participation or endorsement.</p>
+</header>
+<section class="eval-intro" aria-labelledby="eval-choice">
+<h2 id="eval-choice">Choose your evaluation</h2>
+<p class="prose">Both routes begin with the registry rather than a preselected answer. Use the site's own navigation, then return to record your findings.</p>
+<div class="eval-modes" role="group" aria-label="Evaluation type">
+<button type="button" class="eval-mode" data-mode="intro" aria-pressed="true"><strong>Introductory evaluation</strong><span>Approximately 5 minutes · One independent research task</span></button>
+<button type="button" class="eval-mode" data-mode="specialist" aria-pressed="false"><strong>Specialist evaluation</strong><span>Approximately 15–20 minutes · Three evidence interpretation tasks</span></button>
+</div>
+</section>
+<section aria-labelledby="eval-task">
+<h2 id="eval-task">Research task</h2>
+<p id="eval-progress" class="label" aria-live="polite">Introductory · Task 1 of 1</p>
+<p id="eval-prompt" class="eval-prompt">Find one AI-related initiative in the registry. Identify a supporting source. Explain what that source establishes and what it does not establish.</p>
+<p class="prose">Begin at the <a href="/registry/">registry index</a>. No specific record is suggested. You may navigate freely; this page does not monitor where you go.</p>
+<form id="eval-form">
+<div class="eval-field"><label for="finding">What did you find?</label><textarea id="finding" rows="4" autocomplete="off" placeholder="Describe your own finding"></textarea></div>
+<div class="eval-field"><label for="source">Which evidence identifier or source URL supports your finding?</label><textarea id="source" rows="2" autocomplete="off" placeholder="Record the source you selected"></textarea></div>
+<div class="eval-field"><label for="limits">What remains uncertain, unclear, difficult, or missing?</label><textarea id="limits" rows="3" autocomplete="off" placeholder="Describe limitations and navigation difficulties"></textarea></div>
+<fieldset class="eval-field"><legend>How difficult was this task? (optional)</legend>
+<div class="eval-rating"><label><input type="radio" name="difficulty" value="Very easy"> Very easy</label><label><input type="radio" name="difficulty" value="Easy"> Easy</label><label><input type="radio" name="difficulty" value="Neither easy nor difficult"> Neither</label><label><input type="radio" name="difficulty" value="Difficult"> Difficult</label><label><input type="radio" name="difficulty" value="Very difficult"> Very difficult</label><label><input type="radio" name="difficulty" value="Prefer not to answer"> Prefer not to answer</label></div>
+</fieldset>
+<div class="eval-actions"><button type="button" id="eval-next" hidden>Save task and continue</button><button type="button" id="eval-copy">Prepare report</button><button type="reset" id="eval-clear">Clear evaluation</button></div>
+</form>
+</section>
+<section aria-labelledby="eval-report-heading">
+<h2 id="eval-report-heading">Your report</h2>
+<p class="prose">Your answers stay in this browser tab until you clear them or leave. Preparing a report does not send it anywhere. You can select and copy the text below, then voluntarily email it to <a href="mailto:agent@sohadot.com?subject=TheMoroccoAI%20independent%20research%20evaluation">agent@sohadot.com</a>. Email may disclose your identity and will be received and retained by the mailbox operator; do not include personal or sensitive information. Do not send until the recipient's privacy and retention arrangements are acceptable to you.</p>
+<label for="eval-report">Plain-text report (select and copy manually)</label>
+<textarea id="eval-report" rows="10" readonly aria-describedby="eval-status"></textarea>
+<p id="eval-status" role="status" aria-live="polite">No report prepared or sent.</p>
+</section>
+<section aria-labelledby="eval-limits-heading">
+<h2 id="eval-limits-heading">Scope and interpretation</h2>
+<p class="prose">This exercise tests usability and evidence interpretation, not the correctness of participants or the completeness of the Moroccan AI ecosystem. An official target is not proof of achievement; an evidence gap is not evidence of absence. Completing an evaluation does not constitute independent institutional validation.</p>
+</section>
+</div>
+</main>
+<footer>
+  <div class="footer-inner">
+    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
+    <span class="footer-note">Not affiliated with the Government of Morocco · Registry v0.10.1 · as of 20 October 2026</span>
+    <span class="footer-note"><a href="/methodology/">Methodology and changelog</a> · <a href="/data/">Data</a> · <a href="/acquisition/">Acquisition</a></span>
+  </div>
+</footer>
+</body>
+</html>

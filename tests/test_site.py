@@ -28,6 +28,28 @@ class PublishedSite(unittest.TestCase):
         for page in (REPO / "registry").glob("*/index.html"):
             self.assertIn(f"/registry/{page.parent.name}/", sitemap)
 
+    def test_evaluation_is_private_by_design_and_not_in_sitemap(self):
+        page = (REPO / "evaluation" / "index.html").read_text(encoding="utf-8")
+        script = (REPO / "assets" / "evaluation.js").read_text(encoding="utf-8")
+        self.assertIn('<meta name="robots" content="noindex, follow">', page)
+        self.assertNotIn("https://themoroccoai.com/evaluation/", (REPO / "sitemap.xml").read_text())
+        self.assertIn('href="/evaluation/"', (REPO / "index.html").read_text())
+        self.assertIn("owned and operated by Sohadot", page)
+        for prohibited in ("fetch(", "XMLHttpRequest", "sendBeacon", "localStorage", "sessionStorage", "document.cookie", "navigator.clipboard.writeText"):
+            self.assertNotIn(prohibited, script)
+        self.assertIn("No account, tracking, scoring, or automatic submission.", page)
+        self.assertIn("Completing an evaluation does not constitute independent institutional validation.", page)
+
+    def test_evaluation_neutral_prompts_and_local_resources(self):
+        page = (REPO / "evaluation" / "index.html").read_text(encoding="utf-8")
+        script = (REPO / "assets" / "evaluation.js").read_text(encoding="utf-8")
+        self.assertIn('src="/assets/evaluation.js"', page)
+        self.assertIn('href="/assets/evaluation.css"', page)
+        self.assertIn("Find an open evidence gap", script)
+        self.assertIn("Find an official target", script)
+        self.assertNotIn("Correct answer", page + script)
+        self.assertNotIn("expected_answer", page + script)
+
     def test_questions_page_reports_every_project_with_its_lifecycle(self):
         _, ontology = registry.load_all()
         html = (REPO / "registry" / "questions" / "index.html").read_text(encoding="utf-8")

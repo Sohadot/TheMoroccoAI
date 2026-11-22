@@ -147,6 +147,11 @@ def check(network=False):
 
     for f, p in parsed.items():
         where = f.relative_to(ROOT).as_posix()
+        if where == "evaluation/index.html":
+            if p.meta.get("robots", "").lower().replace(" ", "") != "noindex,follow":
+                errors.append("evaluation/index.html: expected noindex, follow")
+            if "/evaluation/" not in (parsed.get(ROOT / "index.html").links if parsed.get(ROOT / "index.html") else []):
+                errors.append("index.html: missing evaluation link")
         path = url_path(f)
         # metadata
         if not p.title.strip():
@@ -254,8 +259,11 @@ def check_sitemap(parsed):
         if not target.exists():
             errors.append(f"sitemap.xml: {loc} has no file")
         listed.add(target)
-    for f in parsed:
-        if f not in listed and f.name != "404.html":
+    for f, page in parsed.items():
+        noindex = "noindex" in {token.strip().lower() for token in page.meta.get("robots", "").split(",")}
+        if noindex and f in listed:
+            errors.append(f"sitemap.xml: noindex page {f.relative_to(ROOT)} must not be listed")
+        elif not noindex and f not in listed and f.name != "404.html":
             errors.append(f"sitemap.xml: {f.relative_to(ROOT)} is not listed")
     return errors
 

@@ -5,10 +5,14 @@ Independent intelligence and reference infrastructure for Morocco's AI ecosystem
 lists.
 
 The site is static and served by GitHub Pages from the root of `main` (`CNAME` → `themoroccoai.com`).
-It has no runtime JavaScript, no third-party requests and no build step at deploy time. Generated
+It has no runtime JavaScript except for the locally served, privacy-minimizing `/evaluation/` interaction. It makes no third-party requests and has no build step at deploy time. Generated
 pages are committed.
 
-## What is here
+## Governance and evaluation roadmap
+
+English is the authoritative language of the project. Approved governance decisions and their separate implementation states are recorded in [docs/DECISION_LOG.md](docs/DECISION_LOG.md). The privacy-first, neutral introductory and specialist evaluation is specified in [docs/EVALUATION_SPEC.md](docs/EVALUATION_SPEC.md); the first static evaluation UI is implemented as a hand-maintained HTML page and local JavaScript, and it is **not externally validated**. Sensitive evaluator responses, scoring keys and confidential commercial information must not be committed to this public repository.
+
+The evaluation page is deliberately **not included in the sitemap** (`noindex, follow`) and is currently maintained separately from the registry generator. Its neutral task prompts, client-side report preparation and no-network behavior require dedicated review before public rollout.\n\n## What is here
 
 | Path | Purpose |
 | --- | --- |
