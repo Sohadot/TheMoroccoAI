@@ -5,7 +5,7 @@
 
 Checks internal links and anchors, third-party resource loading, page metadata and
 canonical URLs, basic accessibility rules, the sitemap, the acquisition page and contact path,
-independence wording, and that no confidential commercial terms or credentials are
+independence and Sohadot ownership wording, and that no confidential commercial terms or credentials are
 committed. Standard library only.
 """
 import json
@@ -20,6 +20,14 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://themoroccoai.com"
 CONTACT = "agent@sohadot.com"
 DISCLAIMER = "Not affiliated with the Government of Morocco"
+# Ownership and independence (decision TMA-DEC-001). Every page carries the short owner note;
+# the pages below also carry the full canonical statement, word for word.
+OWNER_NOTE = "Owned and operated by Sohadot"
+OWNERSHIP_STATEMENT = ("TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. "
+                       "It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, "
+                       "or third-party organization or company. References to external organizations, initiatives and sources "
+                       "do not imply their endorsement of or participation in the project.")
+OWNERSHIP_PAGES = ("index.html", "methodology/index.html", "acquisition/index.html", "evaluation/index.html")
 SKIP_DIRS = {".git", "node_modules", "tests"}
 # Phrases that must not appear on public pages: commercial terms that belong in private
 # negotiation, and self-descriptions that could read as official status.
@@ -184,8 +192,13 @@ def check(network=False):
             errors.append(f"{where}: link without accessible text ({href})")
         # independence wording
         text = " ".join(p.text)
-        if DISCLAIMER.lower() not in re.sub(r"\s+", " ", text).lower():
+        flat = re.sub(r"\s+", " ", text)
+        if DISCLAIMER.lower() not in flat.lower():
             errors.append(f"{where}: missing independence disclaimer '{DISCLAIMER}'")
+        if OWNER_NOTE not in flat:
+            errors.append(f"{where}: missing ownership note '{OWNER_NOTE}'")
+        if where in OWNERSHIP_PAGES and OWNERSHIP_STATEMENT not in flat:
+            errors.append(f"{where}: missing or altered canonical ownership and independence statement")
         for pattern, label in FORBIDDEN_PAGE_TEXT:
             m = pattern.search(text)
             if m:
