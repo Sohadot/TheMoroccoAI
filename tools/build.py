@@ -1998,6 +1998,11 @@ def render_methodology(model, changelog):
   <p class="lede">What the registry documents, what it does not establish, how evidence is admitted, and how claims are corrected. The rules below are enforced by the validator and tests that run on every change.</p>
   <p class="notice"><strong>Independent.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project. No institution has adopted or designated this site as an official reference.</p>
 </header>
+<section aria-labelledby="ownership-h">
+  <h2 id="ownership-h">Ownership and editorial independence</h2>
+  <p class="prose">TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project.</p>
+  <p class="prose">This is a privately governed research resource, not an official registry. Source attribution is not a claim of institutional partnership or endorsement. Evidence classifications, limitations and corrections are documented below. English is the authoritative editorial language; other language editions are planned and are not represented as complete.</p>
+</section>
 <section aria-labelledby="m1-h">
   <h2 id="m1-h"><span class="section-number">01</span>What the registry documents</h2>
   <p class="prose">Version {escape(model.evidence["version"])}, sources checked {escape(human_date(model.as_of))}: {n_rec} evidence records, {n_ent} entities and {n_rel} typed relationships. Entity types: {escape(types)}. Each record carries the source URL, a verbatim excerpt, the publication and retrieval dates, and one classification:</p>
