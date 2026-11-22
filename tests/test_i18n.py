@@ -286,7 +286,7 @@ class ApprovalRules(Fixture):
     """TMA-DEC-008: one registered human reviewer approves exact source and translation versions."""
 
     def approval(self, **over):
-        return approval(self.en["footer.as_of"], "بتاريخ {date}", **over)
+        return approval(self.en["footer.as_of"], "بتاريخ {date}", "footer.as_of", "ar", **over)
 
     def test_a_single_registered_human_reviewer_suffices(self):
         self.with_units([self.message_unit()])
@@ -360,7 +360,7 @@ class ApprovalRules(Fixture):
 
 class EscalationRules(Fixture):
     def unit_with(self, escalation):
-        return self.message_unit(approval=approval(self.en["footer.as_of"], "بتاريخ {date}", escalation=escalation))
+        return self.message_unit(approval=approval(self.en["footer.as_of"], "بتاريخ {date}", "footer.as_of", "ar", escalation=escalation))
 
     def test_open_escalation_blocks_publication(self):
         self.with_units([self.unit_with({"criteria": ["specialist-term"], "status": "open"})])

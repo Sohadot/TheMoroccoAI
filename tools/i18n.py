@@ -467,8 +467,38 @@ def load_reviewers(root=ROOT):
     return {r["id"]: r for r in _load(path).get("reviewers", [])} if path.exists() else {}
 
 
-def validate_reviewers(data, languages):
+# Translation drafts and owner review packages carry this marker and are kept outside the repository: every file
+# on main is publicly served (Arch §6.3). tools/check_site.py fails if any repository file carries it. It is
+# assembled here so that this source file does not itself carry it.
+DRAFT_MARKER = "themoroccoai-" + "translation-draft"
+I18N_FILES = {"languages.json", "glossary.json", "reviewers.json", "changelog-identity.json", "attribute-identity.json",
+              "en/messages.json"}
+
+DECISION_ID = re.compile(r"^TMA-DEC-\d{3}$")
+REVIEWER_FIELDS = {"id", "kind", "languages", "authorized_by", "registered_on"}
+
+
+def accepted_decisions(root=ROOT):
+    """{decision id: section text} for the decisions in docs/DECISION_LOG.md whose decision status is Accepted.
+    A root without its own decision log (a test fixture holding only i18n/) uses the repository's."""
+    path = Path(root) / "docs" / "DECISION_LOG.md"
+    if not path.exists():
+        path = ROOT / "docs" / "DECISION_LOG.md"
+    text = path.read_text(encoding="utf-8") if path.exists() else ""
+    out = {}
+    for m in re.finditer(r"(?ms)^## (TMA-DEC-\d{3})\b(.*?)(?=^## |\Z)", text):
+        if re.search(r"(?mi)^- Decision status: Accepted\b", m.group(2)):
+            out[m.group(1)] = m.group(2)
+    return out
+
+
+def validate_reviewers(data, languages, decisions=None, today=None):
+    """Each reviewer is registered by an explicit, accepted owner decision in docs/DECISION_LOG.md that names the
+    reviewer id (authorized_by), on a recorded date (registered_on). Registry membership says who may approve; it
+    is not a review. The registry cannot prove who a pseudonym is: see docs/TRANSLATION_APPROVAL_SECURITY.md."""
     errors, seen = [], set()
+    decisions = {} if decisions is None else decisions
+    today = today or datetime.date.today()
     if not isinstance(data.get("reviewers"), list):
         return ["i18n/reviewers.json: needs a 'reviewers' list"]
     for r in data["reviewers"]:
@@ -485,8 +515,21 @@ def validate_reviewers(data, languages):
             errors.append(f"{where}: kind must be one of {list(REVIEWER_KINDS)}")
         if not isinstance(r.get("languages"), list) or not r["languages"] or set(r["languages"]) - set(languages):
             errors.append(f"{where}: languages must be registered translation languages")
-        if set(r) - {"id", "kind", "languages"}:
-            errors.append(f"{where}: unexpected fields {sorted(set(r) - {'id', 'kind', 'languages'})} (no personal data)")
+        dec = r.get("authorized_by")
+        if not isinstance(dec, str) or not DECISION_ID.match(dec):
+            errors.append(f"{where}: authorized_by must name the owner decision that registers this reviewer (TMA-DEC-NNN)")
+        elif dec not in decisions:
+            errors.append(f"{where}: authorized_by {dec!r} is not an accepted decision in docs/DECISION_LOG.md")
+        elif not isinstance(rid, str) or not re.search(rf"(?<![\w-]){re.escape(rid)}(?![\w-])", decisions[dec]):
+            errors.append(f"{where}: decision {dec} does not name this reviewer id")
+        reg = r.get("registered_on")
+        try:
+            if datetime.date.fromisoformat(reg) > today:
+                errors.append(f"{where}: registered_on is in the future")
+        except (TypeError, ValueError):
+            errors.append(f"{where}: registered_on must be a date such as 2026-12-01")
+        if set(r) - REVIEWER_FIELDS:
+            errors.append(f"{where}: unexpected fields {sorted(set(r) - REVIEWER_FIELDS)} (no personal data)")
     return errors
 
 
@@ -514,8 +557,13 @@ def _approval_problems(u, lang, reviewers, today, where):
     if not isinstance(a, dict):
         return [f"{where}: APPROVED unit has no human approval record"]
     errors = []
-    allowed = {"reviewer", "decision", "reviewed_at", "policy", "source_sha256", "translation_sha256",
-               "glossary_version", "escalation"}
+    allowed = {"unit", "language", "reviewer", "decision", "reviewed_at", "policy", "source_sha256",
+               "translation_sha256", "glossary_version", "escalation"}
+    # Replay: an approval names the exact unit and language it was given for, besides both fingerprints.
+    if a.get("unit") != u.get("id"):
+        errors.append(f"{where}: the approval names unit {a.get('unit')!r}, not this unit (an approval cannot be reused)")
+    if a.get("language") != lang:
+        errors.append(f"{where}: the approval names language {a.get('language')!r}, not '{lang}' (an approval cannot be reused)")
     if set(a) - allowed:
         errors.append(f"{where}: unexpected approval fields {sorted(set(a) - allowed)} (no personal data)")
     reviewer = a.get("reviewer")
@@ -532,6 +580,9 @@ def _approval_problems(u, lang, reviewers, today, where):
     if a.get("decision") != "approved":
         errors.append(f"{where}: approval.decision must be 'approved' for an APPROVED unit")
     errors += _timestamp_problems(a.get("reviewed_at"), "approval.reviewed_at", where, today)
+    registered = (reviewers.get(reviewer) or {}).get("registered_on") if isinstance(reviewer, str) else None
+    if isinstance(registered, str) and isinstance(a.get("reviewed_at"), str) and a["reviewed_at"][:10] < registered:
+        errors.append(f"{where}: approval.reviewed_at precedes the reviewer's registration ({registered})")
     if a.get("policy") != GOVERNANCE_POLICY:
         errors.append(f"{where}: approval.policy {a.get('policy')!r} is not the policy in force ({GOVERNANCE_POLICY})")
     if a.get("source_sha256") != u.get("source_sha256"):
@@ -680,7 +731,13 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
     reviewers_path = base / "reviewers.json"
     if not reviewers_path.exists():
         return errors + ["i18n/reviewers.json: missing (the registry of human reviewers, empty until the owner adds one)"], report
-    errors += validate_reviewers(_load(reviewers_path), targets)
+    errors += validate_reviewers(_load(reviewers_path), targets, accepted_decisions(root), today)
+    expected = I18N_FILES | {f"{lang}/{kind}.json" for lang in targets for kind in ("messages", "content")}
+    for f in sorted(base.rglob("*")):
+        rel = f.relative_to(base).as_posix()
+        if f.is_file() and rel not in expected:
+            errors.append(f"i18n/{rel}: unexpected file (translation drafts and review packages stay outside the "
+                          "repository; only approved units are committed)")
     reviewers = load_reviewers(root)
     for kind in ("changelog", "attribute"):
         errors += load_identity(kind, root, ontology=sources.ontology)[2]

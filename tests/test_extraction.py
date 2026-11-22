@@ -219,7 +219,7 @@ class ExtractedRegistryFixture(unittest.TestCase):
             self.write(f"{lang}/messages.json", {"language": lang, "units": [self.unit(mid, lang) for mid in self.messages]})
             self.write(f"{lang}/content.json", {"language": lang, "units": [self.unit(cid, lang) for cid in self.req["content"]]})
         g = self.read("glossary.json")
-        g["terms"] = [{"id": t, "translations": {lang: approved_label(t, synthetic(t.split(":")[1], lang)) for lang in ("ar", "fr")}}
+        g["terms"] = [{"id": t, "translations": {lang: approved_label(t, synthetic(t.split(":")[1], lang), lang=lang) for lang in ("ar", "fr")}}
                       for t in self.req["terms"]]
         self.write("glossary.json", g)
 
@@ -240,7 +240,7 @@ class ExtractedRegistryFixture(unittest.TestCase):
             kind = "name"
             over.setdefault("name_basis", "transliteration")
         text = over.pop("text", None) or self.text(uid, lang)
-        return approved_unit(uid, kind, text, source or self.source(uid), **over)
+        return approved_unit(uid, kind, text, source or self.source(uid), lang=lang, **over)
 
     def read(self, rel):
         return json.loads((self.root / "i18n" / rel).read_text(encoding="utf-8"))

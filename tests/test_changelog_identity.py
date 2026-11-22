@@ -229,7 +229,7 @@ class TranslationsFollowIdentity(unittest.TestCase):
         register_reviewers(self.root)
         self.uid = "changelog:changelog.v0-10-1.changes.01:text"
         self.source = i18n.Sources(self.root).content(self.uid)[0]
-        cat = {"language": "fr", "units": [approved_unit(self.uid, "prose", "texte (fr)", self.source)]}
+        cat = {"language": "fr", "units": [approved_unit(self.uid, "prose", "texte (fr)", self.source, lang="fr")]}
         (self.root / "i18n" / "fr" / "content.json").write_text(json.dumps(cat, ensure_ascii=False), encoding="utf-8")
 
     def rewrite_changelog(self, change):

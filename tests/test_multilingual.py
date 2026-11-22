@@ -97,13 +97,13 @@ class SyntheticSite(unittest.TestCase):
         glossary = self.read("glossary.json")
         glossary["terms"] = [{"id": "classification:VERIFIED FACT", "translations": {
             "ar": approved_label("classification:VERIFIED FACT", "واقعة متحقق منها (اختبار)", ["رسمي"]),
-            "fr": approved_label("classification:VERIFIED FACT", "fait vérifié (essai)", ["officiel"])}}]
+            "fr": approved_label("classification:VERIFIED FACT", "fait vérifié (essai)", ["officiel"], lang="fr")}}]
         self.write("glossary.json", glossary)
         evidence, ontology = registry.load_all()
         self.model = build.Model(evidence, ontology)
 
     def unit(self, mid, lang, source=None, **over):
-        return approved_unit(mid, "interface", synthetic(self.english[mid], lang), source or self.english[mid], **over)
+        return approved_unit(mid, "interface", synthetic(self.english[mid], lang), source or self.english[mid], lang=lang, **over)
 
     def read(self, rel):
         return json.loads((self.root / "i18n" / rel).read_text(encoding="utf-8"))
