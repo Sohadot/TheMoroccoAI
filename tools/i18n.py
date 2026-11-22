@@ -79,8 +79,13 @@ CONTENT_FIELDS = {
     "gaps": ("question", "established", "unestablished", "evidence_needed"),
     "classification": ("definition",),
     "domain": ("label",),
+    "predicate": ("label",),
+    # List items without an identifier of their own get an explicit, stable id in an identity map (below):
+    # 'changelog:<item id>:text' (i18n/changelog-identity.json), 'attribute:<item id>:text' (i18n/attribute-identity.json).
+    "changelog": ("text",),
+    "attribute": ("text",),
 }
-CONTENT_ID = re.compile(r"^(evidence|ontology|gaps|classification|domain):([^:]+):([a-z_]+)$")
+CONTENT_ID = re.compile(r"^(evidence|ontology|gaps|classification|domain|predicate|changelog|attribute):([^:]+):([a-z_]+)$")
 # Canonical vocabulary a glossary term may name: '<vocabulary>:<canonical value>'.
 GLOSSARY_VOCABULARIES = ("classification", "verification_status", "entity_type", "lifecycle", "project_kind",
                          "origin", "domain", "predicate")
@@ -117,6 +122,176 @@ def t(message_id, **values):
     return fill(_EN[message_id], values, message_id)
 
 
+# ─── Stable identity for canonical list items ────────────────────────────
+# Changelog texts and entity attributes are list items in canonical data with no identifier of their own. An
+# identity map (i18n/<kind>-identity.json) gives each a stable id without touching canonical data. Binding is by
+# the recorded fingerprint of the text inside a stable entry key (changelog version or commit, entity id), never
+# by array position or presentation order, so a reorder changes nothing. Everything else fails closed:
+# - an inserted text has no identity: register a new id (never a retired one);
+# - a deleted text leaves an orphaned identity: retire it (status "retired"; its id is never reused);
+# - an edited text keeps its id once the maintainer records the new fingerprint, which makes every translation of
+#   it stale until it is approved again;
+# - identical texts in one entry and field are told apart only by an explicit "occurrence" number.
+
+IDENTITY_FIELDS = {"changelog": ("note", "title", "changes", "corrections", "review_fixes", "breaking_changes"),
+                   "attribute": ("name", "value")}
+IDENTITY_ITEM_ID = re.compile(r"^(changelog|attribute)\.[a-z0-9-]+\.[a-z_]+(?:\.[0-9]{2,})?$")
+
+
+def changelog_entries(changelog):
+    """Canonical changelog texts as [(entry key, {field: [texts]})]; the key never depends on position."""
+    out = [({"document": "changelog"}, {"note": [changelog["note"]]})] if changelog.get("note") else []
+    for e in changelog["entries"]:
+        key = ({"version": e["version"]} if e.get("version") else {"commit": e["commit"]} if e.get("commit")
+               else {"pull_request": e.get("pull_request")})
+        fields = {"title": [e["title"]]}
+        for f in ("changes", "corrections", "review_fixes", "breaking_changes"):
+            if e.get(f):
+                fields[f] = list(e[f])
+        out.append((key, fields))
+    return out
+
+
+def attribute_entries(ontology):
+    return [({"entity": e["id"]}, {"name": [a["name"] for a in e["attributes"]], "value": [a["value"] for a in e["attributes"]]})
+            for e in ontology["entities"] if e.get("attributes")]
+
+
+def bind_identity(kind, entries, identity):
+    """Bind canonical texts to identity ids. Returns (bindings, texts, errors): bindings maps
+    (entry index, field, position) to an id; texts maps each bound id to its current canonical text."""
+    errors, bindings, texts, seen = [], {}, {}, set()
+    where = f"i18n/{kind}-identity.json"
+    ientries = identity.get("entries") if isinstance(identity, dict) else None
+    if not isinstance(ientries, list):
+        return bindings, texts, [f"{where}: needs an 'entries' list"]
+    by_key = {}
+    for ie in ientries:
+        eid, key = ie.get("id"), ie.get("key")
+        if not isinstance(eid, str) or not re.fullmatch(r"[a-z0-9-]+", eid or ""):
+            errors.append(f"{where}: entry id {eid!r} must be lowercase letters, digits and hyphens")
+        if eid in seen:
+            errors.append(f"{where}: duplicate identity {eid!r}")
+        seen.add(eid)
+        k = json.dumps(key, sort_keys=True)
+        if k in by_key:
+            errors.append(f"{where}: two identity entries share the key {key}")
+        by_key[k] = ie
+        for it in ie.get("items", []):
+            iid = it.get("id")
+            if not isinstance(iid, str) or not IDENTITY_ITEM_ID.match(iid) or not iid.startswith(f"{kind}.{eid}."):
+                errors.append(f"{where}: item id {iid!r} must look like '{kind}.{eid}.<field>[.NN]'")
+            if iid in seen:
+                errors.append(f"{where}: duplicate identity {iid!r} (ids are never reused, retired ones included)")
+            seen.add(iid)
+            if it.get("field") not in IDENTITY_FIELDS[kind]:
+                errors.append(f"{where}: {iid!r} has unknown field {it.get('field')!r}")
+            if it.get("status") not in ("active", "retired"):
+                errors.append(f"{where}: {iid!r} status must be 'active' or 'retired'")
+            if not isinstance(it.get("source_sha256"), str) or not SHA256.match(it["source_sha256"]):
+                errors.append(f"{where}: {iid!r} needs the source_sha256 of the text it identifies")
+            if "occurrence" in it and (not isinstance(it["occurrence"], int) or it["occurrence"] < 1):
+                errors.append(f"{where}: {iid!r} occurrence must be a positive integer")
+            if set(it) - {"id", "field", "status", "source_sha256", "occurrence"}:
+                errors.append(f"{where}: {iid!r} has unexpected fields")
+    if errors:
+        return bindings, texts, errors
+    canonical_keys = [json.dumps(k, sort_keys=True) for k, _ in entries]
+    for k in {k for k in canonical_keys if canonical_keys.count(k) > 1}:
+        errors.append(f"{where}: canonical entries share the key {k}; their identity is ambiguous")
+    matched = set()
+    for index, (key, fields) in enumerate(entries):
+        k = json.dumps(key, sort_keys=True)
+        ie = by_key.get(k)
+        if ie is None:
+            errors.append(f"{where}: canonical entry {key} has no registered identity")
+            continue
+        matched.add(k)
+        for field in IDENTITY_FIELDS[kind]:
+            values = fields.get(field, [])
+            active = [it for it in ie.get("items", []) if it["field"] == field and it["status"] == "active"]
+            groups = {}
+            for pos, text in enumerate(values):
+                groups.setdefault(fingerprint(text), []).append(pos)
+            items = {}
+            for it in active:
+                items.setdefault(it["source_sha256"], []).append(it)
+            for fp, positions in groups.items():
+                cands = items.get(fp, [])
+                if not cands:
+                    errors.append(f"{where}: {key} {field} text {values[positions[0]][:60]!r} has no active identity "
+                                  "(new text: register a new id; edited text: record its new source_sha256 on the existing id)")
+                    continue
+                if len(cands) != len(positions):
+                    errors.append(f"{where}: {key} {field}: {len(positions)} identical text(s) but {len(cands)} active id(s); ambiguous")
+                    continue
+                if len(positions) == 1 and "occurrence" not in cands[0]:
+                    pairs = [(positions[0], cands[0])]
+                else:
+                    occ = sorted(c.get("occurrence", 0) for c in cands)
+                    if occ != list(range(1, len(cands) + 1)):
+                        errors.append(f"{where}: {key} {field}: identical texts need occurrence numbers 1..{len(cands)}; ambiguous")
+                        continue
+                    pairs = list(zip(positions, sorted(cands, key=lambda c: c["occurrence"])))
+                for pos, it in pairs:
+                    bindings[(index, field, pos)] = it["id"]
+                    texts[it["id"]] = values[pos]
+            for fp, its in items.items():
+                if fp not in groups:
+                    for it in its:
+                        errors.append(f"{where}: active identity {it['id']!r} matches no canonical text "
+                                      "(deleted: retire it; edited: record the new source_sha256)")
+    for k, ie in by_key.items():
+        if k not in matched and any(it.get("status") == "active" for it in ie.get("items", [])):
+            errors.append(f"{where}: identity entry {ie['id']!r} matches no canonical entry; retire its items")
+    return bindings, texts, errors
+
+
+def load_identity(kind, root=ROOT, changelog=None, ontology=None):
+    """(bindings, texts, errors) for 'changelog' or 'attribute' from the canonical data and its identity map."""
+    root = Path(root)
+    path = root / "i18n" / f"{kind}-identity.json"
+    if not path.exists():
+        return {}, {}, [f"i18n/{kind}-identity.json: missing"]
+    def data(name):  # canonical data of this root, or of the repository when the root holds only i18n/
+        return _load(root / "data" / name if (root / "data" / name).exists() else ROOT / "data" / name)
+    if kind == "changelog":
+        entries = changelog_entries(changelog if changelog is not None else data("changelog.json"))
+    else:
+        entries = attribute_entries(ontology if ontology is not None else data("ontology.json"))
+    return bind_identity(kind, entries, _load(path))
+
+
+def identity_proposals(kind, entries, identity):
+    """Suggested repairs for the maintainer, never applied automatically: an edited text where exactly one text
+    and one identity are unmatched in the same entry and field; new ids for inserted texts; retirement for
+    orphaned identities."""
+    out, used = [], {it["id"] for ie in identity.get("entries", []) for it in ie.get("items", [])}
+    by_key = {json.dumps(ie["key"], sort_keys=True): ie for ie in identity.get("entries", [])}
+    for key, fields in entries:
+        ie = by_key.get(json.dumps(key, sort_keys=True))
+        if ie is None:
+            out.append(f"register an identity entry for {key}")
+            continue
+        for field in IDENTITY_FIELDS[kind]:
+            fps = [fingerprint(t) for t in fields.get(field, [])]
+            active = [it for it in ie["items"] if it["field"] == field and it["status"] == "active"]
+            unbound = [i for i, fp in enumerate(fps) if fp not in {it["source_sha256"] for it in active}]
+            orphan = [it for it in active if it["source_sha256"] not in fps]
+            if len(unbound) == 1 and len(orphan) == 1:
+                out.append(f"{orphan[0]['id']}: if the text was edited, set source_sha256 to {fps[unbound[0]]}")
+                continue
+            for i in unbound:
+                n = 1
+                while f"{kind}.{ie['id']}.{field}.{n:02d}" in used:
+                    n += 1
+                used.add(f"{kind}.{ie['id']}.{field}.{n:02d}")
+                out.append(f"new text in {key} {field}: register {kind}.{ie['id']}.{field}.{n:02d} with source_sha256 {fps[i]}")
+            for it in orphan:
+                out.append(f"{it['id']}: matches no text; set status to 'retired' (its id is never reused)")
+    return out
+
+
 # ─── Source resolution ────────────────────────────────────────────────────
 
 class Sources:
@@ -124,6 +299,7 @@ class Sources:
 
     def __init__(self, root=ROOT, evidence=None, ontology=None, gaps=None):
         root = Path(root)
+        self.root = root
         self.messages = english_messages(root)
         self.evidence = evidence if evidence is not None else _load(root / "data" / "evidence.json")
         self.ontology = ontology if ontology is not None else _load(root / "data" / "ontology.json")
@@ -134,6 +310,12 @@ class Sources:
 
     def message(self, unit_id):
         return self.messages.get(unit_id)
+
+    def identity_texts(self, kind):
+        cache = self.__dict__.setdefault("_identity", {})
+        if kind not in cache:
+            cache[kind] = load_identity(kind, self.root, ontology=self.ontology)[1]
+        return cache[kind]
 
     def content(self, unit_id):
         """(text, problem): text is None if the record or field no longer exists (an orphan)."""
@@ -149,6 +331,14 @@ class Sources:
         if kind == "domain":
             text = self.ontology["domains"].get(key)
             return (text, None) if isinstance(text, str) and text else (None, "orphan")
+        if kind == "predicate":
+            text = (self.ontology["predicates"].get(key) or {}).get("label")
+            return (text, None) if isinstance(text, str) and text else (None, "orphan")
+        if kind in ("changelog", "attribute"):
+            if not IDENTITY_ITEM_ID.match(key) or not key.startswith(kind + "."):
+                return None, "malformed"
+            text = self.identity_texts(kind).get(key)
+            return (text, None) if text else (None, "orphan")
         table = {"evidence": self.records, "ontology": self.entities, "gaps": self.gap_items}[kind]
         item = table.get(key)
         if item is None or not isinstance(item.get(field), str) or not item.get(field):
@@ -488,6 +678,8 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
         return errors + ["i18n/reviewers.json: missing (the registry of human reviewers, empty until the owner adds one)"], report
     errors += validate_reviewers(_load(reviewers_path), targets)
     reviewers = load_reviewers(root)
+    for kind in ("changelog", "attribute"):
+        errors += load_identity(kind, root, ontology=sources.ontology)[2]
     gerrors, forbidden = validate_glossary(glossary, sources, targets, reviewers, today)
     errors += gerrors
     for lang in targets:
@@ -637,6 +829,13 @@ def page_eligibility(lang, unit_ids, root=ROOT, evidence=None, ontology=None, ga
 
 
 if __name__ == "__main__":
+    if "--identity-report" in sys.argv:
+        for kind, entries in (("changelog", changelog_entries(_load(ROOT / "data" / "changelog.json"))),
+                              ("attribute", attribute_entries(_load(ROOT / "data" / "ontology.json")))):
+            for line in identity_proposals(kind, entries, _load(ROOT / "i18n" / f"{kind}-identity.json")):
+                print(kind.upper(), line)
+        print("Proposals only: review them and edit the identity map by hand.")
+        sys.exit(0)
     problems, rep = validate()
     for p in problems:
         print("ERROR", p)

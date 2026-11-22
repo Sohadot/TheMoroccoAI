@@ -139,13 +139,10 @@ class CompleteExtraction(unittest.TestCase):
         for value in (ld["name"], ld["description"], ld["spatialCoverage"]["name"]):
             self.assertNotRegex(value, r"[A-Za-z]{2,}")
 
-    def test_methodology_hard_coded_english_is_only_the_deferred_changelog_records(self):
+    def test_methodology_has_no_hard_coded_english(self):
+        # Since Sprint 19B-4 the changelog records render through their stable identities, so nothing is deferred.
         words, facts = residual_words(self.render_pseudo(METHODOLOGY))
-        deferred = " ".join([CHANGELOG["note"]] + [e["title"] for e in CHANGELOG["entries"]] +
-                            [x for e in CHANGELOG["entries"] for k in ("changes", "corrections", "review_fixes", "breaking_changes")
-                             for x in e.get(k, [])])
-        self.assertTrue(words, "the deferred changelog records are expected to remain")
-        self.assertEqual(words - set(re.findall(r"[A-Za-z]{2,}", deferred)), set())
+        self.assertEqual(words, set())
         self.assertNotRegex(facts.title + (facts.description or ""), r"[A-Za-z]{2,}")
 
     def test_the_completeness_check_detects_hard_coded_english(self):

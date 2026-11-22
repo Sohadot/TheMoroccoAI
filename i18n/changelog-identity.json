@@ -1,0 +1,131 @@
+{
+ "version": 1,
+ "note": "Stable identities for the translatable texts of data/changelog.json (TMA-DEC-007, Sprint 19B-4). Canonical data is not modified. Each text binds to an id by its fingerprint inside a stable entry key (version, or commit for the entry without one); the NN suffix is a label given at registration, never used for matching. On a reorder nothing changes. On an edit, keep the id and record the new source_sha256 (translations become stale). On an insert, add a new id. On a deletion, set status to 'retired'; ids are never reused. Identical texts in one entry and field carry an explicit occurrence number. python3 tools/i18n.py --identity-report proposes repairs; it never applies them.",
+ "entries": [
+  {"id": "note", "key": {"document": "changelog"}, "items": [
+   {"id": "changelog.note.note", "field": "note", "status": "active", "source_sha256": "b32898e34931bae0f8f4a7f8c70f63736ef35ccb51cb438d1d9fc5ad8c285bbe"}
+  ]},
+  {"id": "v0-10-1", "key": {"version": "0.10.1"}, "items": [
+   {"id": "changelog.v0-10-1.title", "field": "title", "status": "active", "source_sha256": "a5ce3f1a6bc67e9b20124c0789cf9f6e7d02275b6ded5868c6a305c5f65afb14"},
+   {"id": "changelog.v0-10-1.changes.01", "field": "changes", "status": "active", "source_sha256": "808b4c1310f48e6a5dd2a3e658bad0436d7dc48e1a77d68cfa21fa1eba3042d9"},
+   {"id": "changelog.v0-10-1.changes.02", "field": "changes", "status": "active", "source_sha256": "d0f45e25b61e0a6121e762d0bdf62f409c04e975eabb5be6c575f552ed7940a4"},
+   {"id": "changelog.v0-10-1.changes.03", "field": "changes", "status": "active", "source_sha256": "fa879da7f3a1159621e889a5194a1f8bac204434ff3145b3b24b03909916fa1a"}
+  ]},
+  {"id": "v0-10-0", "key": {"version": "0.10.0"}, "items": [
+   {"id": "changelog.v0-10-0.title", "field": "title", "status": "active", "source_sha256": "c3dee397f56930cf768a8ffd680f5c34f2adfcc2ce188cd9e9a282458698e072"},
+   {"id": "changelog.v0-10-0.changes.01", "field": "changes", "status": "active", "source_sha256": "ec87900bc9250f050630c646fc900b680ff7f736554b5ddfc6c577dd123300c3"},
+   {"id": "changelog.v0-10-0.changes.02", "field": "changes", "status": "active", "source_sha256": "a25c83cb6e64afed818c97da8fbd5b1c0c44d63efdd1310a07403fa62b01a15d"},
+   {"id": "changelog.v0-10-0.changes.03", "field": "changes", "status": "active", "source_sha256": "3c21793988894274c050304260a670ef677afca9a01ec282a8c1f2fa58af29fd"},
+   {"id": "changelog.v0-10-0.changes.04", "field": "changes", "status": "active", "source_sha256": "0d94e1c256a031b085e8f8d0f394b9140fdd4a8f8ea5416e12068d4705a5c47d"}
+  ]},
+  {"id": "v0-9-0", "key": {"version": "0.9.0"}, "items": [
+   {"id": "changelog.v0-9-0.title", "field": "title", "status": "active", "source_sha256": "3dadf8f903a742fb35b29dfe66c35a7f778c6e9e95e1609c1c861ec70e78f2e1"},
+   {"id": "changelog.v0-9-0.changes.01", "field": "changes", "status": "active", "source_sha256": "89b06ce9a070233827b3a0b9898ba78f1d87806f4f87270dcf6a92601e34378f"},
+   {"id": "changelog.v0-9-0.changes.02", "field": "changes", "status": "active", "source_sha256": "782119d45416c8f460856c009e9ea6bc2b3a1bf2669e6fe2a838a3a37aa07daa"},
+   {"id": "changelog.v0-9-0.changes.03", "field": "changes", "status": "active", "source_sha256": "0f83a70fbacb25d358beb95ef18426117faca033c571e04dcba8ff48a3991c82"},
+   {"id": "changelog.v0-9-0.changes.04", "field": "changes", "status": "active", "source_sha256": "b7abebde2a788fdbd7928aa3b0fa7fb4afd9d64dd59ba63fa4c435956f6070b3"},
+   {"id": "changelog.v0-9-0.changes.05", "field": "changes", "status": "active", "source_sha256": "8db72f40916c70b6ba728c0f24c2241d150fe4a5edeaf53580a90cec7ae06f4f"},
+   {"id": "changelog.v0-9-0.changes.06", "field": "changes", "status": "active", "source_sha256": "0acde556f5bcd36c5291708add7a7f90a3aed21164efb46cd44f39732f1eea4d"},
+   {"id": "changelog.v0-9-0.corrections.01", "field": "corrections", "status": "active", "source_sha256": "4c782cd92a6b50ab4b0d0320d29ba392bf85f591a2bc737b1f51595220d4f0ea"}
+  ]},
+  {"id": "v0-8-0", "key": {"version": "0.8.0"}, "items": [
+   {"id": "changelog.v0-8-0.title", "field": "title", "status": "active", "source_sha256": "f31d7bb3a92ca45f3d23d3a86903a7d17f3390761a219fd3f20fb9f62e6df634"},
+   {"id": "changelog.v0-8-0.changes.01", "field": "changes", "status": "active", "source_sha256": "80c9fdb647d767c3537590528e1612617ddcddc8c3bbb15d8c4ed6d722d98454"},
+   {"id": "changelog.v0-8-0.changes.02", "field": "changes", "status": "active", "source_sha256": "ffa4b67aa35d410f6e3f75ff7ea212f533cdee049f308abdcb720e0c39573586"},
+   {"id": "changelog.v0-8-0.changes.03", "field": "changes", "status": "active", "source_sha256": "be6ab70ecab657c3a1ad57bb222938ed2d52a40180c7484787b049c27b6c5421"},
+   {"id": "changelog.v0-8-0.changes.04", "field": "changes", "status": "active", "source_sha256": "0acde556f5bcd36c5291708add7a7f90a3aed21164efb46cd44f39732f1eea4d"}
+  ]},
+  {"id": "v0-7-0", "key": {"version": "0.7.0"}, "items": [
+   {"id": "changelog.v0-7-0.title", "field": "title", "status": "active", "source_sha256": "7084d646eda7eb94cf9e3c6fc47a57da1827ef83022cb79d1256f9192578a2ce"},
+   {"id": "changelog.v0-7-0.changes.01", "field": "changes", "status": "active", "source_sha256": "fe8253d83c96ec4624f05490e7b5b84f52ff8ba70f1e88547d6fb2d6f5a0ee81"},
+   {"id": "changelog.v0-7-0.changes.02", "field": "changes", "status": "active", "source_sha256": "53253e4fb06602625a39ef0e985c7c8f40e5a9c89c48d356a534a4bf35da3adc"},
+   {"id": "changelog.v0-7-0.changes.03", "field": "changes", "status": "active", "source_sha256": "0b60bd037469ed456985c06fc85a7b2ca90f2439073c24266306022f40c846f6"},
+   {"id": "changelog.v0-7-0.changes.04", "field": "changes", "status": "active", "source_sha256": "d00910456e8d18f6124ac8d49085f47d804c74145cea87e96158b199ed914202"},
+   {"id": "changelog.v0-7-0.changes.05", "field": "changes", "status": "active", "source_sha256": "4f675cbb34723b1ade6fd77c4235e6c00fd5e52cb84a7414c39c7612043d65e8"},
+   {"id": "changelog.v0-7-0.corrections.01", "field": "corrections", "status": "active", "source_sha256": "75320b52b37ef0eadff37ad14f7f8cfdd24196101faaf1c08c9a08143e9b42a2"},
+   {"id": "changelog.v0-7-0.corrections.02", "field": "corrections", "status": "active", "source_sha256": "e6a88391f29042f2862d9b51f9d2450c37efa062a0f4971682f049db1ed5ea92"},
+   {"id": "changelog.v0-7-0.corrections.03", "field": "corrections", "status": "active", "source_sha256": "8c036d987bf242603772c73744e91a60bdcf006aa0c6b554f6dc914d69d58aac"}
+  ]},
+  {"id": "v0-6-0", "key": {"version": "0.6.0"}, "items": [
+   {"id": "changelog.v0-6-0.title", "field": "title", "status": "active", "source_sha256": "d4957da8d59986d4f6eb634b891442b092f2cb1ef08e69ad12c85024311a615c"},
+   {"id": "changelog.v0-6-0.changes.01", "field": "changes", "status": "active", "source_sha256": "2066dd06c5de3dfc6eedd3989ff1182c47222a1bd399567d5519dc97cf389940"},
+   {"id": "changelog.v0-6-0.changes.02", "field": "changes", "status": "active", "source_sha256": "fe3ccee72114eef5526635fc4590e8748a488338f3d80209490b8f5a0fcd5168"},
+   {"id": "changelog.v0-6-0.changes.03", "field": "changes", "status": "active", "source_sha256": "18f2d6720a13e67f063f700d9c6f6ec4bce1a6677f6dd87f90349b792a2534c0"},
+   {"id": "changelog.v0-6-0.changes.04", "field": "changes", "status": "active", "source_sha256": "331715b39e4422aeaf7232020695b997f4471f483dce42e40f1cd566b7983e97"},
+   {"id": "changelog.v0-6-0.changes.05", "field": "changes", "status": "active", "source_sha256": "774581ff0c12daab8cbc8f42e754b5f6781f3afd423c297049789d93498a643b"},
+   {"id": "changelog.v0-6-0.changes.06", "field": "changes", "status": "active", "source_sha256": "447b62d50492f488c99c111dad1a243b8144993d2aee95f78672bc6641c750c9"},
+   {"id": "changelog.v0-6-0.corrections.01", "field": "corrections", "status": "active", "source_sha256": "1bb6ad07e25c1d1fdcc459637c97bf93c070b2fd97b379d79e806adfbfea17f9"},
+   {"id": "changelog.v0-6-0.corrections.02", "field": "corrections", "status": "active", "source_sha256": "91de41ae82523cee66956356b598bb27b3bd9ccc1c74276e7973aeb7e8268965"},
+   {"id": "changelog.v0-6-0.corrections.03", "field": "corrections", "status": "active", "source_sha256": "d491a797a4fe918c95c82647976abd19c9c6f39ef56813976e721272a782cb96"},
+   {"id": "changelog.v0-6-0.review_fixes.01", "field": "review_fixes", "status": "active", "source_sha256": "75cebec695b60f247e3234c0d8bf8e7af6e8655b3c3584efc8af1595a0916416"},
+   {"id": "changelog.v0-6-0.review_fixes.02", "field": "review_fixes", "status": "active", "source_sha256": "24b97d8cbff56404ea8565b5e760f087871b12fdd10e85f1853e3a0c18ca5920"},
+   {"id": "changelog.v0-6-0.review_fixes.03", "field": "review_fixes", "status": "active", "source_sha256": "322b7056a2f1e6fd757c51c6dfb44f422877c6b25ccb6ed3d5a2f54d94319830"},
+   {"id": "changelog.v0-6-0.review_fixes.04", "field": "review_fixes", "status": "active", "source_sha256": "a13d3ed7cb0f478bc79cd2122c06ae6099b34ca84b1aac6504e2db6effa1d53a"},
+   {"id": "changelog.v0-6-0.review_fixes.05", "field": "review_fixes", "status": "active", "source_sha256": "077e628d58d1f1dcc5aa3ad75c87a581ab5d63ec02f87bdb58de63d7bb44f327"}
+  ]},
+  {"id": "v0-5-0", "key": {"version": "0.5.0"}, "items": [
+   {"id": "changelog.v0-5-0.title", "field": "title", "status": "active", "source_sha256": "2e7255a3f063cd22c5ce10cecf14ef5d857aa90d63cdb5f0ba56d17109b00997"},
+   {"id": "changelog.v0-5-0.changes.01", "field": "changes", "status": "active", "source_sha256": "0056823da6d68ab21e67d0798cb9f9addb6e5de24722c1212e0740470a7a074a"},
+   {"id": "changelog.v0-5-0.changes.02", "field": "changes", "status": "active", "source_sha256": "60e6719d2563bba46360792994f5a2207d804e3d5d9bd73f51e7c4e12df18151"},
+   {"id": "changelog.v0-5-0.changes.03", "field": "changes", "status": "active", "source_sha256": "3d55dc02a13900b7c7b4154da298a292b794383b2825f5ef80d55cdbc5cb94bb"},
+   {"id": "changelog.v0-5-0.changes.04", "field": "changes", "status": "active", "source_sha256": "04c7e0d0eea4c25a6cb90349e89119cade3564a73b6573a6a427c5600bab9764"},
+   {"id": "changelog.v0-5-0.changes.05", "field": "changes", "status": "active", "source_sha256": "3aff9508d75a74fa6568a73aef8436da9931735e3496eac0c9f7e520005cb0de"},
+   {"id": "changelog.v0-5-0.changes.06", "field": "changes", "status": "active", "source_sha256": "b8221d601d58cf9752d55ce0f4b1b19542278ad627c30bf728d693882ad9ce96"},
+   {"id": "changelog.v0-5-0.corrections.01", "field": "corrections", "status": "active", "source_sha256": "5c18353ab4905e3696418cb48dc071c3023ec3ef5300bec71aa48b0feb50ba36"},
+   {"id": "changelog.v0-5-0.corrections.02", "field": "corrections", "status": "active", "source_sha256": "ed3afa55692b0b8a09c35108902ea061fee78071b491f4633deb96a8e4c407c2"},
+   {"id": "changelog.v0-5-0.corrections.03", "field": "corrections", "status": "active", "source_sha256": "1be2ed041076123fecd16c09fd8966e553fc9caf9772d550ea980f3de6c99e2b"},
+   {"id": "changelog.v0-5-0.breaking_changes.01", "field": "breaking_changes", "status": "active", "source_sha256": "ec5a5dc70a7ba82564a626db3752a03d7261129a966e739589a1cd65e956a1d1"}
+  ]},
+  {"id": "v0-4-1", "key": {"version": "0.4.1"}, "items": [
+   {"id": "changelog.v0-4-1.title", "field": "title", "status": "active", "source_sha256": "78ae1127f5b1b9c5529524ea0200e154c3ef42917e68085f5181088a8715b0ef"},
+   {"id": "changelog.v0-4-1.changes.01", "field": "changes", "status": "active", "source_sha256": "e20617ffa944bedaf9ccece1763b587c413689bf9ae500e669dcc569cca16274"},
+   {"id": "changelog.v0-4-1.changes.02", "field": "changes", "status": "active", "source_sha256": "932a6913fe8d294d8badc92b4ca38c0c20b9c4bbc3ef4f2eeaa1bfd79a9f9d62"},
+   {"id": "changelog.v0-4-1.changes.03", "field": "changes", "status": "active", "source_sha256": "6b7306a01f8d5bcb9a004062a3648b7c64798aa69f4d488bfcb069e4360708a2"},
+   {"id": "changelog.v0-4-1.changes.04", "field": "changes", "status": "active", "source_sha256": "cc41393504bda5aca5b86ad604097b49dcd66b9dcf4d33b339e9afe67a37a3ea"},
+   {"id": "changelog.v0-4-1.changes.05", "field": "changes", "status": "active", "source_sha256": "7030a1fe4ba2256eae2eba40e69770385b08ef9950221f3bbfc5ea3d99e83fa5"},
+   {"id": "changelog.v0-4-1.changes.06", "field": "changes", "status": "active", "source_sha256": "9f4887708488696cb9862d14727c734bf0ba92b3a10f03307472e06309d867ee"},
+   {"id": "changelog.v0-4-1.corrections.01", "field": "corrections", "status": "active", "source_sha256": "77a1320ae0293b2ce1e11e589f35da23d0b0ecfc61c2236e70efb5291bc77e7f"},
+   {"id": "changelog.v0-4-1.corrections.02", "field": "corrections", "status": "active", "source_sha256": "3746e83103b7294e05c4ba23d39831d93a4bdff27abf12783cc68cd0ded71249"},
+   {"id": "changelog.v0-4-1.corrections.03", "field": "corrections", "status": "active", "source_sha256": "0c5beae6e27ee6607f352c791e51c8562c2dc39b40fed698131fabf64abfc8bc"}
+  ]},
+  {"id": "v0-4-0", "key": {"version": "0.4.0"}, "items": [
+   {"id": "changelog.v0-4-0.title", "field": "title", "status": "active", "source_sha256": "57fa0b377caa381775cdc0b07d24ba60ac32a623173350b446b72cdd31b80c54"},
+   {"id": "changelog.v0-4-0.changes.01", "field": "changes", "status": "active", "source_sha256": "8882cfe35f287ce6bae4c869bc6ee4a745975f432a0276d3f02c80cc585e5958"},
+   {"id": "changelog.v0-4-0.changes.02", "field": "changes", "status": "active", "source_sha256": "30414b00b838a43af863de40989d271a4321cdec5da383ee230c320d8123b3e1"},
+   {"id": "changelog.v0-4-0.changes.03", "field": "changes", "status": "active", "source_sha256": "ba38a8b4cd8861e8252aa3c123a1f4324f2935be134a844293d6d94d29c17dc9"},
+   {"id": "changelog.v0-4-0.changes.04", "field": "changes", "status": "active", "source_sha256": "8aeb40e976c6addfbc2b931060e001567b818ccf9e6f1901c957e0cc13ee7b6d"}
+  ]},
+  {"id": "v0-3-0", "key": {"version": "0.3.0"}, "items": [
+   {"id": "changelog.v0-3-0.title", "field": "title", "status": "active", "source_sha256": "5dece67c02163b8fa811778d268b8981b21f0fb92daa029ba9bc830c15a6ef8e"},
+   {"id": "changelog.v0-3-0.changes.01", "field": "changes", "status": "active", "source_sha256": "7a938b294e4088706c7dc8fbc122553f7e4bfa16e69c29bd85db24ea4afd49bc"},
+   {"id": "changelog.v0-3-0.changes.02", "field": "changes", "status": "active", "source_sha256": "b93f099399b2ddb2a9d42554dff3dd1e0f8dba8aa8751c03acee8f202c8b3a8c"},
+   {"id": "changelog.v0-3-0.changes.03", "field": "changes", "status": "active", "source_sha256": "ab074eb26798a1f884be4c0a94510a562aa9ebde64d36679347a9ec3f79e1fb3"},
+   {"id": "changelog.v0-3-0.changes.04", "field": "changes", "status": "active", "source_sha256": "bb38220317e06a32bf99c6d3f92509f1f5ca80f7fbefb5793cca74e4943cc986"},
+   {"id": "changelog.v0-3-0.changes.05", "field": "changes", "status": "active", "source_sha256": "8a13f45cf18488f6501eabc76f7a9c396e63ef6dc7b70d4f2699d43cb2f64833"},
+   {"id": "changelog.v0-3-0.corrections.01", "field": "corrections", "status": "active", "source_sha256": "060b784fe6b2effa46642300a93c9a5939d154e45806514625daff76ea3e7bc1"},
+   {"id": "changelog.v0-3-0.review_fixes.01", "field": "review_fixes", "status": "active", "source_sha256": "25b6cfaadc4ed1d9324319024db70b9e6143d7e18126d3fbebc0543a37b0b964"},
+   {"id": "changelog.v0-3-0.review_fixes.02", "field": "review_fixes", "status": "active", "source_sha256": "780a01124c2b634a74744700db4f703dea67548ba556e0fb3951f26e57212c97"}
+  ]},
+  {"id": "v0-2-0", "key": {"version": "0.2.0"}, "items": [
+   {"id": "changelog.v0-2-0.title", "field": "title", "status": "active", "source_sha256": "e54dc0d0e590ed1b20b795c91b695b6bedb51fe6c5f81dbba723ede11ee96bff"},
+   {"id": "changelog.v0-2-0.changes.01", "field": "changes", "status": "active", "source_sha256": "0f95786e5b116240bccdce8bbbd06459f4896eba1c947ed559d9272c6632966d"},
+   {"id": "changelog.v0-2-0.changes.02", "field": "changes", "status": "active", "source_sha256": "a917b78b4bf0d4e7a7c14f4726db7f06e6a475c64f4bdb2ff39a26c22332fb5a"},
+   {"id": "changelog.v0-2-0.changes.03", "field": "changes", "status": "active", "source_sha256": "961e2c6bf42d67aea65476ed392e2925a20fafdb7efd7e3e823a53674bb0ea07"},
+   {"id": "changelog.v0-2-0.corrections.01", "field": "corrections", "status": "active", "source_sha256": "8ac832163d608c544902ddab132d781778916ca20da9e597406f06f50d844272"},
+   {"id": "changelog.v0-2-0.review_fixes.01", "field": "review_fixes", "status": "active", "source_sha256": "34b02aacffc9ebac1d55c03e4dc6aa4042c45f67a83f8788ee73c7cc385b6de1"},
+   {"id": "changelog.v0-2-0.review_fixes.02", "field": "review_fixes", "status": "active", "source_sha256": "3eb74c242a9229c43cd3c255dd6ef4b00fd493a0278c6c7ddc161fecb5909bdf"}
+  ]},
+  {"id": "v0-1-0", "key": {"version": "0.1.0"}, "items": [
+   {"id": "changelog.v0-1-0.title", "field": "title", "status": "active", "source_sha256": "4b2f3849be1f0391c6f2a2cd4456d2c746182eed8d3ae54d526a3e8d5e969510"},
+   {"id": "changelog.v0-1-0.changes.01", "field": "changes", "status": "active", "source_sha256": "69bd69e9bcbc8fe8f895a14f4860010f876e053437e44a4c6d5de836ac067db6"},
+   {"id": "changelog.v0-1-0.changes.02", "field": "changes", "status": "active", "source_sha256": "d3b4b982f7439a653cd1be187351c6a790f8dbafd4c18d5a361fd9e549e63853"},
+   {"id": "changelog.v0-1-0.corrections.01", "field": "corrections", "status": "active", "source_sha256": "d52a9c482787231f49987332efa2b088ed2018cd9638b44c2904178ca58cc3a5"},
+   {"id": "changelog.v0-1-0.review_fixes.01", "field": "review_fixes", "status": "active", "source_sha256": "0703eb0d616d29ee6e12e6878dfc3de1b3866a722ea4b2dd7032e86327d5f14c"},
+   {"id": "changelog.v0-1-0.review_fixes.02", "field": "review_fixes", "status": "active", "source_sha256": "1a64daba084424c8c662bda9c701ddbf8f31c3df42481b4159c3672738b3fdd6"}
+  ]},
+  {"id": "aa400cf", "key": {"commit": "aa400cfa038c4899435886ee0e2f9d5cee4fe0a4"}, "items": [
+   {"id": "changelog.aa400cf.title", "field": "title", "status": "active", "source_sha256": "caf16fb477b821532565b1949c0081b2185b8bdaef491fd0cd5fa05267857221"},
+   {"id": "changelog.aa400cf.changes.01", "field": "changes", "status": "active", "source_sha256": "b4c302a33b8bcdb8c9c71ccb75a284a7a2d24c701ba02c63604fa2dc82c23c87"}
+  ]}
+ ]
+}

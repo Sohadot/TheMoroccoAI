@@ -155,6 +155,16 @@ def content(unit_id, english):
     return _ISOLATE.sub(lambda m: iso(m.group(0)), text) if _ctx().dir == "rtl" else text
 
 
+def identity_bindings(kind, changelog=None, ontology=None):
+    """Stable ids of canonical list items (i18n/<kind>-identity.json). An unregistered, orphaned or ambiguous
+    item stops the build: identity never falls back to position."""
+    bindings, _, errors = i18n.load_identity(kind, _ctx().root, changelog=changelog, ontology=ontology)
+    if errors:
+        raise SystemExit("identity map is out of date:\n  " + "\n  ".join(errors[:10])
+                         + "\nRun python3 tools/i18n.py --identity-report for proposed repairs.")
+    return bindings
+
+
 def file_link(href, label_html):
     """A link to a data file (not a page): never redirected to a translated page."""
     return f'<a href="{href}">{label_html}</a>'
@@ -2149,25 +2159,31 @@ def render_methodology(model, changelog):
         msg_text(P + "documents.source_count", type=msg_text(f"vocab.source_type.{k}").lower(), count=v)
         for k, v in sorted(sources.items(), key=lambda kv: (-kv[1], kv[0])))
     repo = changelog["repository"]
+    ids = identity_bindings("changelog", changelog=changelog)
+    offset = 1 if changelog.get("note") else 0  # the note is identity entry 0
+
+    def record(index, field, pos, text):
+        return content(f"changelog:{ids[(index + offset, field, pos)]}:text", text)
+
     entries = []
-    for c in changelog["entries"]:
+    for i, c in enumerate(changelog["entries"]):
         figures = (" · " + msg_html(P + "changelog.figures", version=iso(escape(c["version"])), records=c["records"],
                                     entities=c["entities"], relationships=c["relationships"])
                    if c.get("version") else "")
         ref = (f'<a href="{repo}/commit/{c["commit"]}" rel="noopener">{c["commit"][:7]}</a>' if c.get("commit")
                else f'<a href="{repo}/pull/{c["pull_request"]}" rel="noopener">{msg(P + "changelog.pull_request", number=c["pull_request"])}</a>')
-        # Changelog records (title and change lists) are canonical history in data/changelog.json; their
-        # translation is deferred (docs/MULTILINGUAL_ARCHITECTURE.md section 15), so they render as recorded.
-        changes = "".join(f"<li>{escape(x)}</li>" for x in c.get("changes", []))
-        fixes = "".join(f"<li>{escape(x)}</li>" for x in c.get("corrections", []))
+        # Changelog records are canonical history in data/changelog.json; each text renders through its stable
+        # identity (i18n/changelog-identity.json), so a translation stays bound to it across reordering.
+        changes = "".join(f"<li>{record(i, 'changes', n, x)}</li>" for n, x in enumerate(c.get("changes", [])))
+        fixes = "".join(f"<li>{record(i, 'corrections', n, x)}</li>" for n, x in enumerate(c.get("corrections", [])))
         fixes = f'<p class="change-sub">{msg(P + "changelog.corrections")}</p><ul>{fixes}</ul>' if fixes else ""
-        review = "".join(f"<li>{escape(x)}</li>" for x in c.get("review_fixes", []))
+        review = "".join(f"<li>{record(i, 'review_fixes', n, x)}</li>" for n, x in enumerate(c.get("review_fixes", [])))
         fixes += f'<p class="change-sub">{msg(P + "changelog.review_fixes")}</p><ul>{review}</ul>' if review else ""
-        breaking = "".join(f"<li>{escape(x)}</li>" for x in c.get("breaking_changes", []))
+        breaking = "".join(f"<li>{record(i, 'breaking_changes', n, x)}</li>" for n, x in enumerate(c.get("breaking_changes", [])))
         fixes += f'<p class="change-sub">{msg(P + "changelog.breaking")}</p><ul>{breaking}</ul>' if breaking else ""
         entries.append(f"""<li class="change">
   <p class="change-meta"><time datetime="{c["date"]}">{escape(human_date(c["date"]))}</time> · {ref}{figures}</p>
-  <h3>{escape(c["title"])}</h3>
+  <h3>{record(i, "title", 0, c["title"])}</h3>
   <ul>{changes}</ul>{fixes}
 </li>""")
     independent = f'<strong>{msg("page.notice.independent")}</strong>'
@@ -2230,7 +2246,7 @@ def render_methodology(model, changelog):
 </section>
 <section aria-labelledby="m6-h">
   <h2 id="m6-h"><span class="section-number">06</span>{msg(P + "changelog.h2")}</h2>
-  <p class="prose">{escape(changelog["note"])}</p>
+  <p class="prose">{content("changelog:" + ids[(0, "note", 0)] + ":text", changelog["note"])}</p>
   <ol class="changelog">{"".join(entries)}</ol>
 </section>"""
     return page(model, path="/methodology/", current="methodology",
