@@ -32,6 +32,7 @@ This public log records governance decisions, not completed implementation or ex
 - Decision: English is the official, authoritative project language. French and Arabic are secondary localization priorities; Tamazight and Spanish may follow after language-specific quality review.
 - Constraints: Keep original-language evidence excerpts intact, distinguish translations from quotations, use canonical terminology, correct hreflang, and do not index incomplete translations.
 - Rationale: Preserve one semantic reference while widening accessibility.
+- Refined by: TMA-DEC-007 (2026-11-22), which adds Darija and Standard Moroccan Amazigh as future priorities, keeps Spanish as a possible later language without commitment, and sets the translation architecture. The decision above is otherwise unchanged.
 
 ## TMA-DEC-004 — External human validation
 - Date: 2026-11-22
@@ -58,3 +59,14 @@ This public log records governance decisions, not completed implementation or ex
 - Implementation status: Implemented in documentation; Drive access restrictions require owner verification
 - Decision: Public GitHub is the source of truth for non-sensitive implementation, tests and decisions. Restricted operational notes, private scoring criteria, non-public evaluation responses and commercial negotiation material belong in a separately access-controlled private workspace, such as Google Drive.
 - Constraints: No credentials in Drive documents; use a secrets manager. No participant data without informed consent, a retention policy and restricted access. Never place sensitive data in a public PR, issue or commit history.
+
+## TMA-DEC-007 — Multilingual reference architecture
+- Date: 2026-11-22
+- Domain: Content / localization / architecture
+- Decision status: Accepted (Sohadot integration authority)
+- Implementation status: Foundation added in Sprint 19B-1 (translation layer, validation, English interface strings read from a catalog with unchanged output). No translation drafted or reviewed; no localized page or route published.
+- Refines: TMA-DEC-003 (language set). Relies on TMA-DEC-001 (ownership disclosures on every localized page), TMA-DEC-002 (evaluation stays English until a separate neutrality review) and TMA-DEC-006 (pseudonymous review records; no drafts on the public branch).
+- Decision: Publish the single English reference in other languages as reviewed translations derived from the same canonical data, as set out in docs/ADR_MULTILINGUAL_REFERENCE.md. English is the sole authoritative research language. Modern Standard Arabic and French are the first publication languages; Moroccan Darija (Arabic script) and Standard Moroccan Amazigh (Tifinagh) are future priorities; Spanish is a possible later language without a publication commitment. No language introduces research conclusions or duplicates canonical evidence.
+- Constraints: Translations live in i18n/, outside data/ and the reference contract. A page is published in a language only when every unit it needs has a substantive and a linguistic review by reviewers independent of the drafter (two different reviewers preferred), recorded pseudonymously, and matches the current English source. No grace period for stale translations; English publishing never waits for translation. Source excerpts stay verbatim and untranslated in the first two waves. /acquisition/ follows the core reference pages and needs a dedicated substantive and legal review. Begin with the existing self-hosted Arabic font; add a font only on a demonstrated readability need. Machine translation may draft already-public content but never replaces the human reviews, and no review is claimed unless it took place. Webmaster tools may be used to assess indexing; account connection, ownership verification or DNS changes are separately authorized operations; no invasive tracking or analytics. No placeholder routes or premature publication.
+- Rationale: Widen access to one reference without creating a second body of research, keep every translation traceable to its English source, and keep the English reference independent of translation readiness.
+- Detail: docs/ADR_MULTILINGUAL_REFERENCE.md (owner decisions Q1–Q9), docs/MULTILINGUAL_ARCHITECTURE.md, docs/MULTILINGUAL_IMPLEMENTATION_PLAN.md.

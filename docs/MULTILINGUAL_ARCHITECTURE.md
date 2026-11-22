@@ -1,6 +1,6 @@
-# Multilingual Reference Architecture (proposed)
+# Multilingual Reference Architecture
 
-Status: **Proposed (Sprint 19A)**. This document is a design for review. Approval questions are numbered as in the ADR (Q1–Q9). Nothing in it is implemented, and it does not change the published site. The decision it supports is recorded in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). The phased plan is in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
+Status: **Accepted (TMA-DEC-007, 2026-11-22).** The design was proposed in Sprint 19A and accepted with the owner decisions Q1–Q9 recorded in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). **Implementation:** only the Sprint 19B-1 foundation exists (section 13). No translation has been drafted or reviewed, and no localized page or route is published. Section 1 is the Sprint 19A inventory at `728d475`, kept as recorded. The phased plan is in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
 
 Governing policy: [TMA-DEC-003](DECISION_LOG.md) (accepted) says:
 - English is the authoritative project language.
@@ -134,7 +134,7 @@ i18n/
 ```
 
 - **States:** `authoritative` (English only), `in-preparation` (nothing is generated), `published` (eligible pages are generated) and `withdrawn`.
-- **Later waves:** `ary` and `zgh` are added only in Sprint 19D, after the decisions in section 12.
+- **Later waves:** `ary` (Arabic script) and `zgh` (Tifinagh) are added only in Sprint 19D, once their terminology, fonts and review capacity exist (Q7).
 
 ### 4.3 Translation unit
 
@@ -149,7 +149,7 @@ Both catalogs share one unit shape:
   "kind": "prose",
   "review": {
     "drafted_by": "translator-ar-01",
-    "terminology_checked": "2026-12-03",
+    "draft_method": "machine-assisted",
     "substantive_reviewer": "reviewer-sub-01",
     "linguistic_reviewer": "reviewer-ar-02",
     "approved_on": "2026-12-05",
@@ -167,7 +167,7 @@ Both catalogs share one unit shape:
 | `kind` | One of: `interface` (navigation, labels); `prose` (page text); `qualifier` (sentences that limit a claim, such as `PLAN_NOT_DELIVERED`, `AVAILABILITY_SUFFIX` or the recency notice); `disclosure` (ownership, independence, authority notice); `term` (glossary-bound labels); `name` (localized entity display name). |
 | `name_basis` | Only on `name` units: `official` (with `name_source_url` and the retrieval date), `established-usage`, `transliteration` or `translation`. |
 | `status` | `draft`, `terminology-checked`, `parity-reviewed`, `linguistically-reviewed`, `approved` or `stale`. Only `approved` with a matching hash is renderable. |
-| `review` | Pseudonymous reviewer identifiers by default (ADR Q3). This keeps personal data out of a public repository, as TMA-DEC-006 requires. |
+| `review` | Pseudonymous identifiers only (Q3), such as `reviewer-ar-02`; no other fields are allowed, so no personal data reaches a public file (TMA-DEC-006). `draft_method` is `human` or `machine-assisted` (Q9). Required on approved units. |
 
 **Placeholders.** Numbers, dates, identifiers, URLs, entity links and counts are never literal in translatable text. They are named placeholders filled by the generator from canonical data, for example `"{count} evidence records, as of {date}"`. This makes number and identifier parity checkable by machine (section 9).
 
@@ -177,7 +177,7 @@ Both catalogs share one unit shape:
 |---|---|
 | Evidence IDs (`MAI-EV-…`), entity IDs, gap IDs, page codes (`MAI-METHOD`, …) | Identical in all languages. Rendered left-to-right and isolated (section 8) |
 | Source URLs, `source_organization`, source titles as cited | Unchanged. An organisation may be *glossed* by an approved `name` unit, never replaced |
-| `source_excerpts` | Always verbatim, in the source language, with `lang` and `dir`. Wave 1 adds no translations of excerpts (ADR Q6) |
+| `source_excerpts` | Always verbatim, in the source language, with `lang` and `dir`. Not translated in the first two waves, and a translation is never presented as an original quotation (Q6) |
 | Classification codes (`VERIFIED FACT`, `OFFICIAL TARGET`, `ANNOUNCED PLAN`, `UNVERIFIED CLAIM`, `INDEPENDENT ANALYSIS`) | Shown as the glossary-approved localized label **followed by the canonical code**, so a citation can be matched across languages. CSS class and `data-` values stay the canonical slug |
 | Numbers, dates, years, counts, version numbers | Filled from data. The language changes only the presentation (section 5.7) |
 | JSON outputs (`matrix.json`, `gaps.json`, `reference-state.json`, `manifest.json`) | Not localized and not duplicated per language |
@@ -228,8 +228,8 @@ For English, `t` and `c` return the English source. **Sprint 19B's first step is
 | English | `/` (unchanged) | Keeps every existing URL, canonical and backlink. No `/en/` prefix, because a prefix would need redirects that static Pages cannot serve |
 | Arabic | `/ar/…` | Fits static Pages: a directory tree mirroring English paths, for example `/ar/registry/um6p/` |
 | French | `/fr/…` | Same |
-| Darija | `/ary/…` | Valid BCP 47 code. Deferred to Sprint 19D (ADR Q7) |
-| Amazigh | `/zgh/…` | Valid BCP 47 code. Deferred to Sprint 19D (ADR Q7) |
+| Darija | `/ary/…` | Valid BCP 47 code. Deferred to Sprint 19D (Q7) |
+| Amazigh | `/zgh/…` | Valid BCP 47 code. Deferred to Sprint 19D (Q7) |
 
 **Verdict:** the structure is appropriate for this hosting model.
 - **No collisions:** no top-level path or entity ID collides with these prefixes. The validator should reserve them.
@@ -295,7 +295,7 @@ Alternates are declared in page `<head>` only. A sitemap `xhtml:link` mirror is 
   - Transliterations are labelled `name_basis: transliteration`. They are never presented as official names.
 - **Anchor text:** internal anchor text is localized through the same catalog.
 - **Thin pages:** these are prevented by the 100% rule in 5.2. There is no page whose only localized part is the template.
-- **No unsupported claims:** no keyword targeting may introduce a claim, and no search-volume or ranking claims are made. Readiness is verified technically in Sprint 19E. Indexing is observed afterwards, with webmaster tools if the owner chooses to enable them (ADR Q8).
+- **No unsupported claims:** no keyword targeting may introduce a claim, and no search-volume or ranking claims are made. Readiness is verified technically in Sprint 19E. Indexing is observed afterwards, with webmaster tools if the owner chooses to enable them (Q8).
 
 ---
 
@@ -309,15 +309,15 @@ source identified → drafted → terminology checked → substantive parity rev
 | Step | Who / what | Recorded as |
 |---|---|---|
 | Source identified | Build tool lists units required by the eligible pages, with current `source_sha256` | Work list (generated, not committed) |
-| Drafted | Translator (machine translation may be used as a drafting aid only; ADR Q9) | `status: draft`, `drafted_by` |
-| Terminology checked | Automated glossary check, plus the translator | `terminology_checked`, `glossary_version` |
+| Drafted | Translator; machine translation may prepare drafts of already-public content, never replacing the reviews (Q9) | `drafted_by`, `draft_method` |
+| Terminology checked | Automated glossary check, plus the translator | `glossary_version` |
 | Substantive parity reviewed | A reviewer who reads English and the target language confirms that claims, qualifiers, numbers, dates and classifications are preserved | `substantive_reviewer` |
 | Linguistically reviewed | A native or professional reviewer, distinct from the drafter | `linguistic_reviewer` |
 | Approved | Both reviews recorded, all checks pass | `status: approved`, `approved_on` |
 | Published | The Sohadot integration authority merges the PR. The build generates the page | Generated output under `/<lang>/` |
 
 ### 6.1 Separation of duties
-The drafter cannot be either reviewer. The substantive and linguistic reviews may be performed by one person only if that person is not the drafter. Whether that is acceptable for wave 1 is left to the owner (ADR Q3).
+The drafter cannot be either reviewer (enforced by `tools/i18n.py`). Two different reviewers are preferred; one person may perform both functions only if they did not draft the text (Q3).
 
 ### 6.2 What machines can and cannot establish
 The automated checks in section 9 establish structural parity: identifiers, placeholders, numbers, dates, classifications, citations, qualifiers present, links, metadata and disclosures. **They cannot establish semantic equivalence.** Publication therefore always requires the two human reviews. A passing build is a necessary condition for publication, never a sufficient one.
@@ -336,7 +336,7 @@ Because every file on `main` is publicly served (1.1), drafts stay on translatio
   - `build.py --check` prints a **translation impact report**: the units made stale and the localized pages withdrawn.
   - A pull request that changes English text or data must show this report in CI output.
   - The integration authority sees the withdrawals before merging and can choose to update the translations in the same pull request.
-- **Strictness by kind:** `prose`, `qualifier`, `disclosure`, `term` and content units have no grace period. `interface` units may get a grace period, but only if the owner decides so (ADR Q4). The default is no grace period.
+- **Strictness by kind:** `prose`, `qualifier`, `disclosure`, `term` and content units have no grace period. Interface units have none either: there is no grace period for any kind (Q4).
 
 ---
 
@@ -349,7 +349,7 @@ Because every file on `main` is publicly served (1.1), drafts stay on translatio
 5. **Arabic typography:**
    - `:lang(ar)` sets `letter-spacing: 0` and `text-transform: none`, never italic, and a font stack that starts with the bundled Arabic face.
    - DM Mono has no Arabic glyphs, so Arabic labels need the Arabic face.
-   - Noto Kufi Arabic covers the needed characters (1.5). Whether a Kufi design suits long reading is an open typographic decision (ADR Q5).
+   - Noto Kufi Arabic covers the needed characters (1.5). Arabic pages begin with this font; another self-hosted face is added only if testing shows a genuine readability need (Q5).
 6. **Mixed content:** Arabic paragraphs that quote French or English official names use `lang` on the inner span, so that screen readers switch voice and the browser picks the right font.
 7. **Tifinagh (Sprint 19D):** this needs a bundled, OFL-licensed Tifinagh font subset covering at least U+2D30–U+2D67, U+2D6F and U+2D7F. Tifinagh is written left to right. It cannot reuse the Arabic font, and none of the current fonts covers it. Script choice and language tagging (`zgh` / `zgh-Tfng`) are decided in Sprint 19D.
 8. **No new external requests:** all fonts are self-hosted subsets, as now.
@@ -392,7 +392,7 @@ Each new gate gets a negative fixture test, following the existing `GatesCatchRe
 | Homepage | 19B | Entry point. Its hand-written text must first move into the catalog (plan, step B2) |
 | `/methodology/` | 19B | Holds `#ownership-h`, the limits and the classification definitions, which localized pages must be able to link to |
 | `/registry/` (index) | 19B | Navigation hub. It renders entity names and labels only |
-| `/acquisition/` | 19B or later | Commercial page. Owner decision (ADR Q2) |
+| `/acquisition/` | After the core reference pages | May be localized after the core pages, with a dedicated substantive and legal review of its commercial wording before publication (Q2) |
 | Entity pages, `/registry/evidence/`, `/registry/questions/`, `/registry/gaps/`, `/registry/matrix/` | 19C | Need the content catalog (about 13,400 words of canonical prose) and per-page parity |
 | `/registry/state/` | After 19C, possibly never | Its linter forbids numbers and judgment words in static text. A translated page would need a per-language linter that preserves those guarantees |
 | `/data/` | Not planned | Developer documentation for English-keyed JSON. Low search value. Reversible |
@@ -411,9 +411,38 @@ Each new gate gets a negative fixture test, following the existing `GatesCatchRe
 
 ---
 
-## 12. Where the brief goes beyond existing policy
+## 12. Owner decisions
 
-These points need an owner decision and are listed as approval questions Q1–Q9 in the [ADR](ADR_MULTILINGUAL_REFERENCE.md). The others concern choices that existing policy leaves open: whether the acquisition page is translated, reviewer arrangements, staleness grace, Arabic body typeface, excerpt translations, webmaster tools and machine translation.
+The points Sprint 19A found outside existing policy were resolved by the owner on 2026-11-22 (Q1–Q9 in the [ADR](ADR_MULTILINGUAL_REFERENCE.md); TMA-DEC-007 in the [decision log](DECISION_LOG.md)). TMA-DEC-007 refines the language set of TMA-DEC-003: Darija and Standard Moroccan Amazigh are future priorities, and Spanish is a possible later language without commitment.
 
-1. TMA-DEC-003 names "Tamazight and Spanish" as possible later languages. The Sprint 19A brief names Darija (`ary`) and Standard Moroccan Amazigh (`zgh`), and does not mention Spanish.
-2. TMA-DEC-003 does not decide whether the evaluation, the acquisition page or source excerpts are translated.
+## 13. Implemented foundation (Sprint 19B-1)
+
+| Part | What exists |
+|---|---|
+| `i18n/languages.json` | `en` (authoritative, `/`), `ar` and `fr` (`in-preparation`). Nothing is generated for a language that is not published, and `tools/i18n.py` refuses `published` until a renderer exists (`RENDERING_LANGUAGES` is empty) |
+| `i18n/en/messages.json` | 35 English source strings: page shell (skip link, navigation), footer (tagline, owner note, disclaimer, version, date, link labels), the canonical ownership statement, and date formats and month names |
+| `i18n/ar/`, `i18n/fr/` | Empty `messages.json` and `content.json`: no translation unit is recorded before it is drafted and reviewed |
+| `i18n/glossary.json` | Schema and version only; no term labels yet |
+| `tools/i18n.py` | Fingerprints (SHA-256 of NFC English source); source resolution for messages and canonical fields (`evidence`, `ontology`, `gaps`); validation; stale and orphan report; `renderable_units` and `page_eligibility` |
+| `tools/build.py` | Reads the shell, footer, ownership statement and dates from the English catalog. `human_date` no longer uses `strftime`. Output byte-identical (80 generated files) |
+| `tools/registry.py` | Runs the i18n validation, so CI covers it without a workflow change. Stale and orphaned units are reported, never errors |
+| `tools/check_site.py` | Fails a route directory for an unpublished or reserved language (`ar`, `fr`, `ary`, `zgh`, `es`), and `hreflang` to an unpublished language or a missing page |
+| `tests/test_i18n.py` | Positive fixtures and a negative test for every rule |
+
+**Validation rules** (`tools/i18n.py`):
+- **Language registry:** codes, BCP 47 tags, scripts, direction, state, routes, a single authoritative English entry, no `published` without a renderer, no unregistered language directory.
+- **English catalog:** message ids, duplicates, kinds, text hygiene.
+- **Translation units:**
+  - valid and committable status (approved only, since drafts stay off `main`), no duplicate ids, valid kind and `name_basis`;
+  - a source reference that resolves, and a source fingerprint;
+  - NFC text, with no bidirectional controls, invisible characters or markup;
+  - placeholders, digits (Western digits only, none added) and identifiers/URLs identical to the English source;
+  - review record complete, pseudonymous, independent of the drafter, dated, with no extra fields;
+  - no forbidden glossary variant.
+- **Glossary:** terms name canonical vocabulary, labels approved, no label containing its own forbidden variant.
+
+**Never an error:** stale units (English source changed) and orphaned units (source removed) are reported and are never renderable, so English releases never wait for translation (Q4).
+
+**Not established by validation:** semantic equivalence. Only the two recorded human reviews can establish it.
+
+**Deferred extraction:** page-body prose in `build.py`, the hand-maintained homepage (inline CSS, about 1,100 words), the evaluation page (English only, TMA-DEC-002), the state page (English-specific linter), and the label maps that belong to the glossary. Each needs its own output-parity proof and is planned for Sprint 19B-2.
