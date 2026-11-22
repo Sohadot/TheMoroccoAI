@@ -183,7 +183,7 @@ Both catalogs share one unit shape:
 | Classification codes (`VERIFIED FACT`, `OFFICIAL TARGET`, `ANNOUNCED PLAN`, `UNVERIFIED CLAIM`, `INDEPENDENT ANALYSIS`) | Shown as the glossary-approved localized label **followed by the canonical code**, so a citation can be matched across languages. CSS class and `data-` values stay the canonical slug |
 | Numbers, dates, years, counts, version numbers | Filled from data. The language changes only the presentation (section 5.7) |
 | JSON outputs (`matrix.json`, `gaps.json`, `reference-state.json`, `manifest.json`) | Not localized and not duplicated per language |
-| `domain_labels_ar` in `ontology.json` | Left unchanged (canonical data is not modified). The Arabic glossary uses it as seed values, subject to linguistic review. Any divergence is recorded in the glossary, and the canonical field is never rewritten from the translation layer |
+| `domain_labels_ar` in `ontology.json` | Left unchanged (canonical data is not modified). The Arabic glossary uses it as seed values, subject to human approval (TMA-DEC-008). Any divergence is recorded in the glossary, and the canonical field is never rewritten from the translation layer |
 
 ### 4.5 Glossary (`i18n/glossary.json`)
 
@@ -208,7 +208,7 @@ Both catalogs share one unit shape:
 
 **Forbidden variants.** Each term lists forbidden variants: renderings that would strengthen or weaken meaning, or imply official status. One example would be an Arabic or French rendering of "independent registry" that reads as "official registry". `check_site` rejects forbidden variants on pages in that language.
 
-**Who sets the target terms.** Linguistic and substantive reviewers set the target-language terms in Sprint 19B. This design deliberately proposes none.
+**Who sets the target terms.** Target-language terms are drafted (AI assistance allowed) and approved by a registered human reviewer under TMA-DEC-008, with escalation (`specialist-term`) where a term cannot be settled reliably. This design deliberately proposes none; candidate labels are kept outside the repository until approved.
 
 ### 4.6 How a localized page is produced
 
@@ -278,7 +278,7 @@ Alternates are declared in page `<head>` only. A sitemap `xhtml:link` mirror is 
 
 - **`<html>` attributes:** `<html lang="ar" dir="rtl">` and `<html lang="fr" dir="ltr">`.
 - **`og:locale`:** a language-region value such as `ar_MA` or `fr_MA`, with `og:locale:alternate` only for published members. `og:locale` uses the `_MA` region because the intended audience is Moroccan. `hreflang` stays language-only (`ar`, `fr`), because the content is not region-specific.
-- **Dates:** explicit month tables per language in the generator, never `strftime` or locale settings. Every displayed date is wrapped in `<time datetime="YYYY-MM-DD">`. Arabic month names follow the convention chosen by the linguistic reviewers. Moroccan usage (يناير … ماي … يوليوز، غشت، شتنبر، نونبر، دجنبر) is the proposed default, to be confirmed in the glossary.
+- **Dates:** explicit month tables per language in the generator, never `strftime` or locale settings. Every displayed date is wrapped in `<time datetime="YYYY-MM-DD">`. Arabic month names follow the convention chosen by the approving reviewer (TMA-DEC-008). Moroccan usage (يناير … ماي … يوليوز، غشت، شتنبر، نونبر، دجنبر) is the proposed default, to be confirmed in the glossary.
 - **Numerals:** Western digits (0–9) in all languages, consistent with common Moroccan usage. This keeps numbers byte-identical across languages so they can be machine-checked. Arabic-Indic digits are rejected by a check unless policy changes.
 - **French typography:** a no-break space before `; : ! ?` and inside `« »`. Use U+00A0, or extend the Latin font subset to U+202F in Sprint 19B.
 

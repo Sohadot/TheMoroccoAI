@@ -1,4 +1,6 @@
-"""Translation layer for TheMoroccoAI (decision TMA-DEC-007; design in docs/MULTILINGUAL_ARCHITECTURE.md).
+"""Translation layer for TheMoroccoAI (decision TMA-DEC-007; review governance TMA-DEC-008, which supersedes the
+review provisions of TMA-DEC-007; design in docs/MULTILINGUAL_ARCHITECTURE.md, policy in
+docs/TRANSLATION_REVIEW_POLICY.md).
 
     python3 tools/i18n.py            validate i18n/ and print the staleness and orphan report
 
@@ -9,13 +11,15 @@ provides:
 - the English message lookup used by tools/build.py (t, english_messages);
 - source fingerprints (SHA-256 of the NFC English source) that make translations traceable and staleness
   detectable;
-- structural validation of the language registry, catalogs, review metadata and glossary;
+- structural validation of the language registry, catalogs, reviewer registry, approval records and glossary;
 - publication eligibility: a unit is renderable only if it is approved and its fingerprint matches the
   current English source; a language can be 'published' only once a renderer for it exists.
 
 Passing validation proves structure, provenance and parity of placeholders, digits and identifiers. It
 does not and cannot prove that a translation means the same as the English: that is the job of the
-two human reviews recorded on each unit. Standard library only.
+documented human approval recorded on each unit (one competent human reviewer under TMA-DEC-008, and a
+second registered reviewer only when an escalation criterion applies). Semantic-risk checks flag likely
+meaning changes for that reviewer; they are not proof of equivalence. Standard library only.
 """
 import datetime
 import hashlib
@@ -38,7 +42,7 @@ GOVERNANCE_POLICY = "TMA-DEC-008"
 # Stored statuses. STALE is computed (source or approved text changed after approval) and never stored.
 UNIT_STATUSES = ("DRAFT", "NEEDS_REVISION", "APPROVED", "REJECTED")
 # Every file on main is publicly served, so catalogs on main hold approved units only (Arch §6.3). A
-# translation pull request therefore stays red until both reviews are recorded: that is intended.
+# translation pull request therefore stays red until the human approval is recorded: that is intended.
 COMMITTABLE_STATUSES = ("APPROVED",)
 REVIEWER_KINDS = ("human", "certified-translator")
 # Escalation criteria (TMA-DEC-008): an open escalation blocks publication of the unit until a second, qualified
