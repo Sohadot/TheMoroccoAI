@@ -28,6 +28,16 @@ class PublishedSite(unittest.TestCase):
         for page in (REPO / "registry").glob("*/index.html"):
             self.assertIn(f"/registry/{page.parent.name}/", sitemap)
 
+    def test_all_public_pages_disclose_sohadot_ownership(self):
+        for page in check_site.site_pages():
+            body = page.read_text(encoding="utf-8")
+            self.assertIn("Sohadot", body, page.relative_to(REPO))
+            self.assertIn("Not affiliated with the Government of Morocco", body, page.relative_to(REPO))
+        method = (REPO / "methodology" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="ownership-h"', method)
+        self.assertIn("References to external organizations", method)
+        self.assertIn('href="/methodology/#ownership-h"', (REPO / "index.html").read_text(encoding="utf-8"))
+
     def test_evaluation_is_private_by_design_and_not_in_sitemap(self):
         page = (REPO / "evaluation" / "index.html").read_text(encoding="utf-8")
         script = (REPO / "assets" / "evaluation.js").read_text(encoding="utf-8")
@@ -298,7 +308,7 @@ class ReferenceFirstPositioning(unittest.TestCase):
         self.assertIn("Owner's view of potential (not established)", text)
         self.assertIn("no interest from any specific party is implied", text)
         self.assertIn("No price, traffic or revenue figures are published", text)
-        self.assertIn("no institution has adopted or designated it", text)
+        self.assertIn("No institution has adopted or designated it", text)
         self.assertIn(check_site.DISCLAIMER, text)
 
     def test_every_page_links_to_acquisition_quietly(self):
