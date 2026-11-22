@@ -502,7 +502,7 @@ GOOD_PAGE = """<!DOCTYPE html><html lang="en"><head>
 <meta name="description" content="A test page used to exercise the site quality gates in isolation.">
 <link rel="canonical" href="https://themoroccoai.com/">
 <meta property="og:url" content="https://themoroccoai.com/">
-</head><body><main><h1>Title</h1>
+""" + "".join(build.social_image_meta("TheMoroccoAI test page")) + """</head><body><main><h1>Title</h1>
 <section id="acquire"><a href="mailto:agent@sohadot.com">Contact</a> <a href="/acquisition/">Acquisition</a></section>
 <p>Not affiliated with the Government of Morocco · Owned and operated by Sohadot</p>
 <p>""" + check_site.OWNERSHIP_STATEMENT + """</p>
@@ -516,6 +516,8 @@ class LanguageRouteGates(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp)
         (self.tmp / "robots.txt").write_text("Sitemap: https://themoroccoai.com/sitemap.xml\n")
+        (self.tmp / "assets" / "social").mkdir(parents=True)  # the social image the page metadata points to
+        shutil.copy(REPO / "assets" / "social" / "themoroccoai-og.png", self.tmp / "assets" / "social")
         (self.tmp / "sitemap.xml").write_text("<urlset><url><loc>https://themoroccoai.com/</loc></url>"
                                               "<url><loc>https://themoroccoai.com/acquisition/</loc></url></urlset>")
         (self.tmp / "acquisition").mkdir()

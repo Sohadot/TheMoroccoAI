@@ -50,7 +50,8 @@ class EnglishHomepage(unittest.TestCase):
     def test_template_has_only_known_tokens_and_no_hard_coded_links(self):
         tmpl = build.HOMEPAGE_TEMPLATE.read_text(encoding="utf-8")
         kinds = {m.group(1) for m in build._TOKEN.finditer(tmpl)}
-        self.assertLessEqual(kinds, {"m", "a", "j", "h", "i", "href", "b", "lang", "dir", "canonical", "seo", "ld_extra", "notice", "switcher", "localized_css"})
+        self.assertLessEqual(kinds, {"m", "a", "j", "h", "i", "href", "b", "lang", "dir", "canonical", "seo", "ld_extra", "notice", "switcher", "localized_css",
+                                 "og_image", "twitter"})
         # Internal page links go through {{href:...}} or link(); only anchors, data files and mailto stay literal.
         for href in re.findall(r'href="([^"{]+)"', tmpl):
             self.assertTrue(href.startswith(("#", "/data/", "/favicon", "/assets/", "mailto:", "https://")), href)
@@ -123,7 +124,8 @@ class HomepageCompleteness(unittest.TestCase):
         self.assertEqual(words - LITERALS, set())
         self.assertNotRegex(facts.title + (facts.description or ""), r"[A-Za-z]{2,}")
         for attr in re.findall(r'(?:aria-label|content)="([^"]*)"', html):
-            if attr not in ("width=device-width, initial-scale=1.0", "website", "TheMoroccoAI", "summary") and not attr.startswith("https://"):
+            if attr not in ("width=device-width, initial-scale=1.0", "website", "TheMoroccoAI", "summary", "summary_large_image",
+                            "image/png") and not attr.startswith("https://"):
                 self.assertNotRegex(attr, r"[A-Za-z]{2,}", attr)
         ld = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1))
         self.assertNotRegex(ld["description"] + ld["hasPart"]["name"], r"[A-Za-z]{2,}")

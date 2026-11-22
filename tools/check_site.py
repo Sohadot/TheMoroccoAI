@@ -32,6 +32,11 @@ OWNERSHIP_PAGES = ("index.html", "methodology/index.html", "acquisition/index.ht
 # only for a language marked 'published' in i18n/languages.json: no placeholder or unfinished pages.
 RESERVED_LANGUAGE_ROUTES = ("ar", "fr", "ary", "zgh", "es")
 SKIP_DIRS = {".git", "node_modules", "tests"}
+# Social-sharing image: every public page uses this committed PNG (artwork source in tools/social/).
+SOCIAL_IMAGE_PATH = "/assets/social/themoroccoai-og.png"
+SOCIAL_META = ("og:image", "og:image:secure_url", "og:image:type", "og:image:width", "og:image:height", "og:image:alt",
+               "twitter:card", "twitter:image", "twitter:image:alt")
+REPEATABLE_META = {"og:locale:alternate"}
 # Phrases that must not appear on public pages: commercial terms that belong in private
 # negotiation, and self-descriptions that could read as official status.
 FORBIDDEN_PAGE_TEXT = [
@@ -57,6 +62,7 @@ class Page(HTMLParser):
         self.ids, self.dup_ids = set(), set()
         self.links, self.resources, self.headings, self.imgs_no_alt = [], [], [], 0
         self.meta, self.canonical, self.lang, self.title = {}, None, None, ""
+        self.dup_meta = []
         self.h1, self.svgs_unlabelled, self.empty_links, self.styles = 0, 0, [], []
         self.alternates = []
         self.dir = None
@@ -78,6 +84,8 @@ class Page(HTMLParser):
         elif tag == "meta":
             key = a.get("name") or a.get("property")
             if key:
+                if key in self.meta and key not in REPEATABLE_META:
+                    self.dup_meta.append(key)
                 self.meta[key] = a.get("content", "")
         elif tag == "link":
             rel = (a.get("rel") or "").lower()
@@ -179,6 +187,7 @@ def check(network=False):
             errors.append(f"{where}: canonical {p.canonical!r} should be {SITE + path!r}")
         if p.meta.get("og:url") != SITE + path:
             errors.append(f"{where}: og:url does not match canonical")
+        errors += social_meta_errors(where, p)
         if "width=device-width" not in p.meta.get("viewport", ""):
             errors.append(f"{where}: missing responsive viewport meta")
         if not p.lang:
@@ -380,6 +389,37 @@ def check_secrets():
         for pattern in SECRET_PATTERNS:
             if pattern.search(text):
                 errors.append(f"{f.relative_to(ROOT)}: looks like a committed credential ({pattern.pattern[:20]}…)")
+    return errors
+
+
+def png_size(path):
+    """(width, height) of a PNG from its IHDR chunk, or None if the file is not a PNG."""
+    data = Path(path).read_bytes()[:24]
+    if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
+        return None
+    return int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")
+
+
+def social_meta_errors(where, p):
+    """One coherent Open Graph / X image set per page, pointing at the committed social image."""
+    errors = [f"{where}: duplicate <meta> {k!r}" for k in sorted(set(p.dup_meta))]
+    missing = [k for k in SOCIAL_META if not p.meta.get(k)]
+    if missing:
+        return errors + [f"{where}: missing social metadata {missing}"]
+    image = SITE + SOCIAL_IMAGE_PATH
+    if p.meta["og:image"] != image or p.meta["og:image:secure_url"] != image or p.meta["twitter:image"] != image:
+        errors.append(f"{where}: og:image, og:image:secure_url and twitter:image must all be {image}")
+    if p.meta["twitter:card"] != "summary_large_image":
+        errors.append(f"{where}: twitter:card must be summary_large_image for the large social image")
+    size = png_size(ROOT / SOCIAL_IMAGE_PATH.lstrip("/"))
+    if size is None:
+        errors.append(f"{where}: {SOCIAL_IMAGE_PATH} is missing or not a PNG")
+    else:
+        if p.meta["og:image:type"] != "image/png":
+            errors.append(f"{where}: og:image:type {p.meta['og:image:type']!r} does not match the PNG file")
+        if (p.meta["og:image:width"], p.meta["og:image:height"]) != (str(size[0]), str(size[1])):
+            errors.append(f"{where}: og:image dimensions {p.meta['og:image:width']}x{p.meta['og:image:height']} "
+                          f"differ from the file's {size[0]}x{size[1]}")
     return errors
 
 
