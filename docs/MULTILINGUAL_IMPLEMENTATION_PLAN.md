@@ -1,6 +1,6 @@
-# Multilingual Implementation Plan (proposed)
+# Multilingual Implementation Plan
 
-Status: **Proposed (Sprint 19A)**. This plan is for review and nothing in it has started. Its design is in [MULTILINGUAL_ARCHITECTURE.md](MULTILINGUAL_ARCHITECTURE.md) (cited below as "Arch §n"), and the decision is in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). Approval questions are numbered as in the ADR (Q1–Q9).
+Status: **Accepted (TMA-DEC-007, 2026-11-22).** Owner decisions Q1–Q9 are recorded in the ADR. **Progress:** Sprint 19B-1 has added the foundation (part of B1, and B4); nothing else has started, no translation exists and no localized page is published. Its design is in [MULTILINGUAL_ARCHITECTURE.md](MULTILINGUAL_ARCHITECTURE.md) (cited below as "Arch §n"), and the decision is in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). Approval questions are numbered as in the ADR (Q1–Q9).
 
 ## Sequencing rules for every sprint
 
@@ -13,23 +13,25 @@ These apply to every sprint below:
 
 ## Sprint 19B — Core bilingual rollout (Arabic, French)
 
-**Goal:** reviewed Arabic and French versions of three core pages: the homepage, `/methodology/` and `/registry/`. `/acquisition/` is added only if Q2 is answered yes.
+**Goal:** reviewed Arabic and French versions of three core pages: the homepage, `/methodology/` and `/registry/`. `/acquisition/` is not part of this rollout: it follows the core reference pages and needs a dedicated substantive and legal review of its commercial wording (Q2).
+
+**Split:** 19B-1 (foundation, done) and 19B-2 onwards (the remaining steps below).
 
 ### Steps
 
 | # | Step | Proof that English is unchanged |
 |---|---|---|
-| B1 | Extract interface and page strings from `tools/build.py` into `i18n/en/messages.json`. Add `t()`, `c()` and `fmt()`. Replace `human_date()` with explicit month tables (English output identical) | `build.py --check`: 0 stale; full test suite unchanged |
+| B1 | Extract interface and page strings from `tools/build.py` into `i18n/en/messages.json`. Add `t()`, `c()` and `fmt()`. Replace `human_date()` with explicit month tables (English output identical). **19B-1 done:** shell, footer, ownership statement and dates, with `t()` and catalog-based `human_date()`. **Remaining (19B-2):** page-body prose, label maps, `c()` and localized `fmt()` | `build.py --check`: 0 stale; full test suite unchanged |
 | B2 | Make the homepage renderable per language. Move its inline CSS to `assets/home.css`, and its hand-written text into `i18n/en/messages.json` under a homepage template rendered by `build.py` | Text of every element identical (DOM text diff); screenshots at 1440 and 390 px identical; existing homepage tests pass unchanged |
 | B3 | Convert physical CSS properties to logical ones (Arch §8.1). Add `:lang(ar)` typography rules. Reference the Arabic face from `registry.css` | LTR screenshot comparison unchanged at 1440 and 390 px |
-| B4 | Add the language registry, glossary schema, `validate_i18n` and the new `check_site` gates, each with negative fixture tests (Arch §9) | New gates pass vacuously with no published language |
+| B4 | Add the language registry, glossary schema, `validate_i18n` and the new `check_site` gates, each with negative fixture tests (Arch §9). **19B-1 done** for the catalog-level rules and the route and `hreflang` gates (Arch §13). **Remaining:** the page-pair parity gates (identifiers, citations, classifications, dates, numbers, qualifiers, English leakage, localized disclosures, bidi isolation, RTL layout), which need a localized renderer | New gates pass vacuously with no published language |
 | B5 | Glossary: settle Arabic and French terms for the reference vocabulary (Arch §4.5), including forbidden variants. Settle the Arabic month-name and numeral conventions | Glossary review recorded |
 | B6 | Translate and review the units for the B-wave pages, including localized `OWNER_NOTE`, `DISCLAIMER`, `OWNERSHIP_STATEMENT` and the authority notice | Two reviews recorded per unit |
 | B7 | Language switcher, `hreflang` clusters, self canonicals, `og:locale`, sitemap entries and JSON-LD `inLanguage` / `translationOfWork` for the generated pages | English pages gain `hreflang` only where a translation is published |
 | B8 | Update the homepage and footer statements ("AR, FR, TZM planned") to say exactly what is published, in the same pull request that publishes | Tests pin the statement to `languages.json` |
 
 ### Dependencies
-- Answers to Q2, Q3, Q5 and Q9.
+- Owner decisions Q2, Q3, Q5 and Q9 (recorded 2026-11-22). Arabic pages begin with the existing Noto Kufi Arabic font; another face is added only on a demonstrated readability need (Q5).
 - Available reviewers: one substantive and one linguistic reviewer per language, distinct from the drafter.
 
 ### Acceptance criteria
@@ -75,7 +77,7 @@ These apply to every sprint below:
 
 ### Acceptance criteria
 - Every published localized page meets the 19B criteria and the evidence-card parity checks.
-- No `source_excerpts` are translated (pending Q6). Excerpts are shown verbatim with `lang`/`dir`.
+- No `source_excerpts` are translated (Q6: not in the first two waves). Excerpts are shown verbatim with `lang`/`dir`.
 - The translation impact report runs in CI. A data pull request that would withdraw localized pages lists them.
 - `/registry/state/` and `/data/` stay English only (Arch §10).
 
@@ -95,12 +97,12 @@ These apply to every sprint below:
 
 ## Sprint 19D — Additional language support (Darija, Amazigh)
 
-**Goal:** introduce `ary` and `zgh` only when Q1 and Q7 are decided and the prerequisites below are met.
+**Goal:** introduce `ary` (Arabic script) and `zgh` (Tifinagh) only when the prerequisites below are met (Q1, Q7). Spanish remains a possible later language without a publication commitment.
 
 ### Prerequisites
-- An amended TMA-DEC-003, because the language set in the brief differs from the accepted decision (Q1).
+- The language set is settled: TMA-DEC-007 refines TMA-DEC-003 (Q1).
 - For each language:
-  - a decided script and language tag;
+  - the script (decided: Arabic script for Darija, Tifinagh for Amazigh) and the language tag;
   - a glossary covering the reference vocabulary;
   - a named review capacity.
 - For `zgh`: a bundled, OFL-licensed Tifinagh font subset (Arch §8.7), verified on Android, iOS, macOS and Windows.
@@ -130,7 +132,7 @@ Run after each publishing sprint (19B, 19C, 19D).
 - **Metadata:** canonical, `hreflang` reciprocity, `x-default`, sitemap entries, `lang`/`dir` and `og:locale` are correct on live pages.
 - **Browser:** desktop and mobile in LTR and RTL. Keyboard and visible focus on the language switcher. No overflow, no console errors, only same-origin requests. Correct Arabic shaping: no letter-spacing on Arabic text.
 - **Disclosures:** present on every live localized page, and the authority notice links to the English equivalent.
-- **Indexing readiness:** a technical review only. If the owner enables webmaster tools (Q8), observe their coverage reports afterwards. No ranking or traffic claims.
+- **Indexing readiness:** a technical review only. Webmaster tools may be used (Q8); connecting an account, verifying ownership or changing DNS is a separately authorized operation. Observe coverage reports afterwards. No ranking or traffic claims.
 
 ### Acceptance criteria
 Every check passes, or the failing ones are reported with severity. Live pages match `main`.

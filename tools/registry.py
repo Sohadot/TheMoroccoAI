@@ -905,6 +905,14 @@ if __name__ == "__main__":
             print(g["id"], gap_fingerprint(g, evidence, ontology))
         sys.exit(0)
     problems = validate(evidence, ontology) + validate_gaps(gaps, evidence, ontology)
+    # Translation layer (TMA-DEC-007): structural errors fail; stale or orphaned translations are reported
+    # and never rendered, but never block the English reference.
+    import i18n
+    i18n_errors, i18n_report = i18n.validate(ROOT, evidence, ontology, gaps)
+    problems += i18n_errors
+    for key in ("stale", "orphaned"):
+        for uid in i18n_report[key]:
+            print(f"TRANSLATION {key.upper()} {uid} (not renderable; English is unaffected)")
     for p in problems:
         print("ERROR", p)
     print(f"{len(problems)} problem(s)")

@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | **Proposed.** Not accepted. Acceptance is reserved for the Sohadot integration authority. On acceptance, record it in `docs/DECISION_LOG.md` as a new entry that references TMA-DEC-003 |
-| Date | 2026-11-22 (Sprint 19A) |
+| Status | **Accepted** by the Sohadot integration authority on 2026-11-22 and recorded as **TMA-DEC-007** in [DECISION_LOG.md](DECISION_LOG.md), which refines the language set of TMA-DEC-003. Approval of the policy is not implementation: see *Implementation status* below |
+| Date | Proposed 2026-11-22 (Sprint 19A, PR #19); accepted 2026-11-22 (Sprint 19B-1) |
 | Baseline | `main` at `728d475e4a3a73526be08defe279ea64e67b4bfb` |
 | Builds on | TMA-DEC-001 (ownership and independence), TMA-DEC-002 (evaluation), TMA-DEC-003 (language authority, accepted), TMA-DEC-006 (public/private boundary) |
 | Detail | [MULTILINGUAL_ARCHITECTURE.md](MULTILINGUAL_ARCHITECTURE.md) (design), [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md) (phases) |
@@ -31,13 +31,13 @@ The Sprint 19A audit (Arch §1) found:
 - **Fonts:** the bundled Arabic font covers Arabic but is used only on the homepage, and no bundled font covers Tifinagh.
 - **Publicly served repository:** every file on `main` can be fetched from the production domain.
 
-## Decision (proposed)
+## Decision
 
 1. **Single research source.** Evidence, ontology, gaps, changelog and reference state stay in English in `data/` and are never duplicated or altered per language. No language may introduce evidence, entities, classifications, conclusions or interpretations.
 2. **Separate translation layer.** Translations live in `i18n/`, outside `data/`, the manifest and `REFERENCE_INPUTS`. There is one language registry and one glossary. Message catalogs cover interface and page strings, and content catalogs cover canonical prose fields keyed by identifier and field. Each translation unit records the SHA-256 of its English source and its review provenance.
 3. **Derived pages.** Localized pages are rendered by the same `build.py` functions from the same data, with numbers, dates, identifiers, URLs and links filled in as placeholders from canonical data. Generation is deterministic and covered by `build.py --check`.
 4. **Publication rule.** A page is generated in a language only when every unit it needs is approved by two human reviews (substantive and linguistic) and matches the current English source. There is no partial page, English fallback text or placeholder route. Stale or missing translations withdraw the localized page and never block English.
-5. **Routing.** English stays at `/`. Arabic is at `/ar/…` and French at `/fr/…`, mirroring English paths. Darija (`/ary/`) and Amazigh (`/zgh/`) are reserved for a later wave, subject to Q1 and Q7.
+5. **Routing.** English stays at `/`. Arabic is at `/ar/…` and French at `/fr/…`, mirroring English paths. Darija (`/ary/`) and Amazigh (`/zgh/`) are reserved for a later wave (owner decisions Q1 and Q7 below).
 6. **SEO.**
    - Every page has a self-referencing canonical.
    - Reciprocal `hreflang` covers only generated equivalents, with `x-default` pointing to English.
@@ -49,7 +49,7 @@ The Sprint 19A audit (Arch §1) found:
    - `/evaluation/` stays English until its task wording passes a separate neutrality review and `docs/EVALUATION_SPEC.md` is amended.
    - `/registry/state/` and `/data/` stay English.
    - JSON outputs are never localized.
-   - `source_excerpts` are never altered, and translating them is not part of wave 1 (Q6).
+   - `source_excerpts` are never altered, and are not translated in the first two waves (Q6).
 
 ## Alternatives considered
 
@@ -143,14 +143,42 @@ See the plan's risk register (R1–R10). The highest-impact risks, and their mai
    5. Add metadata and the language switcher (B7).
    6. Correct the public language statements (B8).
 2. **19C:** content catalog and reference-page coverage.
-3. **19D:** Darija and Amazigh, after Q1 and Q7.
+3. **19D:** Darija and Amazigh, once the Q7 conditions are met.
 4. **19E:** production validation after each publishing sprint.
 
 Each step is a separate pull request, merged by the integration authority.
 
-## Approval questions
+## Implementation status
 
-These cover only what existing policy does not decide:
+- **Sprint 19B-1 (foundation):** the `i18n/` layer (language registry, English source catalog, empty Arabic and French catalogs, glossary), `tools/i18n.py` (source fingerprints, validation, staleness and orphan report, publication eligibility), English shell and date strings read from the catalog with byte-identical output, and site gates for language routes and `hreflang`. **No translation exists, no review has taken place, and no localized page or route is published.**
+- **Later sprints:** as in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
+
+## Owner decisions (2026-11-22)
+
+The Sohadot integration authority resolved the nine approval questions of the proposal as follows. They are authoritative and are recorded in TMA-DEC-007.
+
+1. **Q1, language strategy.**
+   - English remains the sole authoritative research language.
+   - Modern Standard Arabic (`ar`) and French (`fr`) are the first publication languages.
+   - Moroccan Darija (`ary`) and Standard Moroccan Amazigh (`zgh`) are future localization priorities.
+   - Spanish remains a possible future expansion language, without a publication commitment.
+   - No localized language may introduce independent research conclusions or duplicate canonical evidence.
+2. **Q2, acquisition page.** `/acquisition/` may be localized. Its localization follows the core reference pages and is not part of the initial three-page rollout. Its commercial wording requires a dedicated substantive and legal review before publication.
+3. **Q3, reviewers.**
+   - Each published translation requires two review functions: substantive accuracy and linguistic quality.
+   - Reviewers are independent of the drafter.
+   - Two different reviewers are preferred; one reviewer may perform both functions only if they did not draft the text.
+   - Public review provenance uses pseudonymous identifiers. No personal information is exposed.
+4. **Q4, staleness.** No grace period, including for interface strings. Stale content cannot remain published as if current. English publishing remains independent of translation readiness.
+5. **Q5, Arabic typography.** Begin with the existing self-hosted Arabic font (Noto Kufi Arabic). Add another self-hosted font only if testing shows a genuine readability need. English typography is preserved.
+6. **Q6, source excerpts.** Excerpts stay verbatim in their original language. They are not translated during the first two implementation waves, and a translation is never presented as an original quotation.
+7. **Q7, Darija and Amazigh.** Darija initially uses Arabic script. Standard Moroccan Amazigh uses Tifinagh. Both require controlled terminology and competent linguistic review before publication. No premature publication or placeholder routes.
+8. **Q8, search-engine verification.** Appropriate search-engine webmaster tools may be used to assess indexing and discoverability. Any account connection, ownership verification or DNS change is a separate operation that needs its own authorization. No invasive tracking or analytics.
+9. **Q9, machine-assisted translation.** Machine translation may be used to prepare drafts of already-public content. It cannot substitute for the human substantive and linguistic reviews. Public documentation explains the translation and review policy accurately, and no review is claimed unless it actually took place. Each translation unit records its `draft_method` (`human` or `machine-assisted`).
+
+## Original approval questions (Sprint 19A, for the record)
+
+These were the questions put to the owner in the proposal. The decisions above answer them.
 
 - **Q1. Language set.** TMA-DEC-003 names "Tamazight and Spanish" as later languages. The Sprint 19A brief names Darija (`ary`) and Standard Moroccan Amazigh (`zgh`) and omits Spanish.
   - Should TMA-DEC-003 be amended to add Darija, keep Amazigh as `zgh`, and drop Spanish (or keep it)?

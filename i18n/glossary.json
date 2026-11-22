@@ -1,0 +1,5 @@
+{
+ "version": "2026-11-22",
+ "note": "Controlled terminology (TMA-DEC-007). Each term id names canonical vocabulary (for example classification:VERIFIED FACT); its English form is the canonical value. Target-language labels are added only after terminology review; none is approved yet. 'forbidden' lists renderings that would strengthen, weaken or imply official status.",
+ "terms": []
+}
