@@ -165,6 +165,28 @@ class Mutations(Identity):
         self.assertEqual(texts["changelog.v0-10-1.changes.01"], text)
         self.assertEqual(texts["changelog.v0-10-1.changes.99"], text)
 
+    def test_two_identities_claiming_one_text_fail_closed(self):
+        # Even with explicit occurrence numbers, two active ids for a single text are ambiguous.
+        ident = copy.deepcopy(self.identity)
+        first = self.item("changelog.v0-10-1.changes.01", ident)
+        first["occurrence"] = 1
+        ident["entries"][1]["items"].append({"id": "changelog.v0-10-1.changes.99", "field": "changes", "status": "active",
+                                              "source_sha256": first["source_sha256"], "occurrence": 2})
+        self.assertFails("1 identical text(s) but 2 active id(s); ambiguous", identity=ident)
+
+    def test_the_build_stops_on_an_identity_error(self):
+        root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, root)
+        shutil.copytree(REPO / "i18n", root / "i18n")
+        ident = copy.deepcopy(self.identity)
+        ident["entries"][1]["items"] = [it for it in ident["entries"][1]["items"] if it["id"] != "changelog.v0-10-1.title"]
+        (root / "i18n" / "changelog-identity.json").write_text(json.dumps(ident), encoding="utf-8")
+        evidence, ontology = registry.load_all()
+        with build.rendering(build.RenderContext("en", root, today=TODAY)):
+            with self.assertRaises(SystemExit) as cm:
+                build.render_methodology(build.Model(evidence, ontology), self.changelog)
+        self.assertIn("identity map is out of date", str(cm.exception))
+
     def test_ambiguous_entry_key_fails_closed(self):
         c = copy.deepcopy(self.changelog)
         c["entries"][1]["version"] = c["entries"][0]["version"]

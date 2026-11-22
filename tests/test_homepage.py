@@ -93,6 +93,25 @@ class EnglishHomepage(unittest.TestCase):
         self.assertIn("Affiliated with the Government", changed)
 
 
+    def test_catalog_text_is_escaped_in_attributes_text_and_json_ld(self):
+        root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, root)
+        shutil.copytree(REPO / "i18n", root / "i18n")
+        cat = json.loads((root / "i18n/en/messages.json").read_text(encoding="utf-8"))
+        hostile = 'A "quoted" & <b>bold</b> </script> text that is long enough for a meta description in this test.'
+        for m in cat["messages"]:
+            if m["id"] in ("page.home.description", "page.home.hero.meta", "page.home.jsonld.description"):
+                m["text"] = hostile
+        (root / "i18n/en/messages.json").write_text(json.dumps(cat, ensure_ascii=False), encoding="utf-8")
+        html = render_en(root)
+        self.assertIn('<meta name="description" content="A &quot;quoted&quot; &amp; &lt;b&gt;bold&lt;/b&gt; &lt;/script&gt; text', html)
+        self.assertIn('>A "quoted" &amp; &lt;b&gt;bold&lt;/b&gt; &lt;/script&gt; text', html)
+        ld = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1)
+        self.assertEqual(json.loads(ld)["description"], hostile)
+        self.assertIn("<\\/script> text", ld)  # cannot close the JSON-LD script element
+        self.assertEqual(html.count("</script>"), 1)
+
+
 class HomepageCompleteness(unittest.TestCase):
     def render_pseudo(self):
         with build.rendering(build.RenderContext("fr", translator=PseudoTranslator())):
