@@ -669,6 +669,74 @@
   .posture-more { margin-top: 24px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; }
   .posture-more a, .rule-text a { color: var(--blue-mid); }
 
+  /* ─── INDEPENDENT EVALUATION INVITATION ─── */
+  .evaluate-block {
+    margin-top: 32px;
+    padding: 36px 32px;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-top: 3px solid var(--gold);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px 40px;
+    align-items: center;
+  }
+  .evaluate-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+  }
+  .evaluate-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(24px, 3.4vw, 30px);
+    font-weight: 400;
+    color: var(--paper);
+    line-height: 1.2;
+  }
+  .evaluate-text {
+    margin-top: 12px;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--mist);
+    max-width: 560px;
+  }
+  .evaluate-note {
+    grid-column: 1 / -1;
+    padding-top: 16px;
+    border-top: 1px solid rgba(244,240,232,0.16);
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--mist);
+  }
+  .btn-evaluate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 14px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--blue);
+    background: var(--paper);
+    border: 1px solid var(--paper);
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  .btn-evaluate:hover { background: var(--gold-light); border-color: var(--gold-light); }
+  .btn-evaluate:active { background: var(--sand); border-color: var(--sand); }
+  .btn-evaluate:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; }
+  .btn-evaluate-arrow { font-size: 14px; line-height: 1; }
+
   .framing-note strong { color: var(--text-main); font-weight: 600; }
   .thesis-quote { margin: 0 0 36px; padding: 0 0 0 20px; border-left: 2px solid var(--gold); }
   .thesis-quote p { font-size: clamp(24px, 4vw, 34px); font-weight: 300; font-style: italic; color: var(--blue); line-height: 1.2; }
@@ -791,6 +859,8 @@
     .access-grid { grid-template-columns: 1fr; }
     .example { padding: 22px 18px; }
     .posture-rules { grid-template-columns: 1fr; }
+    .evaluate-block { grid-template-columns: 1fr; padding: 28px 20px; margin-top: 24px; }
+    .btn-evaluate { width: 100%; white-space: normal; text-align: center; }
 
     .section-inner { padding: 56px 20px; }
     .status-bar { padding: 0 20px; }
@@ -1028,6 +1098,16 @@
         <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">The registry establishes no official status, endorsement or legal identity</span></div>
       </div>
       <p class="posture-more"><a href="/methodology/">Full methodology, limits and changelog →</a></p>
+    </div>
+
+    <div class="evaluate-block" id="evaluate">
+      <div>
+        <p class="evaluate-label">MAI-IRE — Independent evaluation</p>
+        <h3 class="evaluate-title">Evaluate TheMoroccoAI</h3>
+        <p class="evaluate-text">Take part in a structured, voluntary evaluation of the registry’s methodology, evidence transparency and research usability: an introductory task of about 5 minutes, or a specialist set of 15–20 minutes. No account or tracking, and nothing is sent unless you choose to email your report.</p>
+      </div>
+      <a class="btn-evaluate" href="/evaluation/">Start independent evaluation <span class="btn-evaluate-arrow" aria-hidden="true">→</span></a>
+      <p class="evaluate-note">Independent feedback is welcome. Participation does not imply endorsement, affiliation or institutional recognition, and no external validation of the registry has been performed.</p>
     </div>
   </div>
 </section>

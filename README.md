@@ -24,7 +24,7 @@ The evaluation page is deliberately **not included in the sitemap** (`noindex, f
 
 | Path | Purpose |
 | --- | --- |
-| `index.html` | Homepage, reference first: what the registry is, coverage, access to the data, three questions answered from the evidence, method and limits, then the owner's labelled thesis and a short acquisition note. Figures and answers between `<!--r:…-->` markers are generated from the data. |
+| `index.html` | Homepage, reference first: what the registry is, coverage, access to the data, three questions answered from the evidence, method and limits closing with one invitation to the voluntary independent evaluation (`/evaluation/`), then the owner's labelled thesis and a short acquisition note. Figures and answers between `<!--r:…-->` markers are generated from the data. |
 | `data/evidence.json` | Evidence registry: one record per sourced claim, with source URL, publication and retrieval dates, verbatim excerpts, classification and verification status. |
 | `data/ontology.json` | Ontology: entity types, domains, predicates, entities and typed relationships, each citing evidence. |
 | `registry/` | Generated pages: registry index, questions page, all evidence, one page per entity. |

@@ -6,7 +6,7 @@ Public route: `/evaluation/`.
 Scope: research usability and evidence interpretation, not factual certification of Morocco's AI ecosystem.
 
 ## Architecture
-Initial implementation reuses the existing generated-page shell but keeps `/evaluation/index.html` hand-maintained, outside the registry generator. The HTML is committed for GitHub Pages; consider integrating into `tools/build.py` after release validation. Add a quiet homepage link. If lightweight client-side JS is needed for optional response drafting/copying, serve it locally, without external requests or analytics. Update README to disclose this scoped exception to the present no-runtime-JavaScript design.
+Initial implementation reuses the existing generated-page shell but keeps `/evaluation/index.html` hand-maintained, outside the registry generator. The HTML is committed for GitHub Pages; consider integrating into `tools/build.py` after release validation. Link to it from the homepage footer and from one restrained invitation at the end of the homepage “Method and limits” section (`#evaluate`): a plain link with no tracking, pop-up or animation, which states that participation is voluntary and implies no endorsement, affiliation or institutional recognition, and that no external validation has been performed. If lightweight client-side JS is needed for optional response drafting/copying, serve it locally, without external requests or analytics. Update README to disclose this scoped exception to the present no-runtime-JavaScript design.
 
 ## Introductory evaluation (~5 minutes)
 Prompt: “Find one AI-related initiative in the registry. Identify a supporting source and explain what the source establishes and what it does not establish.”
