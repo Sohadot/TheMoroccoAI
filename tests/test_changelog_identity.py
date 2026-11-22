@@ -20,6 +20,7 @@ import build  # noqa: E402
 import i18n  # noqa: E402
 import registry  # noqa: E402
 from i18n_fixtures import approved_unit, register_reviewers  # noqa: E402
+from test_multilingual import synthetic  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 TODAY = __import__("datetime").date(2026, 11, 22)
@@ -229,7 +230,7 @@ class TranslationsFollowIdentity(unittest.TestCase):
         register_reviewers(self.root)
         self.uid = "changelog:changelog.v0-10-1.changes.01:text"
         self.source = i18n.Sources(self.root).content(self.uid)[0]
-        cat = {"language": "fr", "units": [approved_unit(self.uid, "prose", "texte (fr)", self.source)]}
+        cat = {"language": "fr", "units": [approved_unit(self.uid, "prose", synthetic(self.source, "fr"), self.source, lang="fr")]}
         (self.root / "i18n" / "fr" / "content.json").write_text(json.dumps(cat, ensure_ascii=False), encoding="utf-8")
 
     def rewrite_changelog(self, change):
@@ -240,7 +241,7 @@ class TranslationsFollowIdentity(unittest.TestCase):
 
     def test_reorder_keeps_the_translation_valid(self):
         self.rewrite_changelog(lambda c: c["entries"][0]["changes"].reverse())
-        self.assertEqual(i18n.validate(self.root, today=TODAY), ([], {"stale": [], "orphaned": []}))
+        self.assertEqual(i18n.validate(self.root, today=TODAY), ([], {"stale": [], "orphaned": [], "unacknowledged": []}))
         self.assertIn(self.uid, i18n.renderable_units("fr", self.root, today=TODAY))
 
     def test_edit_with_rebinding_makes_the_translation_stale(self):

@@ -391,3 +391,8 @@ Their English text is read from canonical data at render time, so it cannot drif
 Sprint 19B-3 deferred the 97 changelog texts on `/methodology/`. Since Sprint 19B-4 each changelog text and each entity attribute text has a stable id in an explicit identity map (`i18n/changelog-identity.json`, 97 items; `i18n/attribute-identity.json`, 66 items). Identity survives reordering; an edit keeps the id and makes approved translations stale; a new text needs a new id; retired ids are never reused; an unregistered, orphaned or ambiguous text stops the build. Neither positional nor content-hash identity is used. `python3 tools/i18n.py --identity-report` proposes repairs and never applies them.
 
 Plural forms: counts use two English forms (`records.one`, `records.other`); Arabic has more plural categories. Translators must phrase these units neutrally until plural selection is added (see Arch section 15).
+
+## Translation pilot and terminology (Sprint 19B-5)
+
+- **Pilot:** a representative sample of 42 of these units per language was drafted in Arabic and French for owner review. The drafts are kept outside the repository; see [TRANSLATION_PILOT.md](TRANSLATION_PILOT.md).
+- **Terminology:** `i18n/glossary.json` now lists 14 editorial concepts (`concept:<id>`). Each English form occurs in the catalog above. No label is approved.

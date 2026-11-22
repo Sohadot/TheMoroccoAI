@@ -24,7 +24,7 @@ UNIT = "page.registry.legend.note"  # a qualifier: approval failures on it must 
 class ApprovalGovernsPublication(ExtractedRegistryFixture):
     def set_approval(self, lang="fr", uid=UNIT, **over):
         src, text = self.source(uid), self.text(uid, lang)
-        self.edit_unit(lang, uid, approval=approval(src, text, **over))
+        self.edit_unit(lang, uid, approval=approval(src, text, uid, lang, **over))
 
     def assertWithheld(self, fragment, lang="fr"):
         files, clusters, report = self.localize()
@@ -79,7 +79,7 @@ class ApprovalGovernsPublication(ExtractedRegistryFixture):
 
     def test_editing_an_approved_translation_withdraws_it(self):
         self.edit_unit("fr", UNIT, text=self.text(UNIT, "fr") + " edited",
-                       approval=approval(self.source(UNIT), self.text(UNIT, "fr")))
+                       approval=approval(self.source(UNIT), self.text(UNIT, "fr"), UNIT, "fr"))
         self.assertWithheld(UNIT)
 
     # 19

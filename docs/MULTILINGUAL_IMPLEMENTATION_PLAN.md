@@ -20,6 +20,7 @@ These apply to every sprint below:
 - 19B-2: rendering engine and gates (done).
 - 19B-3: `/registry/` and `/methodology/` bodies into the catalogs (done; neither registered as localizable).
 - 19B-4: homepage templating (B2), stable changelog and attribute identity, TMA-DEC-008 approval contract (done; nothing registered as localizable).
+- 19B-5: approval security, semantic-risk checks, editorial terminology concepts, owner review workflow and a private 42-unit Arabic/French pilot (done; no reviewer registered, nothing approved or published; Arch §17).
 - Then B5, B6 and B8.
 
 ### Steps
@@ -96,7 +97,7 @@ These apply to every sprint below:
 |---|---|
 | English data changes faster than review, so pages churn in and out | Batch data releases. Update translations in the same PR. Impact report before merge |
 | Name translations presented as official | `name_basis` required. Only `official` names may be presented as official, with a source |
-| Qualifiers lost in fluent translation | Qualifiers are separate `qualifier` units, and their presence is machine-checked. The substantive review focuses on them |
+| Qualifiers lost in fluent translation | Qualifiers are separate `qualifier` units, and their presence is machine-checked. The human reviewer focuses on them, helped by semantic-risk warnings |
 
 ---
 
@@ -148,7 +149,7 @@ Every check passes, or the failing ones are reported with severity. Live pages m
 
 | # | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
-| R1 | A translation changes a claim's meaning | Medium | High | Placeholders, parity gates and qualifier units. Two human reviews. English prevails, and the notice on every page says so |
+| R1 | A translation changes a claim's meaning | Medium | High | Placeholders, parity gates and qualifier units. Semantic-risk warnings. One documented human approval, escalated to a second reviewer where a criterion applies (TMA-DEC-008). English prevails, and the notice on every page says so |
 | R2 | Unreviewed text reaches production | Low | High | Drafts never on `main`. The build renders only approved and fresh units. CI gates |
 | R3 | English releases blocked by translation lag | Low | High | Staleness withdraws localized pages and never blocks English |
 | R4 | Localized pages go stale and drop out often | Medium | Medium | Impact report. Translations updated in the same PR. Batched data releases |

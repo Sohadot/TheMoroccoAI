@@ -1,0 +1,9 @@
+# Translation approval metadata and its governance (TMA-DEC-008; docs/TRANSLATION_APPROVAL_SECURITY.md).
+# This file takes effect only when branch protection on main requires review from Code Owners; that setting is
+# configured on GitHub, not in this repository. Code owner review is a merge control, never a translation approval.
+/i18n/                                  @Sohadot
+/tools/i18n.py                          @Sohadot
+/docs/DECISION_LOG.md                   @Sohadot
+/docs/TRANSLATION_REVIEW_POLICY.md      @Sohadot
+/docs/TRANSLATION_APPROVAL_SECURITY.md  @Sohadot
+/.github/                               @Sohadot

@@ -183,7 +183,7 @@ Both catalogs share one unit shape:
 | Classification codes (`VERIFIED FACT`, `OFFICIAL TARGET`, `ANNOUNCED PLAN`, `UNVERIFIED CLAIM`, `INDEPENDENT ANALYSIS`) | Shown as the glossary-approved localized label **followed by the canonical code**, so a citation can be matched across languages. CSS class and `data-` values stay the canonical slug |
 | Numbers, dates, years, counts, version numbers | Filled from data. The language changes only the presentation (section 5.7) |
 | JSON outputs (`matrix.json`, `gaps.json`, `reference-state.json`, `manifest.json`) | Not localized and not duplicated per language |
-| `domain_labels_ar` in `ontology.json` | Left unchanged (canonical data is not modified). The Arabic glossary uses it as seed values, subject to linguistic review. Any divergence is recorded in the glossary, and the canonical field is never rewritten from the translation layer |
+| `domain_labels_ar` in `ontology.json` | Left unchanged (canonical data is not modified). The Arabic glossary uses it as seed values, subject to human approval (TMA-DEC-008). Any divergence is recorded in the glossary, and the canonical field is never rewritten from the translation layer |
 
 ### 4.5 Glossary (`i18n/glossary.json`)
 
@@ -208,7 +208,7 @@ Both catalogs share one unit shape:
 
 **Forbidden variants.** Each term lists forbidden variants: renderings that would strengthen or weaken meaning, or imply official status. One example would be an Arabic or French rendering of "independent registry" that reads as "official registry". `check_site` rejects forbidden variants on pages in that language.
 
-**Who sets the target terms.** Linguistic and substantive reviewers set the target-language terms in Sprint 19B. This design deliberately proposes none.
+**Who sets the target terms.** Target-language terms are drafted (AI assistance allowed) and approved by a registered human reviewer under TMA-DEC-008, with escalation (`specialist-term`) where a term cannot be settled reliably. This design deliberately proposes none; candidate labels are kept outside the repository until approved.
 
 ### 4.6 How a localized page is produced
 
@@ -278,7 +278,7 @@ Alternates are declared in page `<head>` only. A sitemap `xhtml:link` mirror is 
 
 - **`<html>` attributes:** `<html lang="ar" dir="rtl">` and `<html lang="fr" dir="ltr">`.
 - **`og:locale`:** a language-region value such as `ar_MA` or `fr_MA`, with `og:locale:alternate` only for published members. `og:locale` uses the `_MA` region because the intended audience is Moroccan. `hreflang` stays language-only (`ar`, `fr`), because the content is not region-specific.
-- **Dates:** explicit month tables per language in the generator, never `strftime` or locale settings. Every displayed date is wrapped in `<time datetime="YYYY-MM-DD">`. Arabic month names follow the convention chosen by the linguistic reviewers. Moroccan usage (يناير … ماي … يوليوز، غشت، شتنبر، نونبر، دجنبر) is the proposed default, to be confirmed in the glossary.
+- **Dates:** explicit month tables per language in the generator, never `strftime` or locale settings. Every displayed date is wrapped in `<time datetime="YYYY-MM-DD">`. Arabic month names follow the convention chosen by the approving reviewer (TMA-DEC-008). Moroccan usage (يناير … ماي … يوليوز، غشت، شتنبر، نونبر، دجنبر) is the proposed default, to be confirmed in the glossary.
 - **Numerals:** Western digits (0–9) in all languages, consistent with common Moroccan usage. This keeps numbers byte-identical across languages so they can be machine-checked. Arabic-Indic digits are rejected by a check unless policy changes.
 - **French typography:** a no-break space before `; : ! ?` and inside `« »`. Use U+00A0, or extend the Latin font subset to U+202F in Sprint 19B.
 
@@ -544,3 +544,22 @@ All presentation text of `/registry/` and `/methodology/` now comes from `i18n/e
 - **Disclosure.** Every localized page renders `shell.translation_policy`.
 - **Limitation.** The approval record is an attestation in a public repository, not cryptographic proof of who approved. Validation, the build and CI never write or infer approvals.
 - **Current state.** The repository registers no reviewer and holds no translation.
+
+## 17. Translation readiness: approval security, semantic checks and the pilot (Sprint 19B-5)
+
+- **Governance consistency.** Operative code and documentation state TMA-DEC-008. `tests/test_policy_consistency.py` fails on two-review wording outside sections marked superseded or historical.
+- **Approval security** ([TRANSLATION_APPROVAL_SECURITY.md](TRANSLATION_APPROVAL_SECURITY.md)):
+  - **Binding:** an approval names its `unit` and `language` (anti-replay).
+  - **Registration:** a reviewer entry needs an accepted decision that names it (`authorized_by`) and a date (`registered_on`), and an approval dated before registration is rejected.
+  - **Draft isolation:** `i18n/` accepts only its known files, and `check_site` fails on the draft workspace marker anywhere in the repository.
+  - **CI:** tests fail if a workflow gains write access or a push step.
+  - **Owner-dependent:** `.github/CODEOWNERS` and branch protection depend on GitHub settings.
+- **Semantic-risk checks** (`tools/semantic.py`, standard library, no network):
+  - **Errors:** months, numbers, scale words, classification codes and linked glossary labels. They fail validation and block rendering.
+  - **Warnings:** word-list signals. They must be acknowledged in the approval (`acknowledged_warnings`); otherwise the unit is reported as `unacknowledged` and not rendered.
+  - **Limits:** word lists miss paraphrase and fire on correct text. For example, غير مباشر (*indirect*) reads as negation.
+- **Terminology.** `glossary.json` `concepts` lists 14 editorial terms. Each English form must occur in the English catalog, and a term `concept:<id>` is approved against that form. No label is approved.
+- **Workflow** (`tools/translation_review.py`): `check`, `package` (owner review page), `record` (decisions to approval records, refused in CI) and `provenance` (advisory commit and signature report).
+  - Drafts and packages live outside the repository.
+  - `tests/test_review_workflow.py` simulates the whole lifecycle with synthetic fixtures.
+- **Pilot.** 42 representative units per language were drafted and handed to the owner privately ([TRANSLATION_PILOT.md](TRANSLATION_PILOT.md)). Nothing is approved, registered or published.

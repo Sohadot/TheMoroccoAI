@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build  # noqa: E402
 import check_site  # noqa: E402
 import i18n  # noqa: E402
+import semantic  # noqa: E402
 import registry  # noqa: E402
 from test_layout import BROWSER  # noqa: E402
 from i18n_fixtures import approval, approved_label, approved_unit, register_reviewers  # noqa: E402
@@ -41,14 +42,25 @@ WORD = {"ar": "نص", "fr": "texte"}
 SOURCE = "https://example.org/source"
 
 
+_MONTH_WORDS = "|".join(semantic.MONTHS_EN)
+_KEEP = re.compile(r"\{[a-z_][a-z0-9_]*\}|MAI-[A-Z0-9]+(?:-[A-Z0-9]+)*|https?://\S+|\d+|&|"
+                   + "|".join(semantic.CLASSIFICATION_CODES) + rf"|\b(?:{_MONTH_WORDS})\b|\b(?:million|billion)s?\b")
+
+
 def synthetic(text, lang):
-    """A placeholder 'translation': keeps placeholders, identifiers, URLs and digits, replaces the words."""
-    keep = re.compile(r"\{[a-z_][a-z0-9_]*\}|MAI-[A-Z0-9]+(?:-[A-Z0-9]+)*|https?://\S+|\d+|&")
+    """A placeholder 'translation': keeps placeholders, identifiers, URLs, digits and classification codes,
+    renders month names and scale words in the target language (so it carries no semantic error), and replaces
+    the other words."""
     parts, last = [], 0
-    for m in keep.finditer(text):
+    for m in _KEEP.finditer(text):
         if text[last:m.start()].strip():
             parts.append(WORD[lang])
-        parts.append(m.group(0))
+        token = m.group(0)
+        if token in semantic.MONTHS_EN:
+            token = semantic.MONTHS[lang][semantic.MONTHS_EN.index(token)][0]
+        elif token.rstrip("s") in semantic.SCALE:
+            token = semantic.SCALE[token.rstrip("s")][lang][0]
+        parts.append(token)
         last = m.end()
     if text[last:].strip() or not parts:
         parts.append(WORD[lang])
@@ -97,13 +109,13 @@ class SyntheticSite(unittest.TestCase):
         glossary = self.read("glossary.json")
         glossary["terms"] = [{"id": "classification:VERIFIED FACT", "translations": {
             "ar": approved_label("classification:VERIFIED FACT", "واقعة متحقق منها (اختبار)", ["رسمي"]),
-            "fr": approved_label("classification:VERIFIED FACT", "fait vérifié (essai)", ["officiel"])}}]
+            "fr": approved_label("classification:VERIFIED FACT", "fait vérifié (essai)", ["officiel"], lang="fr")}}]
         self.write("glossary.json", glossary)
         evidence, ontology = registry.load_all()
         self.model = build.Model(evidence, ontology)
 
     def unit(self, mid, lang, source=None, **over):
-        return approved_unit(mid, "interface", synthetic(self.english[mid], lang), source or self.english[mid], **over)
+        return approved_unit(mid, "interface", synthetic(self.english[mid], lang), source or self.english[mid], lang=lang, **over)
 
     def read(self, rel):
         return json.loads((self.root / "i18n" / rel).read_text(encoding="utf-8"))

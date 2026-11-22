@@ -257,6 +257,7 @@ def check(network=False):
     errors += check_languages(parsed)
     errors += check_contact(parsed, network)
     errors += check_secrets()
+    errors += check_draft_leaks()
     return errors
 
 
@@ -379,6 +380,20 @@ def check_secrets():
         for pattern in SECRET_PATTERNS:
             if pattern.search(text):
                 errors.append(f"{f.relative_to(ROOT)}: looks like a committed credential ({pattern.pattern[:20]}…)")
+    return errors
+
+
+def check_draft_leaks():
+    """Translation drafts and owner review packages must never be committed: every file on main is publicly
+    served. They carry a workspace marker (tools/i18n.py DRAFT_MARKER)."""
+    marker = "themoroccoai-" + "translation-draft"
+    errors = []
+    for f in ROOT.rglob("*"):
+        if not f.is_file() or f.suffix not in TEXT_SUFFIXES or SKIP_DIRS & set(f.relative_to(ROOT).parts):
+            continue
+        if marker in f.read_text(encoding="utf-8", errors="ignore"):
+            errors.append(f"{f.relative_to(ROOT)}: unapproved translation draft or review package in the repository "
+                          "(drafts stay outside the publicly served repository)")
     return errors
 
 

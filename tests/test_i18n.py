@@ -49,7 +49,7 @@ class Fixture(unittest.TestCase):
     def message_unit(self, uid="footer.as_of", text="بتاريخ {date}", source=None, **over):
         return approved_unit(uid, over.pop("kind", "interface"), text, source or self.en[uid], **over)
 
-    def content_unit(self, uid="evidence:MAI-EV-0001:title", text="إطلاق رسمي", **over):
+    def content_unit(self, uid="evidence:MAI-EV-0001:title", text="إطلاق رسمي للاستراتيجية الوطنية \"المغرب الرقمي 2030\"", **over):
         source, _ = i18n.Sources(REPO).content(uid)
         return approved_unit(uid, over.pop("kind", "prose"), text, source, **over)
 
@@ -69,7 +69,7 @@ class RepositoryState(unittest.TestCase):
     def test_committed_translation_layer_is_valid_and_empty(self):
         errors, report = i18n.validate(today=TODAY)
         self.assertEqual(errors, [])
-        self.assertEqual(report, {"stale": [], "orphaned": []})
+        self.assertEqual(report, {"stale": [], "orphaned": [], "unacknowledged": []})
         for lang in ("ar", "fr"):
             for kind in ("messages", "content"):
                 units = json.loads((REPO / "i18n" / lang / f"{kind}.json").read_text(encoding="utf-8"))["units"]
@@ -142,7 +142,7 @@ class ValidUnits(Fixture):
     def test_approved_message_and_content_units_validate_and_render(self):
         self.with_units([self.message_unit()])
         self.with_units([self.content_unit()], kind="content")
-        self.assertEqual(self.validate(), ([], {"stale": [], "orphaned": []}))
+        self.assertEqual(self.validate(), ([], {"stale": [], "orphaned": [], "unacknowledged": []}))
         self.assertEqual(i18n.renderable_units("ar", self.root, self.evidence, self.ontology, self.gaps),
                          {"footer.as_of", "evidence:MAI-EV-0001:title"})
 
@@ -286,7 +286,7 @@ class ApprovalRules(Fixture):
     """TMA-DEC-008: one registered human reviewer approves exact source and translation versions."""
 
     def approval(self, **over):
-        return approval(self.en["footer.as_of"], "بتاريخ {date}", **over)
+        return approval(self.en["footer.as_of"], "بتاريخ {date}", "footer.as_of", "ar", **over)
 
     def test_a_single_registered_human_reviewer_suffices(self):
         self.with_units([self.message_unit()])
@@ -360,7 +360,7 @@ class ApprovalRules(Fixture):
 
 class EscalationRules(Fixture):
     def unit_with(self, escalation):
-        return self.message_unit(approval=approval(self.en["footer.as_of"], "بتاريخ {date}", escalation=escalation))
+        return self.message_unit(approval=approval(self.en["footer.as_of"], "بتاريخ {date}", "footer.as_of", "ar", escalation=escalation))
 
     def test_open_escalation_blocks_publication(self):
         self.with_units([self.unit_with({"criteria": ["specialist-term"], "status": "open"})])
