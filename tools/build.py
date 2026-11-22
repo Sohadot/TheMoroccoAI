@@ -294,6 +294,32 @@ def language_switcher(path, cluster):
     return f'  <ul class="lang-switch" aria-label="{escape(ctx.tr.text("shell.lang.label"))}">{"".join(items)}</ul>\n'
 
 
+# Social-sharing image (Open Graph and X), committed at this path; artwork source in tools/social/.
+SOCIAL_IMAGE = SITE + "/assets/social/themoroccoai-og.png"
+SOCIAL_IMAGE_SIZE = (1200, 630)
+
+
+def social_image_meta(alt, twitter_alt=None, twitter_title=None, twitter_description=None):
+    """Open Graph image and X large-image card tags. Text values are HTML-escaped attribute values from the
+    catalog, so a localized page carries its own alt text; X falls back to og:title and og:description unless
+    a page gives its own."""
+    w, h = SOCIAL_IMAGE_SIZE
+    out = (f'<meta property="og:image" content="{SOCIAL_IMAGE}">\n'
+           f'<meta property="og:image:secure_url" content="{SOCIAL_IMAGE}">\n'
+           f'<meta property="og:image:type" content="image/png">\n'
+           f'<meta property="og:image:width" content="{w}">\n'
+           f'<meta property="og:image:height" content="{h}">\n'
+           f'<meta property="og:image:alt" content="{alt}">\n')
+    tw = '<meta name="twitter:card" content="summary_large_image">\n'
+    if twitter_title:
+        tw += f'<meta name="twitter:title" content="{twitter_title}">\n'
+    if twitter_description:
+        tw += f'<meta name="twitter:description" content="{twitter_description}">\n'
+    tw += (f'<meta name="twitter:image" content="{SOCIAL_IMAGE}">\n'
+           f'<meta name="twitter:image:alt" content="{twitter_alt or alt}">\n')
+    return out, tw
+
+
 def page(model, *, path, title, description, body, jsonld=None, current=""):
     ctx = _ctx()
     lang, info = ctx.lang, ctx.info
@@ -332,6 +358,7 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
         return f'<li><a href="{target}"{hl}{c}{cur}>{label}</a></li>'
 
     home, home_english = local_href("/")
+    og_image, twitter = social_image_meta(msg_attr("shell.og_image_alt"))
     return f"""<!DOCTYPE html>
 <html lang="{info["bcp47"]}" dir="{info["dir"]}">
 <head>
@@ -345,8 +372,7 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
 <meta property="og:title" content="{escape(title)}">
 <meta property="og:description" content="{escape(description)}">
 <meta property="og:url" content="{canonical}">
-{seo}<meta name="twitter:card" content="summary">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+{og_image}{seo}{twitter}<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="/assets/registry.css">
 {ld}</head>
@@ -2592,7 +2618,10 @@ def render_homepage(model):
             return href(arg)
         if kind == "b":
             return f"<!--r:{arg}-->{blocks[arg]}<!--/r:{arg}-->"
+        og_image, twitter = social_image_meta(msg_attr("shell.og_image_alt"), msg_attr("page.home.twitter_image_alt"),
+                                              msg_attr("page.home.og_title"), msg_attr("page.home.twitter_description"))
         fixed = {"lang": ctx.info["bcp47"], "dir": ctx.info["dir"], "canonical": canonical, "seo": seo,
+                 "og_image": og_image, "twitter": twitter,
                  "localized_css": HOMEPAGE_LOCALIZED_CSS if ctx.lang != "en" else "",
                  "ld_extra": ld_extra, "notice": notice, "switcher": language_switcher(path, cluster)}
         if kind in fixed and arg is None:

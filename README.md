@@ -48,6 +48,7 @@ The evaluation page is deliberately **not included in the sitemap** (`noindex, f
 | `tools/check_site.py` | Site gates: links, anchors, metadata, canonicals, third-party resources, accessibility basics, sitemap, contact path, independence and ownership wording (canonical statement on the pages in `OWNERSHIP_PAGES`), confidential terms, credentials. |
 | `tests/` | `unittest` suite, including negative cases for every gate. `test_layout.py` renders narrow pages in headless Chromium with the web fonts removed; it skips when no Chromium or Chrome binary is found (set `CHROME_BIN`). |
 | `assets/` | Registry stylesheet and self-hosted fonts (SIL OFL 1.1, see `assets/fonts/OFL.txt`). |
+| `assets/social/themoroccoai-og.png` | Social-sharing image (Open Graph and X large card), 1200 × 630 PNG, used by every public page (`build.social_image_meta`). It is generated from `tools/social/og_image.py`: original computed geometry, the site's colours and self-hosted fonts, and no photograph, flag, seal or insignia. To change it, edit the script, run `python3 tools/social/og_image.py /tmp/og.html && node tools/social/render.js /tmp/og.html` (needs Node, Playwright and Chromium; not run by CI), then commit the PNG. `check_site` and `tests/test_social.py` check the file, its dimensions and every page's social metadata. Social platforms cache previews, so re-scrape a URL after changing the image. |
 | `AUDIT_REPORT.md` | Sprint 01 repository audit and its evidence. |
 
 ## Claim classifications

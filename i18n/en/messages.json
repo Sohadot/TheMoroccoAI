@@ -232,7 +232,7 @@
   {"id": "page.home.ex.infra.workload.reported", "kind": "qualifier", "text": "Compute infrastructure is not an AI application. Reported AI workloads are shown only where a source states them, with who reported them; they do not establish the scale, users or outcomes of AI use (GAP-03)."},
   {"id": "page.home.title", "kind": "metadata", "text": "TheMoroccoAI — Independent Evidence Registry for Morocco’s AI Ecosystem"},
   {"id": "page.home.description", "kind": "metadata", "text": "An independent, evidence-backed registry of institutions, initiatives, projects, models and datasets in Morocco's AI ecosystem, with sources, classifications and open JSON data. Not a government platform."},
-  {"id": "page.home.og_description", "kind": "metadata", "text": "An independent, evidence-backed registry of institutions, initiatives, projects, models and datasets in Morocco's AI ecosystem."},
+  {"id": "page.home.og_description", "kind": "metadata", "text": "Independent research infrastructure documenting Morocco's evolving AI ecosystem through structured evidence and transparent methodology."},
   {"id": "page.home.jsonld.description", "kind": "metadata", "text": "Independent evidence registry for Morocco's AI ecosystem. Not affiliated with the Government of Morocco."},
   {"id": "page.home.nav.coverage", "kind": "navigation", "text": "Coverage"},
   {"id": "page.home.nav.questions", "kind": "navigation", "text": "Questions"},
@@ -339,6 +339,10 @@
   {"id": "page.home.acquire.text.link", "kind": "navigation", "text": "acquisition page"},
   {"id": "page.home.footer.ownership", "kind": "navigation", "text": "Ownership"},
   {"id": "page.home.footer.links", "kind": "navigation", "text": "{ownership} · {methodology} · {data} · {evaluation} · {acquisition}"},
-  {"id": "page.home.footer.languages", "kind": "qualifier", "text": "{english} · AR · FR · {tamazight} planned"}
+  {"id": "page.home.footer.languages", "kind": "qualifier", "text": "{english} · AR · FR · {tamazight} planned"},
+  {"id": "shell.og_image_alt", "kind": "metadata", "text": "TheMoroccoAI — independent research infrastructure mapping Morocco's AI landscape."},
+  {"id": "page.home.og_title", "kind": "metadata", "text": "TheMoroccoAI — Mapping Morocco's AI Landscape"},
+  {"id": "page.home.twitter_description", "kind": "metadata", "text": "Structured evidence and independent research on Morocco's evolving AI ecosystem."},
+  {"id": "page.home.twitter_image_alt", "kind": "metadata", "text": "TheMoroccoAI — mapping Morocco's AI landscape."}
  ]
 }

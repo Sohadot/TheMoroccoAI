@@ -133,7 +133,11 @@ Columns: **kind** is the semantic class (`qualifier` marks text that limits a cl
 | `page.home.nav.method` | navigation | Method | — | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.nav.questions` | navigation | Questions | — | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.nav.thesis` | navigation | Thesis | — | `homepage.tmpl` / `render_homepage` | / | new | — |
-| `page.home.og_description` | metadata | An independent, evidence-backed registry of institutions, initiatives, projects, models and datasets in Morocco's AI ecosystem. | — | `homepage.tmpl` / `render_homepage` | / | new | — |
+| `page.home.og_description` | metadata | Independent research infrastructure documenting Morocco's evolving AI ecosystem through structured evidence and transparent methodology. | — | `homepage.tmpl` / `render_homepage` | / | new | — |
+| `page.home.og_title` | metadata | TheMoroccoAI — Mapping Morocco's AI Landscape | — | `homepage.tmpl` / `render_homepage` | / | new | og:title and twitter:title (social sharing) |
+| `page.home.twitter_description` | metadata | Structured evidence and independent research on Morocco's evolving AI ecosystem. | — | `homepage.tmpl` / `render_homepage` | / | new | twitter:description |
+| `page.home.twitter_image_alt` | metadata | TheMoroccoAI — mapping Morocco's AI landscape. | — | `homepage.tmpl` / `render_homepage` | / | new | twitter:image:alt |
+| `shell.og_image_alt` | metadata | TheMoroccoAI — independent research infrastructure mapping Morocco's AI landscape. | — | `page()` / `social_image_meta()` | /, /methodology/, /registry/ | new | og:image:alt of the shared social image on every page |
 | `page.home.status.as_of` | interface | Sources checked | — | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.status.edition` | interface | Edition | — | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.status.edition_value` | qualifier | English · AR, FR, TZM planned | — | `homepage.tmpl` / `render_homepage` | / | new | — |
@@ -396,3 +400,8 @@ Plural forms: counts use two English forms (`records.one`, `records.other`); Ara
 
 - **Pilot:** a representative sample of 42 of these units per language was drafted in Arabic and French for owner review. The drafts are kept outside the repository; see [TRANSLATION_PILOT.md](TRANSLATION_PILOT.md).
 - **Terminology:** `i18n/glossary.json` now lists 14 editorial concepts (`concept:<id>`). Each English form occurs in the catalog above. No label is approved.
+
+## Social-sharing metadata
+
+Every page carries the shared social image (`assets/social/themoroccoai-og.png`) with `og:image:alt` from `shell.og_image_alt`. The homepage also has its own Open Graph title and description and X title, description and image alt. Those are catalog units, so a localized page gets translated values. The image itself carries English text: it is the same in every language.
+
