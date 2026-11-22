@@ -27,23 +27,12 @@ import i18n  # noqa: E402
 ROOT = registry.ROOT
 SITE = "https://themoroccoai.com"
 CONTACT = "agent@sohadot.com"
-TYPE_LABELS = {
-    "institution": "Institutions",
-    "company": "Companies",
-    "initiative": "Initiatives",
-    "event": "Events",
-    "project": "Projects",
-    "legal_instrument": "Legal instruments",
-    "model": "Models",
-    "dataset": "Datasets",
-    "technology": "Technologies",
-    "sector": "Sectors",
-}
-TYPE_SINGULAR = {
-    "institution": "Institution", "initiative": "Initiative", "event": "Event", "project": "Project",
-    "legal_instrument": "Legal instrument", "technology": "Technology", "sector": "Sector",
-    "company": "Company", "model": "Model", "dataset": "Dataset",
-}
+# Entity-type and source-type labels live in i18n/en/messages.json (vocab.*), so that the pages that render them
+# can be localized; these English dicts are derived from the catalog for the pages that are not localized yet.
+ENTITY_TYPE_ORDER = ("institution", "company", "initiative", "event", "project", "legal_instrument", "model", "dataset",
+                     "technology", "sector")
+TYPE_LABELS = {k: i18n.t(f"vocab.entity_type.{k}.plural") for k in ENTITY_TYPE_ORDER}
+TYPE_SINGULAR = {k: i18n.t(f"vocab.entity_type.{k}.singular") for k in ENTITY_TYPE_ORDER}
 LIFECYCLE_LABELS = {
     "announced": "Announced", "in-development": "In development", "pilot": "Pilot",
     "operational": "Operational", "released": "Released", "discontinued": "Discontinued",
@@ -64,21 +53,10 @@ KIND_COUNT_LABELS = {
     "ai-application": ("AI application", "AI applications"), "compute-infrastructure": ("compute infrastructure", "compute infrastructure"),
     "institute": ("institute", "institutes"), "agreement": ("agreement", "agreements"), "digital-platform": ("digital platform", "digital platforms"),
 }
-SOURCE_TYPE_LABELS = {
-    "government_portal": "Government portal",
-    "government_publication": "Government publication",
-    "state_news_agency": "State news agency",
-    "signatory_organization": "Signatory organisation",
-    "intergovernmental_organization": "Intergovernmental organisation",
-    "regulator": "Regulator",
-    "organization_website": "Organisation's own website",
-    "technical_repository": "Technical repository",
-    "academic_preprint": "Academic preprint",
-    "academic_journal": "Peer-reviewed journal",
-    "investor_publication": "Investor publication",
-    "independent_list": "Independent list",
-    "secondary_press": "Secondary press",
-}
+SOURCE_TYPE_ORDER = ("government_portal", "government_publication", "state_news_agency", "signatory_organization",
+                     "intergovernmental_organization", "regulator", "organization_website", "technical_repository",
+                     "academic_preprint", "academic_journal", "investor_publication", "independent_list", "secondary_press")
+SOURCE_TYPE_LABELS = {k: i18n.t(f"vocab.source_type.{k}") for k in SOURCE_TYPE_ORDER}
 SIGIL = ('<svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">'
          '<polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/>'
          '<polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/>'
@@ -145,6 +123,11 @@ def rendering(ctx):
         _CTX = previous
 
 
+def msg_text(message_id, **values):
+    """Catalog text in the current language, not escaped (for values that are escaped where they are used)."""
+    return _ctx().tr.text(message_id, **values)
+
+
 def msg(message_id, **values):
     """Catalog text in the current language, HTML-escaped as element text (values included)."""
     return escape(_ctx().tr.text(message_id, **values), quote=False)
@@ -154,6 +137,27 @@ def msg_html(message_id, **html):
     """Catalog text with {name} placeholders replaced by HTML built by the generator (links, isolated
     identifiers). The catalog text is escaped; the HTML values are inserted as they are."""
     return i18n.fill(_ctx().tr.template(message_id), html, message_id, transform=lambda t: escape(t, quote=False))
+
+
+def msg_q(message_id, **values):
+    """Catalog text escaped like an attribute value (quotes too), where the template used escape()."""
+    return escape(_ctx().tr.text(message_id, **values))
+
+
+_ISOLATE = re.compile(r"MAI-[A-Z0-9]+(?:-[A-Z0-9]+)*|https?://[^\s<]+|\bv\d+(?:\.\d+)+")
+
+
+def content(unit_id, english):
+    """Canonical prose (entity names and statuses, classification definitions, domain labels) in the current
+    language, escaped as before. The English text is the canonical value itself; in right-to-left pages the
+    identifiers, URLs and versions it contains are isolated."""
+    text = escape(_ctx().tr.content(unit_id, english))
+    return _ISOLATE.sub(lambda m: iso(m.group(0)), text) if _ctx().dir == "rtl" else text
+
+
+def file_link(href, label_html):
+    """A link to a data file (not a page): never redirected to a translated page."""
+    return f'<a href="{href}">{label_html}</a>'
 
 
 def iso(fragment):
@@ -510,113 +514,124 @@ def render_entity(model, e):
 
 
 def render_registry_index(model):
+    R = "page.registry."
     counts = model.counts()
     n_rec, n_ent, n_rel = len(model.records), len(model.entities), len(model.relationships)
     legend = "".join(
-        f'<div class="legend-row">{badge(c)}<span class="legend-def">{escape(model.evidence["classifications"][c])}</span>'
+        f'<div class="legend-row">{badge(c)}<span class="legend-def">{content(f"classification:{c}:definition", model.evidence["classifications"][c])}</span>'
         f'<span class="legend-count">{counts[c]}</span></div>'
         for c in registry.CLASSIFICATIONS
     )
 
+    def name_link(eid):
+        return link(entity_url(eid), content("ontology:" + eid + ":name", model.entities[eid]["name"]))
+
     coverage = []
     for key, label in model.domains.items():
         members = sorted((e for e in model.ontology["entities"] if e.get("domain") == key), key=lambda e: e["name"].lower())
+        heading = content(f"domain:{key}:label", label)
         if members:
             recs = {x for e in members for x in e["evidence"]}
-            items = "".join(f'<li><a href="{entity_url(e["id"])}">{escape(e["name"])}</a></li>' for e in members)
-            coverage.append(f'<div class="coverage-cell" id="domain-{key}"><h3>{escape(label)}</h3>'
-                            f'<p class="coverage-count">{len(members)} entities · {len(recs)} records</p><ul>{items}</ul></div>')
+            items = "".join(f'<li>{name_link(e["id"])}</li>' for e in members)
+            coverage.append(f'<div class="coverage-cell" id="domain-{key}"><h3>{heading}</h3>'
+                            f'<p class="coverage-count">{msg(R + "coverage.count", entities=len(members), records=len(recs))}</p><ul>{items}</ul></div>')
         else:
-            coverage.append(f'<div class="coverage-cell" id="domain-{key}"><h3>{escape(label)}</h3>'
-                            f'<p class="coverage-count">0 entities</p>'
-                            f'<p class="coverage-gap">No record has been verified for this domain yet. It stays empty rather than holding unsourced entries.</p></div>')
+            coverage.append(f'<div class="coverage-cell" id="domain-{key}"><h3>{heading}</h3>'
+                            f'<p class="coverage-count">{msg(R + "coverage.none")}</p>'
+                            f'<p class="coverage-gap">{msg(R + "coverage.gap")}</p></div>')
 
     groups = []
-    for etype, label in TYPE_LABELS.items():
+    for etype in ENTITY_TYPE_ORDER:
         items = []
         for e in model.by_type(etype):
-            meta = f'{len(e["evidence"])} record{"s" if len(e["evidence"]) != 1 else ""}'
-            status = f'<span class="entity-status">{escape(e["status"])}</span>' if e.get("status") else ""
-            items.append(f'<li><a href="{entity_url(e["id"])}">{escape(e["name"])}</a><span class="entity-meta">{meta}</span>{status}</li>')
+            n = len(e["evidence"])
+            meta = msg(R + ("records.one" if n == 1 else "records.other"), count=n)
+            status = (f'<span class="entity-status">{content("ontology:" + e["id"] + ":status", e["status"])}</span>'
+                      if e.get("status") else "")
+            items.append(f'<li>{name_link(e["id"])}<span class="entity-meta">{meta}</span>{status}</li>')
         if items:
-            groups.append(f'<div class="entity-group"><h3>{escape(label)}</h3><ul class="entity-list">{"".join(items)}</ul></div>')
+            groups.append(f'<div class="entity-group"><h3>{msg_q(f"vocab.entity_type.{etype}.plural")}</h3><ul class="entity-list">{"".join(items)}</ul></div>')
 
+    def code_file(href):
+        return file_link(href, f"<code>{href}</code>")
+
+    independent = f'<strong>{msg("page.notice.independent")}</strong>'
+    contact = f'<a href="mailto:{CONTACT}?subject=TheMoroccoAI%20registry%20correction">{CONTACT}</a>'
     body = f"""<header class="page-head">
-  <p class="label">MAI-REG — Reference Registry v{escape(model.evidence["version"])}</p>
-  <h1>Morocco’s AI ecosystem, <em>on the record.</em></h1>
-  <p class="lede">Institutions, initiatives and projects in Morocco’s artificial intelligence ecosystem. Every entry cites its source, whose type is labelled, with a verbatim excerpt and dates, and <strong>facts, official targets, announced plans and our own analysis are labelled separately</strong>.</p>
-  <p class="notice"><strong>Independent.</strong> TheMoroccoAI is an independent reference project. It is not affiliated with, endorsed by or operated by the Government of Morocco or any institution listed here. Records quote public sources and link to them; they are not official statements.</p>
-  <div class="stats" role="group" aria-label="Registry status">
-    <div class="stat"><div class="stat-key">Evidence records</div><div class="stat-val">{n_rec}</div></div>
-    <div class="stat"><div class="stat-key">Entities</div><div class="stat-val">{n_ent}</div></div>
-    <div class="stat"><div class="stat-key">Relationships</div><div class="stat-val">{n_rel}</div></div>
-    <div class="stat"><div class="stat-key">Sources checked</div><div class="stat-val">{escape(human_date(model.as_of))}</div></div>
-    <div class="stat"><div class="stat-key">Format</div><div class="stat-val">Static HTML · JSON</div></div>
+  <p class="label">{msg_html(R + "label", code=iso("MAI-REG"), version=iso(escape(model.evidence["version"])))}</p>
+  <h1>{msg_html(R + "h1", emphasis=f"<em>{msg(R + 'h1.emphasis')}</em>")}</h1>
+  <p class="lede">{msg_html(R + "lede", emphasis=f"<strong>{msg(R + 'lede.emphasis')}</strong>")}</p>
+  <p class="notice">{msg_html(R + "notice", independent=independent)}</p>
+  <div class="stats" role="group" aria-label="{msg_q(R + "stats.label")}">
+    <div class="stat"><div class="stat-key">{msg(R + "stats.records")}</div><div class="stat-val">{n_rec}</div></div>
+    <div class="stat"><div class="stat-key">{msg(R + "stats.entities")}</div><div class="stat-val">{n_ent}</div></div>
+    <div class="stat"><div class="stat-key">{msg(R + "stats.relationships")}</div><div class="stat-val">{n_rel}</div></div>
+    <div class="stat"><div class="stat-key">{msg(R + "stats.checked")}</div><div class="stat-val">{escape(human_date(model.as_of))}</div></div>
+    <div class="stat"><div class="stat-key">{msg(R + "stats.format")}</div><div class="stat-val">{msg(R + "stats.format_value")}</div></div>
   </div>
 </header>
 
 <section aria-labelledby="start-h">
-  <h2 id="start-h"><span class="section-number">01</span>Start here</h2>
-  <p class="prose"><a href="/registry/questions/">Questions the registry answers</a> lists which organisations have documented AI activity, which projects are operational or only announced, which models and datasets are public, and which relationships are verified. Each answer links to its evidence.</p>
-  <p class="prose">The <a href="/registry/matrix/">institutional matrix</a> shows which organisations are documented as connected to which projects and initiatives, and on what evidence. The <a href="/registry/gaps/">evidence gap register</a> lists what the registry cannot yet establish.</p>
-  <p class="prose">The fullest chain in this version runs from <a href="{entity_url("morocco-ai-2030")}">Morocco AI 2030</a> to the announced <a href="{entity_url("jazari-network")}">JAZARI Institutes network</a>, its planned core institute <a href="{entity_url("jazari-root")}">Institut Jazari ROOT</a> and the <a href="{entity_url("jazari-industrie-x0")}">JAZARI Industrie X.0</a> convention signed in Fès. It then goes on to the signatories, the stated technologies and the targeted sectors. Each page shows the source excerpt, the publication and retrieval dates, and the classification of every claim.</p>
+  <h2 id="start-h"><span class="section-number">01</span>{msg(R + "start.h2")}</h2>
+  <p class="prose">{msg_html(R + "start.questions", questions=link("/registry/questions/", msg(R + "start.questions_link")))}</p>
+  <p class="prose">{msg_html(R + "start.matrix", matrix=link("/registry/matrix/", msg(R + "start.matrix_link")), gaps=link("/registry/gaps/", msg("link.gap_register")))}</p>
+  <p class="prose">{msg_html(R + "start.chain", ai2030=name_link("morocco-ai-2030"), jazari_network=name_link("jazari-network"),
+                             jazari_root=name_link("jazari-root"), jazari_x0=name_link("jazari-industrie-x0"))}</p>
 </section>
 
 <section aria-labelledby="legend-h">
-  <h2 id="legend-h"><span class="section-number">02</span>How claims are classified</h2>
+  <h2 id="legend-h"><span class="section-number">02</span>{msg(R + "legend.h2")}</h2>
   <div class="legend">{legend}</div>
-  <p class="prose" style="margin-top:14px">Counts cover evidence records, plus relationships for independent analysis. An official target is never shown as an outcome. A record marked “partial” states what could not be checked.</p>
+  <p class="prose" style="margin-top:14px">{msg(R + "legend.note")}</p>
 </section>
 
 <section aria-labelledby="coverage-h">
-  <h2 id="coverage-h"><span class="section-number">03</span>Coverage by domain</h2>
+  <h2 id="coverage-h"><span class="section-number">03</span>{msg(R + "coverage.h2")}</h2>
   <div class="coverage">{"".join(coverage)}</div>
 </section>
 
 <section aria-labelledby="entities-h">
-  <h2 id="entities-h"><span class="section-number">04</span>All entities</h2>
+  <h2 id="entities-h"><span class="section-number">04</span>{msg(R + "entities.h2")}</h2>
   {"".join(groups)}
 </section>
 
 <section aria-labelledby="data-h">
-  <h2 id="data-h"><span class="section-number">05</span>Machine-readable data</h2>
-  <p class="prose"><a href="/data/">Using the registry data</a> describes the files, identifiers, null values and versions, says which answers can be recomputed, and links to an example that checks the data independently.</p>
+  <h2 id="data-h"><span class="section-number">05</span>{msg(R + "data.h2")}</h2>
+  <p class="prose">{msg_html(R + "data.intro", data_guide=link("/data/", msg("link.data_guide")))}</p>
   <ul class="data-links">
-    <li><a href="/registry/state/">Reference state</a>: what the registry currently records (classifications, documented lifecycle stages, official target records and open gaps), generated from <a href="/registry/reference-state.json"><code>/registry/reference-state.json</code></a>.</li>
-    <li><a href="/data/manifest.json"><code>/data/manifest.json</code></a>: the list of published JSON files, with the SHA-256 of each in this version.</li>
-    <li><a href="/data/evidence.json"><code>/data/evidence.json</code></a>: every evidence record, with its source URL, dates, verbatim excerpts, classification and verification status.</li>
-    <li><a href="/data/ontology.json"><code>/data/ontology.json</code></a>: entity types, domains, predicates, entities and typed relationships, each citing its evidence.</li>
-    <li><a href="/registry/evidence/">All evidence on one page</a>, each record addressable as <code>/registry/evidence/#MAI-EV-NNNN</code>.</li>
+    <li>{msg_html(R + "data.state", state=link("/registry/state/", msg(R + "data.state_link")), file=code_file("/registry/reference-state.json"))}</li>
+    <li>{msg_html(R + "data.manifest", file=code_file("/data/manifest.json"))}</li>
+    <li>{msg_html(R + "data.evidence", file=code_file("/data/evidence.json"))}</li>
+    <li>{msg_html(R + "data.ontology", file=code_file("/data/ontology.json"))}</li>
+    <li>{msg_html(R + "data.all_evidence", link=link("/registry/evidence/", msg(R + "data.all_evidence_link")), pattern=iso("<code>/registry/evidence/#MAI-EV-NNNN</code>"))}</li>
   </ul>
 </section>
 
 <section aria-labelledby="method-h">
-  <h2 id="method-h"><span class="section-number">06</span>Method and limits</h2>
+  <h2 id="method-h"><span class="section-number">06</span>{msg(R + "method.h2")}</h2>
   <div class="prose">
-    <p>Each record was retrieved from its source on the stated retrieval date, and its excerpt was matched against the retrieved text. An automated validator checks every build. It requires unique identifiers, https source URLs, valid dates and complete fields, and that every entity and relationship cites existing evidence. It also blocks forward-looking wording in records classified as fact, and rejects any relationship whose classification its evidence does not support.</p>
-    <p>The registry is deliberately selective: it omits facts it could not verify against an original source, and an absent entry is a gap in coverage. Corrections can be sent to <a href="mailto:{CONTACT}?subject=TheMoroccoAI%20registry%20correction">{CONTACT}</a>.</p>
+    <p>{msg(R + "method.validation")}</p>
+    <p>{msg_html(R + "method.selective", contact=contact)}</p>
   </div>
 </section>"""
     jsonld = {
         "@context": "https://schema.org",
         "@type": "Dataset",
-        "name": "TheMoroccoAI Evidence Registry",
-        "description": "Primary-source evidence records and an ontology of institutions, initiatives and projects in Morocco's AI ecosystem, with claims classified as verified fact, official target, announced plan, independent analysis or unverified claim.",
+        "name": msg_text(R + "jsonld.name"),
+        "description": msg_text(R + "jsonld.description"),
         "url": SITE + "/registry/",
         "version": model.evidence["version"],
         "dateModified": model.as_of,
         "isAccessibleForFree": True,
         "creator": {"@type": "Organization", "name": "TheMoroccoAI", "url": SITE + "/"},
-        "spatialCoverage": {"@type": "Place", "name": "Morocco"},
+        "spatialCoverage": {"@type": "Place", "name": msg_text(R + "jsonld.place")},
         "distribution": [
             {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": SITE + "/data/evidence.json"},
             {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": SITE + "/data/ontology.json"},
         ],
     }
     return page(model, path="/registry/", current="registry",
-                title="Reference Registry — TheMoroccoAI",
-                description="Independent, evidence-backed registry of Morocco's AI ecosystem: institutions, initiatives and projects tied to primary sources, with facts, targets and plans labelled separately.",
-                body=body, jsonld=jsonld)
+                title=msg_text(R + "title"), description=msg_text(R + "description"), body=body, jsonld=jsonld)
 
 
 def _ev_links(ids):
@@ -2117,97 +2132,108 @@ def render_data_reference(model, gaps, man):
 # ─── HOMEPAGE BLOCKS ──────────────────────────────────────────────────────
 
 def render_methodology(model, changelog):
+    P = "page.methodology."
     n_rec, n_ent, n_rel = len(model.records), len(model.entities), len(model.relationships)
-    types = ", ".join(f"{TYPE_SINGULAR.get(t, t).lower()} ({sum(1 for e in model.entities.values() if e['type'] == t)})"
-                      for t in model.ontology["entity_types"])
-    classes = "".join(f'<div class="legend-row">{badge(c)}<span class="legend-def">{escape(model.evidence["classifications"][c])}</span></div>'
+    types = msg_text("punct.list_comma").join(
+        msg_text(P + "documents.type_count", type=msg_text(f"vocab.entity_type.{t}.singular").lower(),
+                 count=sum(1 for e in model.entities.values() if e['type'] == t))
+        for t in model.ontology["entity_types"])
+    classes = "".join(f'<div class="legend-row">{badge(c)}<span class="legend-def">'
+                      f'{content(f"classification:{c}:definition", model.evidence["classifications"][c])}</span></div>'
                       for c in registry.CLASSIFICATIONS)
     sources = {}
     for r in model.records.values():
         sources[r["source_type"]] = sources.get(r["source_type"], 0) + 1
-    source_line = "; ".join(f"{SOURCE_TYPE_LABELS[k].lower()}: {v}" for k, v in sorted(sources.items(), key=lambda kv: (-kv[1], kv[0])))
+    source_line = msg_text("punct.list_semicolon").join(
+        msg_text(P + "documents.source_count", type=msg_text(f"vocab.source_type.{k}").lower(), count=v)
+        for k, v in sorted(sources.items(), key=lambda kv: (-kv[1], kv[0])))
     repo = changelog["repository"]
     entries = []
     for c in changelog["entries"]:
-        figures = (f' · v{escape(c["version"])} · {c["records"]} records, {c["entities"]} entities, {c["relationships"]} relationships'
+        figures = (" · " + msg_html(P + "changelog.figures", version=iso(escape(c["version"])), records=c["records"],
+                                    entities=c["entities"], relationships=c["relationships"])
                    if c.get("version") else "")
         ref = (f'<a href="{repo}/commit/{c["commit"]}" rel="noopener">{c["commit"][:7]}</a>' if c.get("commit")
-               else f'<a href="{repo}/pull/{c["pull_request"]}" rel="noopener">pull request #{c["pull_request"]}</a>')
+               else f'<a href="{repo}/pull/{c["pull_request"]}" rel="noopener">{msg(P + "changelog.pull_request", number=c["pull_request"])}</a>')
+        # Changelog records (title and change lists) are canonical history in data/changelog.json; their
+        # translation is deferred (docs/MULTILINGUAL_ARCHITECTURE.md section 15), so they render as recorded.
         changes = "".join(f"<li>{escape(x)}</li>" for x in c.get("changes", []))
         fixes = "".join(f"<li>{escape(x)}</li>" for x in c.get("corrections", []))
-        fixes = f'<p class="change-sub">Corrections to previously published content</p><ul>{fixes}</ul>' if fixes else ""
+        fixes = f'<p class="change-sub">{msg(P + "changelog.corrections")}</p><ul>{fixes}</ul>' if fixes else ""
         review = "".join(f"<li>{escape(x)}</li>" for x in c.get("review_fixes", []))
-        fixes += f'<p class="change-sub">Found in pre-release review (never published)</p><ul>{review}</ul>' if review else ""
+        fixes += f'<p class="change-sub">{msg(P + "changelog.review_fixes")}</p><ul>{review}</ul>' if review else ""
         breaking = "".join(f"<li>{escape(x)}</li>" for x in c.get("breaking_changes", []))
-        fixes += f'<p class="change-sub">Breaking changes to the data contract</p><ul>{breaking}</ul>' if breaking else ""
+        fixes += f'<p class="change-sub">{msg(P + "changelog.breaking")}</p><ul>{breaking}</ul>' if breaking else ""
         entries.append(f"""<li class="change">
   <p class="change-meta"><time datetime="{c["date"]}">{escape(human_date(c["date"]))}</time> · {ref}{figures}</p>
   <h3>{escape(c["title"])}</h3>
   <ul>{changes}</ul>{fixes}
 </li>""")
+    independent = f'<strong>{msg("page.notice.independent")}</strong>'
+    contact = f'<a href="mailto:{CONTACT}?subject=TheMoroccoAI.com%20%E2%80%94%20correction">{CONTACT}</a>'
+    def limit(k):
+        term = "<strong>" + msg(P + "limits." + k + ".term") + "</strong>"
+        return "    <li>" + msg_html(P + "limits." + k, term=term) + "</li>"
+
+    limits = "\n".join(limit(k) for k in ("completeness", "use", "targets", "operation", "identity", "status"))
+    admission = "\n".join("    <li>" + msg(P + "admission." + k) + "</li>"
+                           for k in ("retrieved", "stage", "basis", "inference", "unpublished"))
+    conflicts = "\n".join([
+        f"    <li>{msg(P + 'conflicts.unverified')}</li>",
+        f"    <li>{msg(P + 'conflicts.unresolved')}</li>",
+        f"    <li>{msg(P + 'conflicts.superseded')}</li>",
+        f"    <li>{msg_html(P + 'conflicts.gaps', gap_register=link('/registry/gaps/', msg('link.gap_register')))}</li>",
+        f"    <li>{msg_html(P + 'conflicts.recency', questions_page=link('/registry/questions/#q7-h', msg(P + 'conflicts.questions_page')))}</li>"])
     body = f"""<header class="page-head">
-  <p class="breadcrumb"><a href="/registry/">Registry</a> / Methodology</p>
-  <p class="label">MAI-METHOD — How the registry works</p>
-  <h1>Methodology, limits and changelog</h1>
-  <p class="lede">What the registry documents, what it does not establish, how evidence is admitted, and how claims are corrected. The rules below are enforced by the validator and tests that run on every change.</p>
-  <p class="notice"><strong>Independent.</strong> {OWNERSHIP_STATEMENT} No institution has adopted or designated it as an official reference.</p>
+  <p class="breadcrumb">{link("/registry/", msg("breadcrumb.registry"))} / {msg(P + "breadcrumb")}</p>
+  <p class="label">{msg_html(P + "label", code=iso("MAI-METHOD"))}</p>
+  <h1>{msg(P + "h1")}</h1>
+  <p class="lede">{msg(P + "lede")}</p>
+  <p class="notice">{msg_html(P + "notice", independent=independent, statement=msg("disclosure.ownership_statement"))}</p>
 </header>
 <section aria-labelledby="ownership-h">
-  <h2 id="ownership-h">Ownership and editorial independence</h2>
-  <p class="prose">{OWNERSHIP_STATEMENT}</p>
-  <p class="prose">This is a privately governed research resource, not an official registry. Source attribution is not a claim of institutional partnership or endorsement. Evidence classifications, limitations and corrections are documented below. English is the authoritative editorial language; other language editions are planned and are not represented as complete.</p>
+  <h2 id="ownership-h">{msg(P + "ownership.h2")}</h2>
+  <p class="prose">{msg("disclosure.ownership_statement")}</p>
+  <p class="prose">{msg(P + "ownership.private")}</p>
 </section>
 <section aria-labelledby="m1-h">
-  <h2 id="m1-h"><span class="section-number">01</span>What the registry documents</h2>
-  <p class="prose">Version {escape(model.evidence["version"])}, sources checked {escape(human_date(model.as_of))}: {n_rec} evidence records, {n_ent} entities and {n_rel} typed relationships. Entity types: {escape(types)}. Each record carries the source URL, a verbatim excerpt, the publication and retrieval dates, and one classification:</p>
+  <h2 id="m1-h"><span class="section-number">01</span>{msg(P + "documents.h2")}</h2>
+  <p class="prose">{msg_html(P + "documents.summary", version=escape(model.evidence["version"]), date=escape(human_date(model.as_of)),
+                              records=n_rec, entities=n_ent, relationships=n_rel, types=escape(types))}</p>
   <div class="legend">{classes}</div>
-  <p class="prose">Sources by type: {escape(source_line)}. Primary sources are preferred; secondary press may support only an announced plan or an unverified claim.</p>
+  <p class="prose">{msg_html(P + "documents.sources", sources=escape(source_line))}</p>
 </section>
 <section aria-labelledby="m2-h">
-  <h2 id="m2-h"><span class="section-number">02</span>What it does not establish</h2>
+  <h2 id="m2-h"><span class="section-number">02</span>{msg(P + "limits.h2")}</h2>
   <ul class="prose">
-    <li><strong>Completeness.</strong> The registry covers what it has documented so far. An absent organisation, project or sector is a gap in coverage, not evidence of absence in Morocco.</li>
-    <li><strong>Use and outcomes.</strong> Public availability is not adoption. No usage, accuracy, performance or impact figure is recorded as fact.</li>
-    <li><strong>Delivery of targets and plans.</strong> Official targets and announced plans are shown as such, never as outcomes.</li>
-    <li><strong>Current operation.</strong> An operational stage rests on its latest evidence; operation after that date is not reconfirmed.</li>
-    <li><strong>Legal identity.</strong> A matching name does not make two organisations the same legal entity; such links are labelled as associations.</li>
-    <li><strong>Official status.</strong> Records quote public sources; they are not official statements, and the registry speaks for no institution.</li>
+{limits}
   </ul>
 </section>
 <section aria-labelledby="m3-h">
-  <h2 id="m3-h"><span class="section-number">03</span>How evidence is admitted</h2>
+  <h2 id="m3-h"><span class="section-number">03</span>{msg(P + "admission.h2")}</h2>
   <ul class="prose">
-    <li>A record is added only after the original source has been retrieved and the excerpt matched against it.</li>
-    <li>A lifecycle stage beyond "announced" needs a verified record that declares that stage. A signature, announcement, procurement notice, market clearance or official gazette text never establishes operation: a gazette text shows legal establishment, not activity.</li>
-    <li>An operational or pilot claim states its basis (public availability, an operator's report of use, or an independent source) and names the operator separately from any developer or provider.</li>
-    <li>Inferences drawn by the registry are labelled independent analysis and need at least two records.</li>
-    <li>Candidates that do not meet these rules are not published.</li>
+{admission}
   </ul>
 </section>
 <section aria-labelledby="m4-h">
-  <h2 id="m4-h"><span class="section-number">04</span>Unsupported, conflicting and outdated claims</h2>
+  <h2 id="m4-h"><span class="section-number">04</span>{msg(P + "conflicts.h2")}</h2>
   <ul class="prose">
-    <li>Statements the registry could not check are kept only as unverified claims, with a note saying what was not checked.</li>
-    <li>Where sources conflict or are insufficient, the stage is "unresolved", with the reason stated.</li>
-    <li>A record whose quotation still matches its source but whose claim later evidence contradicts is marked superseded and can no longer set a stage. It stays visible.</li>
-    <li>Questions the evidence cannot yet answer are published in the <a href="/registry/gaps/">evidence gap register</a>, with what is established, what is not and what would resolve them. A gap must be re-assessed whenever a new record concerns it.</li>
-    <li>When the latest evidence for an operational claim is more than 12 months old, the <a href="/registry/questions/#q7-h">questions page</a> says current operation has not been reconfirmed. Elapsed time never changes a stage by itself.</li>
+{conflicts}
   </ul>
 </section>
 <section aria-labelledby="m5-h">
-  <h2 id="m5-h"><span class="section-number">05</span>Corrections and reuse</h2>
-  <p class="prose">Corrections are made in the data, re-validated and published as a new commit on the <a href="{repo}" rel="noopener">public repository</a>, so every change is visible in its history. The record's verification note says what changed and why. Corrections with a source can be sent to <a href="mailto:{CONTACT}?subject=TheMoroccoAI.com%20%E2%80%94%20correction">{CONTACT}</a>.</p>
-  <p class="prose">The data is published as <a href="/data/evidence.json">evidence.json</a> and <a href="/data/ontology.json">ontology.json</a>, with the gap register and derived files; <a href="/data/">Using the registry data</a> explains how to read and verify them. No content or data licence has been declared yet; that is the owner's decision.</p>
+  <h2 id="m5-h"><span class="section-number">05</span>{msg(P + "corrections.h2")}</h2>
+  <p class="prose">{msg_html(P + "corrections.process", repository=f'<a href="{repo}" rel="noopener">{msg(P + "corrections.repository")}</a>', contact=contact)}</p>
+  <p class="prose">{msg_html(P + "corrections.reuse", evidence_json=file_link("/data/evidence.json", "evidence.json"),
+                             ontology_json=file_link("/data/ontology.json", "ontology.json"), data_guide=link("/data/", msg("link.data_guide")))}</p>
 </section>
 <section aria-labelledby="m6-h">
-  <h2 id="m6-h"><span class="section-number">06</span>Changelog</h2>
+  <h2 id="m6-h"><span class="section-number">06</span>{msg(P + "changelog.h2")}</h2>
   <p class="prose">{escape(changelog["note"])}</p>
   <ol class="changelog">{"".join(entries)}</ol>
 </section>"""
     return page(model, path="/methodology/", current="methodology",
-                title="Methodology, Limits and Changelog — TheMoroccoAI",
-                description="How TheMoroccoAI's evidence registry admits, classifies and corrects claims, what it does not establish, and a changelog tied to its public repository.",
-                body=body)
+                title=msg_text(P + "title"), description=msg_text(P + "description"), body=body)
 
 
 def render_acquisition(model):
@@ -2417,6 +2443,28 @@ class PageSpec:
 # extracted in Sprint 19B-3. With this empty, nothing is localized and English output is unchanged.
 LOCALIZABLE_PAGES = ()
 
+# Pages whose presentation text has been extracted into the catalogs (Sprint 19B-3). They are NOT registered for
+# localization: /registry/ is complete but waits for reviewed translations and the owner's decision to publish;
+# /methodology/ also renders canonical changelog records whose translation is deferred (Arch section 15).
+EXTRACTED_PAGES = (
+    PageSpec("/registry/", lambda model: render_registry_index(model)),
+    PageSpec("/methodology/", lambda model: render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json"))),
+)
+
+
+def page_requirements(model, spec, root=ROOT):
+    """The complete set of units a page needs in another language: catalog messages, canonical content units
+    and the glossary terms its terminology messages link to. Determined by rendering the English page with a
+    recording translator, so it is exactly what the page uses. A localized rendering additionally needs the
+    localization-only shell messages (LOCALIZATION_ONLY_MESSAGES)."""
+    tr = i18n.Translator("en", root)
+    with rendering(RenderContext("en", root, translator=tr)):
+        spec.render(model)
+    used = set(tr.used)
+    return {"messages": sorted(u for u in used if ":" not in u),
+            "content": sorted(u for u in used if ":" in u),
+            "terms": sorted({tr.term_links[u] for u in used if u in tr.term_links})}
+
 # Shell units that only localized pages use (switcher, translation notice, fallback marker).
 LOCALIZATION_ONLY_MESSAGES = {"shell.lang.label", "shell.translation_notice", "shell.translation_notice.english",
                               "shell.in_english"}
@@ -2441,6 +2489,9 @@ class _PageFacts(HTMLParser):
         self.title, self.description = "", None
         self.text, self.unisolated, self.hrefs, self.badges, self.classes, self.alternates = [], [], [], [], set(), []
         self.stack, self._title = [], False
+        # Structure outside the localization-only furniture (switcher, translation notice, fallback markers).
+        self.headings, self.ids, self.internal, self.structure, self._skip = [], [], [], [], 0
+        self._code = 0  # inside <script> or <style>: not visible text
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
@@ -2448,12 +2499,28 @@ class _PageFacts(HTMLParser):
             self.lang, self.dir = a.get("lang"), a.get("dir")
         elif tag == "title":
             self._title = True
+        elif tag in ("script", "style"):
+            self._code += 1
         elif tag == "meta" and a.get("name") == "description":
             self.description = a.get("content")
         elif tag == "link" and a.get("rel") == "canonical":
             self.canonical = a.get("href")
         elif tag == "link" and a.get("rel") == "alternate" and a.get("hreflang"):
             self.alternates.append((a["hreflang"], a.get("href")))
+        cls = (a.get("class") or "").split()
+        furniture = {"lang-switch", "translation-notice", "lang-note"} & set(cls)
+        if self._skip or furniture:
+            if tag not in ("meta", "link", "br", "img", "input", "hr", "source"):
+                self._skip += 1
+        else:
+            if re.fullmatch(r"h[1-6]", tag):
+                self.headings.append(tag)
+            if a.get("id"):
+                self.ids.append(a["id"])
+            if tag in ("section", "ul", "ol", "li", "table", "thead", "tbody", "tr", "th", "td", "dl", "dt", "dd", "blockquote"):
+                self.structure.append(tag)
+            if tag == "a" and (a.get("href") or "").startswith(("/", "#")):
+                self.internal.append(a["href"])
         if tag == "a" and a.get("href"):
             self.hrefs.append(a["href"])
         for c in (a.get("class") or "").split():
@@ -2467,12 +2534,18 @@ class _PageFacts(HTMLParser):
     def handle_endtag(self, tag):
         if tag == "title":
             self._title = False
+        if tag in ("script", "style") and self._code:
+            self._code -= 1
+        if self._skip and tag not in ("meta", "link", "br", "img", "input", "hr", "source"):
+            self._skip -= 1
         if tag not in ("meta", "link", "br", "img", "input", "hr", "source") and self.stack:
             self.stack.pop()
 
     def handle_data(self, data):
         if self._title:
             self.title += data
+            return
+        if self._code:
             return
         if self.stack and self.stack[-1] and not data.strip():
             return
@@ -2510,11 +2583,29 @@ def localized_page_errors(lang, path, html, english_html, used, english_used, la
         errors.append(f"numbers or dates differ from English: {sorted(((digits(en) - digits(loc)) + (digits(loc) - digits(en))).elements())}")
     if loc.badges != en.badges:
         errors.append("classification codes differ from English")
+    if loc.headings != en.headings:
+        errors.append(f"heading hierarchy differs from English: {loc.headings} vs {en.headings}")
+    if loc.ids != en.ids:
+        errors.append("element ids (anchor targets) differ from English: "
+                      f"{sorted(set(en.ids) ^ set(loc.ids)) or 'order differs'}")
+    unprefix = lambda h: h[len(lang) + 1:] if h.startswith(f"/{lang}/") else h
+    if sorted(unprefix(h) for h in loc.internal) != sorted(en.internal):
+        errors.append("internal links or anchors differ from English: "
+                      f"{sorted(set(map(unprefix, loc.internal)) ^ set(en.internal))}")
+    if loc.structure != en.structure:
+        errors.append("sections, lists or tables differ in structure from English")
     en_ids, loc_ids = set(english_used), set(used)
     if en_ids - loc_ids or loc_ids - en_ids - LOCALIZATION_ONLY_MESSAGES:
         errors.append(f"rendered a different set of messages from English (qualifiers or text missing or added): "
                       f"{sorted((en_ids - loc_ids) | (loc_ids - en_ids - LOCALIZATION_ONLY_MESSAGES))}")
     texts = translator.texts
+    for mid in sorted(set(used)):
+        if translator.kinds.get(mid) in ("qualifier", "disclosure") and mid in texts:
+            for fragment in i18n.PLACEHOLDER.sub("\0", texts[mid]).split("\0"):
+                fragment = re.sub(r"\s+", " ", fragment).strip()
+                if len(fragment) >= 4 and fragment not in loc.visible:
+                    errors.append(f"{translator.kinds[mid]} {mid} is not present on the page")
+                    break
     for mid in ("footer.owner_note", "footer.disclaimer"):
         if mid in texts and texts[mid] not in loc.visible:
             errors.append(f"missing localized disclosure {mid}")
