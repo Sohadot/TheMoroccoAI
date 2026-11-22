@@ -36,7 +36,7 @@ The Sprint 19A audit (Arch §1) found:
 1. **Single research source.** Evidence, ontology, gaps, changelog and reference state stay in English in `data/` and are never duplicated or altered per language. No language may introduce evidence, entities, classifications, conclusions or interpretations.
 2. **Separate translation layer.** Translations live in `i18n/`, outside `data/`, the manifest and `REFERENCE_INPUTS`. There is one language registry and one glossary. Message catalogs cover interface and page strings, and content catalogs cover canonical prose fields keyed by identifier and field. Each translation unit records the SHA-256 of its English source and its review provenance.
 3. **Derived pages.** Localized pages are rendered by the same `build.py` functions from the same data, with numbers, dates, identifiers, URLs and links filled in as placeholders from canonical data. Generation is deterministic and covered by `build.py --check`.
-4. **Publication rule.** A page is generated in a language only when every unit it needs is approved by two human reviews (substantive and linguistic) and matches the current English source. There is no partial page, English fallback text or placeholder route. Stale or missing translations withdraw the localized page and never block English.
+4. **Publication rule.** A page is generated in a language only when every unit it needs is approved by two human reviews (substantive and linguistic) and matches the current English source. *(Amended by TMA-DEC-008: one documented human approval, with risk-based escalation; see [TRANSLATION_REVIEW_POLICY.md](TRANSLATION_REVIEW_POLICY.md).)* There is no partial page, English fallback text or placeholder route. Stale or missing translations withdraw the localized page and never block English.
 5. **Routing.** English stays at `/`. Arabic is at `/ar/…` and French at `/fr/…`, mirroring English paths. Darija (`/ary/`) and Amazigh (`/zgh/`) are reserved for a later wave (owner decisions Q1 and Q7 below).
 6. **SEO.**
    - Every page has a self-referencing canonical.
@@ -88,7 +88,7 @@ The Sprint 19A audit (Arch §1) found:
 
 ## Risks
 See the plan's risk register (R1–R10). The highest-impact risks, and their main controls, are:
-- **Meaning drift in translation (R1):** controlled by parity gates and two human reviews.
+- **Meaning drift in translation (R1):** controlled by parity gates and human approval (two reviews under TMA-DEC-007; since TMA-DEC-008, one documented human approval with escalation to a second reviewer when a risk criterion applies).
 - **Unreviewed text in production (R2):** controlled by keeping drafts off `main` and building from approved units only.
 - **Evaluation comparability (R9):** controlled by keeping the evaluation English-only.
 
@@ -153,6 +153,7 @@ Each step is a separate pull request, merged by the integration authority.
 - **Sprint 19B-1 (foundation):** the `i18n/` layer (language registry, English source catalog, empty Arabic and French catalogs, glossary), `tools/i18n.py` (source fingerprints, validation, staleness and orphan report, publication eligibility), English shell and date strings read from the catalog with byte-identical output, and site gates for language routes and `hreflang`. **No translation exists, no review has taken place, and no localized page or route is published.**
 - **Sprint 19B-2 (rendering engine):** localized rendering for `ar` and `fr`, strict translation lookup with no English fallback, page publication gates (identifiers, source URLs, numbers and dates, classifications, qualifiers, disclosures, right-to-left isolation, untranslated English), reciprocal `hreflang` / `x-default` / `og:locale` / JSON-LD language and sitemap entries, a no-JavaScript language switcher, withdrawal of files no longer generated, and logical and Arabic CSS with English pixel-identical (Arch §14). No page is registered for localization, so nothing is generated or published.
 - **Sprint 19B-3 (reference content extraction):** all presentation text of `/registry/` and `/methodology/` read from the catalog, with English byte-identical. Canonical text (entity names and statuses, classification definitions, domain labels) is resolved from `data/` as content units. There are page requirement sets, a pseudo-localization completeness check, and structural and qualifier-presence gates. The canonical changelog records on `/methodology/` are deferred (Arch §15). Neither page is registered for localization.
+- **Sprint 19B-4 (homepage, identity, governance):** the homepage is generated from a catalog-driven template with English byte-identical; changelog and attribute texts have stable identities in explicit maps, so `/methodology/` has no deferred text; and TMA-DEC-008 replaces the two-review requirement with one documented human approval, risk-based escalation and a public translation-policy disclosure (Arch §16). No reviewer is registered, no translation exists and no page is registered for localization.
 - **Later sprints:** as in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
 
 ## Owner decisions (2026-11-22)
@@ -166,7 +167,7 @@ The Sohadot integration authority resolved the nine approval questions of the pr
    - Spanish remains a possible future expansion language, without a publication commitment.
    - No localized language may introduce independent research conclusions or duplicate canonical evidence.
 2. **Q2, acquisition page.** `/acquisition/` may be localized. Its localization follows the core reference pages and is not part of the initial three-page rollout. Its commercial wording requires a dedicated substantive and legal review before publication.
-3. **Q3, reviewers.**
+3. **Q3, reviewers.** *(Review requirements superseded by TMA-DEC-008 on 2026-11-22; the text below is kept as decided. Pseudonymous provenance still applies.)*
    - Each published translation requires two review functions: substantive accuracy and linguistic quality.
    - Reviewers are independent of the drafter.
    - Two different reviewers are preferred; one reviewer may perform both functions only if they did not draft the text.
@@ -176,7 +177,7 @@ The Sohadot integration authority resolved the nine approval questions of the pr
 6. **Q6, source excerpts.** Excerpts stay verbatim in their original language. They are not translated during the first two implementation waves, and a translation is never presented as an original quotation.
 7. **Q7, Darija and Amazigh.** Darija initially uses Arabic script. Standard Moroccan Amazigh uses Tifinagh. Both require controlled terminology and competent linguistic review before publication. No premature publication or placeholder routes.
 8. **Q8, search-engine verification.** Appropriate search-engine webmaster tools may be used to assess indexing and discoverability. Any account connection, ownership verification or DNS change is a separate operation that needs its own authorization. No invasive tracking or analytics.
-9. **Q9, machine-assisted translation.** Machine translation may be used to prepare drafts of already-public content. It cannot substitute for the human substantive and linguistic reviews. Public documentation explains the translation and review policy accurately, and no review is claimed unless it actually took place. Each translation unit records its `draft_method` (`human` or `machine-assisted`).
+9. **Q9, machine-assisted translation.** Machine translation may be used to prepare drafts of already-public content. It cannot substitute for the human substantive and linguistic reviews *(since TMA-DEC-008: for the documented human approval)*. Public documentation explains the translation and review policy accurately, and no review is claimed unless it actually took place. Each translation unit records its `draft_method` (`human` or `machine-assisted`).
 
 ## Original approval questions (Sprint 19A, for the record)
 

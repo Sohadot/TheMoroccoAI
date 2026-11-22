@@ -5,7 +5,7 @@
 | Policy version | **TMA-DEC-008** (the value an approval must record in `approval.policy`) |
 | Status | Accepted by the project owner, 2026-11-22 |
 | Replaces | The review requirements of TMA-DEC-007 (two review functions, reviewers independent of the drafter, two reviewers preferred). History: [DECISION_LOG.md](DECISION_LOG.md) |
-| Enforced by | `tools/i18n.py` (validation and eligibility), `tools/build.py` (publication gates), `tests/test_i18n.py`, `tests/test_multilingual.py`, `tests/test_extraction.py`, `tests/test_governance.py` |
+| Enforced by | `tools/i18n.py` (validation and eligibility), `tools/build.py` (publication gates), `tests/test_i18n.py`, `tests/test_multilingual.py`, `tests/test_extraction.py`, `tests/test_governance.py`, `tests/test_homepage.py`; stable identity: `tests/test_changelog_identity.py` |
 | Current state | **No reviewer is registered. No translation has been approved. No localized page is published.** |
 
 ## What is decided

@@ -1,13 +1,13 @@
 # Multilingual Implementation Plan
 
-Status: **Accepted (TMA-DEC-007, 2026-11-22).** Owner decisions Q1–Q9 are recorded in the ADR. **Progress:** Sprint 19B-1 added the foundation (part of B1, and B4). Sprint 19B-2 added the rendering engine, publication gates, multilingual SEO, logical/RTL CSS and the language switcher (B3, B7 and the remaining B4 gates; Arch §14). Sprint 19B-3 extracted all presentation text of `/registry/` and `/methodology/` (byte-identical English; Arch §15). No page is registered for localization yet, no translation exists and no localized page is published. Its design is in [MULTILINGUAL_ARCHITECTURE.md](MULTILINGUAL_ARCHITECTURE.md) (cited below as "Arch §n"), and the decision is in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). Approval questions are numbered as in the ADR (Q1–Q9).
+Status: **Accepted (TMA-DEC-007, 2026-11-22).** Owner decisions Q1–Q9 are recorded in the ADR. **Progress:** Sprint 19B-1 added the foundation (part of B1, and B4). Sprint 19B-2 added the rendering engine, publication gates, multilingual SEO, logical/RTL CSS and the language switcher (B3, B7 and the remaining B4 gates; Arch §14). Sprint 19B-3 extracted all presentation text of `/registry/` and `/methodology/` (byte-identical English; Arch §15). Sprint 19B-4 generated the homepage from a catalog-driven template (B2), gave changelog and attribute texts stable identities, and adopted TMA-DEC-008: one documented human approval per translation, with risk-based escalation (Arch §16, [TRANSLATION_REVIEW_POLICY.md](TRANSLATION_REVIEW_POLICY.md)). No page is registered for localization yet, no translation exists and no localized page is published. Its design is in [MULTILINGUAL_ARCHITECTURE.md](MULTILINGUAL_ARCHITECTURE.md) (cited below as "Arch §n"), and the decision is in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). Approval questions are numbered as in the ADR (Q1–Q9).
 
 ## Sequencing rules for every sprint
 
 These apply to every sprint below:
 - English output is never changed as a side effect. Each refactoring step proves `build.py --check` reports 0 stale against the previous English output before any translation work lands.
 - A sprint ends with its own pull request, green CI, and a decision by the Sohadot integration authority. Nothing is merged by an agent.
-- No language becomes `published` in `i18n/languages.json` until its first page set passes every gate (Arch §9) and both human reviews are recorded (Arch §6).
+- No language becomes `published` in `i18n/languages.json` until its first page set passes every gate (Arch §9) and its human approvals are recorded (TMA-DEC-008; Arch §16).
 
 ---
 
@@ -18,8 +18,8 @@ These apply to every sprint below:
 **Split:**
 - 19B-1: foundation (done).
 - 19B-2: rendering engine and gates (done).
-- 19B-3: `/registry/` and `/methodology/` bodies into the catalogs (done; neither registered as localizable). The canonical changelog records on `/methodology/` need a list-item identity decision first (Arch §15).
-- 19B-4: homepage templating (B2).
+- 19B-3: `/registry/` and `/methodology/` bodies into the catalogs (done; neither registered as localizable).
+- 19B-4: homepage templating (B2), stable changelog and attribute identity, TMA-DEC-008 approval contract (done; nothing registered as localizable).
 - Then B5, B6 and B8.
 
 ### Steps
@@ -27,17 +27,17 @@ These apply to every sprint below:
 | # | Step | Proof that English is unchanged |
 |---|---|---|
 | B1 | Extract interface and page strings from `tools/build.py` into `i18n/en/messages.json`. Add `t()`, `c()` and `fmt()`. Replace `human_date()` with explicit month tables (English output identical). **19B-1 done:** shell, footer, ownership statement and dates, with `t()` and catalog-based `human_date()`. **Remaining (19B-2):** page-body prose, label maps, `c()` and localized `fmt()` | `build.py --check`: 0 stale; full test suite unchanged |
-| B2 | Make the homepage renderable per language. Move its inline CSS to `assets/home.css`, and its hand-written text into `i18n/en/messages.json` under a homepage template rendered by `build.py` | Text of every element identical (DOM text diff); screenshots at 1440 and 390 px identical; existing homepage tests pass unchanged |
+| B2 | Make the homepage renderable per language. Move its inline CSS to `assets/home.css`, and its hand-written text into `i18n/en/messages.json` under a homepage template rendered by `build.py`. **19B-4 done:** `tools/templates/homepage.tmpl` and `render_homepage()`; the CSS stays inline in the template so that `index.html` remains byte-identical (moving it is a separate, visual-only change) | Text of every element identical (DOM text diff); screenshots at 1440 and 390 px identical; existing homepage tests pass unchanged |
 | B3 | Convert physical CSS properties to logical ones (Arch §8.1). Add Arabic typography rules. Reference the Arabic face from `registry.css`. **19B-2 done:** rules scoped to `html[lang="ar"]`, 28 English screenshots pixel-identical | LTR screenshot comparison unchanged at 1440 and 390 px |
 | B4 | Add the language registry, glossary schema, `validate_i18n` and the new `check_site` gates, each with negative fixture tests (Arch §9). **19B-1 done** for the catalog-level rules and the route and `hreflang` gates (Arch §13). **Remaining:** the page-pair parity gates (identifiers, citations, classifications, dates, numbers, qualifiers, English leakage, localized disclosures, bidi isolation, RTL layout), which need a localized renderer | New gates pass vacuously with no published language |
 | B5 | Glossary: settle Arabic and French terms for the reference vocabulary (Arch §4.5), including forbidden variants. Settle the Arabic month-name and numeral conventions | Glossary review recorded |
-| B6 | Translate and review the units for the B-wave pages, including localized `OWNER_NOTE`, `DISCLAIMER`, `OWNERSHIP_STATEMENT` and the authority notice | Two reviews recorded per unit |
+| B6 | Translate and review the units for the B-wave pages, including localized `OWNER_NOTE`, `DISCLAIMER`, `OWNERSHIP_STATEMENT` and the authority notice | One human approval recorded per unit (TMA-DEC-008), escalated where a criterion applies |
 | B7 | Language switcher, `hreflang` clusters, self canonicals, `og:locale`, sitemap entries and JSON-LD `inLanguage` / `translationOfWork` for the generated pages. **19B-2 done** as infrastructure; it takes effect only when a page is generated | English pages gain `hreflang` only where a translation is published |
 | B8 | Update the homepage and footer statements ("AR, FR, TZM planned") to say exactly what is published, in the same pull request that publishes | Tests pin the statement to `languages.json` |
 
 ### Dependencies
 - Owner decisions Q2, Q3, Q5 and Q9 (recorded 2026-11-22). Arabic pages begin with the existing Noto Kufi Arabic font; another face is added only on a demonstrated readability need (Q5).
-- Available reviewers: one substantive and one linguistic reviewer per language, distinct from the drafter.
+- Available reviewers: at least one registered human reviewer per language (TMA-DEC-008); a second registered reviewer for escalations.
 
 ### Acceptance criteria
 - `/ar/`, `/ar/methodology/`, `/ar/registry/`, `/fr/`, `/fr/methodology/` and `/fr/registry/` are generated, and nothing else under `/ar/` or `/fr/`.
