@@ -34,11 +34,11 @@ a:hover { color: var(--gold-ink); }
 a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 .skip-link {
-  position: absolute; left: -9999px; top: 8px; z-index: 200;
+  position: absolute; inset-inline-start: -9999px; top: 8px; z-index: 200;
   background: var(--blue); color: var(--paper); padding: 8px 14px;
   font-family: 'DM Mono', monospace; font-size: 11px;
 }
-.skip-link:focus { left: 8px; }
+.skip-link:focus { inset-inline-start: 8px; }
 
 .zellige-bg {
   position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.04;
@@ -106,22 +106,22 @@ h2 .section-number {
 h3 { font-size: 21px; font-weight: 600; color: var(--blue); line-height: 1.25; }
 p + p { margin-top: 12px; }
 .prose { max-width: 680px; font-size: 17px; font-weight: 400; color: var(--text-sub); }
-.prose li { margin: 6px 0 6px 20px; }
+.prose li { margin-block: 6px; margin-inline: 20px 0; }
 
 /* ─── NOTICE ─── */
 .notice {
-  position: relative; margin-top: 28px; padding: 18px 22px 18px 26px;
+  position: relative; margin-top: 28px; padding-block: 18px; padding-inline: 26px 22px;
   border: 1px solid var(--border-gold); background: rgba(255,255,255,0.35);
   font-size: 15px; color: var(--text-sub); max-width: 680px;
 }
-.notice::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--gold); }
+.notice::before { content: ''; position: absolute; top: 0; inset-inline-start: 0; width: 3px; height: 100%; background: var(--gold); }
 .notice strong { color: var(--text-main); font-weight: 600; }
 
 /* ─── STATS STRIP ─── */
 .stats {
   display: flex; flex-wrap: wrap; margin-top: 36px; background: var(--blue);
 }
-.stat { padding: 14px 22px; border-right: 1px solid rgba(255,255,255,0.08); }
+.stat { padding: 14px 22px; border-inline-end: 1px solid rgba(255,255,255,0.08); }
 .stat-key {
   font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em;
   text-transform: uppercase; color: rgba(255,255,255,0.62); margin-bottom: 4px;
@@ -144,7 +144,7 @@ p + p { margin-top: 12px; }
 .legend { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); }
 .legend-row { display: grid; grid-template-columns: 200px 1fr 64px; gap: 16px; align-items: center; padding: 14px 18px; background: var(--paper); }
 .legend-def { font-size: 15px; color: var(--text-sub); line-height: 1.5; }
-.legend-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-sub); text-align: right; }
+.legend-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-sub); text-align: end; }
 
 /* ─── DOMAIN COVERAGE ─── */
 .coverage { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
@@ -164,13 +164,13 @@ p + p { margin-top: 12px; }
 .entity-list li:hover { background: var(--sand); }
 .entity-list a { font-size: 18px; font-weight: 600; color: var(--blue); text-decoration: none; }
 .entity-list a:hover { color: var(--gold-ink); text-decoration: underline; }
-.entity-meta { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text-sub); text-align: right; }
+.entity-meta { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text-sub); text-align: end; }
 .entity-status { grid-column: 1 / -1; font-size: 14px; color: var(--text-sub); margin-top: -4px; }
 
 /* ─── FACT SHEET ─── */
 .facts { display: grid; grid-template-columns: 160px 1fr; border: 1px solid var(--border); margin-top: 28px; max-width: 720px; }
 .facts dt, .facts dd { padding: 12px 18px; border-bottom: 1px solid var(--border); }
-.facts dt { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-sub); border-right: 1px solid var(--border); }
+.facts dt { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-sub); border-inline-end: 1px solid var(--border); }
 .facts dd { font-size: 16px; color: var(--text-main); }
 .facts dt:last-of-type, .facts dd:last-of-type { border-bottom: none; }
 
@@ -224,7 +224,7 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
   .legend-def { grid-column: 1 / -1; grid-row: 2; }
   .coverage { grid-template-columns: 1fr; }
   .facts { grid-template-columns: 1fr; }
-  .facts dt { border-right: none; border-bottom: none; padding-bottom: 0; }
+  .facts dt { border-inline-end: none; border-bottom: none; padding-bottom: 0; }
   .evidence-card { padding: 18px 16px; }
   .evidence-meta { grid-template-columns: 1fr; }
   .evidence-meta dd { margin-bottom: 6px; }
@@ -241,13 +241,13 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
 .qtable { width: 100%; border-collapse: collapse; font-size: 15px; }
 .qtable th {
   font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--text-sub); text-align: left; padding: 10px 14px;
+  text-transform: uppercase; color: var(--text-sub); text-align: start; padding: 10px 14px;
   border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.35);
 }
 .qtable td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text-main); }
 .qtable tr:last-child td { border-bottom: none; }
 .qtable td a[href^="/registry/evidence/"] { font-family: 'DM Mono', monospace; font-size: 10px; white-space: nowrap; }
-.qtable .badge { margin-right: 4px; }
+.qtable .badge { margin-inline-end: 4px; }
 .table-hint { display: none; }
 @media (max-width: 700px) {
   .qtable { min-width: 560px; }
@@ -255,17 +255,17 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
 }
 
 /* ─── CHANGELOG ─── */
-.changelog { list-style: none; max-width: 720px; border-left: 2px solid var(--border-gold); margin-top: 16px; }
-.change { padding: 0 0 28px 20px; }
+.changelog { list-style: none; max-width: 720px; border-inline-start: 2px solid var(--border-gold); margin-top: 16px; }
+.change { padding-block: 0 28px; padding-inline: 20px 0; }
 .change h3 { font-size: 20px; color: var(--blue); margin: 2px 0 6px; }
 .change-meta { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--text-dim); }
 .change-meta a { color: var(--blue-mid); }
-.change ul { margin: 4px 0 0 20px; font-size: 16px; color: var(--text-sub); }
+.change ul { margin-block: 4px 0; margin-inline: 20px 0; font-size: 16px; color: var(--text-sub); }
 .change-sub { margin-top: 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
 .table-wrap + .prose { margin-top: 16px; }
 
 /* ─── MATRIX AND GAPS ─── */
-.qtable .group-row th { background: var(--sand, #e8dcc8); text-align: left; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--blue); padding: 10px 14px; }
+.qtable .group-row th { background: var(--sand, #e8dcc8); text-align: start; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--blue); padding: 10px 14px; }
 .ev-meta { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: var(--text-dim); }
 .gap { border-top: 1px solid var(--border); padding-top: 28px; margin-top: 36px; }
 .gap h3 { font-size: 18px; color: var(--blue); margin: 18px 0 6px; }
@@ -275,7 +275,7 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
 .qtable .group-row .ev-meta { color: var(--text-sub); }
 
 /* ─── REFERENCE STATE ─── */
-.state-boundary ul { margin: 8px 0 0 18px; }
+.state-boundary ul { margin-block: 8px 0; margin-inline: 18px 0; }
 .state-boundary li { margin: 2px 0; }
 .state-stats .stat-val { font-size: 18px; }
 .state-details { margin-top: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.3); }
@@ -301,3 +301,24 @@ footer { position: relative; z-index: 1; background: var(--ink); padding: 32px; 
 .state-page td code { display: block; margin-top: 2px; font-size: 11px; color: var(--text-sub); overflow-wrap: anywhere; }
 .state-page td [data-ref$="/count"] { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--blue); }
 .state-page .prose + .table-wrap, .state-page .prose + .table-hint { margin-top: 14px; }
+
+/* ─── MULTILINGUAL (TMA-DEC-007) ─────────────────────────────────────────
+   Language switcher and translation notice appear only on pages that exist in more than one language.
+   Arabic rules are scoped to Arabic documents (html[lang="ar"]): Arabic excerpts on English pages keep
+   their current rendering. Arabic is never letter-spaced (it breaks cursive joining) nor set in italics. */
+.lang-switch { display: flex; gap: 12px; list-style: none; margin-inline-start: 24px; align-items: center; }
+.lang-switch a { font-size: 12px; color: var(--text-sub); text-decoration: none; padding: 6px 4px; }
+.lang-switch a:hover, .lang-switch a[aria-current="true"] { color: var(--gold-ink); text-decoration: underline; text-underline-offset: 4px; }
+.translation-notice { margin-bottom: 28px; padding-block: 10px; padding-inline: 14px; border-inline-start: 3px solid var(--gold); background: rgba(184,137,42,0.06); font-size: 15px; color: var(--text-sub); }
+.lang-note { font-size: 0.85em; color: var(--text-dim); }
+html[lang="ar"] body { font-family: 'Noto Kufi Arabic', 'Cormorant Garamond', Georgia, serif; line-height: 1.9; }
+html[lang="ar"] body * { font-family: 'Noto Kufi Arabic', 'DM Mono', 'Cormorant Garamond', Georgia, serif; letter-spacing: 0 !important; font-style: normal !important; }
+html[lang="ar"] .prose, html[lang="ar"] .lede, html[lang="ar"] p { line-height: 1.9; }
+html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3 { line-height: 1.5; }
+html[lang="ar"] .label, html[lang="ar"] .nav-links a, html[lang="ar"] .footer-note, html[lang="ar"] .footer-brand,
+html[lang="ar"] .section-number, html[lang="ar"] .stat-key { text-transform: none; font-size: 12px; }
+bdi[dir="ltr"] { unicode-bidi: isolate; }
+.site-nav:has(.lang-switch) { flex-wrap: wrap; height: auto; min-height: 56px; row-gap: 0; }
+@media (max-width: 700px) {
+  .lang-switch { flex-basis: 100%; justify-content: flex-end; margin-inline-start: 0; padding-bottom: 6px; gap: 14px; }
+}
