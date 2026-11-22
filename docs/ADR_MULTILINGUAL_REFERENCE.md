@@ -151,6 +151,7 @@ Each step is a separate pull request, merged by the integration authority.
 ## Implementation status
 
 - **Sprint 19B-1 (foundation):** the `i18n/` layer (language registry, English source catalog, empty Arabic and French catalogs, glossary), `tools/i18n.py` (source fingerprints, validation, staleness and orphan report, publication eligibility), English shell and date strings read from the catalog with byte-identical output, and site gates for language routes and `hreflang`. **No translation exists, no review has taken place, and no localized page or route is published.**
+- **Sprint 19B-2 (rendering engine):** localized rendering for `ar` and `fr`, strict translation lookup with no English fallback, page publication gates (identifiers, source URLs, numbers and dates, classifications, qualifiers, disclosures, right-to-left isolation, untranslated English), reciprocal `hreflang` / `x-default` / `og:locale` / JSON-LD language and sitemap entries, a no-JavaScript language switcher, withdrawal of files no longer generated, and logical and Arabic CSS with English pixel-identical (Arch §14). No page is registered for localization, so nothing is generated or published.
 - **Later sprints:** as in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
 
 ## Owner decisions (2026-11-22)
