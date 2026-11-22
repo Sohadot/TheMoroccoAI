@@ -8,6 +8,10 @@ The site is static and served by GitHub Pages from the root of `main` (`CNAME` â
 It has no runtime JavaScript, no third-party requests and no build step at deploy time. Generated
 pages are committed.
 
+## Governance and evaluation roadmap
+
+English is the authoritative language of the project. Approved governance decisions and their separate implementation states are recorded in [docs/DECISION_LOG.md](docs/DECISION_LOG.md). The privacy-first, neutral introductory and specialist evaluation is specified in [docs/EVALUATION_SPEC.md](docs/EVALUATION_SPEC.md); it is **not yet implemented or externally validated**. Sensitive evaluator responses, scoring keys and confidential commercial information must not be committed to this public repository.
+
 ## What is here
 
 | Path | Purpose |
