@@ -569,7 +569,9 @@ def _approval_problems(u, lang, reviewers, today, where):
         return [f"{where}: APPROVED unit has no human approval record"]
     errors = []
     allowed = {"unit", "language", "reviewer", "decision", "reviewed_at", "policy", "source_sha256",
-               "translation_sha256", "glossary_version", "escalation", "acknowledged_warnings"}
+               "translation_sha256", "glossary_version", "escalation", "acknowledged_warnings", "revised"}
+    if "revised" in a and a["revised"] is not True:
+        errors.append(f"{where}: approval.revised is either absent or true (the reviewer corrected the draft)")
     ack = a.get("acknowledged_warnings", [])
     if not isinstance(ack, list) or not all(isinstance(x, str) for x in ack):
         errors.append(f"{where}: approval.acknowledged_warnings must list the semantic warning codes the reviewer saw")
