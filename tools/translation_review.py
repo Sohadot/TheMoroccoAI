@@ -135,14 +135,16 @@ h3 { font-size: 1.05rem; margin: 28px 0 8px; color: var(--muted); }
 .texts h4 { margin:0 0 4px; font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
 [lang="ar"] { font-family: "Noto Naskh Arabic", "Noto Kufi Arabic", "Geeza Pro", serif; font-size: 1.1rem; }
 .findings { margin:8px 0; padding-left: 20px; } .error { color:var(--err); } .warning { color:var(--warn); } .clean { color:var(--ok); }
-fieldset { border:1px solid var(--line); border-radius:6px; margin:10px 0 0; } legend { font-weight:600; padding:0 4px; }
+fieldset { border:1px solid var(--line); border-radius:6px; margin:10px 0 0; min-width:0; } legend { font-weight:600; padding:0 4px; }
 label { display:inline-flex; align-items:center; gap:6px; margin:4px 14px 4px 0; }
 textarea { width:100%; min-height:4.5em; font:inherit; color:inherit; background:transparent; border:1px solid var(--line); border-radius:6px; padding:8px; }
-select { font:inherit; }
+select { font:inherit; max-width:100%; }
+.scroll { overflow-x:auto; }
 .bar { position:sticky; bottom:0; background:var(--card); border-top:1px solid var(--line); padding:12px 16px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; }
 button { font:inherit; padding:8px 14px; border-radius:6px; border:1px solid var(--accent); background:var(--accent); color:var(--bg); cursor:pointer; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 details summary { cursor:pointer; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; background: var(--card); } th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: start; vertical-align: top; }
 """
 
 PACKAGE_JS = r"""
@@ -201,7 +203,12 @@ def build_package(workspaces, root=ROOT, generated=None):
     package_id = i18n.fingerprint(json.dumps([(r[2], r[3].get("id"), r[3].get("text")) for r in rows], ensure_ascii=False))[:16]
     e = lambda x: html.escape(str(x), quote=True)
     body, current = [], None
-    for page, section, lang, u, problems, findings, source in sorted(rows, key=lambda r: (r[0], r[1], r[3].get("id", ""), r[2])):
+    order = {}
+    for r in rows:  # pages and sections keep the order in which the drafts list them
+        order.setdefault(r[0], len(order))
+        order.setdefault((r[0], r[1]), len(order))
+    for page, section, lang, u, problems, findings, source in sorted(
+            rows, key=lambda r: (order[r[0]], order[(r[0], r[1])], r[3].get("id", ""), r[2])):
         if page != current:
             body.append(f"<h2>Page {e(page)}</h2>")
             current, current_section = page, None
@@ -241,6 +248,15 @@ def build_package(workspaces, root=ROOT, generated=None):
   <textarea id="c-{e(key)}" class="comment"></textarea>
  </fieldset>
 </article>""")
+    terms = [(ws["language"], t) for ws in workspaces for t in ws.get("term_candidates", [])]
+    if terms:
+        trs = "".join(f'<tr><td><code>{e(t.get("id", ""))}</code></td><td>{lang}</td>'
+                      f'<td lang="{lang}" dir="{"rtl" if lang == "ar" else "ltr"}">{e(t.get("label", ""))}</td><td>{e(t.get("basis", ""))}</td></tr>'
+                      for lang, t in sorted(terms, key=lambda x: (x[1].get("id", ""), x[0])))
+        body.append('<h2>Terminology candidates</h2><p>For information. Glossary labels are approved separately, through '
+                    'the same human approval; they are not part of the decisions exported from this page.</p>'
+                    '<div class="scroll"><table><thead><tr><th scope="col">Term</th><th scope="col">Language</th><th scope="col">Candidate label</th>'
+                    f'<th scope="col">Basis</th></tr></thead><tbody>{trs}</tbody></table></div>')
     n = len(rows)
     return f"""<!DOCTYPE html>
 <html lang="en">
