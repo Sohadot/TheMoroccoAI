@@ -28,6 +28,16 @@ class PublishedSite(unittest.TestCase):
         for page in (REPO / "registry").glob("*/index.html"):
             self.assertIn(f"/registry/{page.parent.name}/", sitemap)
 
+    def test_all_public_pages_disclose_sohadot_ownership(self):
+        for page in check_site.site_pages():
+            body = page.read_text(encoding="utf-8")
+            self.assertIn("Sohadot", body, page.relative_to(REPO))
+            self.assertIn("Not affiliated with the Government of Morocco", body, page.relative_to(REPO))
+        method = (REPO / "methodology" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="ownership-h"', method)
+        self.assertIn("References to external organizations", method)
+        self.assertIn('href="/methodology/#ownership-h"', (REPO / "index.html").read_text(encoding="utf-8"))
+
     def test_evaluation_is_private_by_design_and_not_in_sitemap(self):
         page = (REPO / "evaluation" / "index.html").read_text(encoding="utf-8")
         script = (REPO / "assets" / "evaluation.js").read_text(encoding="utf-8")
