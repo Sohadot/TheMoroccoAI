@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" dir="{{dir}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{m:page.home.title}}</title>
+<meta name="description" content="{{a:page.home.description}}">
+<link rel="canonical" href="{{canonical}}">
+{{seo}}<meta property="og:type" content="website">
+<meta property="og:site_name" content="TheMoroccoAI">
+<meta property="og:title" content="{{a:page.home.title}}">
+<meta property="og:description" content="{{a:page.home.og_description}}">
+<meta property="og:url" content="{{canonical}}">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebSite",
+ "name": "TheMoroccoAI",
+ "url": "{{canonical}}",
+ "description": "{{j:page.home.jsonld.description}}",
+ "hasPart": {"@type": "Dataset", "name": "{{j:page.registry.jsonld.name}}", "url": "https://themoroccoai.com/registry/"}{{ld_extra}}
+}
+</script>
+
+<style>
+  :root {
+    --ink:       #0a0c10;
+    --paper:     #f4f0e8;
+    --blue:      #1a2e4a;
+    --blue-mid:  #2a4a72;
+    --gold:      #b8892a;
+    --gold-light:#d4a84b;
+    --gold-ink:  #7a5a16; /* gold for small text on light grounds (WCAG AA) */
+    --copper:    #8b4513;
+    --sand:      #e8dcc8;
+    --mist:      #c8d4e0;
+    --text-main: #1a1a1a;
+    --text-sub:  #4a5568;
+    --text-dim:  #5c6878;
+    --border:    rgba(26,46,74,0.12);
+    --border-gold: rgba(184,137,42,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--text-main);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ─── ZELLIGE GRID BACKGROUND ─── */
+  .zellige-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(0deg, var(--blue) 0, var(--blue) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(90deg, var(--blue) 0, var(--blue) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 1px, transparent 56px),
+      repeating-linear-gradient(-45deg, var(--gold) 0, var(--gold) 1px, transparent 1px, transparent 56px);
+  }
+
+  /* ─── NAVIGATION ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 56px;
+    background: rgba(244,240,232,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-sigil {
+    width: 28px;
+    height: 28px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .nav-sigil svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .nav-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-sub);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  .nav-mark { text-decoration: none; }
+  .nav-links .nav-quiet { color: var(--blue); border-bottom: 1px solid var(--border-gold); }
+
+  .skip-link {
+    position: absolute; left: -999px; top: 8px; z-index: 200;
+    background: var(--blue); color: var(--paper); padding: 8px 12px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+  }
+  .skip-link:focus { left: 8px; }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 32px 56px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-meta-line {
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-meta-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-ink);
+  }
+
+  .hero-title-block {
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.4s forwards;
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(42px, 8vw, 80px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--blue);
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-arabic {
+    font-family: 'Noto Kufi Arabic', serif;
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 300;
+    color: var(--blue-mid);
+    margin-top: 8px;
+    direction: rtl;
+    text-align: left;
+    opacity: 0.7;
+  }
+
+  .hero-thesis {
+    margin-top: 24px;
+    max-width: 560px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.6s forwards;
+  }
+
+  .hero-thesis p {
+    font-size: 19px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.7;
+  }
+
+  .hero-thesis p strong {
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.8s forwards;
+  }
+
+  .btn-primary {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--blue);
+    text-decoration: none;
+    padding: 14px 28px;
+    border: 1px solid var(--blue);
+    transition: all 0.25s;
+  }
+
+  .btn-primary:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .btn-secondary {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    text-decoration: none;
+    padding: 14px 28px;
+    border: 1px solid var(--border-gold);
+    transition: all 0.25s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ─── STATUS BAR ─── */
+  .status-bar {
+    position: relative;
+    z-index: 1;
+    background: var(--blue);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .status-bar::-webkit-scrollbar { display: none; }
+
+  .status-item {
+    padding: 16px 28px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .status-item:first-child { padding-left: 0; }
+
+  .status-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.62);
+    margin-bottom: 4px;
+  }
+
+  .status-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--gold-light);
+  }
+
+  /* ─── SECTION SHARED ─── */
+  section {
+    position: relative;
+    z-index: 1;
+    scroll-margin-top: 56px;
+  }
+
+  .section-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 32px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 52px;
+  }
+
+  .section-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--gold-ink);
+    padding-top: 6px;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 300;
+    color: var(--blue);
+    line-height: 1.15;
+  }
+
+  /* ─── THESIS SECTION ─── */
+  .thesis-section {
+    border-top: 1px solid var(--border);
+  }
+
+  .thesis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .thesis-cell {
+    background: var(--paper);
+    padding: 32px 28px;
+    transition: background 0.2s;
+  }
+
+  .thesis-cell:hover { background: var(--sand); }
+
+  .thesis-cell-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--gold-ink);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .thesis-cell-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .thesis-cell-body {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  /* ─── LANDSCAPE SECTION ─── */
+  .landscape-section {
+    border-top: 1px solid var(--border);
+    background: var(--blue);
+  }
+
+  .landscape-section .section-number { color: var(--gold-light); }
+  .landscape-section h2 { color: var(--paper); }
+
+  .landscape-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .landscape-node {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 28px 24px;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: default;
+  }
+
+  .landscape-node:hover {
+    border-color: var(--gold);
+    background: rgba(184,137,42,0.06);
+  }
+
+  .node-status {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+  }
+
+  .node-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    color: rgba(255,255,255,0.58);
+    margin-bottom: 10px;
+  }
+
+  .node-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--paper);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+
+  .node-title a { color: inherit; text-decoration: none; }
+  .node-title a:hover, .node-title a:focus-visible { color: var(--gold-light); text-decoration: underline; }
+
+  .node-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.55;
+  }
+
+  .node-desc a { color: rgba(255,255,255,0.88); text-underline-offset: 3px; }
+  .node-desc a:hover { color: var(--gold-light); }
+
+  .landscape-node-cta { border-color: var(--border-gold); }
+
+  .section-intro {
+    max-width: 640px;
+    margin: -28px 0 40px;
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.65;
+  }
+
+  .section-intro a { color: var(--blue-mid); text-underline-offset: 3px; }
+  .landscape-section .section-intro { color: rgba(255,255,255,0.72); }
+  .landscape-section .section-intro a { color: var(--gold-light); }
+
+  .node-ar {
+    font-family: 'Noto Kufi Arabic', serif;
+    font-size: 12px;
+    color: rgba(212,168,75,0.5);
+    direction: rtl;
+    margin-top: 10px;
+  }
+
+  /* ─── ONTOLOGY SECTION ─── */
+  .ontology-section {
+    border-top: 1px solid var(--border);
+  }
+
+  .ontology-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+
+  .onto-item {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.18s;
+  }
+
+  .onto-item:last-child { border-bottom: none; }
+  .onto-item:hover { background: var(--sand); }
+
+  .onto-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--gold-ink);
+    padding: 20px 20px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .onto-term {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--blue);
+    padding: 20px 24px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .onto-def {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-sub);
+    padding: 20px 24px;
+    line-height: 1.55;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ─── GOVERNANCE POSTURE ─── */
+  .governance-section {
+    border-top: 1px solid var(--border);
+    background: var(--sand);
+  }
+
+  .posture-block {
+    border: 1px solid var(--border-gold);
+    padding: 36px 32px;
+    background: var(--paper);
+    position: relative;
+  }
+
+  .posture-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+  }
+
+  .posture-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-ink);
+    margin-bottom: 16px;
+  }
+
+  .posture-text {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.75;
+    max-width: 680px;
+  }
+
+  .posture-rules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .rule-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .rule-mark {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    flex-shrink: 0;
+    padding-top: 3px;
+  }
+
+  .rule-text {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  /* ─── NOTICE, ACCESS, EXAMPLES ─── */
+  .hero-notice {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--gold);
+    background: rgba(255,255,255,0.45);
+    font-size: 16px !important;
+    color: var(--text-main) !important;
+  }
+
+  .access-section { border-top: 1px solid var(--border); }
+  .access-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .access-card {
+    display: flex; flex-direction: column; gap: 6px;
+    background: var(--paper);
+    padding: 24px 22px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .access-card:hover, .access-card:focus-visible { background: var(--sand); }
+  .access-id { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: var(--gold-ink); text-transform: uppercase; }
+  .access-title { font-size: 20px; font-weight: 600; color: var(--blue); line-height: 1.2; }
+  .access-desc { font-size: 15px; font-weight: 300; color: var(--text-sub); line-height: 1.5; }
+
+  .examples-section { border-top: 1px solid var(--border); background: var(--sand); }
+  .examples { display: flex; flex-direction: column; gap: 20px; }
+  .example {
+    background: var(--paper);
+    border: 1px solid var(--border-gold);
+    padding: 26px 28px;
+    position: relative;
+  }
+  .example::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--gold); }
+  .example-q { font-size: 21px; font-weight: 600; color: var(--blue); line-height: 1.25; margin-bottom: 10px; }
+  .example-a p, .example-a li { font-size: 16px; font-weight: 400; color: var(--text-sub); line-height: 1.6; }
+  .example-a p + p { margin-top: 8px; }
+  .example-a ul { margin: 4px 0 8px 20px; }
+  .example-a a, .example-links a { color: var(--blue-mid); text-underline-offset: 3px; }
+  .example-cls { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-dim); }
+  .example-links { margin-top: 12px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: var(--text-dim); }
+
+  .posture-more { margin-top: 24px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; }
+  .posture-more a, .rule-text a { color: var(--blue-mid); }
+
+  /* ─── INDEPENDENT EVALUATION INVITATION ─── */
+  .evaluate-block {
+    margin-top: 32px;
+    padding: 36px 32px;
+    background: var(--blue);
+    border: 1px solid var(--blue);
+    border-top: 3px solid var(--gold);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px 40px;
+    align-items: center;
+  }
+  .evaluate-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+  }
+  .evaluate-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(24px, 3.4vw, 30px);
+    font-weight: 400;
+    color: var(--paper);
+    line-height: 1.2;
+  }
+  .evaluate-text {
+    margin-top: 12px;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--mist);
+    max-width: 560px;
+  }
+  .evaluate-note {
+    grid-column: 1 / -1;
+    padding-top: 16px;
+    border-top: 1px solid rgba(244,240,232,0.16);
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--mist);
+  }
+  .btn-evaluate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 14px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--blue);
+    background: var(--paper);
+    border: 1px solid var(--paper);
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  .btn-evaluate:hover { background: var(--gold-light); border-color: var(--gold-light); }
+  .btn-evaluate:active { background: var(--sand); border-color: var(--sand); }
+  .btn-evaluate:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; }
+  .btn-evaluate-arrow { font-size: 14px; line-height: 1; }
+
+  .framing-note strong { color: var(--text-main); font-weight: 600; }
+  .thesis-quote { margin: 0 0 36px; padding: 0 0 0 20px; border-left: 2px solid var(--gold); }
+  .thesis-quote p { font-size: clamp(24px, 4vw, 34px); font-weight: 300; font-style: italic; color: var(--blue); line-height: 1.2; }
+  .thesis-quote footer { background: none; padding: 8px 0 0; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-dim); }
+  .thesis-cell-body a { color: var(--blue-mid); }
+  .vocab-head { margin-top: 48px; font-size: 22px; font-weight: 600; color: var(--blue); }
+  .vocab-note { margin: 4px 0 18px; font-size: 15px; font-weight: 300; color: var(--text-sub); }
+  .vocab-note a { color: var(--blue-mid); }
+
+  /* ─── ACQUISITION (discreet) ─── */
+  .acquire-section { border-top: 1px solid var(--border); }
+  .acquire-inner { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding-top: 48px; padding-bottom: 48px; }
+  .acquire-title { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+  .acquire-inner p { font-size: 16px; font-weight: 300; color: var(--text-sub); line-height: 1.65; max-width: 640px; }
+  .acquire-inner a { color: var(--blue-mid); text-underline-offset: 3px; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    background: var(--ink);
+    padding: 32px;
+  }
+
+  .footer-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .footer-langs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .footer-lang.active { color: var(--gold-light); }
+
+  .footer-langs a { color: var(--gold-light); }
+
+  /* ─── DIVIDER ─── */
+  .ornament-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .ornament-divider::before,
+  .ornament-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-gold);
+  }
+
+  .ornament-diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hero-meta, .hero-title-block, .hero-thesis, .hero-cta { animation: none; opacity: 1; }
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 700px) {
+    nav { padding: 0 20px; gap: 12px; }
+    .nav-links { gap: 16px; }
+    .nav-links li:not(.nav-keep) { display: none; }
+    @media (max-width: 360px) {
+      nav { padding: 0 16px; }
+      .nav-links a { letter-spacing: 0.06em; }
+    }
+
+    .hero { padding: 76px 20px 44px; min-height: 0; }
+    .hero-meta { display: none; }
+    .hero-thesis { margin-top: 20px; }
+    .hero-thesis p { font-size: 17px; line-height: 1.55; }
+    .hero-notice { margin-top: 14px; padding: 10px 14px; font-size: 15px !important; }
+    .hero-cta { margin-top: 22px; gap: 10px; }
+    .hero-cta a { padding: 12px 20px; }
+
+    .thesis-grid { grid-template-columns: 1fr; }
+    .landscape-grid { grid-template-columns: 1fr; }
+    .onto-item { grid-template-columns: 80px 1fr; }
+    .onto-def { grid-column: 1 / -1; border-top: 1px solid var(--border); padding: 12px 20px 16px; }
+    .onto-term { border-right: none; }
+
+    .acquire-inner { grid-template-columns: 1fr; gap: 12px; }
+    .access-grid { grid-template-columns: 1fr; }
+    .example { padding: 22px 18px; }
+    .posture-rules { grid-template-columns: 1fr; }
+    .evaluate-block { grid-template-columns: 1fr; padding: 28px 20px; margin-top: 24px; }
+    .btn-evaluate { width: 100%; white-space: normal; text-align: center; }
+
+    .section-inner { padding: 56px 20px; }
+    .status-bar { padding: 0 20px; }
+    footer { padding: 24px 20px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+{{localized_css}}</style>
+</head>
+
+<body>
+<a class="skip-link" href="#content">{{m:shell.skip_link}}</a>
+<div class="zellige-bg" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav aria-label="{{a:shell.nav.label}}">
+  <a class="nav-mark" href="{{href:/}}">
+    <span class="nav-sigil">
+      <svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+        <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#1a2e4a" stroke-width="1" fill="none"/>
+        <polygon points="14,7 21,10.5 21,17.5 14,21 7,17.5 7,10.5" stroke="#b8892a" stroke-width="0.75" fill="none"/>
+        <circle cx="14" cy="14" r="2.5" fill="#b8892a"/>
+      </svg>
+    </span>
+    <span class="nav-name">TheMoroccoAI</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#coverage">{{m:page.home.nav.coverage}}</a></li>
+    <li class="nav-keep"><a href="{{href:/registry/}}">{{m:shell.nav.registry}}</a></li>
+    <li><a href="#examples">{{m:page.home.nav.questions}}</a></li>
+    <li><a href="#method">{{m:page.home.nav.method}}</a></li>
+    <li><a href="#thesis">{{m:page.home.nav.thesis}}</a></li>
+    <li class="nav-keep"><a href="{{href:/acquisition/}}" class="nav-quiet">{{m:shell.nav.acquisition}}</a></li>
+  </ul>
+{{switcher}}</nav>
+
+<main id="content">
+{{notice}}<!-- 1. WHAT THIS IS -->
+<section class="hero" id="top">
+  <div class="hero-meta">
+    <div class="hero-meta-line"></div>
+    <span class="hero-meta-text">{{m:page.home.hero.meta}}</span>
+  </div>
+
+  <div class="hero-title-block">
+    <div class="hero-label">{{h:page.home.hero.label}}</div>
+    <h1>{{h:page.home.hero.h1}}</h1>
+    <div class="hero-arabic" lang="ar" dir="rtl">المغرب · الذكاء الاصطناعي · سجل الأدلة</div>
+  </div>
+
+  <div class="hero-thesis">
+    <p>
+      {{h:page.home.hero.lede}}
+    </p>
+    <p class="hero-notice">{{h:page.home.hero.notice}}</p>
+  </div>
+
+  <div class="hero-cta">
+    <a href="{{href:/registry/}}" class="btn-primary">{{m:page.home.hero.cta.registry}}</a>
+    <a href="#examples" class="btn-secondary">{{m:page.home.hero.cta.examples}}</a>
+  </div>
+</section>
+
+<!-- 2. CURRENT COVERAGE -->
+<div class="status-bar" role="group" aria-label="{{a:page.home.status.label}}" tabindex="0">
+  <div class="status-item">
+    <div class="status-key">{{m:page.home.status.version}}</div>
+    <div class="status-val">v{{b:version}}</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">{{m:page.home.status.records}}</div>
+    <div class="status-val">{{b:records}}</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">{{m:page.home.status.entities}}</div>
+    <div class="status-val">{{b:entities}}</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">{{m:page.home.status.relationships}}</div>
+    <div class="status-val">{{b:relationships}}</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">{{m:page.home.status.as_of}}</div>
+    <div class="status-val">{{b:as-of}}</div>
+  </div>
+  <div class="status-item">
+    <div class="status-key">{{m:page.home.status.edition}}</div>
+    <div class="status-val">{{m:page.home.status.edition_value}}</div>
+  </div>
+</div>
+
+<section class="landscape-section" id="coverage">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">{{m:page.home.coverage.number}}</span>
+      <h2>{{h:page.home.coverage.h2}}</h2>
+    </div>
+
+    <p class="section-intro">{{h:page.home.coverage.intro}}</p>
+
+    <div class="landscape-grid">{{b:landscape}}</div>
+  </div>
+</section>
+
+<!-- 3. ACCESS -->
+<section class="access-section" id="access">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">{{m:page.home.access.number}}</span>
+      <h2>{{h:page.home.access.h2}}</h2>
+    </div>
+    <div class="access-grid">
+      <a class="access-card" href="{{href:/registry/}}"><span class="access-id">{{i:MAI-REG}}</span><span class="access-title">{{m:page.home.access.registry.title}}</span><span class="access-desc">{{m:page.home.access.registry.text}}</span></a>
+      <a class="access-card" href="{{href:/registry/questions/}}"><span class="access-id">{{i:MAI-Q}}</span><span class="access-title">{{m:page.home.access.questions.title}}</span><span class="access-desc">{{m:page.home.access.questions.text}}</span></a>
+      <a class="access-card" href="{{href:/registry/evidence/}}"><span class="access-id">{{i:MAI-EV}}</span><span class="access-title">{{m:page.home.access.evidence.title}}</span><span class="access-desc">{{m:page.home.access.evidence.text}}</span></a>
+      <a class="access-card" href="/data/evidence.json"><span class="access-id">{{i:JSON}}</span><span class="access-title">{{i:evidence.json}}</span><span class="access-desc">{{h:page.home.access.evidence_json.text}}</span></a>
+      <a class="access-card" href="/data/ontology.json"><span class="access-id">{{i:JSON}}</span><span class="access-title">{{i:ontology.json}}</span><span class="access-desc">{{h:page.home.access.ontology_json.text}}</span></a>
+      <a class="access-card" href="{{href:/registry/matrix/}}"><span class="access-id">{{i:MAI-MATRIX}}</span><span class="access-title">{{m:page.home.access.matrix.title}}</span><span class="access-desc">{{m:page.home.access.matrix.text}}</span></a>
+      <a class="access-card" href="{{href:/registry/gaps/}}"><span class="access-id">{{i:MAI-GAPS}}</span><span class="access-title">{{m:page.home.access.gaps.title}}</span><span class="access-desc">{{m:page.home.access.gaps.text}}</span></a>
+      <a class="access-card" href="{{href:/methodology/}}"><span class="access-id">{{i:MAI-METHOD}}</span><span class="access-title">{{m:page.home.access.methodology.title}}</span><span class="access-desc">{{m:page.home.access.methodology.text}}</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- 4. QUESTIONS ANSWERED FROM THE EVIDENCE -->
+<section class="examples-section" id="examples">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">{{m:page.home.examples.number}}</span>
+      <h2>{{h:page.home.examples.h2}}</h2>
+    </div>
+    <p class="section-intro">{{h:page.home.examples.intro}}</p>
+    <div class="examples">{{b:examples}}</div>
+  </div>
+</section>
+
+<!-- 5. METHOD AND LIMITS -->
+<section class="governance-section" id="method">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">{{m:page.home.method.number}}</span>
+      <h2>{{h:page.home.method.h2}}</h2>
+    </div>
+
+    <div class="posture-block">
+      <div class="posture-label">{{h:page.home.method.rules.label}}</div>
+      <p class="posture-text">
+        {{m:page.home.method.rules.text}}
+      </p>
+      <div class="posture-rules">
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">{{m:page.home.method.rule.1}}</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">{{m:page.home.method.rule.2}}</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">{{m:page.home.method.rule.3}}</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">{{h:page.home.method.rule.4}}</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">{{m:page.home.method.rule.5}}</span></div>
+        <div class="rule-item"><span class="rule-mark" aria-hidden="true">◆</span><span class="rule-text">{{m:page.home.method.rule.6}}</span></div>
+      </div>
+      <p class="posture-more">{{h:page.home.method.more_link}}</p>
+    </div>
+
+    <div class="evaluate-block" id="evaluate">
+      <div>
+        <p class="evaluate-label">{{h:page.home.evaluate.label}}</p>
+        <h3 class="evaluate-title">{{m:page.home.evaluate.title}}</h3>
+        <p class="evaluate-text">{{m:page.home.evaluate.text}}</p>
+      </div>
+      <a class="btn-evaluate" href="{{href:/evaluation/}}">{{m:page.home.evaluate.cta}} <span class="btn-evaluate-arrow" aria-hidden="true">→</span></a>
+      <p class="evaluate-note">{{m:page.home.evaluate.note}}</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. THE OWNER'S STRATEGIC THESIS -->
+<section class="thesis-section" id="thesis">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-number">{{m:page.home.thesis.number}}</span>
+      <h2>{{h:page.home.thesis.h2}}</h2>
+    </div>
+    <p class="section-intro framing-note">{{h:page.home.thesis.framing}}</p>
+
+    <blockquote class="thesis-quote"><p>{{m:page.home.thesis.quote}}</p><footer>{{m:page.home.thesis.quote.attribution}}</footer></blockquote>
+
+    <div class="thesis-grid">
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">{{h:page.home.thesis.cell.owner_view|MAI-T-001}}</div>
+        <div class="thesis-cell-title">{{m:page.home.thesis.1.title}}</div>
+        <p class="thesis-cell-body">{{m:page.home.thesis.1.body}}</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">{{h:page.home.thesis.cell.owner_view|MAI-T-002}}</div>
+        <div class="thesis-cell-title">{{m:page.home.thesis.2.title}}</div>
+        <p class="thesis-cell-body">{{m:page.home.thesis.2.body}}</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">{{h:page.home.thesis.cell.ambition|MAI-T-003}}</div>
+        <div class="thesis-cell-title">{{m:page.home.thesis.3.title}}</div>
+        <p class="thesis-cell-body">{{m:page.home.thesis.3.body}}</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">{{h:page.home.thesis.cell.owner_view|MAI-T-004}}</div>
+        <div class="thesis-cell-title">{{m:page.home.thesis.4.title}}</div>
+        <p class="thesis-cell-body">{{m:page.home.thesis.4.body}}</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">{{h:page.home.thesis.cell.owner_view|MAI-T-005}}</div>
+        <div class="thesis-cell-title">{{m:page.home.thesis.5.title}}</div>
+        <p class="thesis-cell-body">{{h:page.home.thesis.5.body}}</p>
+      </div>
+      <div class="thesis-cell">
+        <div class="thesis-cell-id">{{h:page.home.thesis.cell.intended_role|MAI-T-006}}</div>
+        <div class="thesis-cell-title">{{m:page.home.thesis.6.title}}</div>
+        <p class="thesis-cell-body">{{m:page.home.thesis.6.body}}</p>
+      </div>
+    </div>
+
+    <h3 class="vocab-head">{{m:page.home.vocab.head}}</h3>
+    <p class="vocab-note">{{h:page.home.vocab.note}}</p>
+    <div class="ontology-list" role="list">
+      <div class="onto-item" role="listitem"><div class="onto-id">{{i:MAI-O-001}}</div><div class="onto-term">{{m:page.home.vocab.1.term}}</div><div class="onto-def">{{m:page.home.vocab.1.definition}}</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">{{i:MAI-O-002}}</div><div class="onto-term">{{m:page.home.vocab.2.term}}</div><div class="onto-def">{{m:page.home.vocab.2.definition}}</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">{{i:MAI-O-003}}</div><div class="onto-term">{{m:page.home.vocab.3.term}}</div><div class="onto-def">{{m:page.home.vocab.3.definition}}</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">{{i:MAI-O-004}}</div><div class="onto-term">{{m:page.home.vocab.4.term}}</div><div class="onto-def">{{m:page.home.vocab.4.definition}}</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">{{i:MAI-O-005}}</div><div class="onto-term">{{m:page.home.vocab.5.term}}</div><div class="onto-def">{{m:page.home.vocab.5.definition}}</div></div>
+      <div class="onto-item" role="listitem"><div class="onto-id">{{i:MAI-O-006}}</div><div class="onto-term">{{m:page.home.vocab.6.term}}</div><div class="onto-def">{{m:page.home.vocab.6.definition}}</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ACQUISITION (discreet) -->
+<section class="acquire-section" id="acquire">
+  <div class="section-inner acquire-inner">
+    <span class="section-number">{{m:page.home.acquire.number}}</span>
+    <div>
+      <h2 class="acquire-title">{{m:page.home.acquire.title}}</h2>
+      <p>{{h:page.home.acquire.text}}</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <span class="footer-brand">TheMoroccoAI.com · {{m:footer.tagline}}</span>
+    <div class="footer-langs">
+      <span>{{m:footer.owner_note}} · {{m:footer.disclaimer}}</span>
+      <span>{{h:page.home.footer.links}}</span>
+      <span>{{h:page.home.footer.languages}}</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

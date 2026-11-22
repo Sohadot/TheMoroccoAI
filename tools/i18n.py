@@ -32,10 +32,23 @@ LANGUAGE_STATES = ("authoritative", "in-preparation", "published", "withdrawn")
 # of these languages only when the language is 'published' in i18n/languages.json and the page is eligible
 # (every unit it uses approved, reviewed and current; page gates passed). ary and zgh have no renderer.
 RENDERING_LANGUAGES = frozenset({"ar", "fr"})
-UNIT_STATUSES = ("draft", "terminology-checked", "parity-reviewed", "linguistically-reviewed", "approved")
+# Translation governance in force: TMA-DEC-008 (human-approved, AI-assisted translation), which supersedes the
+# two-review provisions of TMA-DEC-007. An approval records this policy id; any other id is not accepted.
+GOVERNANCE_POLICY = "TMA-DEC-008"
+# Stored statuses. STALE is computed (source or approved text changed after approval) and never stored.
+UNIT_STATUSES = ("DRAFT", "NEEDS_REVISION", "APPROVED", "REJECTED")
 # Every file on main is publicly served, so catalogs on main hold approved units only (Arch §6.3). A
 # translation pull request therefore stays red until both reviews are recorded: that is intended.
-COMMITTABLE_STATUSES = ("approved",)
+COMMITTABLE_STATUSES = ("APPROVED",)
+REVIEWER_KINDS = ("human", "certified-translator")
+# Escalation criteria (TMA-DEC-008): an open escalation blocks publication of the unit until a second, qualified
+# registered reviewer resolves it.
+ESCALATION_CRITERIA = ("reviewer-uncertain", "legal-ambiguity", "specialist-term", "research-qualification",
+                       "language-expertise", "independent-review-claimed", "certified-translation-required")
+# Identities that denote tools, AI systems or automated processes. They may draft, never approve.
+AUTOMATED_ID = re.compile(r"(?:^|-)(?:ai|bot|ci|claude|gpt|llm|machine|auto|automated|assistant|model|pipeline|script)(?:-|$)")
+DRAFTER_ID = re.compile(r"^[a-z]+(?:-[a-z]+)*(?:-[0-9]{2,})?$")
+ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?Z$")
 KINDS = ("interface", "navigation", "heading", "metadata", "prose", "qualifier", "disclosure", "term", "name")
 DRAFT_METHODS = ("human", "machine-assisted")
 NAME_BASES = ("official", "established-usage", "transliteration", "translation")
@@ -66,8 +79,13 @@ CONTENT_FIELDS = {
     "gaps": ("question", "established", "unestablished", "evidence_needed"),
     "classification": ("definition",),
     "domain": ("label",),
+    "predicate": ("label",),
+    # List items without an identifier of their own get an explicit, stable id in an identity map (below):
+    # 'changelog:<item id>:text' (i18n/changelog-identity.json), 'attribute:<item id>:text' (i18n/attribute-identity.json).
+    "changelog": ("text",),
+    "attribute": ("text",),
 }
-CONTENT_ID = re.compile(r"^(evidence|ontology|gaps|classification|domain):([^:]+):([a-z_]+)$")
+CONTENT_ID = re.compile(r"^(evidence|ontology|gaps|classification|domain|predicate|changelog|attribute):([^:]+):([a-z_]+)$")
 # Canonical vocabulary a glossary term may name: '<vocabulary>:<canonical value>'.
 GLOSSARY_VOCABULARIES = ("classification", "verification_status", "entity_type", "lifecycle", "project_kind",
                          "origin", "domain", "predicate")
@@ -104,6 +122,176 @@ def t(message_id, **values):
     return fill(_EN[message_id], values, message_id)
 
 
+# ─── Stable identity for canonical list items ────────────────────────────
+# Changelog texts and entity attributes are list items in canonical data with no identifier of their own. An
+# identity map (i18n/<kind>-identity.json) gives each a stable id without touching canonical data. Binding is by
+# the recorded fingerprint of the text inside a stable entry key (changelog version or commit, entity id), never
+# by array position or presentation order, so a reorder changes nothing. Everything else fails closed:
+# - an inserted text has no identity: register a new id (never a retired one);
+# - a deleted text leaves an orphaned identity: retire it (status "retired"; its id is never reused);
+# - an edited text keeps its id once the maintainer records the new fingerprint, which makes every translation of
+#   it stale until it is approved again;
+# - identical texts in one entry and field are told apart only by an explicit "occurrence" number.
+
+IDENTITY_FIELDS = {"changelog": ("note", "title", "changes", "corrections", "review_fixes", "breaking_changes"),
+                   "attribute": ("name", "value")}
+IDENTITY_ITEM_ID = re.compile(r"^(changelog|attribute)\.[a-z0-9-]+\.[a-z_]+(?:\.[0-9]{2,})?$")
+
+
+def changelog_entries(changelog):
+    """Canonical changelog texts as [(entry key, {field: [texts]})]; the key never depends on position."""
+    out = [({"document": "changelog"}, {"note": [changelog["note"]]})] if changelog.get("note") else []
+    for e in changelog["entries"]:
+        key = ({"version": e["version"]} if e.get("version") else {"commit": e["commit"]} if e.get("commit")
+               else {"pull_request": e.get("pull_request")})
+        fields = {"title": [e["title"]]}
+        for f in ("changes", "corrections", "review_fixes", "breaking_changes"):
+            if e.get(f):
+                fields[f] = list(e[f])
+        out.append((key, fields))
+    return out
+
+
+def attribute_entries(ontology):
+    return [({"entity": e["id"]}, {"name": [a["name"] for a in e["attributes"]], "value": [a["value"] for a in e["attributes"]]})
+            for e in ontology["entities"] if e.get("attributes")]
+
+
+def bind_identity(kind, entries, identity):
+    """Bind canonical texts to identity ids. Returns (bindings, texts, errors): bindings maps
+    (entry index, field, position) to an id; texts maps each bound id to its current canonical text."""
+    errors, bindings, texts, seen = [], {}, {}, set()
+    where = f"i18n/{kind}-identity.json"
+    ientries = identity.get("entries") if isinstance(identity, dict) else None
+    if not isinstance(ientries, list):
+        return bindings, texts, [f"{where}: needs an 'entries' list"]
+    by_key = {}
+    for ie in ientries:
+        eid, key = ie.get("id"), ie.get("key")
+        if not isinstance(eid, str) or not re.fullmatch(r"[a-z0-9-]+", eid or ""):
+            errors.append(f"{where}: entry id {eid!r} must be lowercase letters, digits and hyphens")
+        if eid in seen:
+            errors.append(f"{where}: duplicate identity {eid!r}")
+        seen.add(eid)
+        k = json.dumps(key, sort_keys=True)
+        if k in by_key:
+            errors.append(f"{where}: two identity entries share the key {key}")
+        by_key[k] = ie
+        for it in ie.get("items", []):
+            iid = it.get("id")
+            if not isinstance(iid, str) or not IDENTITY_ITEM_ID.match(iid) or not iid.startswith(f"{kind}.{eid}."):
+                errors.append(f"{where}: item id {iid!r} must look like '{kind}.{eid}.<field>[.NN]'")
+            if iid in seen:
+                errors.append(f"{where}: duplicate identity {iid!r} (ids are never reused, retired ones included)")
+            seen.add(iid)
+            if it.get("field") not in IDENTITY_FIELDS[kind]:
+                errors.append(f"{where}: {iid!r} has unknown field {it.get('field')!r}")
+            if it.get("status") not in ("active", "retired"):
+                errors.append(f"{where}: {iid!r} status must be 'active' or 'retired'")
+            if not isinstance(it.get("source_sha256"), str) or not SHA256.match(it["source_sha256"]):
+                errors.append(f"{where}: {iid!r} needs the source_sha256 of the text it identifies")
+            if "occurrence" in it and (not isinstance(it["occurrence"], int) or it["occurrence"] < 1):
+                errors.append(f"{where}: {iid!r} occurrence must be a positive integer")
+            if set(it) - {"id", "field", "status", "source_sha256", "occurrence"}:
+                errors.append(f"{where}: {iid!r} has unexpected fields")
+    if errors:
+        return bindings, texts, errors
+    canonical_keys = [json.dumps(k, sort_keys=True) for k, _ in entries]
+    for k in {k for k in canonical_keys if canonical_keys.count(k) > 1}:
+        errors.append(f"{where}: canonical entries share the key {k}; their identity is ambiguous")
+    matched = set()
+    for index, (key, fields) in enumerate(entries):
+        k = json.dumps(key, sort_keys=True)
+        ie = by_key.get(k)
+        if ie is None:
+            errors.append(f"{where}: canonical entry {key} has no registered identity")
+            continue
+        matched.add(k)
+        for field in IDENTITY_FIELDS[kind]:
+            values = fields.get(field, [])
+            active = [it for it in ie.get("items", []) if it["field"] == field and it["status"] == "active"]
+            groups = {}
+            for pos, text in enumerate(values):
+                groups.setdefault(fingerprint(text), []).append(pos)
+            items = {}
+            for it in active:
+                items.setdefault(it["source_sha256"], []).append(it)
+            for fp, positions in groups.items():
+                cands = items.get(fp, [])
+                if not cands:
+                    errors.append(f"{where}: {key} {field} text {values[positions[0]][:60]!r} has no active identity "
+                                  "(new text: register a new id; edited text: record its new source_sha256 on the existing id)")
+                    continue
+                if len(cands) != len(positions):
+                    errors.append(f"{where}: {key} {field}: {len(positions)} identical text(s) but {len(cands)} active id(s); ambiguous")
+                    continue
+                if len(positions) == 1 and "occurrence" not in cands[0]:
+                    pairs = [(positions[0], cands[0])]
+                else:
+                    occ = sorted(c.get("occurrence", 0) for c in cands)
+                    if occ != list(range(1, len(cands) + 1)):
+                        errors.append(f"{where}: {key} {field}: identical texts need occurrence numbers 1..{len(cands)}; ambiguous")
+                        continue
+                    pairs = list(zip(positions, sorted(cands, key=lambda c: c["occurrence"])))
+                for pos, it in pairs:
+                    bindings[(index, field, pos)] = it["id"]
+                    texts[it["id"]] = values[pos]
+            for fp, its in items.items():
+                if fp not in groups:
+                    for it in its:
+                        errors.append(f"{where}: active identity {it['id']!r} matches no canonical text "
+                                      "(deleted: retire it; edited: record the new source_sha256)")
+    for k, ie in by_key.items():
+        if k not in matched and any(it.get("status") == "active" for it in ie.get("items", [])):
+            errors.append(f"{where}: identity entry {ie['id']!r} matches no canonical entry; retire its items")
+    return bindings, texts, errors
+
+
+def load_identity(kind, root=ROOT, changelog=None, ontology=None):
+    """(bindings, texts, errors) for 'changelog' or 'attribute' from the canonical data and its identity map."""
+    root = Path(root)
+    path = root / "i18n" / f"{kind}-identity.json"
+    if not path.exists():
+        return {}, {}, [f"i18n/{kind}-identity.json: missing"]
+    def data(name):  # canonical data of this root, or of the repository when the root holds only i18n/
+        return _load(root / "data" / name if (root / "data" / name).exists() else ROOT / "data" / name)
+    if kind == "changelog":
+        entries = changelog_entries(changelog if changelog is not None else data("changelog.json"))
+    else:
+        entries = attribute_entries(ontology if ontology is not None else data("ontology.json"))
+    return bind_identity(kind, entries, _load(path))
+
+
+def identity_proposals(kind, entries, identity):
+    """Suggested repairs for the maintainer, never applied automatically: an edited text where exactly one text
+    and one identity are unmatched in the same entry and field; new ids for inserted texts; retirement for
+    orphaned identities."""
+    out, used = [], {it["id"] for ie in identity.get("entries", []) for it in ie.get("items", [])}
+    by_key = {json.dumps(ie["key"], sort_keys=True): ie for ie in identity.get("entries", [])}
+    for key, fields in entries:
+        ie = by_key.get(json.dumps(key, sort_keys=True))
+        if ie is None:
+            out.append(f"register an identity entry for {key}")
+            continue
+        for field in IDENTITY_FIELDS[kind]:
+            fps = [fingerprint(t) for t in fields.get(field, [])]
+            active = [it for it in ie["items"] if it["field"] == field and it["status"] == "active"]
+            unbound = [i for i, fp in enumerate(fps) if fp not in {it["source_sha256"] for it in active}]
+            orphan = [it for it in active if it["source_sha256"] not in fps]
+            if len(unbound) == 1 and len(orphan) == 1:
+                out.append(f"{orphan[0]['id']}: if the text was edited, set source_sha256 to {fps[unbound[0]]}")
+                continue
+            for i in unbound:
+                n = 1
+                while f"{kind}.{ie['id']}.{field}.{n:02d}" in used:
+                    n += 1
+                used.add(f"{kind}.{ie['id']}.{field}.{n:02d}")
+                out.append(f"new text in {key} {field}: register {kind}.{ie['id']}.{field}.{n:02d} with source_sha256 {fps[i]}")
+            for it in orphan:
+                out.append(f"{it['id']}: matches no text; set status to 'retired' (its id is never reused)")
+    return out
+
+
 # ─── Source resolution ────────────────────────────────────────────────────
 
 class Sources:
@@ -111,6 +299,7 @@ class Sources:
 
     def __init__(self, root=ROOT, evidence=None, ontology=None, gaps=None):
         root = Path(root)
+        self.root = root
         self.messages = english_messages(root)
         self.evidence = evidence if evidence is not None else _load(root / "data" / "evidence.json")
         self.ontology = ontology if ontology is not None else _load(root / "data" / "ontology.json")
@@ -121,6 +310,12 @@ class Sources:
 
     def message(self, unit_id):
         return self.messages.get(unit_id)
+
+    def identity_texts(self, kind):
+        cache = self.__dict__.setdefault("_identity", {})
+        if kind not in cache:
+            cache[kind] = load_identity(kind, self.root, ontology=self.ontology)[1]
+        return cache[kind]
 
     def content(self, unit_id):
         """(text, problem): text is None if the record or field no longer exists (an orphan)."""
@@ -136,6 +331,14 @@ class Sources:
         if kind == "domain":
             text = self.ontology["domains"].get(key)
             return (text, None) if isinstance(text, str) and text else (None, "orphan")
+        if kind == "predicate":
+            text = (self.ontology["predicates"].get(key) or {}).get("label")
+            return (text, None) if isinstance(text, str) and text else (None, "orphan")
+        if kind in ("changelog", "attribute"):
+            if not IDENTITY_ITEM_ID.match(key) or not key.startswith(kind + "."):
+                return None, "malformed"
+            text = self.identity_texts(kind).get(key)
+            return (text, None) if text else (None, "orphan")
         table = {"evidence": self.records, "ontology": self.entities, "gaps": self.gap_items}[kind]
         item = table.get(key)
         if item is None or not isinstance(item.get(field), str) or not item.get(field):
@@ -254,36 +457,113 @@ def _parity_problems(text, source, where):
     return errors
 
 
-def _review_problems(review, where, today):
-    if not isinstance(review, dict):
-        return [f"{where}: approved unit has no review record"]
-    errors = []
-    for key in ("drafted_by", "substantive_reviewer", "linguistic_reviewer"):
-        value = review.get(key)
-        if not isinstance(value, str) or not PSEUDONYM.match(value):
-            errors.append(f"{where}: review.{key} must be a pseudonymous identifier such as 'reviewer-ar-02'")
-    drafter = review.get("drafted_by")
-    for key in ("substantive_reviewer", "linguistic_reviewer"):
-        if drafter and review.get(key) == drafter:
-            errors.append(f"{where}: review.{key} must be independent of the drafter")
-    if review.get("draft_method") not in DRAFT_METHODS:
-        errors.append(f"{where}: review.draft_method must be one of {list(DRAFT_METHODS)}")
-    try:
-        approved = datetime.date.fromisoformat(review.get("approved_on", ""))
-        if approved > today:
-            errors.append(f"{where}: review.approved_on is in the future")
-    except (TypeError, ValueError):
-        errors.append(f"{where}: review.approved_on must be an ISO date")
-    if not isinstance(review.get("glossary_version"), str) or not review["glossary_version"]:
-        errors.append(f"{where}: review.glossary_version is required")
-    unknown = set(review) - {"drafted_by", "draft_method", "substantive_reviewer", "linguistic_reviewer",
-                             "approved_on", "glossary_version"}
-    if unknown:
-        errors.append(f"{where}: unexpected review fields {sorted(unknown)} (no personal data in a public file)")
+def load_reviewers(root=ROOT):
+    """{id: entry} from i18n/reviewers.json: the pseudonymous human reviewers the owner has registered."""
+    path = Path(root) / "i18n" / "reviewers.json"
+    return {r["id"]: r for r in _load(path).get("reviewers", [])} if path.exists() else {}
+
+
+def validate_reviewers(data, languages):
+    errors, seen = [], set()
+    if not isinstance(data.get("reviewers"), list):
+        return ["i18n/reviewers.json: needs a 'reviewers' list"]
+    for r in data["reviewers"]:
+        rid = r.get("id")
+        where = f"i18n/reviewers.json {rid!r}"
+        if not isinstance(rid, str) or not PSEUDONYM.match(rid):
+            errors.append(f"{where}: reviewer id must be pseudonymous, such as 'reviewer-ar-02'")
+        elif AUTOMATED_ID.search(rid):
+            errors.append(f"{where}: an automated or AI identity cannot be registered as a reviewer")
+        if rid in seen:
+            errors.append(f"{where}: duplicate reviewer id")
+        seen.add(rid)
+        if r.get("kind") not in REVIEWER_KINDS:
+            errors.append(f"{where}: kind must be one of {list(REVIEWER_KINDS)}")
+        if not isinstance(r.get("languages"), list) or not r["languages"] or set(r["languages"]) - set(languages):
+            errors.append(f"{where}: languages must be registered translation languages")
+        if set(r) - {"id", "kind", "languages"}:
+            errors.append(f"{where}: unexpected fields {sorted(set(r) - {'id', 'kind', 'languages'})} (no personal data)")
     return errors
 
 
-def validate_catalog(lang, kind, catalog, sources, forbidden, today):
+def _timestamp_problems(value, field, where, today):
+    if not isinstance(value, str) or not ISO_UTC.match(value):
+        return [f"{where}: {field} must be a UTC timestamp such as 2026-12-01T09:30:00Z"]
+    if datetime.date.fromisoformat(value[:10]) > today:
+        return [f"{where}: {field} is in the future"]
+    return []
+
+
+def _draft_problems(u, where):
+    d = u.get("draft")
+    if not isinstance(d, dict) or d.get("method") not in DRAFT_METHODS or not isinstance(d.get("by"), str) \
+            or not DRAFTER_ID.match(d["by"]) or set(d) - {"method", "by"}:
+        return [f"{where}: draft must record method {list(DRAFT_METHODS)} and 'by' (a pseudonym or a process id)"]
+    return []
+
+
+def _approval_problems(u, lang, reviewers, today, where):
+    """Errors in the human approval of an APPROVED unit (TMA-DEC-008). Approval is a deliberate, attributable
+    human decision bound to exact source and translation versions: it is never inferred from a passing check,
+    a commit, a merge or repository access, and no automated or AI identity can give it."""
+    a = u.get("approval")
+    if not isinstance(a, dict):
+        return [f"{where}: APPROVED unit has no human approval record"]
+    errors = []
+    allowed = {"reviewer", "decision", "reviewed_at", "policy", "source_sha256", "translation_sha256",
+               "glossary_version", "escalation"}
+    if set(a) - allowed:
+        errors.append(f"{where}: unexpected approval fields {sorted(set(a) - allowed)} (no personal data)")
+    reviewer = a.get("reviewer")
+    if not isinstance(reviewer, str) or not PSEUDONYM.match(reviewer):
+        errors.append(f"{where}: approval.reviewer must be a pseudonymous identifier such as 'reviewer-ar-02'")
+    elif AUTOMATED_ID.search(reviewer):
+        errors.append(f"{where}: an automated or AI identity cannot approve a translation")
+    elif reviewer not in reviewers:
+        errors.append(f"{where}: approval.reviewer {reviewer!r} is not a registered human reviewer (i18n/reviewers.json)")
+    elif lang not in reviewers[reviewer].get("languages", []):
+        errors.append(f"{where}: reviewer {reviewer!r} is not registered for '{lang}'")
+    if reviewer and (u.get("draft") or {}).get("by") == reviewer:
+        errors.append(f"{where}: a reviewer cannot approve a translation recorded as their own draft")
+    if a.get("decision") != "approved":
+        errors.append(f"{where}: approval.decision must be 'approved' for an APPROVED unit")
+    errors += _timestamp_problems(a.get("reviewed_at"), "approval.reviewed_at", where, today)
+    if a.get("policy") != GOVERNANCE_POLICY:
+        errors.append(f"{where}: approval.policy {a.get('policy')!r} is not the policy in force ({GOVERNANCE_POLICY})")
+    if a.get("source_sha256") != u.get("source_sha256"):
+        errors.append(f"{where}: the approval covers a different English source version")
+    if not isinstance(a.get("translation_sha256"), str) or not SHA256.match(a["translation_sha256"]):
+        errors.append(f"{where}: approval.translation_sha256 must record the approved translation")
+    if not isinstance(a.get("glossary_version"), str) or not a["glossary_version"]:
+        errors.append(f"{where}: approval.glossary_version is required")
+    esc = a.get("escalation")
+    if esc is not None:
+        if not isinstance(esc, dict) or not esc.get("criteria") or set(esc.get("criteria", [])) - set(ESCALATION_CRITERIA):
+            errors.append(f"{where}: escalation.criteria must be a non-empty subset of {list(ESCALATION_CRITERIA)}")
+        elif esc.get("status") == "open":
+            errors.append(f"{where}: escalation {esc['criteria']} is unresolved; publication is blocked")
+        elif esc.get("status") != "resolved":
+            errors.append(f"{where}: escalation.status must be 'open' or 'resolved'")
+        else:
+            by = esc.get("resolved_by")
+            need = "certified-translator" if "certified-translation-required" in esc["criteria"] else None
+            if by not in reviewers or by == reviewer or lang not in reviewers[by].get("languages", []):
+                errors.append(f"{where}: an escalation is resolved only by a second registered reviewer for '{lang}'")
+            elif need and reviewers[by].get("kind") != need:
+                errors.append(f"{where}: certified translation was required; {by!r} is not a certified translator")
+            errors += _timestamp_problems(esc.get("resolved_at"), "escalation.resolved_at", where, today)
+        if isinstance(esc, dict) and set(esc) - {"criteria", "status", "resolved_by", "resolved_at"}:
+            errors.append(f"{where}: unexpected escalation fields")
+    return errors
+
+
+def _approved_current(u, text):
+    """True when the approved translation text is exactly the version the reviewer approved."""
+    a = u.get("approval") or {}
+    return isinstance(text, str) and a.get("translation_sha256") == fingerprint(text)
+
+
+def validate_catalog(lang, kind, catalog, sources, forbidden, today, reviewers=None):
     """Returns (errors, report). report lists stale and orphaned units: they are not errors, so English
     publishing never waits for translation (TMA-DEC-007 Q4), but they are never renderable."""
     path = f"i18n/{lang}/{kind}.json"
@@ -310,9 +590,10 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today):
                 errors.append(f"{where}: not a translatable canonical field (expected <file>:<id>:<field>)")
                 continue
         if u.get("status") not in UNIT_STATUSES:
-            errors.append(f"{where}: unknown status {u.get('status')!r}")
+            errors.append(f"{where}: unknown status {u.get('status')!r} (STALE is computed, never stored)")
         elif u["status"] not in COMMITTABLE_STATUSES:
             errors.append(f"{where}: status {u['status']!r} is not publishable; drafts stay off main")
+        errors += _draft_problems(u, where)
         if u.get("kind") not in KINDS:
             errors.append(f"{where}: unknown kind {u.get('kind')!r}")
         if u.get("kind") == "name" and u.get("name_basis") not in NAME_BASES:
@@ -324,8 +605,8 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today):
         for variant in forbidden:
             if variant.lower() in lowered:
                 errors.append(f"{where}: uses forbidden glossary variant {variant!r}")
-        if u.get("status") == "approved":
-            errors += _review_problems(u.get("review"), where, today)
+        if u.get("status") == "APPROVED":
+            errors += _approval_problems(u, lang, reviewers or {}, today, where)
         if problem == "orphan":
             report["orphaned"].append(f"{lang}:{uid}")
             continue
@@ -333,10 +614,17 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today):
             errors += _parity_problems(u["text"], source, where)
         if isinstance(u.get("source_sha256"), str) and u["source_sha256"] != fingerprint(source):
             report["stale"].append(f"{lang}:{uid}")
+        elif u.get("status") == "APPROVED" and isinstance(u.get("approval"), dict) and not _approved_current(u, u.get("text")):
+            report["stale"].append(f"{lang}:{uid}")  # text changed after approval: renewed approval needed
     return errors, report
 
 
-def validate_glossary(glossary, sources, languages):
+def _term_unit(term_id, entry):
+    """A glossary label as an approvable unit: its source is the canonical term value."""
+    return dict(entry, id=term_id, text=entry.get("label"), source_sha256=fingerprint(term_id.partition(":")[2]))
+
+
+def validate_glossary(glossary, sources, languages, reviewers=None, today=None):
     errors, seen, forbidden = [], set(), {lang: [] for lang in languages}
     if not isinstance(glossary.get("version"), str) or not isinstance(glossary.get("terms"), list):
         return ["i18n/glossary.json: needs a 'version' string and a 'terms' list"], forbidden
@@ -356,6 +644,10 @@ def validate_glossary(glossary, sources, languages):
             errors += _text_problems(entry.get("label"), f"{where}.{lang}.label")
             if entry.get("status") not in COMMITTABLE_STATUSES:
                 errors.append(f"{where}.{lang}: status {entry.get('status')!r} is not approved")
+            else:
+                unit = _term_unit(tid, entry)
+                errors += _draft_problems(unit, f"{where}.{lang}")
+                errors += _approval_problems(unit, lang, reviewers or {}, today or datetime.date.today(), f"{where}.{lang}")
             for variant in entry.get("forbidden", []):
                 if variant and variant.lower() in (entry.get("label") or "").lower():
                     errors.append(f"{where}.{lang}: label contains its own forbidden variant {variant!r}")
@@ -381,7 +673,14 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
     sources = Sources(root, evidence, ontology, gaps)
     errors += [e for e in validate_english(english, sources) if "term link" in e]
     targets = [lang["code"] for lang in registry["languages"] if lang["code"] != "en"]
-    gerrors, forbidden = validate_glossary(glossary, sources, targets)
+    reviewers_path = base / "reviewers.json"
+    if not reviewers_path.exists():
+        return errors + ["i18n/reviewers.json: missing (the registry of human reviewers, empty until the owner adds one)"], report
+    errors += validate_reviewers(_load(reviewers_path), targets)
+    reviewers = load_reviewers(root)
+    for kind in ("changelog", "attribute"):
+        errors += load_identity(kind, root, ontology=sources.ontology)[2]
+    gerrors, forbidden = validate_glossary(glossary, sources, targets, reviewers, today)
     errors += gerrors
     for lang in targets:
         for kind in ("messages", "content"):
@@ -393,7 +692,7 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
             except ValueError as exc:
                 errors.append(f"i18n/{lang}/{kind}.json: invalid JSON ({exc})")
                 continue
-            cerrors, creport = validate_catalog(lang, kind, catalog, sources, forbidden[lang], today)
+            cerrors, creport = validate_catalog(lang, kind, catalog, sources, forbidden[lang], today, reviewers)
             errors += cerrors
             report["stale"] += creport["stale"]
             report["orphaned"] += creport["orphaned"]
@@ -406,13 +705,15 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
 # ─── Publication eligibility ─────────────────────────────────────────────
 
 def renderable_texts(lang, root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
-    """{id: text} of the units in `lang` that may be rendered. A unit is renderable only if it is approved,
-    its review is complete and independent of the drafter, its text passes every text and parity rule, and
-    its fingerprint matches the current English source. Stale, orphaned, unapproved or invalid units are never
-    renderable (no grace period, Q4), whether or not the validator was run."""
+    """{id: text} of the units in `lang` that may be rendered. A unit is renderable only if it is APPROVED by a
+    registered human reviewer under the policy in force (TMA-DEC-008), the approval covers exactly the current
+    English source and the current translation text, no escalation is open, and the text passes every text and
+    parity rule. Stale, orphaned, unapproved or invalid units are never renderable (no grace period), whether or
+    not the validator was run. Nothing here, nor any check or merge, can create an approval."""
     root = Path(root)
     today = today or datetime.date.today()
     sources = Sources(root, evidence, ontology, gaps)
+    reviewers = load_reviewers(root)
     out = {}
     for kind in ("messages", "content"):
         path = root / "i18n" / lang / f"{kind}.json"
@@ -421,9 +722,9 @@ def renderable_texts(lang, root=ROOT, evidence=None, ontology=None, gaps=None, t
         for u in _load(path).get("units", []):
             uid, text = u.get("id"), u.get("text")
             source = sources.message(uid) if kind == "messages" else sources.content(uid or "")[0]
-            if (source is None or u.get("status") != "approved" or u.get("source_sha256") != fingerprint(source)
-                    or _review_problems(u.get("review"), uid, today) or _text_problems(text, uid)
-                    or _parity_problems(text, source, uid)):
+            if (source is None or u.get("status") != "APPROVED" or u.get("source_sha256") != fingerprint(source)
+                    or _draft_problems(u, uid) or _approval_problems(u, lang, reviewers, today, uid)
+                    or not _approved_current(u, text) or _text_problems(text, uid) or _parity_problems(text, source, uid)):
                 continue
             out[uid] = text
     return out
@@ -433,14 +734,20 @@ def renderable_units(lang, root=ROOT, evidence=None, ontology=None, gaps=None, t
     return set(renderable_texts(lang, root, evidence, ontology, gaps, today))
 
 
-def approved_terms(lang, root=ROOT):
-    """{term id: label} of glossary terms with an approved, well-formed label in `lang`."""
-    out = {}
+def approved_terms(lang, root=ROOT, today=None):
+    """{term id: label} of glossary terms whose label in `lang` is well formed and human-approved (TMA-DEC-008)
+    for exactly that label."""
+    out, reviewers, today = {}, load_reviewers(root), today or datetime.date.today()
     for term in _load(Path(root) / "i18n" / "glossary.json").get("terms", []):
         entry = term.get("translations", {}).get(lang)
-        if entry and entry.get("status") in COMMITTABLE_STATUSES and not _text_problems(entry.get("label"), "") \
-                and not any(v and v.lower() in entry["label"].lower() for v in entry.get("forbidden", [])):
-            out[term["id"]] = entry["label"]
+        if not entry or entry.get("status") not in COMMITTABLE_STATUSES or _text_problems(entry.get("label"), ""):
+            continue
+        unit = _term_unit(term["id"], entry)
+        if any(v and v.lower() in entry["label"].lower() for v in entry.get("forbidden", [])) \
+                or _draft_problems(unit, "") or _approval_problems(unit, lang, reviewers, today, "") \
+                or not _approved_current(unit, entry["label"]):
+            continue
+        out[term["id"]] = entry["label"]
     return out
 
 
@@ -476,7 +783,7 @@ class Translator:
             self.texts, self.terms = self.english, None
         else:
             self.texts = renderable_texts(lang, root, evidence, ontology, gaps, today)
-            self.terms = approved_terms(lang, root)
+            self.terms = approved_terms(lang, root, today)
 
     def template(self, message_id):
         self.used.append(message_id)
@@ -522,6 +829,13 @@ def page_eligibility(lang, unit_ids, root=ROOT, evidence=None, ontology=None, ga
 
 
 if __name__ == "__main__":
+    if "--identity-report" in sys.argv:
+        for kind, entries in (("changelog", changelog_entries(_load(ROOT / "data" / "changelog.json"))),
+                              ("attribute", attribute_entries(_load(ROOT / "data" / "ontology.json")))):
+            for line in identity_proposals(kind, entries, _load(ROOT / "i18n" / f"{kind}-identity.json")):
+                print(kind.upper(), line)
+        print("Proposals only: review them and edit the identity map by hand.")
+        sys.exit(0)
     problems, rep = validate()
     for p in problems:
         print("ERROR", p)

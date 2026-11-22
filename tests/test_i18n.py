@@ -21,10 +21,11 @@ import check_site  # noqa: E402
 import i18n  # noqa: E402
 import registry  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from i18n_fixtures import DRAFT, approval, approved_label, approved_unit, register_reviewers  # noqa: E402
+
 REPO = Path(__file__).resolve().parent.parent
 TODAY = datetime.date(2026, 11, 22)
-REVIEW = {"drafted_by": "translator-ar-01", "draft_method": "machine-assisted", "substantive_reviewer": "reviewer-sub-01",
-          "linguistic_reviewer": "reviewer-ar-02", "approved_on": "2026-11-20", "glossary_version": "2026-11-22"}
 
 
 class Fixture(unittest.TestCase):
@@ -34,6 +35,7 @@ class Fixture(unittest.TestCase):
         self.root = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.root)
         shutil.copytree(REPO / "i18n", self.root / "i18n")
+        register_reviewers(self.root)  # SYNTHETIC reviewers, temporary directory only
         self.evidence, self.ontology = registry.load_all()
         self.gaps = registry.load(REPO / "data" / "gaps.json")
         self.en = i18n.english_messages(REPO)
@@ -44,18 +46,12 @@ class Fixture(unittest.TestCase):
     def read(self, rel):
         return json.loads((self.root / "i18n" / rel).read_text(encoding="utf-8"))
 
-    def message_unit(self, uid="footer.as_of", text="بتاريخ {date}", **over):
-        unit = {"id": uid, "kind": "interface", "status": "approved", "text": text,
-                "source_sha256": i18n.fingerprint(self.en[uid]), "review": dict(REVIEW)}
-        unit.update(over)
-        return unit
+    def message_unit(self, uid="footer.as_of", text="بتاريخ {date}", source=None, **over):
+        return approved_unit(uid, over.pop("kind", "interface"), text, source or self.en[uid], **over)
 
     def content_unit(self, uid="evidence:MAI-EV-0001:title", text="إطلاق رسمي", **over):
         source, _ = i18n.Sources(REPO).content(uid)
-        unit = {"id": uid, "kind": "prose", "status": "approved", "text": text,
-                "source_sha256": i18n.fingerprint(source), "review": dict(REVIEW)}
-        unit.update(over)
-        return unit
+        return approved_unit(uid, over.pop("kind", "prose"), text, source, **over)
 
     def with_units(self, units, kind="messages", lang="ar"):
         self.write(f"{lang}/{kind}.json", {"language": lang, "units": units})
@@ -232,8 +228,13 @@ class UnitRules(Fixture):
         self.assertRejected("unknown status")
 
     def test_unapproved_unit_cannot_be_committed(self):
-        self.with_units([self.message_unit(status="draft")])
-        self.assertRejected("is not publishable; drafts stay off main")
+        for status in ("DRAFT", "NEEDS_REVISION", "REJECTED"):
+            self.with_units([self.message_unit(status=status)])
+            self.assertRejected("is not publishable; drafts stay off main")
+
+    def test_stale_is_computed_never_stored(self):
+        self.with_units([self.message_unit(status="STALE")])
+        self.assertRejected("STALE is computed, never stored")
 
     def test_duplicate_translation_id(self):
         self.with_units([self.message_unit(), self.message_unit()])
@@ -256,7 +257,8 @@ class UnitRules(Fixture):
         self.assertRejected("needs name_basis")
 
     def test_stale_translation_is_reported_not_rendered_and_not_an_error(self):
-        self.with_units([self.message_unit(source_sha256=i18n.fingerprint("an older English text"))])
+        # Approved against an older English text, which has since changed: STALE, never rendered.
+        self.with_units([self.message_unit(source="an older English text")])
         errors, report = self.validate()
         self.assertEqual(errors, [])
         self.assertEqual(report["stale"], ["ar:footer.as_of"])
@@ -280,44 +282,126 @@ class UnitRules(Fixture):
         self.assertEqual(report["orphaned"], ["ar:evidence:MAI-EV-0001:title"])
 
 
-class ReviewRules(Fixture):
-    def review(self, **over):
-        r = dict(REVIEW)
-        r.update(over)
-        return r
+class ApprovalRules(Fixture):
+    """TMA-DEC-008: one registered human reviewer approves exact source and translation versions."""
 
-    def test_approved_unit_needs_a_review_record(self):
-        unit = self.message_unit()
-        del unit["review"]
-        self.with_units([unit])
-        self.assertRejected("approved unit has no review record")
+    def approval(self, **over):
+        return approval(self.en["footer.as_of"], "بتاريخ {date}", **over)
+
+    def test_a_single_registered_human_reviewer_suffices(self):
+        self.with_units([self.message_unit()])
+        self.assertEqual(self.validate()[0], [])
+        self.assertEqual(i18n.renderable_units("ar", self.root, self.evidence, self.ontology, self.gaps, today=TODAY), {"footer.as_of"})
+
+    def test_approved_unit_needs_a_human_approval_record(self):
+        self.with_units([self.message_unit(approval=None)])
+        self.assertRejected("APPROVED unit has no human approval record")
 
     def test_reviewers_must_be_pseudonymous(self):
         for value in ("Jane Doe", "jane@example.com", "reviewer"):
-            self.with_units([self.message_unit(review=self.review(linguistic_reviewer=value))])
+            self.with_units([self.message_unit(approval=self.approval(reviewer=value))])
             self.assertRejected("must be a pseudonymous identifier")
 
-    def test_reviewers_must_be_independent_of_the_drafter(self):
-        self.with_units([self.message_unit(review=self.review(substantive_reviewer="translator-ar-01"))])
-        self.assertRejected("must be independent of the drafter")
+    def test_reviewer_must_be_registered_for_the_language(self):
+        self.with_units([self.message_unit(approval=self.approval(reviewer="reviewer-ar-02"))])
+        self.assertRejected("is not a registered human reviewer")
+        register_reviewers(self.root, [{"id": "synthetic-reviewer-01", "kind": "human", "languages": ["fr"]}])
+        self.with_units([self.message_unit()])
+        self.assertRejected("is not registered for 'ar'")
 
-    def test_one_reviewer_may_perform_both_reviews_if_not_the_drafter(self):
-        self.with_units([self.message_unit(review=self.review(substantive_reviewer="reviewer-ar-02"))])
-        self.assertEqual(self.validate()[0], [])
+    def test_ai_or_automated_identity_cannot_approve(self):
+        for value in ("claude-code-01", "ai-assistant-01", "ci-pipeline-01", "translation-bot-01"):
+            self.with_units([self.message_unit(approval=self.approval(reviewer=value))])
+            self.assertRejected("automated or AI identity cannot approve")
 
-    def test_draft_method_is_declared(self):
-        self.with_units([self.message_unit(review=self.review(draft_method="unknown"))])
-        self.assertRejected("draft_method must be one of")
+    def test_reviewer_cannot_approve_their_own_draft(self):
+        self.with_units([self.message_unit(draft={"method": "human", "by": "synthetic-reviewer-01"})])
+        self.assertRejected("cannot approve a translation recorded as their own draft")
 
-    def test_approval_date_is_valid_and_not_in_the_future(self):
-        self.with_units([self.message_unit(review=self.review(approved_on="2027-01-01"))])
-        self.assertRejected("approved_on is in the future")
-        self.with_units([self.message_unit(review=self.review(approved_on="soon"))])
-        self.assertRejected("approved_on must be an ISO date")
+    def test_draft_provenance_is_declared(self):
+        self.with_units([self.message_unit(draft={"method": "unknown", "by": "synthetic-drafter-01"})])
+        self.assertRejected("draft must record method")
+        unit = self.message_unit()
+        del unit["draft"]
+        self.with_units([unit])
+        self.assertRejected("draft must record method")
+
+    def test_decision_must_be_an_explicit_approval(self):
+        self.with_units([self.message_unit(approval=self.approval(decision="looks fine"))])
+        self.assertRejected("approval.decision must be 'approved'")
+
+    def test_review_timestamp_is_utc_and_not_in_the_future(self):
+        self.with_units([self.message_unit(approval=self.approval(reviewed_at="2027-01-01T00:00:00Z"))])
+        self.assertRejected("reviewed_at is in the future")
+        self.with_units([self.message_unit(approval=self.approval(reviewed_at="2026-11-20"))])
+        self.assertRejected("must be a UTC timestamp")
+
+    def test_approval_under_another_policy_is_not_accepted(self):
+        for policy in ("TMA-DEC-007", "", None):
+            self.with_units([self.message_unit(approval=self.approval(policy=policy))])
+            self.assertRejected("is not the policy in force (TMA-DEC-008)")
+
+    def test_approval_for_a_different_source_version(self):
+        self.with_units([self.message_unit(approval=self.approval(source_sha256=i18n.fingerprint("another English text")))])
+        self.assertRejected("covers a different English source version")
+        self.assertEqual(i18n.renderable_units("ar", self.root, self.evidence, self.ontology, self.gaps, today=TODAY), set())
+
+    def test_approval_for_a_different_translation_makes_the_unit_stale(self):
+        self.with_units([self.message_unit(approval=self.approval(translation_sha256=i18n.fingerprint("نص آخر {date}")))])
+        errors, report = self.validate()
+        self.assertEqual(errors, [])
+        self.assertEqual(report["stale"], ["ar:footer.as_of"])
+        self.assertEqual(i18n.renderable_units("ar", self.root, self.evidence, self.ontology, self.gaps, today=TODAY), set())
 
     def test_no_extra_personal_fields(self):
-        self.with_units([self.message_unit(review=self.review(email="someone@example.com"))])
-        self.assertRejected("unexpected review fields")
+        self.with_units([self.message_unit(approval=self.approval(email="someone@example.com"))])
+        self.assertRejected("unexpected approval fields")
+
+
+class EscalationRules(Fixture):
+    def unit_with(self, escalation):
+        return self.message_unit(approval=approval(self.en["footer.as_of"], "بتاريخ {date}", escalation=escalation))
+
+    def test_open_escalation_blocks_publication(self):
+        self.with_units([self.unit_with({"criteria": ["specialist-term"], "status": "open"})])
+        self.assertRejected("is unresolved; publication is blocked")
+        self.assertEqual(i18n.renderable_units("ar", self.root, self.evidence, self.ontology, self.gaps, today=TODAY), set())
+
+    def test_resolution_needs_a_second_registered_reviewer(self):
+        for by in ("synthetic-reviewer-01", "unregistered-reviewer-01"):
+            self.with_units([self.unit_with({"criteria": ["research-qualification"], "status": "resolved",
+                                             "resolved_by": by, "resolved_at": "2026-11-21T09:00:00Z"})])
+            self.assertRejected("resolved only by a second registered reviewer")
+        self.with_units([self.unit_with({"criteria": ["research-qualification"], "status": "resolved",
+                                         "resolved_by": "synthetic-reviewer-02", "resolved_at": "2026-11-21T09:00:00Z"})])
+        self.assertEqual(self.validate()[0], [])
+        self.assertEqual(i18n.renderable_units("ar", self.root, self.evidence, self.ontology, self.gaps, today=TODAY), {"footer.as_of"})
+
+    def test_certified_translation_needs_a_certified_translator(self):
+        self.with_units([self.unit_with({"criteria": ["certified-translation-required"], "status": "resolved",
+                                         "resolved_by": "synthetic-reviewer-02", "resolved_at": "2026-11-21T09:00:00Z"})])
+        self.assertRejected("is not a certified translator")
+        self.with_units([self.unit_with({"criteria": ["certified-translation-required"], "status": "resolved",
+                                         "resolved_by": "synthetic-certified-01", "resolved_at": "2026-11-21T09:00:00Z"})])
+        self.assertEqual(self.validate()[0], [])
+
+    def test_unknown_criterion(self):
+        self.with_units([self.unit_with({"criteria": ["it-feels-risky"], "status": "open"})])
+        self.assertRejected("escalation.criteria must be a non-empty subset")
+
+
+class ReviewerRegistryRules(Fixture):
+    def test_committed_registry_is_empty(self):
+        self.assertEqual(json.loads((REPO / "i18n" / "reviewers.json").read_text(encoding="utf-8"))["reviewers"], [])
+
+    def test_registry_rejects_names_ai_identities_and_personal_fields(self):
+        for entry, fragment in (({"id": "Jane Doe", "kind": "human", "languages": ["ar"]}, "must be pseudonymous"),
+                                ({"id": "claude-reviewer-01", "kind": "human", "languages": ["ar"]}, "cannot be registered"),
+                                ({"id": "reviewer-ar-03", "kind": "robot", "languages": ["ar"]}, "kind must be one of"),
+                                ({"id": "reviewer-ar-03", "kind": "human", "languages": ["es"]}, "registered translation languages"),
+                                ({"id": "reviewer-ar-03", "kind": "human", "languages": ["ar"], "email": "x@y.z"}, "no personal data")):
+            register_reviewers(self.root, [entry])
+            self.assertRejected(fragment)
 
 
 class TextRules(Fixture):
@@ -355,19 +439,17 @@ class TextRules(Fixture):
         en = self.read("en/messages.json")
         en["messages"].append({"id": "test.identifiers", "kind": "prose", "text": source})
         self.write("en/messages.json", en)
-        base = {"id": "test.identifiers", "kind": "prose", "status": "approved",
-                "source_sha256": i18n.fingerprint(source), "review": dict(REVIEW)}
         for text in ("انظر MAI-EV-0002 في https://example.org/a", "انظر MAI-EV-0001", "انظر MAI-EV-0001 في https://example.org/b"):
-            self.with_units([dict(base, text=text)])
+            self.with_units([approved_unit("test.identifiers", "prose", text, source)])
             self.assertRejected("identifiers or URLs differ")
-        self.with_units([dict(base, text="انظر MAI-EV-0001 في https://example.org/a")])
+        self.with_units([approved_unit("test.identifiers", "prose", "انظر MAI-EV-0001 في https://example.org/a", source)])
         self.assertEqual(self.validate()[0], [])
 
 
 class GlossaryRules(Fixture):
     def term(self, **over):
-        t = {"id": "classification:VERIFIED FACT", "translations": {"ar": {"label": "واقعة متحقق منها", "status": "approved",
-                                                                          "forbidden": ["رسمي"]}}}
+        t = {"id": "classification:VERIFIED FACT",
+             "translations": {"ar": approved_label("classification:VERIFIED FACT", "واقعة متحقق منها", ["رسمي"])}}
         t.update(over)
         return t
 
@@ -391,15 +473,21 @@ class GlossaryRules(Fixture):
         self.assertRejected("duplicate term id")
 
     def test_unapproved_term_label(self):
-        self.with_terms([self.term(translations={"ar": {"label": "واقعة", "status": "draft", "forbidden": []}})])
+        self.with_terms([self.term(translations={"ar": approved_label("classification:VERIFIED FACT", "واقعة", status="DRAFT")})])
         self.assertRejected("is not approved")
+        self.with_terms([self.term(translations={"ar": approved_label("classification:VERIFIED FACT", "واقعة", approval=None)})])
+        self.assertRejected("no human approval record")
+        label = approved_label("classification:VERIFIED FACT", "واقعة")
+        label["approval"]["reviewer"] = "ai-assistant-01"
+        self.with_terms([self.term(translations={"ar": label})])
+        self.assertRejected("automated or AI identity cannot approve")
 
     def test_term_for_unregistered_language(self):
-        self.with_terms([self.term(translations={"es": {"label": "hecho", "status": "approved", "forbidden": []}})])
+        self.with_terms([self.term(translations={"es": approved_label("classification:VERIFIED FACT", "hecho")})])
         self.assertRejected("not a registered translation language")
 
     def test_label_cannot_contain_its_forbidden_variant(self):
-        self.with_terms([self.term(translations={"ar": {"label": "واقعة رسمية", "status": "approved", "forbidden": ["رسمي"]}})])
+        self.with_terms([self.term(translations={"ar": approved_label("classification:VERIFIED FACT", "واقعة رسمية", ["رسمي"])})])
         self.assertRejected("contains its own forbidden variant")
 
     def test_units_cannot_use_a_forbidden_variant(self):

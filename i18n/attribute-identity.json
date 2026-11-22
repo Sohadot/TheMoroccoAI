@@ -1,0 +1,90 @@
+{
+ "version": 1,
+ "note": "Stable identities for the translatable texts of the entity attributes in data/ontology.json (TMA-DEC-007, Sprint 19B-4). Canonical data is not modified. Each text binds to an id by its fingerprint inside a stable entry key (the entity id); the NN suffix is a label given at registration, never used for matching. On a reorder nothing changes. On an edit, keep the id and record the new source_sha256 (translations become stale). On an insert, add a new id. On a deletion, set status to 'retired'; ids are never reused. Identical texts in one entry and field carry an explicit occurrence number. python3 tools/i18n.py --identity-report proposes repairs; it never applies them.",
+ "entries": [
+  {"id": "idarati-ai", "key": {"entity": "idarati-ai"}, "items": [
+   {"id": "attribute.idarati-ai.name.01", "field": "name", "status": "active", "source_sha256": "291101a07fe980e93b900ae85c9eb824f9e7e93d0d754be7440b9386b615cad7"},
+   {"id": "attribute.idarati-ai.name.02", "field": "name", "status": "active", "source_sha256": "fb45f0c8b6a8a8b8e5e7e4b4958e1d1390b9abe5e8bed7fe330813253634689f"},
+   {"id": "attribute.idarati-ai.name.03", "field": "name", "status": "active", "source_sha256": "b073f6c68ef8721107fd9815b19b2c35ec111d526b75c2123d1111ba64424000"},
+   {"id": "attribute.idarati-ai.value.01", "field": "value", "status": "active", "source_sha256": "8248ca24828265ca27390e4e154dc8e4ce5f6c6551d6bc1a7872643f071a79ea"},
+   {"id": "attribute.idarati-ai.value.02", "field": "value", "status": "active", "source_sha256": "42a02fa435e1fc4155a8d4d8e8c52d9c52cf7e1ae16dacbc2dd4ee5fa8cd8dca"},
+   {"id": "attribute.idarati-ai.value.03", "field": "value", "status": "active", "source_sha256": "17dce96ac4b8ebb377b9fea2b9a44f9593a739588f5c568f0447b338212a7547"}
+  ]},
+  {"id": "toubkal-supercomputer", "key": {"entity": "toubkal-supercomputer"}, "items": [
+   {"id": "attribute.toubkal-supercomputer.name.01", "field": "name", "status": "active", "source_sha256": "332729424db7d5944226e1e66b14ca810539ce6f1e682f2bbc32af77c5252cd6"},
+   {"id": "attribute.toubkal-supercomputer.name.02", "field": "name", "status": "active", "source_sha256": "7bff6181add2231b3c0f092fa826243267781cbeaef4fb83e292604e1319dcc0"},
+   {"id": "attribute.toubkal-supercomputer.name.03", "field": "name", "status": "active", "source_sha256": "c7b15bc20ddd5862a23eab010e38d699727c5760d66ace553f012aa173d7bfb9"},
+   {"id": "attribute.toubkal-supercomputer.name.04", "field": "name", "status": "active", "source_sha256": "34aeb6732950d34edde841beac47920b9a776a3455f5a47720e1a7160f2c0841"},
+   {"id": "attribute.toubkal-supercomputer.name.05", "field": "name", "status": "active", "source_sha256": "a670d0fb2d6825db07392c4c23ddf71c359c8ca9d346765ebda7aab0dc7b548c"},
+   {"id": "attribute.toubkal-supercomputer.name.06", "field": "name", "status": "active", "source_sha256": "c41a14705aff0654b8262754718eb1e097b2bf2632a738eb2547aed0777fa825"},
+   {"id": "attribute.toubkal-supercomputer.name.07", "field": "name", "status": "active", "source_sha256": "f0236221b181ca3b415715a5796f16dee0b1ae6ee95a4de5fabf80894c815bce"},
+   {"id": "attribute.toubkal-supercomputer.value.01", "field": "value", "status": "active", "source_sha256": "85d42508f205315835f3ce8511f4cf537b074ca98567cfe305502d35ca527758"},
+   {"id": "attribute.toubkal-supercomputer.value.02", "field": "value", "status": "active", "source_sha256": "7382983da5888658c9b5793a0b6af90eed1c8018c30df309b174135f2e0db02d"},
+   {"id": "attribute.toubkal-supercomputer.value.03", "field": "value", "status": "active", "source_sha256": "73a2af8864fc500fa49048bf3003776c19938f360e56bd03663866fb3087884a"},
+   {"id": "attribute.toubkal-supercomputer.value.04", "field": "value", "status": "active", "source_sha256": "480f5a496560ae4228bb7977ecf29b2c589d7a7aa6b609534566af8cbc229a9e"},
+   {"id": "attribute.toubkal-supercomputer.value.05", "field": "value", "status": "active", "source_sha256": "2b1d73d2d76fa2c8f022ce4a2d399a84923fea0e4dacec6356918905b234a234"},
+   {"id": "attribute.toubkal-supercomputer.value.06", "field": "value", "status": "active", "source_sha256": "61ec2bdfa8770c23462882cd0a9fa81c82e89904f7551f30fa610f3f47fb3efc"},
+   {"id": "attribute.toubkal-supercomputer.value.07", "field": "value", "status": "active", "source_sha256": "378299755e46a4204e8413a7e3350b17d232bb7c7833bfe23d692e075a5bb66f"}
+  ]},
+  {"id": "deepecho-ultrasound-software", "key": {"entity": "deepecho-ultrasound-software"}, "items": [
+   {"id": "attribute.deepecho-ultrasound-software.name.01", "field": "name", "status": "active", "source_sha256": "39ed6bf7e5900d8926f1b09b9681e6b4171fc67560524ec09a410262d043ffda"},
+   {"id": "attribute.deepecho-ultrasound-software.name.02", "field": "name", "status": "active", "source_sha256": "825f56420540764075378d8aedd1562063cb8eab9a1358e302bcbfa5b1618679"},
+   {"id": "attribute.deepecho-ultrasound-software.value.01", "field": "value", "status": "active", "source_sha256": "2193627ae3ee9c77672b323fddcff1250df99ffa05af7b44882a936b7064e127"},
+   {"id": "attribute.deepecho-ultrasound-software.value.02", "field": "value", "status": "active", "source_sha256": "1b95f535e301974e86aba1e347bcae628018de4f76fa26d814a1b0df4e5168c0"}
+  ]},
+  {"id": "atlas-chat", "key": {"entity": "atlas-chat"}, "items": [
+   {"id": "attribute.atlas-chat.name.01", "field": "name", "status": "active", "source_sha256": "ac037c0793eae1fdf003b26f6d356c566a5d8543a4d221369196594cadc8fc51"},
+   {"id": "attribute.atlas-chat.name.02", "field": "name", "status": "active", "source_sha256": "a4fe65264ef7dbb38d104b1e81eb3350f3142f3d16f32bdec39b1d9b42c1b8d1"},
+   {"id": "attribute.atlas-chat.name.03", "field": "name", "status": "active", "source_sha256": "74a3978d10045c73c94bf4ce0c2125efd6f93a654afea5b8853cd65c33fd82f5"},
+   {"id": "attribute.atlas-chat.name.04", "field": "name", "status": "active", "source_sha256": "107be6ec2679814adea0675d00d2f206eb9f9a86b910983b48745144c3a2c90c"},
+   {"id": "attribute.atlas-chat.name.05", "field": "name", "status": "active", "source_sha256": "f3ec8e880a46c8a6fb105396ee5400124f828934a9dd68c668f796cf6d47b1c8"},
+   {"id": "attribute.atlas-chat.value.01", "field": "value", "status": "active", "source_sha256": "3d3a0e6ab58a510ea6206307816aa1367542b28686c0fdfbdeafb6b8e0cccc12"},
+   {"id": "attribute.atlas-chat.value.02", "field": "value", "status": "active", "source_sha256": "d82fc36d72e5390e1269ef09d2a378bd1049d3713cc50cd545d55b2673d3ae54"},
+   {"id": "attribute.atlas-chat.value.03", "field": "value", "status": "active", "source_sha256": "03c16e90781da2cd8bc1da668428273a26303b6b172a5fafc8d1b028210442f9"},
+   {"id": "attribute.atlas-chat.value.04", "field": "value", "status": "active", "source_sha256": "1f9bfb32cf6ad7589ecd7c8b65d5986581b731da5429c2e8428e19d1ed6bb93a"},
+   {"id": "attribute.atlas-chat.value.05", "field": "value", "status": "active", "source_sha256": "67d5c7435efd8048b72ec16c4b6fe57405738ccb3351f828bc64885f7606fc4a"}
+  ]},
+  {"id": "darija-sft-mixture", "key": {"entity": "darija-sft-mixture"}, "items": [
+   {"id": "attribute.darija-sft-mixture.name.01", "field": "name", "status": "active", "source_sha256": "ac037c0793eae1fdf003b26f6d356c566a5d8543a4d221369196594cadc8fc51"},
+   {"id": "attribute.darija-sft-mixture.name.02", "field": "name", "status": "active", "source_sha256": "1af851907331c0ed99e7c63b4e55df808bc5fc4c990a1cf80ca8c0f76daf1f3b"},
+   {"id": "attribute.darija-sft-mixture.name.03", "field": "name", "status": "active", "source_sha256": "f3ec8e880a46c8a6fb105396ee5400124f828934a9dd68c668f796cf6d47b1c8"},
+   {"id": "attribute.darija-sft-mixture.value.01", "field": "value", "status": "active", "source_sha256": "b34554d55584b5d576e4fcd50855283a6f884a27951b390b85958f6e30a58c4b"},
+   {"id": "attribute.darija-sft-mixture.value.02", "field": "value", "status": "active", "source_sha256": "083fba9ff24a65e01cf1175baba7c2f4fda2188a15c768872cbeadbd7fb08b0c"},
+   {"id": "attribute.darija-sft-mixture.value.03", "field": "value", "status": "active", "source_sha256": "109d38a1ade820ea3d33c3516b628a8be79ad31237ac148b0eb32245286f1b86"}
+  ]},
+  {"id": "darijabert", "key": {"entity": "darijabert"}, "items": [
+   {"id": "attribute.darijabert.name.01", "field": "name", "status": "active", "source_sha256": "ac037c0793eae1fdf003b26f6d356c566a5d8543a4d221369196594cadc8fc51"},
+   {"id": "attribute.darijabert.name.02", "field": "name", "status": "active", "source_sha256": "cd74053c54816e473883dede0ad3b152f38a41995409eade6b42704919bb1359"},
+   {"id": "attribute.darijabert.name.03", "field": "name", "status": "active", "source_sha256": "acef4e991a0b6417b6ef1af7dbcbebbe7eafffbdd478d5979f94a7c8059cb604"},
+   {"id": "attribute.darijabert.value.01", "field": "value", "status": "active", "source_sha256": "fc0d553bbe593582c47288470d0485107161915f64ec1f1d0fa102568e75c8d8"},
+   {"id": "attribute.darijabert.value.02", "field": "value", "status": "active", "source_sha256": "d43c8033a8592fdf57bde213ef66265ae4452da19db08fa4f0c94702f3b826a0"},
+   {"id": "attribute.darijabert.value.03", "field": "value", "status": "active", "source_sha256": "e52a381ef657e8041ee6b9bd7f8c11ea13d0bec27778e9e79d852499314ca549"}
+  ]},
+  {"id": "al-atlas", "key": {"entity": "al-atlas"}, "items": [
+   {"id": "attribute.al-atlas.name.01", "field": "name", "status": "active", "source_sha256": "ac037c0793eae1fdf003b26f6d356c566a5d8543a4d221369196594cadc8fc51"},
+   {"id": "attribute.al-atlas.name.02", "field": "name", "status": "active", "source_sha256": "e68b36b17cbd990802f57741cb75cf3a73fa66a61999b0cd70e3cf7d26cfb25f"},
+   {"id": "attribute.al-atlas.name.03", "field": "name", "status": "active", "source_sha256": "4a69528ebd553c8d3c6bbf3fb11ebb47fc3f79a31cd92bcd66b49d29d4130232"},
+   {"id": "attribute.al-atlas.name.04", "field": "name", "status": "active", "source_sha256": "1751289edc7c5eccdb7f144a579a792438512d762c6937bc2f33cda2b17d6b22"},
+   {"id": "attribute.al-atlas.value.01", "field": "value", "status": "active", "source_sha256": "663a5b499306b5d35c09caf3cf925731008c7b9d5259090ab8278eb833d5ca41"},
+   {"id": "attribute.al-atlas.value.02", "field": "value", "status": "active", "source_sha256": "b6bc4516c46a52db6403f4b4277b861d2869a1156fbc61f24f13f1593beafd89"},
+   {"id": "attribute.al-atlas.value.03", "field": "value", "status": "active", "source_sha256": "b3a114d7599169f683f8936d2f374f8bf78cc8e75d02fe0805c0da91361b0ee8"},
+   {"id": "attribute.al-atlas.value.04", "field": "value", "status": "active", "source_sha256": "2dfd6d6edc050e474f822acafde5fa23c2f29ceab22fbf19723a06d28471ac17"}
+  ]},
+  {"id": "deepecho-public-health-evaluation", "key": {"entity": "deepecho-public-health-evaluation"}, "items": [
+   {"id": "attribute.deepecho-public-health-evaluation.name.01", "field": "name", "status": "active", "source_sha256": "805a8a469c09db2b34cd503fcbd7181a9dc954f8a2355d2967add18c3204abfb"},
+   {"id": "attribute.deepecho-public-health-evaluation.name.02", "field": "name", "status": "active", "source_sha256": "472590ae974d4c1f44b3780df0b152d9119f076c61bfb3e8cb6affd7889ac0a8"},
+   {"id": "attribute.deepecho-public-health-evaluation.name.03", "field": "name", "status": "active", "source_sha256": "62bd5d5b5c6a0463367101b2d37ddc471b8657b9e972d0b5f93d118f2f52f9b1"},
+   {"id": "attribute.deepecho-public-health-evaluation.value.01", "field": "value", "status": "active", "source_sha256": "861d306ee16c640fd303c9b3b2a048bbaea43371de813d0339021839b001f856"},
+   {"id": "attribute.deepecho-public-health-evaluation.value.02", "field": "value", "status": "active", "source_sha256": "38900ca7f9ea05fb8e7532bb52729747dc04e85801101587d62310e6d4d705b3"},
+   {"id": "attribute.deepecho-public-health-evaluation.value.03", "field": "value", "status": "active", "source_sha256": "82c45c4ef1961f7ff12603523bf919049afad8c88a25bc3272ce4dfad7a64d48"}
+  ]},
+  {"id": "swam-fraud-scoring", "key": {"entity": "swam-fraud-scoring"}, "items": [
+   {"id": "attribute.swam-fraud-scoring.name.01", "field": "name", "status": "active", "source_sha256": "291101a07fe980e93b900ae85c9eb824f9e7e93d0d754be7440b9386b615cad7"},
+   {"id": "attribute.swam-fraud-scoring.name.02", "field": "name", "status": "active", "source_sha256": "472590ae974d4c1f44b3780df0b152d9119f076c61bfb3e8cb6affd7889ac0a8"},
+   {"id": "attribute.swam-fraud-scoring.name.03", "field": "name", "status": "active", "source_sha256": "b073f6c68ef8721107fd9815b19b2c35ec111d526b75c2123d1111ba64424000"},
+   {"id": "attribute.swam-fraud-scoring.value.01", "field": "value", "status": "active", "source_sha256": "79a84ca9fbc38095293fadb596eec73452a4b41b6d1877bb86809ca6783c0560"},
+   {"id": "attribute.swam-fraud-scoring.value.02", "field": "value", "status": "active", "source_sha256": "92f1dadd7d6d86f64ade5846b1d4b48c84fd31d8b410cdaa0bdb6b6dea8eff14"},
+   {"id": "attribute.swam-fraud-scoring.value.03", "field": "value", "status": "active", "source_sha256": "bfe5bb6743fd7525147f02e2ba41c58b961676e40a846f7463d88aff4b441141"}
+  ]}
+ ]
+}

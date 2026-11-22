@@ -138,6 +138,8 @@ i18n/
 
 ### 4.3 Translation unit
 
+> **Superseded in part by TMA-DEC-008 (Sprint 19B-4).** The `status` values and the `review` record below are the TMA-DEC-007 design, kept for the record. The implemented unit has the statuses `DRAFT`, `NEEDS_REVISION`, `APPROVED` and `REJECTED` (STALE is computed), a `draft` record and a single human `approval` record; see section 16 and [TRANSLATION_REVIEW_POLICY.md](TRANSLATION_REVIEW_POLICY.md).
+
 Both catalogs share one unit shape:
 
 ```json
@@ -301,6 +303,8 @@ Alternates are declared in page `<head>` only. A sitemap `xhtml:link` mirror is 
 
 ## 6. Translation lifecycle
 
+> **Superseded in part by TMA-DEC-008 (Sprint 19B-4).** The two review functions and the independence of reviewers from the drafter (6, 6.1, 6.2) are replaced by one documented human approval, with risk-based escalation to a second reviewer. The rest of this section (drafts off `main`, checks are not approval) stands. See section 16.
+
 ```
 source identified → drafted → terminology checked → substantive parity reviewed → linguistically reviewed → approved → published
                                                                                                  ↘ (English source changes) → stale → re-review
@@ -317,10 +321,10 @@ source identified → drafted → terminology checked → substantive parity rev
 | Published | The Sohadot integration authority merges the PR. The build generates the page | Generated output under `/<lang>/` |
 
 ### 6.1 Separation of duties
-The drafter cannot be either reviewer (enforced by `tools/i18n.py`). Two different reviewers are preferred; one person may perform both functions only if they did not draft the text (Q3).
+*(TMA-DEC-007 text; replaced by TMA-DEC-008: a reviewer cannot approve their own draft, and AI, tools or automated processes can never approve.)* The drafter cannot be either reviewer (enforced by `tools/i18n.py`). Two different reviewers are preferred; one person may perform both functions only if they did not draft the text (Q3).
 
 ### 6.2 What machines can and cannot establish
-The automated checks in section 9 establish structural parity: identifiers, placeholders, numbers, dates, classifications, citations, qualifiers present, links, metadata and disclosures. **They cannot establish semantic equivalence.** Publication therefore always requires the two human reviews. A passing build is a necessary condition for publication, never a sufficient one.
+The automated checks in section 9 establish structural parity: identifiers, placeholders, numbers, dates, classifications, citations, qualifiers present, links, metadata and disclosures. **They cannot establish semantic equivalence.** Publication therefore always requires human review (two reviews under TMA-DEC-007; one documented human approval under TMA-DEC-008). A passing build is a necessary condition for publication, never a sufficient one.
 
 ### 6.3 Drafts and `main`
 Because every file on `main` is publicly served (1.1), drafts stay on translation branches and in pull requests. `main` receives only units with `status: approved`. The build also refuses to render anything that is not approved and fresh, as a second safeguard. An unreviewed unit therefore cannot enter the public build silently.
@@ -437,7 +441,7 @@ The points Sprint 19A found outside existing policy were resolved by the owner o
   - a source reference that resolves, and a source fingerprint;
   - NFC text, with no bidirectional controls, invisible characters or markup;
   - placeholders, digits (Western digits only, none added) and identifiers/URLs identical to the English source;
-  - review record complete, pseudonymous, independent of the drafter, dated, with no extra fields;
+  - review record complete, pseudonymous, independent of the drafter, dated, with no extra fields (replaced in Sprint 19B-4 by the TMA-DEC-008 approval record, section 16);
   - no forbidden glossary variant.
 - **Glossary:** terms name canonical vocabulary, labels approved, no label containing its own forbidden variant.
 
@@ -494,7 +498,7 @@ All presentation text of `/registry/` and `/methodology/` now comes from `i18n/e
 | Completeness | A pseudo-localization test replaces every letter of every catalog and canonical text. `/registry/` then shows no English, and `/methodology/` shows only the deferred changelog records |
 | Gates added | Structural parity with English (heading sequence, element ids and anchor targets, internal links, sections, lists and tables). The literal text of every qualifier and disclosure the page renders must be present on the page. `/registry/` passes every gate end to end in synthetic Arabic and French |
 
-**Deferred.** The 97 canonical changelog texts on `/methodology/` (note, entry titles, change lists, corrections, review fixes, breaking changes) still render as recorded in `data/changelog.json`.
+**Deferred (resolved in Sprint 19B-4, section 16).** The 97 canonical changelog texts on `/methodology/` (note, entry titles, change lists, corrections, review fixes, breaking changes) still render as recorded in `data/changelog.json`.
 - **Why:** translating them needs content units for list items, which means deciding how such items are identified:
   - position-based ids break when items are inserted;
   - content-addressed ids turn every edit into a new unit.
@@ -504,3 +508,39 @@ All presentation text of `/registry/` and `/methodology/` now comes from `i18n/e
 
 **Conditional units.** `page.registry.coverage.none` and `page.registry.coverage.gap` render only when a domain has no entity. They are in the inventory so they are translated together with the page. If they are needed but not translated, the page is withdrawn rather than shown with English.
 
+## 16. Homepage, stable identity and human-approved translation (Sprint 19B-4)
+
+### 16.1 Homepage
+- **Generated.** `index.html` is generated from `tools/templates/homepage.tmpl` by `render_homepage()`. The template keeps the structure, styles and `<!--r:key-->` markers. Its tokens are `{{m:id}}` (element text), `{{a:id}}` (attribute), `{{j:id}}` (JSON-LD string), `{{h:id}}` (text with HTML placeholders), `{{i:code}}` (isolated identifier), `{{href:path}}` (language-aware link) and `{{b:key}}` (generated figure with its markers). An unknown token stops the build.
+- **Parity.** The English homepage and the other 79 outputs are byte-identical to the previous build.
+- **Shared vocabulary.** Lifecycle and status-basis labels, the availability suffix, project-kind phrases, the currency sentences and inline classification labels are catalog messages. The English dicts published in the data contract are derived from them with unchanged values.
+- **Localized shell.** A localized homepage would carry reciprocal alternates, `og:locale`, JSON-LD `inLanguage`/`translationOfWork`, the language switcher, the translation notice and the policy disclosure. The English page carries none of them. Its styles (switcher, notice, right-to-left mirroring of the homepage's physical CSS, Arabic typography) come from a `{{localized_css}}` token that is empty in English; synthetic Arabic and French homepages, rendered only in a scratch directory, have no horizontal overflow at 1440, 834 and 390 px.
+- **Not localized.** The homepage is in `EXTRACTED_PAGES`, not `LOCALIZABLE_PAGES`. Unit inventory: [MULTILINGUAL_CONTENT_INVENTORY.md](MULTILINGUAL_CONTENT_INVENTORY.md).
+
+### 16.2 Stable identity of changelog and attribute texts
+- **Maps.** `i18n/changelog-identity.json` (97 items) and `i18n/attribute-identity.json` (66 items) give each canonical list text a stable id. Canonical data is not modified.
+- **Binding.** A text binds by its fingerprint inside a stable entry key (changelog version or commit; entity id). Nothing is matched by position. `occurrence` separates byte-identical texts in one entry and field.
+- **Rules:**
+  - a reorder changes nothing;
+  - an edit keeps the id once the maintainer records the new fingerprint, and the approved translations become stale;
+  - a new text needs a new id;
+  - a removed text is retired and its id is never reused;
+  - an unregistered, orphaned, duplicate or ambiguous text stops the build (fail closed).
+- **Repairs.** `python3 tools/i18n.py --identity-report` proposes repairs and never applies them.
+- **Rendering.** Changelog texts render as `changelog:<item id>:text` and attribute texts as `attribute:<item id>:text`. `/methodology/` now has no deferred English.
+
+### 16.3 Approval contract (TMA-DEC-008)
+- **Unit.** `status` is one of `DRAFT`, `NEEDS_REVISION`, `APPROVED`, `REJECTED`; only `APPROVED` may be committed. STALE is computed when the English source or the approved text no longer matches the approval.
+- **Draft record.** `draft {method, by}`.
+- **Approval record.** `approval {reviewer, decision, reviewed_at, policy, source_sha256, translation_sha256, glossary_version, escalation?}`:
+  - `policy` must be `TMA-DEC-008`;
+  - `reviewed_at` is an ISO-8601 UTC timestamp, not in the future;
+  - both fingerprints must match the current source and text.
+- **Reviewers.** Reviewers are registered in `i18n/reviewers.json` (pseudonymous id, kind `human` or `certified-translator`, languages).
+  - Ids that denote AI systems, bots, CI or automated processes are rejected.
+  - A reviewer cannot approve their own draft.
+- **Escalation.** An open escalation blocks the unit. Only a second registered reviewer for the language resolves it, and a `certified-translator` is required for `certified-translation-required`.
+- **Glossary.** Glossary labels use the same approval contract.
+- **Disclosure.** Every localized page renders `shell.translation_policy`.
+- **Limitation.** The approval record is an attestation in a public repository, not cryptographic proof of who approved. Validation, the build and CI never write or infer approvals.
+- **Current state.** The repository registers no reviewer and holds no translation.

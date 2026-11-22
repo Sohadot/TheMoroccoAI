@@ -25,12 +25,11 @@ import check_site  # noqa: E402
 import i18n  # noqa: E402
 import registry  # noqa: E402
 from test_layout import BROWSER  # noqa: E402
+from i18n_fixtures import approval, approved_label, approved_unit, register_reviewers  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 TODAY = datetime.date(2026, 11, 22)
 PATH = "/registry/"  # the synthetic page reuses a real English path so hreflang and routes are realistic
-REVIEW = {"drafted_by": "synthetic-drafter-01", "draft_method": "machine-assisted", "substantive_reviewer": "synthetic-reviewer-01",
-          "linguistic_reviewer": "synthetic-reviewer-02", "approved_on": "2026-11-20", "glossary_version": "2026-11-22"}
 SYNTHETIC_EN = [
     {"id": "test.title", "kind": "prose", "text": "Synthetic registry page"},
     {"id": "test.description", "kind": "prose", "text": "A synthetic page used only to test the multilingual renderer and its gates."},
@@ -84,6 +83,7 @@ class SyntheticSite(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.root)
         shutil.copytree(REPO / "i18n", self.root / "i18n")
         shutil.copytree(REPO / "data", self.root / "data")  # sources for fingerprints; never modified
+        register_reviewers(self.root)  # SYNTHETIC reviewers, temporary directory only
         en = self.read("en/messages.json")
         en["messages"] += SYNTHETIC_EN
         self.write("en/messages.json", en)
@@ -96,17 +96,14 @@ class SyntheticSite(unittest.TestCase):
             self.write(f"{lang}/messages.json", {"language": lang, "units": [self.unit(mid, lang) for mid in self.english]})
         glossary = self.read("glossary.json")
         glossary["terms"] = [{"id": "classification:VERIFIED FACT", "translations": {
-            "ar": {"label": "واقعة متحقق منها (اختبار)", "status": "approved", "forbidden": ["رسمي"]},
-            "fr": {"label": "fait vérifié (essai)", "status": "approved", "forbidden": ["officiel"]}}}]
+            "ar": approved_label("classification:VERIFIED FACT", "واقعة متحقق منها (اختبار)", ["رسمي"]),
+            "fr": approved_label("classification:VERIFIED FACT", "fait vérifié (essai)", ["officiel"])}}]
         self.write("glossary.json", glossary)
         evidence, ontology = registry.load_all()
         self.model = build.Model(evidence, ontology)
 
-    def unit(self, mid, lang, **over):
-        u = {"id": mid, "kind": "interface", "status": "approved", "text": synthetic(self.english[mid], lang),
-             "source_sha256": i18n.fingerprint(self.english[mid]), "review": dict(REVIEW)}
-        u.update(over)
-        return u
+    def unit(self, mid, lang, source=None, **over):
+        return approved_unit(mid, "interface", synthetic(self.english[mid], lang), source or self.english[mid], **over)
 
     def read(self, rel):
         return json.loads((self.root / "i18n" / rel).read_text(encoding="utf-8"))
@@ -285,19 +282,19 @@ class Eligibility(SyntheticSite):
         self.assertEqual(self.assertNotGenerated("ar", "no approved, current translation"), ["fr/registry/index.html"])
 
     def test_unapproved_translation(self):
-        self.replace_unit("ar", "test.title", status="draft")
+        self.replace_unit("ar", "test.title", status="DRAFT")
         self.assertNotGenerated("ar", "test.title")
 
     def test_stale_translation(self):
-        self.replace_unit("ar", "footer.disclaimer", source_sha256=i18n.fingerprint("an older English text"))
+        self.replace_unit("ar", "footer.disclaimer", source="an older English text")  # approved before English changed
         self.assertNotGenerated("ar", "footer.disclaimer")
 
     def test_missing_review_record(self):
-        self.replace_unit("ar", "test.cites", review=None)
+        self.replace_unit("ar", "test.cites", approval=None)
         self.assertNotGenerated("ar", "test.cites")
 
     def test_reviewer_not_independent_of_drafter(self):
-        self.replace_unit("ar", "test.cites", review=dict(REVIEW, linguistic_reviewer="synthetic-drafter-01"))
+        self.replace_unit("ar", "test.cites", draft={"method": "human", "by": "synthetic-reviewer-01"})
         self.assertNotGenerated("ar", "test.cites")
 
     def test_missing_required_terminology(self):

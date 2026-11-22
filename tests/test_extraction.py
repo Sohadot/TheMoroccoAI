@@ -30,12 +30,11 @@ import check_site  # noqa: E402
 import i18n  # noqa: E402
 import registry  # noqa: E402
 from test_multilingual import synthetic  # noqa: E402
+from i18n_fixtures import approved_label, approved_unit, register_reviewers  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 TODAY = datetime.date(2026, 11, 22)
-REVIEW = {"drafted_by": "synthetic-drafter-01", "draft_method": "machine-assisted", "substantive_reviewer": "synthetic-reviewer-01",
-          "linguistic_reviewer": "synthetic-reviewer-02", "approved_on": "2026-11-20", "glossary_version": "2026-11-22"}
-REGISTRY, METHODOLOGY = build.EXTRACTED_PAGES
+REGISTRY, METHODOLOGY, HOMEPAGE = build.EXTRACTED_PAGES
 CHANGELOG = registry.load(REPO / "data" / "changelog.json")
 
 
@@ -140,13 +139,10 @@ class CompleteExtraction(unittest.TestCase):
         for value in (ld["name"], ld["description"], ld["spatialCoverage"]["name"]):
             self.assertNotRegex(value, r"[A-Za-z]{2,}")
 
-    def test_methodology_hard_coded_english_is_only_the_deferred_changelog_records(self):
+    def test_methodology_has_no_hard_coded_english(self):
+        # Since Sprint 19B-4 the changelog records render through their stable identities, so nothing is deferred.
         words, facts = residual_words(self.render_pseudo(METHODOLOGY))
-        deferred = " ".join([CHANGELOG["note"]] + [e["title"] for e in CHANGELOG["entries"]] +
-                            [x for e in CHANGELOG["entries"] for k in ("changes", "corrections", "review_fixes", "breaking_changes")
-                             for x in e.get(k, [])])
-        self.assertTrue(words, "the deferred changelog records are expected to remain")
-        self.assertEqual(words - set(re.findall(r"[A-Za-z]{2,}", deferred)), set())
+        self.assertEqual(words, set())
         self.assertNotRegex(facts.title + (facts.description or ""), r"[A-Za-z]{2,}")
 
     def test_the_completeness_check_detects_hard_coded_english(self):
@@ -199,28 +195,32 @@ class RequirementsContract(unittest.TestCase):
 
 
 class ExtractedRegistryFixture(unittest.TestCase):
-    """A temporary i18n/ with ar and fr published and synthetic approved units for every unit /registry/ needs."""
+    """A temporary i18n/ with ar and fr published and synthetic approved units for every unit the page needs
+    (/registry/ unless a subclass sets SPEC)."""
+
+    SPEC = REGISTRY
 
     def setUp(self):
         self.root = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.root)
         shutil.copytree(REPO / "i18n", self.root / "i18n")
         shutil.copytree(REPO / "data", self.root / "data")  # read-only sources for fingerprints
+        register_reviewers(self.root)  # SYNTHETIC reviewers, temporary directory only
         langs = self.read("languages.json")
         for x in langs["languages"]:
             if x["code"] in ("ar", "fr"):
                 x["state"] = "published"
         self.write("languages.json", langs)
         self.model = model()
-        self.req = build.page_requirements(self.model, REGISTRY, self.root)
+        self.req = build.page_requirements(self.model, self.SPEC, self.root)
         self.sources = i18n.Sources(self.root)
         self.messages = sorted(set(self.req["messages"]) | build.LOCALIZATION_ONLY_MESSAGES)
         for lang in ("ar", "fr"):
             self.write(f"{lang}/messages.json", {"language": lang, "units": [self.unit(mid, lang) for mid in self.messages]})
             self.write(f"{lang}/content.json", {"language": lang, "units": [self.unit(cid, lang) for cid in self.req["content"]]})
         g = self.read("glossary.json")
-        g["terms"] = [{"id": t, "translations": {lang: {"label": synthetic(t.split(":")[1], lang), "status": "approved", "forbidden": []}
-                                               for lang in ("ar", "fr")}} for t in self.req["terms"]]
+        g["terms"] = [{"id": t, "translations": {lang: approved_label(t, synthetic(t.split(":")[1], lang)) for lang in ("ar", "fr")}}
+                      for t in self.req["terms"]]
         self.write("glossary.json", g)
 
     def source(self, uid):
@@ -234,14 +234,13 @@ class ExtractedRegistryFixture(unittest.TestCase):
     def text(self, uid, lang):
         return synthetic(self.source(uid), lang) + " " + self.tag(uid)
 
-    def unit(self, uid, lang, **over):
-        src = self.source(uid)
-        u = {"id": uid, "kind": "interface" if ":" not in uid else "prose", "status": "approved", "text": self.text(uid, lang),
-             "source_sha256": i18n.fingerprint(src), "review": dict(REVIEW)}
+    def unit(self, uid, lang, source=None, **over):
+        kind = "interface" if ":" not in uid else "prose"
         if uid.endswith(":name"):
-            u.update(kind="name", name_basis="transliteration")
-        u.update(over)
-        return u
+            kind = "name"
+            over.setdefault("name_basis", "transliteration")
+        text = over.pop("text", None) or self.text(uid, lang)
+        return approved_unit(uid, kind, text, source or self.source(uid), **over)
 
     def read(self, rel):
         return json.loads((self.root / "i18n" / rel).read_text(encoding="utf-8"))
@@ -256,21 +255,24 @@ class ExtractedRegistryFixture(unittest.TestCase):
         self.write(f"{lang}/{kind}.json", cat)
 
     def localize(self):
-        return build.localize(self.model, [REGISTRY], root=self.root, today=TODAY)
+        return build.localize(self.model, [self.SPEC], root=self.root, today=TODAY)
+
+    def output(self, lang):
+        return build.output_path(lang, self.SPEC.path)
 
     def generated(self, lang="ar"):
         files, clusters, report = self.localize()
         self.assertEqual(report, [], report[:3])
-        return files[f"{lang}/registry/index.html"]
+        return files[self.output(lang)]
 
     def gate(self, lang, html):
         en_ctx = build.RenderContext("en", self.root, today=TODAY)
         with build.rendering(en_ctx):
-            english = REGISTRY.render(self.model)
+            english = self.SPEC.render(self.model)
         tr = i18n.Translator(lang, self.root, today=TODAY)
-        with build.rendering(build.RenderContext(lang, self.root, clusters={"/registry/": ["en", lang]}, translator=tr)):
-            REGISTRY.render(self.model)
-        return build.localized_page_errors(lang, "/registry/", html, english, tr.used, en_ctx.tr.used,
+        with build.rendering(build.RenderContext(lang, self.root, clusters={self.SPEC.path: ["en", lang]}, translator=tr)):
+            self.SPEC.render(self.model)
+        return build.localized_page_errors(lang, self.SPEC.path, html, english, tr.used, en_ctx.tr.used,
                                            build.load_languages(self.root), tr)
 
     def assertGate(self, lang, html, fragment):
@@ -279,8 +281,8 @@ class ExtractedRegistryFixture(unittest.TestCase):
 
     def assertNotGenerated(self, fragment, lang="ar"):
         files, clusters, report = self.localize()
-        self.assertNotIn(f"{lang}/registry/index.html", files)
-        self.assertNotIn(lang, clusters.get("/registry/", []))
+        self.assertNotIn(self.output(lang), files)
+        self.assertNotIn(lang, clusters.get(self.SPEC.path, []))
         self.assertTrue(any(fragment in r for r in report), report[:5])
 
 
@@ -400,7 +402,7 @@ class NegativeRegressions(ExtractedRegistryFixture):
 
     # 13
     def test_stale_translation_is_not_eligible(self):
-        self.edit_unit("ar", "domain:government-policy:label", source_sha256=i18n.fingerprint("an older label"))
+        self.edit_unit("ar", "domain:government-policy:label", source="an older label")  # approved before the label changed
         self.assertNotIn("domain:government-policy:label", i18n.renderable_units("ar", self.root, today=TODAY))
         self.assertNotGenerated("domain:government-policy:label")
 
