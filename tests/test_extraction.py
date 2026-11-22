@@ -34,7 +34,7 @@ from i18n_fixtures import approved_label, approved_unit, register_reviewers  # n
 
 REPO = Path(__file__).resolve().parent.parent
 TODAY = datetime.date(2026, 11, 22)
-REGISTRY, METHODOLOGY = build.EXTRACTED_PAGES
+REGISTRY, METHODOLOGY, HOMEPAGE = build.EXTRACTED_PAGES
 CHANGELOG = registry.load(REPO / "data" / "changelog.json")
 
 
@@ -195,7 +195,10 @@ class RequirementsContract(unittest.TestCase):
 
 
 class ExtractedRegistryFixture(unittest.TestCase):
-    """A temporary i18n/ with ar and fr published and synthetic approved units for every unit /registry/ needs."""
+    """A temporary i18n/ with ar and fr published and synthetic approved units for every unit the page needs
+    (/registry/ unless a subclass sets SPEC)."""
+
+    SPEC = REGISTRY
 
     def setUp(self):
         self.root = Path(tempfile.mkdtemp())
@@ -209,7 +212,7 @@ class ExtractedRegistryFixture(unittest.TestCase):
                 x["state"] = "published"
         self.write("languages.json", langs)
         self.model = model()
-        self.req = build.page_requirements(self.model, REGISTRY, self.root)
+        self.req = build.page_requirements(self.model, self.SPEC, self.root)
         self.sources = i18n.Sources(self.root)
         self.messages = sorted(set(self.req["messages"]) | build.LOCALIZATION_ONLY_MESSAGES)
         for lang in ("ar", "fr"):
@@ -252,21 +255,24 @@ class ExtractedRegistryFixture(unittest.TestCase):
         self.write(f"{lang}/{kind}.json", cat)
 
     def localize(self):
-        return build.localize(self.model, [REGISTRY], root=self.root, today=TODAY)
+        return build.localize(self.model, [self.SPEC], root=self.root, today=TODAY)
+
+    def output(self, lang):
+        return build.output_path(lang, self.SPEC.path)
 
     def generated(self, lang="ar"):
         files, clusters, report = self.localize()
         self.assertEqual(report, [], report[:3])
-        return files[f"{lang}/registry/index.html"]
+        return files[self.output(lang)]
 
     def gate(self, lang, html):
         en_ctx = build.RenderContext("en", self.root, today=TODAY)
         with build.rendering(en_ctx):
-            english = REGISTRY.render(self.model)
+            english = self.SPEC.render(self.model)
         tr = i18n.Translator(lang, self.root, today=TODAY)
-        with build.rendering(build.RenderContext(lang, self.root, clusters={"/registry/": ["en", lang]}, translator=tr)):
-            REGISTRY.render(self.model)
-        return build.localized_page_errors(lang, "/registry/", html, english, tr.used, en_ctx.tr.used,
+        with build.rendering(build.RenderContext(lang, self.root, clusters={self.SPEC.path: ["en", lang]}, translator=tr)):
+            self.SPEC.render(self.model)
+        return build.localized_page_errors(lang, self.SPEC.path, html, english, tr.used, en_ctx.tr.used,
                                            build.load_languages(self.root), tr)
 
     def assertGate(self, lang, html, fragment):
@@ -275,8 +281,8 @@ class ExtractedRegistryFixture(unittest.TestCase):
 
     def assertNotGenerated(self, fragment, lang="ar"):
         files, clusters, report = self.localize()
-        self.assertNotIn(f"{lang}/registry/index.html", files)
-        self.assertNotIn(lang, clusters.get("/registry/", []))
+        self.assertNotIn(self.output(lang), files)
+        self.assertNotIn(lang, clusters.get(self.SPEC.path, []))
         self.assertTrue(any(fragment in r for r in report), report[:5])
 
 

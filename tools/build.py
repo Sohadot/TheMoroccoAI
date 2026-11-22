@@ -33,11 +33,10 @@ ENTITY_TYPE_ORDER = ("institution", "company", "initiative", "event", "project",
                      "technology", "sector")
 TYPE_LABELS = {k: i18n.t(f"vocab.entity_type.{k}.plural") for k in ENTITY_TYPE_ORDER}
 TYPE_SINGULAR = {k: i18n.t(f"vocab.entity_type.{k}.singular") for k in ENTITY_TYPE_ORDER}
-LIFECYCLE_LABELS = {
-    "announced": "Announced", "in-development": "In development", "pilot": "Pilot",
-    "operational": "Operational", "released": "Released", "discontinued": "Discontinued",
-    "unresolved": "Unresolved",
-}
+# Lifecycle and status-basis labels live in the catalog (vocab.*); these English dicts, derived from it, are also
+# published in the data contract (matrix.json derivation, data/manifest.json), so they keep their exact values.
+LIFECYCLE_ORDER = ("announced", "in-development", "pilot", "operational", "released", "discontinued", "unresolved")
+LIFECYCLE_LABELS = {k: i18n.t(f"vocab.lifecycle.{k.replace('-', '_')}") for k in LIFECYCLE_ORDER}
 ORIGIN_LABELS = {
     "based-in-morocco": "Based in Morocco (independent source)",
     "self-described-moroccan": "Self-described Moroccan",
@@ -63,12 +62,8 @@ SIGIL = ('<svg viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="fal
          '<circle cx="14" cy="14" r="2.5" fill="#b8892a"/></svg>')
 
 
-STATUS_BASIS_LABELS = {
-    "public-availability-observed": "public availability on the operator's own service (usage not documented)",
-    "operator-report-of-use": "operator's report of use",
-    "independent-listing": "independent listing",
-    "independent-report-of-use": "independent report of use",
-}
+STATUS_BASIS_ORDER = ("public-availability-observed", "operator-report-of-use", "independent-listing", "independent-report-of-use")
+STATUS_BASIS_LABELS = {k: i18n.t(f"vocab.status_basis.{k.replace('-', '_')}") for k in STATUS_BASIS_ORDER}
 # Evidence-recency convention, not a lifecycle rule: operational or pilot evidence whose latest record is
 # more than this many calendar months before the registry's as-of date is flagged as not reconfirmed.
 # Elapsed time never changes a lifecycle stage; only a record declaring a new status can.
@@ -646,11 +641,11 @@ def render_registry_index(model):
 
 
 def _ev_links(ids):
-    return " ".join(f'<a href="/registry/evidence/#{x}">{x}</a>' for x in ids)
+    return " ".join(f'<a href="/registry/evidence/#{x}">{iso(x)}</a>' for x in ids)
 
 
 def _ent_link(model, eid):
-    return f'<a href="{entity_url(eid)}">{escape(model.entities[eid]["name"])}</a>'
+    return link(entity_url(eid), content(f"ontology:{eid}:name", model.entities[eid]["name"]))
 
 
 def _table(label, headers, rows, empty):
@@ -678,17 +673,17 @@ def _months_before(day, months):
     return datetime.date(y, m, min(day.day, last))
 
 
-AVAILABILITY_SUFFIX = " (public availability; use not documented)"
+AVAILABILITY_SUFFIX = " " + i18n.t("vocab.lifecycle.availability_suffix")
 
 
 def stage_label(model, e):
     """Lifecycle label; an operational or pilot stage resting only on observed availability says so."""
-    label = LIFECYCLE_LABELS[e["lifecycle"]]
+    label = msg_text(f"vocab.lifecycle.{e['lifecycle'].replace('-', '_')}")
     if e.get("lifecycle") in ("operational", "pilot"):
         bases = {model.records[x].get("status_basis") for x in e.get("lifecycle_evidence") or []
                  if model.records[x].get("status_evidence") == e["lifecycle"]}
         if bases == {"public-availability-observed"}:
-            label += AVAILABILITY_SUFFIX
+            label += " " + msg_text("vocab.lifecycle.availability_suffix")
     return label
 
 
@@ -703,12 +698,10 @@ def deployment_facts(model, e):
     currency, stale = "", False
     if latest and e.get("lifecycle") in ("operational", "pilot"):
         as_of = datetime.date(*[int(x) for x in model.as_of.split("-")])
-        label = f"{human_date(latest[1])}{' (observed)' if latest[2] else ''}"
+        label = msg_text("facts.observed", date=human_date(latest[1])) if latest[2] else human_date(latest[1])
         stale = latest[0] < _months_before(as_of, RECENCY_MONTHS)
-        currency = (f"Latest supporting evidence {label} is more than {RECENCY_MONTHS} months old; current operation has not been reconfirmed"
-                    if stale else
-                    f"Latest supporting evidence {label}, within {RECENCY_MONTHS} months; operation after that date not reconfirmed")
-    bases = sorted({STATUS_BASIS_LABELS[r["status_basis"]] for r in status if r.get("status_basis")})
+        currency = msg_text("facts.currency.stale" if stale else "facts.currency.recent", date=label, months=RECENCY_MONTHS)
+    bases = sorted({msg_text(f"vocab.status_basis.{r['status_basis'].replace('-', '_')}") for r in status if r.get("status_basis")})
     return {"operators": operators, "sectors": sectors, "provider": provider, "bases": bases, "currency": currency,
             "stale": stale, "status_ids": [r["evidence_id"] for r in status]}
 
@@ -2304,31 +2297,32 @@ def render_acquisition(model):
 
 
 def homepage_blocks(model):
+    H = "page.home."
     nodes = []
     for i, (key, label) in enumerate(model.domains.items(), 1):
         members = sorted((e for e in model.ontology["entities"] if e.get("domain") == key),
                          key=lambda e: (-len(e["evidence"]), e["name"].lower()))
         if members:
             recs = {x for e in members for x in e["evidence"]}
-            status = f"{len(recs)} record{'s' if len(recs) != 1 else ''}"
-            names = ", ".join(f'<a href="{entity_url(e["id"])}">{escape(e["name"])}</a>' for e in members[:3])
-            more = f" and {len(members) - 3} more" if len(members) > 3 else ""
-            desc = f"{names}{more}."
+            status = msg(H + ("domain.records.one" if len(recs) == 1 else "domain.records.other"), count=len(recs))
+            names = msg_text("punct.list_comma").join(_ent_link(model, e["id"]) for e in members[:3])
+            desc = (msg_html(H + "domain.members_more", names=names, count=str(len(members) - 3)) if len(members) > 3
+                    else msg_html(H + "domain.members", names=names))
         else:
-            status = "Not yet sourced"
-            desc = "No verified record yet. This domain stays empty until primary sources support an entry."
+            status = msg(H + "domain.empty.status")
+            desc = msg(H + "domain.empty.text")
         nodes.append(f"""      <div class="landscape-node">
         <span class="node-status">{status}</span>
-        <div class="node-id">MAI-D-{i:03d}</div>
-        <h3 class="node-title"><a href="/registry/#domain-{key}">{escape(label)}</a></h3>
+        <div class="node-id">{iso(f"MAI-D-{i:03d}")}</div>
+        <h3 class="node-title">{link(f"/registry/#domain-{key}", content(f"domain:{key}:label", label))}</h3>
         <p class="node-desc">{desc}</p>
         <div class="node-ar" lang="ar" dir="rtl">{escape(model.ontology.get("domain_labels_ar", {}).get(key, ""))}</div>
       </div>""")
-    nodes.append("""      <div class="landscape-node landscape-node-cta">
-        <span class="node-status">Open</span>
-        <div class="node-id">MAI-REG</div>
-        <h3 class="node-title"><a href="/registry/">Open the full registry →</a></h3>
-        <p class="node-desc">Every entity, relationship and source excerpt, plus the JSON data.</p>
+    nodes.append(f"""      <div class="landscape-node landscape-node-cta">
+        <span class="node-status">{msg(H + "domain.cta.status")}</span>
+        <div class="node-id">{iso("MAI-REG")}</div>
+        <h3 class="node-title">{link("/registry/", msg(H + "domain.cta.title"))}</h3>
+        <p class="node-desc">{msg(H + "domain.cta.text")}</p>
       </div>""")
     return {
         "landscape": "\n" + "\n".join(nodes) + "\n      ",
@@ -2338,65 +2332,85 @@ def homepage_blocks(model):
         "relationships": str(len(model.relationships)),
         "domains": str(len(model.domains)),
         "entity-types": str(len(model.ontology["entity_types"])),
-        "as-of": human_date(model.as_of).split(" ", 1)[-1] if model.as_of else "",
+        "as-of": human_date(model.as_of[:7]) if model.as_of else "",
         "examples": "\n" + homepage_examples(model) + "\n    ",
     }
 
 
-KIND_PHRASES = {"compute-infrastructure": "compute infrastructure", "digital-platform": "digital platform, not an AI application",
-                "institute": "institute", "agreement": "agreement"}
+KIND_PHRASES = {k: i18n.t(f"vocab.project_kind_phrase.{k.replace('-', '_')}") for k in ("compute-infrastructure", "digital-platform", "institute", "agreement")}
 
 
 def _stage_with_kind(model, e):
-    kind = KIND_PHRASES.get(e.get("project_kind"), "")
+    kind = msg_text(f"vocab.project_kind_phrase.{e['project_kind'].replace('-', '_')}") if e.get("project_kind") in KIND_PHRASES else ""
     return f"{kind}; {stage_label(model, e).lower()}" if kind else stage_label(model, e).lower()
 
 
-def _example(qid, question, answer, links):
-    link_html = " · ".join(f'<a href="{href}">{escape(label)}</a>' for href, label in links)
+def attribute_text(model, eid, field, pos, text):
+    """An entity attribute's name or value through its stable identity (i18n/attribute-identity.json)."""
+    ids = identity_bindings("attribute", ontology=model.ontology)
+    index = [e["id"] for e in model.ontology["entities"] if e.get("attributes")].index(eid)
+    return content(f"attribute:{ids[(index, field, pos)]}:text", text)
+
+
+def _lower_first(html):
+    return html[:1].lower() + html[1:]
+
+
+def _example(qid, question_id, answer, links):
+    """links: (href, label HTML) pairs; evidence identifiers are isolated, labels come from the catalog."""
+    link_html = " · ".join(link(href, label) for href, label in links)
     return f"""      <article class="example" aria-labelledby="{qid}">
-        <h3 class="example-q" id="{qid}">{escape(question)}</h3>
+        <h3 class="example-q" id="{qid}">{msg_q(question_id)}</h3>
         <div class="example-a">{answer}</div>
-        <p class="example-links">Evidence: {link_html}</p>
+        <p class="example-links">{msg_html("page.home.ex.evidence", links=link_html)}</p>
       </article>"""
+
+
+def _evidence_links(ids):
+    return [(f"/registry/evidence/#{x}", iso(x)) for x in ids]
 
 
 def homepage_examples(model):
     """Three questions answered entirely from the registry data, each linking to its supporting output."""
     ents, rels = model.entities, model.relationships
+    H = "page.home.ex."
     out = []
+    semi = msg_text("punct.list_semicolon")
 
     # 1. The documented status of Idarati AI.
     e = ents["idarati-ai"]
     f = deployment_facts(model, e)
-    ops = ", ".join(_ent_link(model, o) for o, c in f["operators"] if c == "VERIFIED FACT") or "not documented"
-    use = (" Public availability is not evidence of use: no usage, accuracy or outcome evidence is recorded."
+    ops = (msg_text("punct.list_comma").join(_ent_link(model, o) for o, c in f["operators"] if c == "VERIFIED FACT")
+           or msg(H + "idarati.no_operator"))
+    use = (" " + msg_q(H + "idarati.use_qualifier")
            if set(model.records[x].get("status_basis") for x in f["status_ids"]) == {"public-availability-observed"} else "")
     out.append(_example(
-        "ex-idarati", "What is the documented status of Idarati AI?",
-        f'<p>{_ent_link(model, e["id"])}: {escape(stage_label(model, e))}. Operator: {ops}. '
-        f'Basis: {escape("; ".join(f["bases"]))}. {escape(f["currency"])}.{escape(use)}</p>',
-        [(entity_url(e["id"]), "entity page"), ("/registry/questions/#q6-h", "Q6 deployments")]
-        + [(f"/registry/evidence/#{x}", x) for x in f["status_ids"]]))
+        "ex-idarati", H + "idarati.question",
+        "<p>" + msg_html(H + "idarati.answer", entity=_ent_link(model, e["id"]), stage=escape(stage_label(model, e)),
+                         operators=ops, basis=escape(semi.join(f["bases"])), currency=escape(f["currency"])) + use + "</p>",
+        [(entity_url(e["id"]), msg_q(H + "link.entity_page")), ("/registry/questions/#q6-h", msg_q(H + "link.q6"))]
+        + _evidence_links(f["status_ids"])))
 
     # 2. Morocco AI 2030: official targets versus what is verified.
     plan = ents["morocco-ai-2030"]
     targets = [r for r in model.records.values() if r["classification"] == "OFFICIAL TARGET" and plan["id"] in r["related_entities"]]
     included = [ents[r["object"]] for r in rels if r["subject"] == plan["id"] and r["predicate"] == "includes"]
-    target_text = " ".join(f'{escape(r["claim"])} {escape(r["verification_note"])}' for r in targets)
+    target_text = " ".join(f'{content(f"evidence:{r["evidence_id"]}:claim", r["claim"])} '
+                           f'{content(f"evidence:{r["evidence_id"]}:verification_note", r["verification_note"])}' for r in targets)
     include_ids = sorted({x for r in rels if r["subject"] == plan["id"] and r["predicate"] == "includes" for x in r["evidence"]})
-    parts = "; ".join(f'{_ent_link(model, x["id"])} ({escape(_stage_with_kind(model, x))})' for x in included)
+    parts = semi.join(f'{_ent_link(model, x["id"])} ({escape(_stage_with_kind(model, x))})' for x in included)
     verified = [r for r in rels if r["subject"] == plan["id"] and r["classification"] == "VERIFIED FACT"]
-    via = ", ".join(f'{escape(model.predicates[r["predicate"]]["label"])} {_ent_link(model, r["object"])}' for r in verified)
-    via = f" Verified: it is {via}." if via else ""
+    via = msg_text("punct.list_comma").join(
+        f'{content(f"predicate:{r["predicate"]}:label", model.predicates[r["predicate"]]["label"])} {_ent_link(model, r["object"])}'
+        for r in verified)
+    via = " " + msg_html(H + "2030.verified", relations=via) if via else ""
     out.append(_example(
-        "ex-2030", "What has Morocco AI 2030 set as targets, and what is verified so far?",
-        f'<p>{target_text} The registry shows targets as targets, never as outcomes, and records no target as achieved.</p>'
-        f'<p>The roadmap is recorded as including {len(included)} projects, on the basis of the ministry\'s presentation: {parts}.{via} '
-        f'A project\'s status is not a measure of progress toward the quantified targets.</p>',
-        [(entity_url(plan["id"]), "entity page")]
-        + [(f"/registry/evidence/#{x}", x) for x in [r["evidence_id"] for r in targets] + include_ids]
-        + [("/registry/questions/#q2-h", "Q2 projects by stage")]))
+        "ex-2030", H + "2030.question",
+        f'<p>{target_text} {msg(H + "2030.targets_qualifier")}</p>'
+        f'<p>{msg_html(H + "2030.included", count=str(len(included)), projects=parts)}{via} {msg(H + "2030.status_qualifier")}</p>',
+        [(entity_url(plan["id"]), msg_q(H + "link.entity_page"))]
+        + _evidence_links([r["evidence_id"] for r in targets] + include_ids)
+        + [("/registry/questions/#q2-h", msg_q(H + "link.q2"))]))
 
     # 3. Institutions documented as connected to compute and data-centre infrastructure.
     infra_tech = ("high-performance-computing", "data-centres")
@@ -2407,32 +2421,31 @@ def homepage_examples(model):
     rows = []
     for x in infra:
         links = [r for r in rels if r["object"] == x["id"] and ents[r["subject"]]["type"] in ("institution", "company")]
-        who = "; ".join(f'{_ent_link(model, r["subject"])}, {escape(model.predicates[r["predicate"]]["label"].removesuffix(" of"))} '
-                        f'<span class="example-cls">({escape(r["classification"].lower())})</span>' for r in links) or "no organisation recorded"
+        # Predicate labels read 'hosts of' / 'signatory of'; the trailing ' of' is dropped in this list (English rule).
+        who = semi.join(f'{_ent_link(model, r["subject"])}, '
+                        f'{content(f"predicate:{r["predicate"]}:label", model.predicates[r["predicate"]]["label"]).removesuffix(" of")} '
+                        f'<span class="example-cls">({msg_q("vocab.classification_inline." + r["classification"].lower().replace(" ", "_"))})</span>'
+                        for r in links) or msg(H + "infra.no_organisation")
         basis = ""
         if x["lifecycle"] in ("operational", "pilot"):
             f = deployment_facts(model, x)
-            basis = f' (basis: {escape("; ".join(f["bases"]))}; {escape(f["currency"][0].lower() + f["currency"][1:])})'
-        reported = [a for a in x.get("attributes") or [] if a["name"].startswith("Reported AI workloads")]
-        work = "".join(f'; {escape(a["name"])}: {escape(a["value"][0].lower() + a["value"][1:])} {_ev_links([a["evidence"]])}' for a in reported)
+            basis = " " + msg_html(H + "infra.basis", basis=escape(semi.join(f["bases"])), currency=_lower_first(escape(f["currency"])))
+        work = "".join(f'; {attribute_text(model, x["id"], "name", n, a["name"])}: '
+                       f'{_lower_first(attribute_text(model, x["id"], "value", n, a["value"]))} '
+                       f'{_ev_links([a["evidence"]])}'
+                       for n, a in enumerate(x.get("attributes") or []) if a["name"].startswith("Reported AI workloads"))
         rows.append(f'<li>{_ent_link(model, x["id"])}, {escape(_stage_with_kind(model, x))}{basis}: {who}{work}</li>')
     announced = sum(1 for x in infra if x["lifecycle"] == "announced")
     ids = {x["id"] for x in infra}
     runs_ai = any({r["subject"], r["object"]} & ids and ents[r["subject"] if r["object"] in ids else r["object"]].get("project_kind") == "ai-application"
                   for r in rels)
     reports = any(a["name"].startswith("Reported AI workloads") for x in infra for a in x.get("attributes") or [])
-    if not runs_ai and not reports:
-        workload = ("Compute infrastructure is not an AI application: the registry documents capacity, not what runs on it, "
-                    "and records no AI workload on these systems.")
-    else:
-        workload = ("Compute infrastructure is not an AI application. Reported AI workloads are shown only where a source states them, "
-                    "with who reported them; they do not establish the scale, users or outcomes of AI use (GAP-03).")
+    workload = msg(H + ("infra.workload.none" if not runs_ai and not reports else "infra.workload.reported"))
     out.append(_example(
-        "ex-infra", "Which institutions are documented as connected to computing and data-centre infrastructure?",
-        f'<ul>{"".join(rows)}</ul><p>{announced} of these {len(infra)} projects are only announced or signed: no record shows them built '
-        f'or running. A signature is recorded as a signature. {workload}</p>',
-        [(f"/registry/evidence/#{x}", x) for x in sorted({y for i in infra for y in i["lifecycle_evidence"]})]
-        + [("/registry/questions/#q5-h", "Q5 relationships"), ("/registry/questions/#q2-h", "Q2 projects by stage")]))
+        "ex-infra", H + "infra.question",
+        f'<ul>{"".join(rows)}</ul><p>{msg(H + "infra.announced", announced=announced, total=len(infra))} {workload}</p>',
+        _evidence_links(sorted({y for i in infra for y in i["lifecycle_evidence"]}))
+        + [("/registry/questions/#q5-h", msg_q(H + "link.q5")), ("/registry/questions/#q2-h", msg_q(H + "link.q2"))]))
     return "\n".join(out)
 
 
@@ -2443,6 +2456,114 @@ def inject(html_text, blocks):
             raise SystemExit(f"index.html: missing marker <!--r:{key}-->")
         html_text = pattern.sub(lambda m: m.group(1) + value + m.group(3), html_text)
     return html_text
+
+
+HOMEPAGE_TEMPLATE = ROOT / "tools" / "templates" / "homepage.tmpl"
+_TOKEN = re.compile(r"\{\{(\w+)(?::([^}|]*))?(?:\|([^}]*))?\}\}")
+
+
+def msg_attr(message_id, **values):
+    """Catalog text for a double-quoted attribute where the hand-written page escaped only '&', '<', '>' and '"'."""
+    return escape(_ctx().tr.text(message_id, **values), quote=False).replace('"', "&quot;")
+
+
+def _homepage_html(model, blocks):
+    """HTML values for the homepage's catalog messages with placeholders (links, emphasis, isolated codes, the
+    generated figures with their markers)."""
+    P = "page.home."
+    b = lambda key: f"<!--r:{key}-->{blocks[key]}<!--/r:{key}-->"
+    em = lambda tag, mid: f"<{tag}>{msg(mid)}</{tag}>"
+    links = {"ownership": link("/methodology/#ownership-h", msg(P + "footer.ownership")),
+             "methodology": link("/methodology/", msg("footer.link.methodology")),
+             "data": file_link("/data/evidence.json", msg("footer.link.data")),
+             "evaluation": link("/evaluation/", msg("footer.link.evaluation")),
+             "acquisition": link("/acquisition/", msg("footer.link.acquisition"))}
+    mail = ('<a href="mailto:agent@sohadot.com?subject=TheMoroccoAI.com%20%E2%80%94%20confidential%20acquisition%20enquiry">'
+            'agent@sohadot.com</a>')
+    values = {
+        "hero.label": {"code": iso("MAI-ROOT-001")},
+        "hero.h1": {"emphasis": em("em", P + "hero.h1.emphasis")},
+        "hero.lede": {"emphasis": em("strong", P + "hero.lede.emphasis")},
+        "hero.notice": {"independent": em("strong", P + "hero.notice.independent")},
+        "coverage.intro": {"count": b("domains")},
+        "access.evidence_json.text": {"count": b("records")},
+        "access.ontology_json.text": {"types": b("entity-types"), "entities": b("entities")},
+        "examples.intro": {"questions": link("/registry/questions/", msg(P + "examples.intro.link"))},
+        "method.rules.label": {"code": iso("MAI-GOV-001")},
+        "method.rule.4": {"changelog": link("/methodology/#m6-h", msg(P + "method.rule.4.link"))},
+        "evaluate.label": {"code": iso("MAI-IRE")},
+        "thesis.framing": {"framing": em("strong", P + "thesis.framing.lead"),
+                           "registry": link("/registry/", msg(P + "thesis.framing.registry"))},
+        "thesis.5.body": {"roadmap": link("/registry/morocco-ai-2030/", msg(P + "thesis.5.body.roadmap")),
+                          "digital": link("/registry/digital-morocco-2030/",
+                                          content("ontology:digital-morocco-2030:name", model.entities["digital-morocco-2030"]["name"]))},
+        "vocab.note": {"file": file_link("/data/ontology.json", iso("/data/ontology.json"))},
+        "acquire.text": {"ownership": msg("disclosure.ownership_statement"),
+                         "acquisition": link("/acquisition/", msg(P + "acquire.text.link")), "email": iso(mail)},
+        "footer.links": links,
+        "footer.languages": {"english": '<span class="footer-lang active" lang="en">EN</span>',
+                             "tamazight": '<span lang="zgh">ⵜⵣⵎ</span>'},
+    }
+    for key in ("coverage", "access", "examples", "method", "thesis"):
+        values[f"{key}.h2"] = {"break": "<br>"}
+    out = {P + k: (lambda k=k, v=v: msg_html(P + k, **v)) for k, v in values.items()}
+    out[P + "method.more_link"] = lambda: link("/methodology/", msg(P + "method.more"))
+    for k in ("owner_view", "ambition", "intended_role"):
+        out[P + f"thesis.cell.{k}"] = lambda code, k=k: msg_html(P + f"thesis.cell.{k}", code=iso(code))
+    return out
+
+
+def render_homepage(model):
+    """The homepage from tools/templates/homepage.tmpl: every visible, metadata and accessibility text comes from
+    the catalog ({{m:id}} element text, {{a:id}} attribute, {{j:id}} JSON-LD string, {{h:id}} text with HTML
+    placeholders), identifiers are isolated ({{i:code}}), internal links follow the page's language ({{href:path}}),
+    and the generated blocks keep their <!--r:key--> markers ({{b:key}})."""
+    ctx = _ctx()
+    path, cluster = "/", ctx.clusters.get("/", ())
+    canonical = SITE + route(ctx.lang, path)
+    blocks = homepage_blocks(model)
+    html_values = _homepage_html(model, blocks)
+    seo = ld_extra = notice = ""
+    if len(cluster) > 1:
+        seo = "".join(f'<link rel="alternate" hreflang="{ctx.languages[c]["bcp47"]}" href="{SITE}{route(c, path)}">\n' for c in cluster)
+        seo += f'<link rel="alternate" hreflang="x-default" href="{SITE}{path}">\n'
+        seo += f'<meta property="og:locale" content="{ctx.info["og_locale"]}">\n'
+        seo += "".join(f'<meta property="og:locale:alternate" content="{ctx.languages[c]["og_locale"]}">\n' for c in cluster if c != ctx.lang)
+        ld_extra = f',\n "inLanguage": "{ctx.info["bcp47"]}",\n ' + (
+            '"workTranslation": ' + json.dumps([{"@id": SITE + route(c, path)} for c in cluster if c != "en"]) if ctx.lang == "en"
+            else '"translationOfWork": ' + json.dumps({"@id": SITE + path}))
+    if ctx.lang != "en":
+        english = f'<a href="{path}" hreflang="en">{msg("shell.translation_notice.english")}</a>'
+        notice = (f'<p class="translation-notice" role="note">{msg_html("shell.translation_notice", english=english)} '
+                  f'{msg("shell.translation_policy")}</p>\n')
+
+    def href(target):
+        local, english = local_href(target)
+        return local + ('" hreflang="en' if english else "")
+
+    def fill(m):
+        kind, arg, extra = m.group(1), m.group(2), m.group(3)
+        if kind == "m":
+            return msg(arg)
+        if kind == "a":
+            return msg_attr(arg)
+        if kind == "j":
+            return json.dumps(ctx.tr.text(arg), ensure_ascii=False)[1:-1].replace("</", "<\\/")
+        if kind == "h":
+            return html_values[arg](extra) if extra else html_values[arg]()
+        if kind == "i":
+            return iso(escape(arg, quote=False))
+        if kind == "href":
+            return href(arg)
+        if kind == "b":
+            return f"<!--r:{arg}-->{blocks[arg]}<!--/r:{arg}-->"
+        fixed = {"lang": ctx.info["bcp47"], "dir": ctx.info["dir"], "canonical": canonical, "seo": seo,
+                 "ld_extra": ld_extra, "notice": notice, "switcher": language_switcher(path, cluster)}
+        if kind in fixed and arg is None:
+            return fixed[kind]
+        raise SystemExit(f"{HOMEPAGE_TEMPLATE.name}: unknown token {m.group(0)}")
+
+    return _TOKEN.sub(fill, HOMEPAGE_TEMPLATE.read_text(encoding="utf-8"))
 
 
 # ─── LOCALIZED PAGES (TMA-DEC-007) ─────────────────────────────────────────
@@ -2466,6 +2587,7 @@ LOCALIZABLE_PAGES = ()
 EXTRACTED_PAGES = (
     PageSpec("/registry/", lambda model: render_registry_index(model)),
     PageSpec("/methodology/", lambda model: render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json"))),
+    PageSpec("/", lambda model: render_homepage(model)),
 )
 
 
@@ -2774,7 +2896,7 @@ def _english_outputs(model, localized_paths):
     files["data/index.html"] = render_data_reference(model, gaps, json.loads(files["data/manifest.json"]))
     for eid, e in model.entities.items():
         files[f"registry/{eid}/index.html"] = render_entity(model, e)
-    files["index.html"] = inject((ROOT / "index.html").read_text(encoding="utf-8"), homepage_blocks(model))
+    files["index.html"] = render_homepage(model)
     return files
 
 
