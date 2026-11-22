@@ -44,7 +44,7 @@ SOURCE = "https://example.org/source"
 
 def synthetic(text, lang):
     """A placeholder 'translation': keeps placeholders, identifiers, URLs and digits, replaces the words."""
-    keep = re.compile(r"\{[a-z_]+\}|MAI-[A-Z0-9]+(?:-[A-Z0-9]+)*|https?://\S+|\d+|&")
+    keep = re.compile(r"\{[a-z_][a-z0-9_]*\}|MAI-[A-Z0-9]+(?:-[A-Z0-9]+)*|https?://\S+|\d+|&")
     parts, last = [], 0
     for m in keep.finditer(text):
         if text[last:m.start()].strip():

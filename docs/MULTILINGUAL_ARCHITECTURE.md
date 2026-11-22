@@ -1,6 +1,6 @@
 # Multilingual Reference Architecture
 
-Status: **Accepted (TMA-DEC-007, 2026-11-22).** The design was proposed in Sprint 19A and accepted with the owner decisions Q1–Q9 recorded in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). **Implementation:** the Sprint 19B-1 foundation (section 13) and the Sprint 19B-2 rendering engine (section 14) exist; no page is registered for localization yet. No translation has been drafted or reviewed, and no localized page or route is published. Section 1 is the Sprint 19A inventory at `728d475`, kept as recorded. The phased plan is in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
+Status: **Accepted (TMA-DEC-007, 2026-11-22).** The design was proposed in Sprint 19A and accepted with the owner decisions Q1–Q9 recorded in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). **Implementation:** the Sprint 19B-1 foundation (section 13), the Sprint 19B-2 rendering engine (section 14) and the Sprint 19B-3 extraction of `/registry/` and `/methodology/` (section 15) exist; no page is registered for localization yet. No translation has been drafted or reviewed, and no localized page or route is published. Section 1 is the Sprint 19A inventory at `728d475`, kept as recorded. The phased plan is in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
 
 Governing policy: [TMA-DEC-003](DECISION_LOG.md) (accepted) says:
 - English is the authoritative project language.
@@ -480,4 +480,27 @@ None of these holds today, so **no localized file is generated, listed or linked
 **Sprint 19B-4:** homepage templating.
 
 **Typography to review with real Arabic text (Q5):** Latin runs inside Arabic pages currently fall back to DM Mono.
+
+## 15. Extracted reference pages (Sprint 19B-3)
+
+All presentation text of `/registry/` and `/methodology/` now comes from `i18n/en/messages.json`: 134 new units, plus 23 reused shell, footer, ownership-statement and date units. The per-unit inventory is in [MULTILINGUAL_CONTENT_INVENTORY.md](MULTILINGUAL_CONTENT_INVENTORY.md). Both pages, and every other generated file, are **byte-identical** to the previous output. The old and new renderers were also compared on deliberately altered data, so that every conditional branch was exercised. Neither page is registered for localization.
+
+| Part | Implementation |
+|---|---|
+| Rich text | Links, emphasis and identifiers are `{name}` placeholders filled by the generator (`msg_html`). Catalog text cannot hold markup, and a brace outside a valid placeholder is rejected as a malformed rich-text token |
+| Canonical text | Entity names and statuses, classification definitions and domain labels are **content units** resolved from `data/`: `ontology:<id>:name`, `ontology:<id>:status`, `classification:<code>:definition` and `domain:<key>:label`. They are never copied into the catalog. Identifiers inside them are isolated in right-to-left text (`content()`) |
+| Terminology | The entity-type and source-type labels moved from `build.py` into `vocab.*` messages. The `TYPE_LABELS`, `TYPE_SINGULAR` and `SOURCE_TYPE_LABELS` dicts are derived from them, so other pages are unchanged. Entity-type messages carry a `term` link to the glossary, and a localized page using one needs an approved glossary label for that term |
+| Requirements | `page_requirements()` returns exactly the messages, content units and glossary terms a page renders: `/registry/` 77, 102 and 10; `/methodology/` 102, 5 and 10. A localized rendering also needs the localization-only shell messages |
+| Completeness | A pseudo-localization test replaces every letter of every catalog and canonical text. `/registry/` then shows no English, and `/methodology/` shows only the deferred changelog records |
+| Gates added | Structural parity with English (heading sequence, element ids and anchor targets, internal links, sections, lists and tables). The literal text of every qualifier and disclosure the page renders must be present on the page. `/registry/` passes every gate end to end in synthetic Arabic and French |
+
+**Deferred.** The 97 canonical changelog texts on `/methodology/` (note, entry titles, change lists, corrections, review fixes, breaking changes) still render as recorded in `data/changelog.json`.
+- **Why:** translating them needs content units for list items, which means deciding how such items are identified:
+  - position-based ids break when items are inserted;
+  - content-addressed ids turn every edit into a new unit.
+- **Consequence:** until that decision, `/methodology/` cannot be complete in another language.
+
+**Plural forms.** Counts use two English forms (`records.one`, `records.other`). Arabic has more plural categories. Translators phrase these units neutrally until plural selection is added.
+
+**Conditional units.** `page.registry.coverage.none` and `page.registry.coverage.gap` render only when a domain has no entity. They are in the inventory so they are translated together with the page. If they are needed but not translated, the page is withdrawn rather than shown with English.
 

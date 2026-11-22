@@ -36,7 +36,7 @@ UNIT_STATUSES = ("draft", "terminology-checked", "parity-reviewed", "linguistica
 # Every file on main is publicly served, so catalogs on main hold approved units only (Arch §6.3). A
 # translation pull request therefore stays red until both reviews are recorded: that is intended.
 COMMITTABLE_STATUSES = ("approved",)
-KINDS = ("interface", "prose", "qualifier", "disclosure", "term", "name")
+KINDS = ("interface", "navigation", "heading", "metadata", "prose", "qualifier", "disclosure", "term", "name")
 DRAFT_METHODS = ("human", "machine-assisted")
 NAME_BASES = ("official", "established-usage", "transliteration", "translation")
 
@@ -57,13 +57,17 @@ ARABIC_INDIC_DIGITS = re.compile(r"[٠-٩۰-۹]")
 FORBIDDEN_CHARS = {c: f"U+{c:04X}" for c in
                    [*range(0x202A, 0x202F), *range(0x2066, 0x206A), 0x200B, 0x200E, 0x200F, 0x2060, 0xFEFF]}
 
-# Canonical prose a content unit may translate: '<file>:<id>:<field>'.
+# Canonical prose a content unit may translate: '<file>:<id>:<field>' for records, entities and gaps, and
+# '<vocabulary>:<key>:<field>' for canonical vocabulary text (classification definitions, domain labels).
+# The English text is always read from data/, never copied into a catalog.
 CONTENT_FIELDS = {
     "evidence": ("title", "claim", "verification_note"),
-    "ontology": ("name", "summary", "note"),
+    "ontology": ("name", "summary", "note", "status"),
     "gaps": ("question", "established", "unestablished", "evidence_needed"),
+    "classification": ("definition",),
+    "domain": ("label",),
 }
-CONTENT_ID = re.compile(r"^(evidence|ontology|gaps):([^:]+):([a-z_]+)$")
+CONTENT_ID = re.compile(r"^(evidence|ontology|gaps|classification|domain):([^:]+):([a-z_]+)$")
 # Canonical vocabulary a glossary term may name: '<vocabulary>:<canonical value>'.
 GLOSSARY_VOCABULARIES = ("classification", "verification_status", "entity_type", "lifecycle", "project_kind",
                          "origin", "domain", "predicate")
@@ -126,6 +130,12 @@ class Sources:
         kind, key, field = m.groups()
         if field not in CONTENT_FIELDS[kind]:
             return None, "malformed"
+        if kind == "classification":
+            text = self.evidence["classifications"].get(key)
+            return (text, None) if isinstance(text, str) and text else (None, "orphan")
+        if kind == "domain":
+            text = self.ontology["domains"].get(key)
+            return (text, None) if isinstance(text, str) and text else (None, "orphan")
         table = {"evidence": self.records, "ontology": self.entities, "gaps": self.gap_items}[kind]
         item = table.get(key)
         if item is None or not isinstance(item.get(field), str) or not item.get(field):
@@ -159,6 +169,8 @@ def _text_problems(text, where):
         errors.append(f"{where}: prohibited invisible or bidirectional control characters {bad}")
     if "<" in text or ">" in text:
         errors.append(f"{where}: markup is not allowed in catalog text (keep it in the generator)")
+    if "{" in PLACEHOLDER.sub("", text) or "}" in PLACEHOLDER.sub("", text):
+        errors.append(f"{where}: malformed rich-text token: braces are allowed only as {{name}} placeholders")
     return errors
 
 
@@ -205,7 +217,7 @@ def validate_languages(registry):
     return errors
 
 
-def validate_english(catalog):
+def validate_english(catalog, sources=None):
     errors, seen = [], set()
     if catalog.get("language") != "en" or not isinstance(catalog.get("messages"), list):
         return ["i18n/en/messages.json: must declare language 'en' and a 'messages' list"]
@@ -218,6 +230,10 @@ def validate_english(catalog):
         seen.add(m.get("id"))
         if m.get("kind") not in KINDS:
             errors.append(f"{where}: unknown kind {m.get('kind')!r}")
+        if "term" in m:
+            vocab, _, value = str(m["term"]).partition(":")
+            if m.get("kind") != "term" or vocab not in GLOSSARY_VOCABULARIES or (sources and value not in sources.vocabulary(vocab)):
+                errors.append(f"{where}: term link {m['term']!r} must name canonical vocabulary on a 'term' message")
         errors += _text_problems(m.get("text"), where)
     return errors
 
@@ -363,6 +379,7 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
     if errors:
         return errors, report
     sources = Sources(root, evidence, ontology, gaps)
+    errors += [e for e in validate_english(english, sources) if "term link" in e]
     targets = [lang["code"] for lang in registry["languages"] if lang["code"] != "en"]
     gerrors, forbidden = validate_glossary(glossary, sources, targets)
     errors += gerrors
@@ -452,6 +469,9 @@ class Translator:
     def __init__(self, lang, root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
         self.lang, self.used, self.terms_used = lang, [], []
         self.english = english_messages(root)
+        catalog = _load(Path(root) / "i18n" / "en" / "messages.json")["messages"]
+        self.term_links = {m["id"]: m["term"] for m in catalog if "term" in m}
+        self.kinds = {m["id"]: m["kind"] for m in catalog}
         if lang == "en":
             self.texts, self.terms = self.english, None
         else:
@@ -464,7 +484,18 @@ class Translator:
             if message_id not in self.english:
                 raise KeyError(f"unknown message id {message_id!r}")
             raise Untranslated(f"{self.lang}: message {message_id!r} has no approved, current translation")
+        if self.lang != "en" and message_id in self.term_links:
+            self.term(self.term_links[message_id], self.english[message_id])  # terminology must be approved too
         return self.texts[message_id]
+
+    def content(self, unit_id, english):
+        """Canonical prose: the canonical English value itself for 'en', else its renderable translation."""
+        self.used.append(unit_id)
+        if self.lang == "en":
+            return english
+        if unit_id not in self.texts:
+            raise Untranslated(f"{self.lang}: canonical text {unit_id!r} has no approved, current translation")
+        return self.texts[unit_id]
 
     def text(self, message_id, **values):
         return fill(self.template(message_id), values, message_id)

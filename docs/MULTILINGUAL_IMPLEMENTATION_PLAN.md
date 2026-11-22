@@ -1,6 +1,6 @@
 # Multilingual Implementation Plan
 
-Status: **Accepted (TMA-DEC-007, 2026-11-22).** Owner decisions Q1–Q9 are recorded in the ADR. **Progress:** Sprint 19B-1 added the foundation (part of B1, and B4). Sprint 19B-2 added the rendering engine, publication gates, multilingual SEO, logical/RTL CSS and the language switcher (B3, B7 and the remaining B4 gates; Arch §14). No page is registered for localization yet (19B-3, 19B-4), no translation exists and no localized page is published. Its design is in [MULTILINGUAL_ARCHITECTURE.md](MULTILINGUAL_ARCHITECTURE.md) (cited below as "Arch §n"), and the decision is in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). Approval questions are numbered as in the ADR (Q1–Q9).
+Status: **Accepted (TMA-DEC-007, 2026-11-22).** Owner decisions Q1–Q9 are recorded in the ADR. **Progress:** Sprint 19B-1 added the foundation (part of B1, and B4). Sprint 19B-2 added the rendering engine, publication gates, multilingual SEO, logical/RTL CSS and the language switcher (B3, B7 and the remaining B4 gates; Arch §14). Sprint 19B-3 extracted all presentation text of `/registry/` and `/methodology/` (byte-identical English; Arch §15). No page is registered for localization yet, no translation exists and no localized page is published. Its design is in [MULTILINGUAL_ARCHITECTURE.md](MULTILINGUAL_ARCHITECTURE.md) (cited below as "Arch §n"), and the decision is in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). Approval questions are numbered as in the ADR (Q1–Q9).
 
 ## Sequencing rules for every sprint
 
@@ -18,7 +18,7 @@ These apply to every sprint below:
 **Split:**
 - 19B-1: foundation (done).
 - 19B-2: rendering engine and gates (done).
-- 19B-3: `/registry/` and `/methodology/` bodies into the catalogs, registered as localizable (B1 remainder).
+- 19B-3: `/registry/` and `/methodology/` bodies into the catalogs (done; neither registered as localizable). The canonical changelog records on `/methodology/` need a list-item identity decision first (Arch §15).
 - 19B-4: homepage templating (B2).
 - Then B5, B6 and B8.
 
