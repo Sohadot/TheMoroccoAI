@@ -5,7 +5,7 @@
 | Policy version | **TMA-DEC-008** (the value an approval must record in `approval.policy`) |
 | Status | Accepted by the project owner, 2026-11-22 |
 | Replaces | The review requirements of TMA-DEC-007 (two review functions, reviewers independent of the drafter, two reviewers preferred). History: [DECISION_LOG.md](DECISION_LOG.md) |
-| Enforced by | `tools/i18n.py` (validation and eligibility), `tools/build.py` (publication gates), `tests/test_i18n.py`, `tests/test_multilingual.py`, `tests/test_extraction.py`, `tests/test_governance.py`, `tests/test_homepage.py`, `tests/test_approval_security.py`, `tests/test_policy_consistency.py`; stable identity: `tests/test_changelog_identity.py` |
+| Enforced by | `tools/i18n.py` (validation and eligibility), `tools/build.py` (publication gates), `tests/test_i18n.py`, `tests/test_multilingual.py`, `tests/test_extraction.py`, `tests/test_governance.py`, `tests/test_homepage.py`, `tests/test_approval_security.py`, `tests/test_policy_consistency.py`, `tests/test_semantic.py`, `tests/test_review_workflow.py`; stable identity: `tests/test_changelog_identity.py` |
 | Current state | **No reviewer is registered. No translation has been approved. No localized page is published.** |
 
 ## What is decided
@@ -38,10 +38,18 @@ Every published unit carries this record:
  "approval": {"unit": "page.registry.legend.note", "language": "ar",
               "reviewer": "reviewer-ar-02", "decision": "approved", "reviewed_at": "2026-12-01T09:30:00Z",
               "policy": "TMA-DEC-008", "source_sha256": "<same as above>",
-              "translation_sha256": "<fingerprint of the approved text>", "glossary_version": "2026-11-22"}}
+              "translation_sha256": "<fingerprint of the approved text>", "glossary_version": "2026-11-22.1",
+              "acknowledged_warnings": ["HEDGE_LOST"]}}
 ```
 
 - **Binding:** an approval names its unit and language and both fingerprints, so it cannot be copied to another unit, language, source version or text (replay).
+- **Semantic-risk checks** (`tools/semantic.py`):
+  - **Errors** block a unit: a changed month, a missing number, a changed million or billion, a changed classification code, or a missing approved label for a linked term.
+  - **Warnings** are shown to the reviewer: negation, hedging, plans presented as done, attribution, verification, added causation, comparison, legal terms, acronyms, length, untranslated text, and approved terms not used.
+  - The approval lists the warnings the reviewer saw (`acknowledged_warnings`). If the current warnings differ, the unit is not rendered until it is reviewed again.
+  - These checks are word lists. They are review aids, not proof of meaning.
+- **Corrections by the reviewer:** a reviewer may correct the AI draft before approving it. The approval then carries `revised: true`, and the AI drafter stays recorded as the drafter.
+- **Workflow and security:** [TRANSLATION_APPROVAL_SECURITY.md](TRANSLATION_APPROVAL_SECURITY.md) covers the six separate events, the owner's steps, the threat model, the GitHub settings and reviewer registration.
 - **Statuses:**
   - `DRAFT`: a translation exists but is not approved.
   - `NEEDS_REVISION`: the reviewer asked for changes.

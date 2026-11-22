@@ -208,5 +208,26 @@ class Package(unittest.TestCase):
         self.assertFalse((REPO / "review.html").exists())
 
 
+
+class Provenance(unittest.TestCase):
+    def test_reports_the_commit_behind_each_approval_and_its_signature_status(self):
+        import subprocess
+        root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, root)
+        (root / "i18n" / "fr").mkdir(parents=True)
+        unit = {"id": "footer.as_of", "approval": {"reviewer": "synthetic-reviewer-01", "translation_sha256": i18n.fingerprint("au {date}")}}
+        (root / "i18n" / "fr" / "messages.json").write_text(json.dumps({"language": "fr", "units": [unit]}), encoding="utf-8")
+        git = lambda *a: subprocess.run(["git", *a], cwd=root, check=True, capture_output=True)
+        git("init", "-q")
+        git("-c", "user.name=SYNTHETIC", "-c", "user.email=synthetic@example.invalid", "-c", "commit.gpgsign=false",
+            "add", ".")
+        git("-c", "user.name=SYNTHETIC", "-c", "user.email=synthetic@example.invalid", "-c", "commit.gpgsign=false",
+            "commit", "-q", "-m", "SYNTHETIC approval commit")
+        [(uid, reviewer, commit, author, date, sig)] = tr.provenance(root)
+        self.assertEqual((uid, reviewer, author, sig), ("fr:footer.as_of", "synthetic-reviewer-01", "SYNTHETIC", "N"))
+        self.assertRegex(commit, r"^[0-9a-f]{7,}$")
+        self.assertEqual(tr.provenance(REPO), [])  # the repository holds no approval
+
+
 if __name__ == "__main__":
     unittest.main()

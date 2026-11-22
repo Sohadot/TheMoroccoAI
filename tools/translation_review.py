@@ -3,6 +3,7 @@
     python3 tools/translation_review.py check   DRAFTS.json [DRAFTS.json ...]
     python3 tools/translation_review.py package DRAFTS.json [DRAFTS.json ...] --out REVIEW.html
     python3 tools/translation_review.py record  DECISIONS.json --drafts DRAFTS.json [...] --reviewer ID
+    python3 tools/translation_review.py provenance   (advisory: the commit behind each committed approval)
 
 Six separate events, never merged into one:
   1. AI draft preparation       a draft workspace file, outside the repository (status DRAFT)
@@ -25,6 +26,7 @@ import datetime
 import html
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -380,7 +382,35 @@ def record(decisions, workspaces, reviewer, root=ROOT, today=None):
     return approved, others
 
 
+def provenance(root=ROOT):
+    """[(lang:unit, reviewer, commit, author, date, signature status)] for every committed approval: the commit
+    that introduced its translation fingerprint, and git's signature status (G good, U good but untrusted key,
+    N none, E cannot check, B bad). Advisory: a repository cannot prove who a pseudonymous reviewer is; a
+    signature by a key only the owner holds is the strongest evidence available. See
+    docs/TRANSLATION_APPROVAL_SECURITY.md."""
+    out = []
+    for path in sorted(Path(root).glob("i18n/*/*.json")):
+        if path.parent.name == "en" or path.name not in ("messages.json", "content.json"):
+            continue
+        for u in i18n._load(path).get("units", []):
+            a = u.get("approval") or {}
+            sha = a.get("translation_sha256")
+            if not sha:
+                continue
+            log = subprocess.run(["git", "log", "--reverse", "-S", sha, "--format=%h|%an|%cI|%G?", "--", str(path.relative_to(root))],
+                                 cwd=root, capture_output=True, text=True).stdout.splitlines()
+            commit, author, date, sig = (log[0].split("|") + ["", "", "", ""])[:4] if log else ("uncommitted", "", "", "")
+            out.append((f"{path.parent.name}:{u['id']}", a.get("reviewer"), commit, author, date, sig))
+    return out
+
+
 def main(argv):
+    if argv[:1] == ["provenance"]:
+        rows = provenance()
+        for row in rows:
+            print(" | ".join(map(str, row)))
+        print(f"{len(rows)} committed approval(s). Advisory: signature status is evidence, not proof of identity.")
+        return 0
     if len(argv) < 2 or argv[0] not in ("check", "package", "record"):
         print(__doc__)
         return 2

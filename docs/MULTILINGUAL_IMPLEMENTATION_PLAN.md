@@ -20,6 +20,7 @@ These apply to every sprint below:
 - 19B-2: rendering engine and gates (done).
 - 19B-3: `/registry/` and `/methodology/` bodies into the catalogs (done; neither registered as localizable).
 - 19B-4: homepage templating (B2), stable changelog and attribute identity, TMA-DEC-008 approval contract (done; nothing registered as localizable).
+- 19B-5: approval security, semantic-risk checks, editorial terminology concepts, owner review workflow and a private 42-unit Arabic/French pilot (done; no reviewer registered, nothing approved or published; Arch §17).
 - Then B5, B6 and B8.
 
 ### Steps

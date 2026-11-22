@@ -544,3 +544,22 @@ All presentation text of `/registry/` and `/methodology/` now comes from `i18n/e
 - **Disclosure.** Every localized page renders `shell.translation_policy`.
 - **Limitation.** The approval record is an attestation in a public repository, not cryptographic proof of who approved. Validation, the build and CI never write or infer approvals.
 - **Current state.** The repository registers no reviewer and holds no translation.
+
+## 17. Translation readiness: approval security, semantic checks and the pilot (Sprint 19B-5)
+
+- **Governance consistency.** Operative code and documentation state TMA-DEC-008. `tests/test_policy_consistency.py` fails on two-review wording outside sections marked superseded or historical.
+- **Approval security** ([TRANSLATION_APPROVAL_SECURITY.md](TRANSLATION_APPROVAL_SECURITY.md)):
+  - **Binding:** an approval names its `unit` and `language` (anti-replay).
+  - **Registration:** a reviewer entry needs an accepted decision that names it (`authorized_by`) and a date (`registered_on`), and an approval dated before registration is rejected.
+  - **Draft isolation:** `i18n/` accepts only its known files, and `check_site` fails on the draft workspace marker anywhere in the repository.
+  - **CI:** tests fail if a workflow gains write access or a push step.
+  - **Owner-dependent:** `.github/CODEOWNERS` and branch protection depend on GitHub settings.
+- **Semantic-risk checks** (`tools/semantic.py`, standard library, no network):
+  - **Errors:** months, numbers, scale words, classification codes and linked glossary labels. They fail validation and block rendering.
+  - **Warnings:** word-list signals. They must be acknowledged in the approval (`acknowledged_warnings`); otherwise the unit is reported as `unacknowledged` and not rendered.
+  - **Limits:** word lists miss paraphrase and fire on correct text. For example, غير مباشر (*indirect*) reads as negation.
+- **Terminology.** `glossary.json` `concepts` lists 14 editorial terms. Each English form must occur in the English catalog, and a term `concept:<id>` is approved against that form. No label is approved.
+- **Workflow** (`tools/translation_review.py`): `check`, `package` (owner review page), `record` (decisions to approval records, refused in CI) and `provenance` (advisory commit and signature report).
+  - Drafts and packages live outside the repository.
+  - `tests/test_review_workflow.py` simulates the whole lifecycle with synthetic fixtures.
+- **Pilot.** 42 representative units per language were drafted and handed to the owner privately ([TRANSLATION_PILOT.md](TRANSLATION_PILOT.md)). Nothing is approved, registered or published.
