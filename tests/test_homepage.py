@@ -44,13 +44,13 @@ class EnglishHomepage(unittest.TestCase):
             self.assertIn(f"<!--/r:{key}-->", INDEX)
 
     def test_english_page_carries_no_localization_markup(self):
-        for fragment in ("hreflang", "translation-notice", "lang-switch", "og:locale", "inLanguage", "{{", "}}"):
+        for fragment in ("hreflang", "translation-notice", "lang-switch", "og:locale", "inLanguage", "LOCALIZED PAGES ONLY", "{{", "}}"):
             self.assertNotIn(fragment, INDEX)
 
     def test_template_has_only_known_tokens_and_no_hard_coded_links(self):
         tmpl = build.HOMEPAGE_TEMPLATE.read_text(encoding="utf-8")
         kinds = {m.group(1) for m in build._TOKEN.finditer(tmpl)}
-        self.assertLessEqual(kinds, {"m", "a", "j", "h", "i", "href", "b", "lang", "dir", "canonical", "seo", "ld_extra", "notice", "switcher"})
+        self.assertLessEqual(kinds, {"m", "a", "j", "h", "i", "href", "b", "lang", "dir", "canonical", "seo", "ld_extra", "notice", "switcher", "localized_css"})
         # Internal page links go through {{href:...}} or link(); only anchors, data files and mailto stay literal.
         for href in re.findall(r'href="([^"{]+)"', tmpl):
             self.assertTrue(href.startswith(("#", "/data/", "/favicon", "/assets/", "mailto:", "https://")), href)
@@ -164,6 +164,7 @@ class LocalizedHomepage(ExtractedRegistryFixture):
         policy = build.escape(self.text("shell.translation_policy", "ar"), quote=False)
         self.assertIn(policy, ar)
         self.assertIn('class="lang-switch"', ar)
+        self.assertIn("LOCALIZED PAGES ONLY", ar)  # switcher, notice and right-to-left styles
         # Untranslated pages are linked in English and say so.
         self.assertIn('href="/registry/" hreflang="en"', ar)
 

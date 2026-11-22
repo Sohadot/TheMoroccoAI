@@ -2513,6 +2513,41 @@ def _homepage_html(model, blocks):
     return out
 
 
+# Styles that only a localized homepage needs (language switcher, translation notice, English-fallback marker,
+# right-to-left mirroring of the homepage's physical properties, Arabic typography). Empty on the English page,
+# which therefore keeps its exact bytes.
+HOMEPAGE_LOCALIZED_CSS = """
+  /* ─── LOCALIZED PAGES ONLY ─── */
+  nav:has(.lang-switch) { flex-wrap: wrap; height: auto; min-height: 56px; }
+  .lang-switch { display: flex; gap: 12px; list-style: none; margin-inline-start: 24px; align-items: center; }
+  .lang-switch a { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-sub); text-decoration: none; padding: 6px 4px; }
+  .lang-switch a:hover, .lang-switch a[aria-current="true"] { color: var(--gold); text-decoration: underline; text-underline-offset: 4px; }
+  .translation-notice { position: relative; z-index: 1; max-width: 1100px; margin: 72px auto 0; padding-block: 10px; padding-inline: 14px;
+    border-inline-start: 3px solid var(--gold); background: rgba(184,137,42,0.06); font-size: 15px; }
+  .lang-note { font-size: 0.85em; opacity: 0.8; }
+  .translation-notice a { color: var(--gold); }
+  html[dir="rtl"] .skip-link { left: auto; right: -999px; }
+  html[dir="rtl"] .skip-link:focus { right: 8px; }
+  html[dir="rtl"] .hero-arabic { text-align: right; }
+  html[dir="rtl"] .status-item { border-right: none; border-left: 1px solid rgba(255,255,255,0.08); }
+  html[dir="rtl"] .status-item:first-child { padding-left: 28px; padding-right: 0; }
+  html[dir="rtl"] .node-status { right: auto; left: 16px; }
+  html[dir="rtl"] .onto-id, html[dir="rtl"] .onto-term { border-right: none; border-left: 1px solid var(--border); }
+  html[dir="rtl"] .posture-block::before { left: auto; right: 0; }
+  html[dir="rtl"] .hero-notice { border-left: none; border-right: 3px solid var(--gold); }
+  html[dir="rtl"] .example::before { left: auto; right: 0; }
+  html[dir="rtl"] .thesis-quote { padding: 0 20px 0 0; border-left: none; border-right: 2px solid var(--gold); }
+  html[lang="ar"] body, html[lang="ar"] body * { font-family: 'Noto Kufi Arabic', 'DM Mono', Georgia, serif; letter-spacing: 0 !important; font-style: normal !important; }
+  html[lang="ar"] p { line-height: 1.9; }
+  html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3 { line-height: 1.5; }
+  html[lang="ar"] .section-number, html[lang="ar"] .nav-links a, html[lang="ar"] .status-key { text-transform: none; }
+  @media (max-width: 700px) {
+    .lang-switch { flex-basis: 100%; justify-content: flex-end; margin-inline-start: 0; padding-bottom: 6px; }
+    html[dir="rtl"] .onto-id, html[dir="rtl"] .onto-term { border-left: none; }
+  }
+"""
+
+
 def render_homepage(model):
     """The homepage from tools/templates/homepage.tmpl: every visible, metadata and accessibility text comes from
     the catalog ({{m:id}} element text, {{a:id}} attribute, {{j:id}} JSON-LD string, {{h:id}} text with HTML
@@ -2558,6 +2593,7 @@ def render_homepage(model):
         if kind == "b":
             return f"<!--r:{arg}-->{blocks[arg]}<!--/r:{arg}-->"
         fixed = {"lang": ctx.info["bcp47"], "dir": ctx.info["dir"], "canonical": canonical, "seo": seo,
+                 "localized_css": HOMEPAGE_LOCALIZED_CSS if ctx.lang != "en" else "",
                  "ld_extra": ld_extra, "notice": notice, "switcher": language_switcher(path, cluster)}
         if kind in fixed and arg is None:
             return fixed[kind]
