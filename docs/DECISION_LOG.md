@@ -6,11 +6,11 @@ This public log records governance decisions, not completed implementation or ex
 - Date: 2026-11-22
 - Domain: Governance / public representation
 - Decision status: Accepted
-- Implementation status: Implemented in PR #15; external review pending
+- Implementation status: Implemented in PR #15 (merged); wording consistency, footer synchronization and regression gates completed in PR #16 (draft, not merged); external review pending
 - Decision: State that TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot, and is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external sources do not imply endorsement or participation.
 - Rationale: Distinguish ownership, editorial independence, source provenance and institutional authority.
 - Constraints: Do not claim ownership of third-party source materials or assert an unverified corporate legal form.
-- Implementation: About/independence disclosure, acquisition page and site footer, with corresponding quality gates.
+- Implementation: Canonical statement (`OWNERSHIP_STATEMENT` in tools/build.py and tools/check_site.py) published in the methodology ownership section (/methodology/#ownership-h) and on the homepage, acquisition and evaluation pages; every page carries the footer note "Owned and operated by Sohadot" and links to the ownership section. Enforced by tools/check_site.py and tests/test_site.py.
 
 ## TMA-DEC-002 — Independent Research Evaluation
 - Date: 2026-11-22

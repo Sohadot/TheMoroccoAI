@@ -1,8 +1,14 @@
 # TheMoroccoAI.com
 
-Independent intelligence and reference infrastructure for Morocco's AI ecosystem. The site is
-**not affiliated with, endorsed by or operated by the Government of Morocco** or any institution it
-lists.
+Independent intelligence and reference infrastructure for Morocco's AI ecosystem.
+
+TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is
+**not affiliated with, endorsed by, or operated on behalf of any government, public institution, or
+third-party organization or company**. References to external organizations, initiatives and
+sources do not imply their endorsement of or participation in the project. The canonical wording is
+`OWNERSHIP_STATEMENT` in `tools/build.py` and `tools/check_site.py` (decision TMA-DEC-001); it is
+published at `/methodology/#ownership-h` and on the homepage, acquisition and evaluation pages, and
+every page carries the footer note "Owned and operated by Sohadot".
 
 The site is static and served by GitHub Pages from the root of `main` (`CNAME` → `themoroccoai.com`).
 It has no runtime JavaScript except for the locally served, privacy-minimizing `/evaluation/` interaction. It makes no third-party requests and has no build step at deploy time. Generated
@@ -12,7 +18,9 @@ pages are committed.
 
 English is the authoritative language of the project. Approved governance decisions and their separate implementation states are recorded in [docs/DECISION_LOG.md](docs/DECISION_LOG.md). The privacy-first, neutral introductory and specialist evaluation is specified in [docs/EVALUATION_SPEC.md](docs/EVALUATION_SPEC.md); the first static evaluation UI is implemented as a hand-maintained HTML page and local JavaScript, and it is **not externally validated**. Sensitive evaluator responses, scoring keys and confidential commercial information must not be committed to this public repository.
 
-The evaluation page is deliberately **not included in the sitemap** (`noindex, follow`) and is currently maintained separately from the registry generator. Its neutral task prompts, client-side report preparation and no-network behavior require dedicated review before public rollout.\n\n## What is here
+The evaluation page is deliberately **not included in the sitemap** (`noindex, follow`) and is currently maintained separately from the registry generator. Its neutral task prompts, client-side report preparation and no-network behavior require dedicated review before public rollout. Its footer must match `build.footer()` and is checked by the tests.
+
+## What is here
 
 | Path | Purpose |
 | --- | --- |
@@ -33,7 +41,7 @@ The evaluation page is deliberately **not included in the sitemap** (`noindex, f
 | `tools/registry.py` | Validator for referential integrity and claim-classification rules. |
 | `tools/build.py` | Static generator: registry pages, homepage blocks, `sitemap.xml`. |
 | `tools/check_sources.py` | Source checker (network; never run by the build): re-fetches each source once per run, spaced per host, and re-matches its excerpts. Reports reachable, blocked, HTTP error, redirects, matched and changed separately, and flags superseded records; claim support stays a manual review. Never edits data or writes into `data/`. |
-| `tools/check_site.py` | Site gates: links, anchors, metadata, canonicals, third-party resources, accessibility basics, sitemap, contact path, confidential terms, credentials. |
+| `tools/check_site.py` | Site gates: links, anchors, metadata, canonicals, third-party resources, accessibility basics, sitemap, contact path, independence and ownership wording (canonical statement on the pages in `OWNERSHIP_PAGES`), confidential terms, credentials. |
 | `tests/` | `unittest` suite, including negative cases for every gate. `test_layout.py` renders narrow pages in headless Chromium with the web fonts removed; it skips when no Chromium or Chrome binary is found (set `CHROME_BIN`). |
 | `assets/` | Registry stylesheet and self-hosted fonts (SIL OFL 1.1, see `assets/fonts/OFL.txt`). |
 | `AUDIT_REPORT.md` | Sprint 01 repository audit and its evidence. |
