@@ -313,7 +313,8 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
                     jsonld["url"] = canonical
     if lang != "en":
         english = f'<a href="{path}" hreflang="en">{msg("shell.translation_notice.english")}</a>'
-        notice = f'<p class="translation-notice" role="note">{msg_html("shell.translation_notice", english=english)}</p>\n'
+        notice = (f'<p class="translation-notice" role="note">{msg_html("shell.translation_notice", english=english)} '
+                  f'{msg("shell.translation_policy")}</p>\n')
     ld = ""
     if jsonld:
         ld = '<script type="application/ld+json">' + json.dumps(jsonld, ensure_ascii=False, indent=1).replace("</", "<\\/") + "</script>\n"
@@ -2467,7 +2468,7 @@ def page_requirements(model, spec, root=ROOT):
 
 # Shell units that only localized pages use (switcher, translation notice, fallback marker).
 LOCALIZATION_ONLY_MESSAGES = {"shell.lang.label", "shell.translation_notice", "shell.translation_notice.english",
-                              "shell.in_english"}
+                              "shell.in_english", "shell.translation_policy"}
 # Language route prefixes that must never hold a file the build did not generate (withdrawn translations).
 RESERVED_LANGUAGE_DIRS = ("ar", "fr", "ary", "zgh", "es")
 

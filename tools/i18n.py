@@ -32,10 +32,23 @@ LANGUAGE_STATES = ("authoritative", "in-preparation", "published", "withdrawn")
 # of these languages only when the language is 'published' in i18n/languages.json and the page is eligible
 # (every unit it uses approved, reviewed and current; page gates passed). ary and zgh have no renderer.
 RENDERING_LANGUAGES = frozenset({"ar", "fr"})
-UNIT_STATUSES = ("draft", "terminology-checked", "parity-reviewed", "linguistically-reviewed", "approved")
+# Translation governance in force: TMA-DEC-008 (human-approved, AI-assisted translation), which supersedes the
+# two-review provisions of TMA-DEC-007. An approval records this policy id; any other id is not accepted.
+GOVERNANCE_POLICY = "TMA-DEC-008"
+# Stored statuses. STALE is computed (source or approved text changed after approval) and never stored.
+UNIT_STATUSES = ("DRAFT", "NEEDS_REVISION", "APPROVED", "REJECTED")
 # Every file on main is publicly served, so catalogs on main hold approved units only (Arch §6.3). A
 # translation pull request therefore stays red until both reviews are recorded: that is intended.
-COMMITTABLE_STATUSES = ("approved",)
+COMMITTABLE_STATUSES = ("APPROVED",)
+REVIEWER_KINDS = ("human", "certified-translator")
+# Escalation criteria (TMA-DEC-008): an open escalation blocks publication of the unit until a second, qualified
+# registered reviewer resolves it.
+ESCALATION_CRITERIA = ("reviewer-uncertain", "legal-ambiguity", "specialist-term", "research-qualification",
+                       "language-expertise", "independent-review-claimed", "certified-translation-required")
+# Identities that denote tools, AI systems or automated processes. They may draft, never approve.
+AUTOMATED_ID = re.compile(r"(?:^|-)(?:ai|bot|ci|claude|gpt|llm|machine|auto|automated|assistant|model|pipeline|script)(?:-|$)")
+DRAFTER_ID = re.compile(r"^[a-z]+(?:-[a-z]+)*(?:-[0-9]{2,})?$")
+ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?Z$")
 KINDS = ("interface", "navigation", "heading", "metadata", "prose", "qualifier", "disclosure", "term", "name")
 DRAFT_METHODS = ("human", "machine-assisted")
 NAME_BASES = ("official", "established-usage", "transliteration", "translation")
@@ -254,36 +267,113 @@ def _parity_problems(text, source, where):
     return errors
 
 
-def _review_problems(review, where, today):
-    if not isinstance(review, dict):
-        return [f"{where}: approved unit has no review record"]
-    errors = []
-    for key in ("drafted_by", "substantive_reviewer", "linguistic_reviewer"):
-        value = review.get(key)
-        if not isinstance(value, str) or not PSEUDONYM.match(value):
-            errors.append(f"{where}: review.{key} must be a pseudonymous identifier such as 'reviewer-ar-02'")
-    drafter = review.get("drafted_by")
-    for key in ("substantive_reviewer", "linguistic_reviewer"):
-        if drafter and review.get(key) == drafter:
-            errors.append(f"{where}: review.{key} must be independent of the drafter")
-    if review.get("draft_method") not in DRAFT_METHODS:
-        errors.append(f"{where}: review.draft_method must be one of {list(DRAFT_METHODS)}")
-    try:
-        approved = datetime.date.fromisoformat(review.get("approved_on", ""))
-        if approved > today:
-            errors.append(f"{where}: review.approved_on is in the future")
-    except (TypeError, ValueError):
-        errors.append(f"{where}: review.approved_on must be an ISO date")
-    if not isinstance(review.get("glossary_version"), str) or not review["glossary_version"]:
-        errors.append(f"{where}: review.glossary_version is required")
-    unknown = set(review) - {"drafted_by", "draft_method", "substantive_reviewer", "linguistic_reviewer",
-                             "approved_on", "glossary_version"}
-    if unknown:
-        errors.append(f"{where}: unexpected review fields {sorted(unknown)} (no personal data in a public file)")
+def load_reviewers(root=ROOT):
+    """{id: entry} from i18n/reviewers.json: the pseudonymous human reviewers the owner has registered."""
+    path = Path(root) / "i18n" / "reviewers.json"
+    return {r["id"]: r for r in _load(path).get("reviewers", [])} if path.exists() else {}
+
+
+def validate_reviewers(data, languages):
+    errors, seen = [], set()
+    if not isinstance(data.get("reviewers"), list):
+        return ["i18n/reviewers.json: needs a 'reviewers' list"]
+    for r in data["reviewers"]:
+        rid = r.get("id")
+        where = f"i18n/reviewers.json {rid!r}"
+        if not isinstance(rid, str) or not PSEUDONYM.match(rid):
+            errors.append(f"{where}: reviewer id must be pseudonymous, such as 'reviewer-ar-02'")
+        elif AUTOMATED_ID.search(rid):
+            errors.append(f"{where}: an automated or AI identity cannot be registered as a reviewer")
+        if rid in seen:
+            errors.append(f"{where}: duplicate reviewer id")
+        seen.add(rid)
+        if r.get("kind") not in REVIEWER_KINDS:
+            errors.append(f"{where}: kind must be one of {list(REVIEWER_KINDS)}")
+        if not isinstance(r.get("languages"), list) or not r["languages"] or set(r["languages"]) - set(languages):
+            errors.append(f"{where}: languages must be registered translation languages")
+        if set(r) - {"id", "kind", "languages"}:
+            errors.append(f"{where}: unexpected fields {sorted(set(r) - {'id', 'kind', 'languages'})} (no personal data)")
     return errors
 
 
-def validate_catalog(lang, kind, catalog, sources, forbidden, today):
+def _timestamp_problems(value, field, where, today):
+    if not isinstance(value, str) or not ISO_UTC.match(value):
+        return [f"{where}: {field} must be a UTC timestamp such as 2026-12-01T09:30:00Z"]
+    if datetime.date.fromisoformat(value[:10]) > today:
+        return [f"{where}: {field} is in the future"]
+    return []
+
+
+def _draft_problems(u, where):
+    d = u.get("draft")
+    if not isinstance(d, dict) or d.get("method") not in DRAFT_METHODS or not isinstance(d.get("by"), str) \
+            or not DRAFTER_ID.match(d["by"]) or set(d) - {"method", "by"}:
+        return [f"{where}: draft must record method {list(DRAFT_METHODS)} and 'by' (a pseudonym or a process id)"]
+    return []
+
+
+def _approval_problems(u, lang, reviewers, today, where):
+    """Errors in the human approval of an APPROVED unit (TMA-DEC-008). Approval is a deliberate, attributable
+    human decision bound to exact source and translation versions: it is never inferred from a passing check,
+    a commit, a merge or repository access, and no automated or AI identity can give it."""
+    a = u.get("approval")
+    if not isinstance(a, dict):
+        return [f"{where}: APPROVED unit has no human approval record"]
+    errors = []
+    allowed = {"reviewer", "decision", "reviewed_at", "policy", "source_sha256", "translation_sha256",
+               "glossary_version", "escalation"}
+    if set(a) - allowed:
+        errors.append(f"{where}: unexpected approval fields {sorted(set(a) - allowed)} (no personal data)")
+    reviewer = a.get("reviewer")
+    if not isinstance(reviewer, str) or not PSEUDONYM.match(reviewer):
+        errors.append(f"{where}: approval.reviewer must be a pseudonymous identifier such as 'reviewer-ar-02'")
+    elif AUTOMATED_ID.search(reviewer):
+        errors.append(f"{where}: an automated or AI identity cannot approve a translation")
+    elif reviewer not in reviewers:
+        errors.append(f"{where}: approval.reviewer {reviewer!r} is not a registered human reviewer (i18n/reviewers.json)")
+    elif lang not in reviewers[reviewer].get("languages", []):
+        errors.append(f"{where}: reviewer {reviewer!r} is not registered for '{lang}'")
+    if reviewer and (u.get("draft") or {}).get("by") == reviewer:
+        errors.append(f"{where}: a reviewer cannot approve a translation recorded as their own draft")
+    if a.get("decision") != "approved":
+        errors.append(f"{where}: approval.decision must be 'approved' for an APPROVED unit")
+    errors += _timestamp_problems(a.get("reviewed_at"), "approval.reviewed_at", where, today)
+    if a.get("policy") != GOVERNANCE_POLICY:
+        errors.append(f"{where}: approval.policy {a.get('policy')!r} is not the policy in force ({GOVERNANCE_POLICY})")
+    if a.get("source_sha256") != u.get("source_sha256"):
+        errors.append(f"{where}: the approval covers a different English source version")
+    if not isinstance(a.get("translation_sha256"), str) or not SHA256.match(a["translation_sha256"]):
+        errors.append(f"{where}: approval.translation_sha256 must record the approved translation")
+    if not isinstance(a.get("glossary_version"), str) or not a["glossary_version"]:
+        errors.append(f"{where}: approval.glossary_version is required")
+    esc = a.get("escalation")
+    if esc is not None:
+        if not isinstance(esc, dict) or not esc.get("criteria") or set(esc.get("criteria", [])) - set(ESCALATION_CRITERIA):
+            errors.append(f"{where}: escalation.criteria must be a non-empty subset of {list(ESCALATION_CRITERIA)}")
+        elif esc.get("status") == "open":
+            errors.append(f"{where}: escalation {esc['criteria']} is unresolved; publication is blocked")
+        elif esc.get("status") != "resolved":
+            errors.append(f"{where}: escalation.status must be 'open' or 'resolved'")
+        else:
+            by = esc.get("resolved_by")
+            need = "certified-translator" if "certified-translation-required" in esc["criteria"] else None
+            if by not in reviewers or by == reviewer or lang not in reviewers[by].get("languages", []):
+                errors.append(f"{where}: an escalation is resolved only by a second registered reviewer for '{lang}'")
+            elif need and reviewers[by].get("kind") != need:
+                errors.append(f"{where}: certified translation was required; {by!r} is not a certified translator")
+            errors += _timestamp_problems(esc.get("resolved_at"), "escalation.resolved_at", where, today)
+        if isinstance(esc, dict) and set(esc) - {"criteria", "status", "resolved_by", "resolved_at"}:
+            errors.append(f"{where}: unexpected escalation fields")
+    return errors
+
+
+def _approved_current(u, text):
+    """True when the approved translation text is exactly the version the reviewer approved."""
+    a = u.get("approval") or {}
+    return isinstance(text, str) and a.get("translation_sha256") == fingerprint(text)
+
+
+def validate_catalog(lang, kind, catalog, sources, forbidden, today, reviewers=None):
     """Returns (errors, report). report lists stale and orphaned units: they are not errors, so English
     publishing never waits for translation (TMA-DEC-007 Q4), but they are never renderable."""
     path = f"i18n/{lang}/{kind}.json"
@@ -310,9 +400,10 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today):
                 errors.append(f"{where}: not a translatable canonical field (expected <file>:<id>:<field>)")
                 continue
         if u.get("status") not in UNIT_STATUSES:
-            errors.append(f"{where}: unknown status {u.get('status')!r}")
+            errors.append(f"{where}: unknown status {u.get('status')!r} (STALE is computed, never stored)")
         elif u["status"] not in COMMITTABLE_STATUSES:
             errors.append(f"{where}: status {u['status']!r} is not publishable; drafts stay off main")
+        errors += _draft_problems(u, where)
         if u.get("kind") not in KINDS:
             errors.append(f"{where}: unknown kind {u.get('kind')!r}")
         if u.get("kind") == "name" and u.get("name_basis") not in NAME_BASES:
@@ -324,8 +415,8 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today):
         for variant in forbidden:
             if variant.lower() in lowered:
                 errors.append(f"{where}: uses forbidden glossary variant {variant!r}")
-        if u.get("status") == "approved":
-            errors += _review_problems(u.get("review"), where, today)
+        if u.get("status") == "APPROVED":
+            errors += _approval_problems(u, lang, reviewers or {}, today, where)
         if problem == "orphan":
             report["orphaned"].append(f"{lang}:{uid}")
             continue
@@ -333,10 +424,17 @@ def validate_catalog(lang, kind, catalog, sources, forbidden, today):
             errors += _parity_problems(u["text"], source, where)
         if isinstance(u.get("source_sha256"), str) and u["source_sha256"] != fingerprint(source):
             report["stale"].append(f"{lang}:{uid}")
+        elif u.get("status") == "APPROVED" and isinstance(u.get("approval"), dict) and not _approved_current(u, u.get("text")):
+            report["stale"].append(f"{lang}:{uid}")  # text changed after approval: renewed approval needed
     return errors, report
 
 
-def validate_glossary(glossary, sources, languages):
+def _term_unit(term_id, entry):
+    """A glossary label as an approvable unit: its source is the canonical term value."""
+    return dict(entry, id=term_id, text=entry.get("label"), source_sha256=fingerprint(term_id.partition(":")[2]))
+
+
+def validate_glossary(glossary, sources, languages, reviewers=None, today=None):
     errors, seen, forbidden = [], set(), {lang: [] for lang in languages}
     if not isinstance(glossary.get("version"), str) or not isinstance(glossary.get("terms"), list):
         return ["i18n/glossary.json: needs a 'version' string and a 'terms' list"], forbidden
@@ -356,6 +454,10 @@ def validate_glossary(glossary, sources, languages):
             errors += _text_problems(entry.get("label"), f"{where}.{lang}.label")
             if entry.get("status") not in COMMITTABLE_STATUSES:
                 errors.append(f"{where}.{lang}: status {entry.get('status')!r} is not approved")
+            else:
+                unit = _term_unit(tid, entry)
+                errors += _draft_problems(unit, f"{where}.{lang}")
+                errors += _approval_problems(unit, lang, reviewers or {}, today or datetime.date.today(), f"{where}.{lang}")
             for variant in entry.get("forbidden", []):
                 if variant and variant.lower() in (entry.get("label") or "").lower():
                     errors.append(f"{where}.{lang}: label contains its own forbidden variant {variant!r}")
@@ -381,7 +483,12 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
     sources = Sources(root, evidence, ontology, gaps)
     errors += [e for e in validate_english(english, sources) if "term link" in e]
     targets = [lang["code"] for lang in registry["languages"] if lang["code"] != "en"]
-    gerrors, forbidden = validate_glossary(glossary, sources, targets)
+    reviewers_path = base / "reviewers.json"
+    if not reviewers_path.exists():
+        return errors + ["i18n/reviewers.json: missing (the registry of human reviewers, empty until the owner adds one)"], report
+    errors += validate_reviewers(_load(reviewers_path), targets)
+    reviewers = load_reviewers(root)
+    gerrors, forbidden = validate_glossary(glossary, sources, targets, reviewers, today)
     errors += gerrors
     for lang in targets:
         for kind in ("messages", "content"):
@@ -393,7 +500,7 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
             except ValueError as exc:
                 errors.append(f"i18n/{lang}/{kind}.json: invalid JSON ({exc})")
                 continue
-            cerrors, creport = validate_catalog(lang, kind, catalog, sources, forbidden[lang], today)
+            cerrors, creport = validate_catalog(lang, kind, catalog, sources, forbidden[lang], today, reviewers)
             errors += cerrors
             report["stale"] += creport["stale"]
             report["orphaned"] += creport["orphaned"]
@@ -406,13 +513,15 @@ def validate(root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
 # ─── Publication eligibility ─────────────────────────────────────────────
 
 def renderable_texts(lang, root=ROOT, evidence=None, ontology=None, gaps=None, today=None):
-    """{id: text} of the units in `lang` that may be rendered. A unit is renderable only if it is approved,
-    its review is complete and independent of the drafter, its text passes every text and parity rule, and
-    its fingerprint matches the current English source. Stale, orphaned, unapproved or invalid units are never
-    renderable (no grace period, Q4), whether or not the validator was run."""
+    """{id: text} of the units in `lang` that may be rendered. A unit is renderable only if it is APPROVED by a
+    registered human reviewer under the policy in force (TMA-DEC-008), the approval covers exactly the current
+    English source and the current translation text, no escalation is open, and the text passes every text and
+    parity rule. Stale, orphaned, unapproved or invalid units are never renderable (no grace period), whether or
+    not the validator was run. Nothing here, nor any check or merge, can create an approval."""
     root = Path(root)
     today = today or datetime.date.today()
     sources = Sources(root, evidence, ontology, gaps)
+    reviewers = load_reviewers(root)
     out = {}
     for kind in ("messages", "content"):
         path = root / "i18n" / lang / f"{kind}.json"
@@ -421,9 +530,9 @@ def renderable_texts(lang, root=ROOT, evidence=None, ontology=None, gaps=None, t
         for u in _load(path).get("units", []):
             uid, text = u.get("id"), u.get("text")
             source = sources.message(uid) if kind == "messages" else sources.content(uid or "")[0]
-            if (source is None or u.get("status") != "approved" or u.get("source_sha256") != fingerprint(source)
-                    or _review_problems(u.get("review"), uid, today) or _text_problems(text, uid)
-                    or _parity_problems(text, source, uid)):
+            if (source is None or u.get("status") != "APPROVED" or u.get("source_sha256") != fingerprint(source)
+                    or _draft_problems(u, uid) or _approval_problems(u, lang, reviewers, today, uid)
+                    or not _approved_current(u, text) or _text_problems(text, uid) or _parity_problems(text, source, uid)):
                 continue
             out[uid] = text
     return out
@@ -433,14 +542,20 @@ def renderable_units(lang, root=ROOT, evidence=None, ontology=None, gaps=None, t
     return set(renderable_texts(lang, root, evidence, ontology, gaps, today))
 
 
-def approved_terms(lang, root=ROOT):
-    """{term id: label} of glossary terms with an approved, well-formed label in `lang`."""
-    out = {}
+def approved_terms(lang, root=ROOT, today=None):
+    """{term id: label} of glossary terms whose label in `lang` is well formed and human-approved (TMA-DEC-008)
+    for exactly that label."""
+    out, reviewers, today = {}, load_reviewers(root), today or datetime.date.today()
     for term in _load(Path(root) / "i18n" / "glossary.json").get("terms", []):
         entry = term.get("translations", {}).get(lang)
-        if entry and entry.get("status") in COMMITTABLE_STATUSES and not _text_problems(entry.get("label"), "") \
-                and not any(v and v.lower() in entry["label"].lower() for v in entry.get("forbidden", [])):
-            out[term["id"]] = entry["label"]
+        if not entry or entry.get("status") not in COMMITTABLE_STATUSES or _text_problems(entry.get("label"), ""):
+            continue
+        unit = _term_unit(term["id"], entry)
+        if any(v and v.lower() in entry["label"].lower() for v in entry.get("forbidden", [])) \
+                or _draft_problems(unit, "") or _approval_problems(unit, lang, reviewers, today, "") \
+                or not _approved_current(unit, entry["label"]):
+            continue
+        out[term["id"]] = entry["label"]
     return out
 
 
@@ -476,7 +591,7 @@ class Translator:
             self.texts, self.terms = self.english, None
         else:
             self.texts = renderable_texts(lang, root, evidence, ontology, gaps, today)
-            self.terms = approved_terms(lang, root)
+            self.terms = approved_terms(lang, root, today)
 
     def template(self, message_id):
         self.used.append(message_id)

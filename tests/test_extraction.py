@@ -30,11 +30,10 @@ import check_site  # noqa: E402
 import i18n  # noqa: E402
 import registry  # noqa: E402
 from test_multilingual import synthetic  # noqa: E402
+from i18n_fixtures import approved_label, approved_unit, register_reviewers  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 TODAY = datetime.date(2026, 11, 22)
-REVIEW = {"drafted_by": "synthetic-drafter-01", "draft_method": "machine-assisted", "substantive_reviewer": "synthetic-reviewer-01",
-          "linguistic_reviewer": "synthetic-reviewer-02", "approved_on": "2026-11-20", "glossary_version": "2026-11-22"}
 REGISTRY, METHODOLOGY = build.EXTRACTED_PAGES
 CHANGELOG = registry.load(REPO / "data" / "changelog.json")
 
@@ -206,6 +205,7 @@ class ExtractedRegistryFixture(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.root)
         shutil.copytree(REPO / "i18n", self.root / "i18n")
         shutil.copytree(REPO / "data", self.root / "data")  # read-only sources for fingerprints
+        register_reviewers(self.root)  # SYNTHETIC reviewers, temporary directory only
         langs = self.read("languages.json")
         for x in langs["languages"]:
             if x["code"] in ("ar", "fr"):
@@ -219,8 +219,8 @@ class ExtractedRegistryFixture(unittest.TestCase):
             self.write(f"{lang}/messages.json", {"language": lang, "units": [self.unit(mid, lang) for mid in self.messages]})
             self.write(f"{lang}/content.json", {"language": lang, "units": [self.unit(cid, lang) for cid in self.req["content"]]})
         g = self.read("glossary.json")
-        g["terms"] = [{"id": t, "translations": {lang: {"label": synthetic(t.split(":")[1], lang), "status": "approved", "forbidden": []}
-                                               for lang in ("ar", "fr")}} for t in self.req["terms"]]
+        g["terms"] = [{"id": t, "translations": {lang: approved_label(t, synthetic(t.split(":")[1], lang)) for lang in ("ar", "fr")}}
+                      for t in self.req["terms"]]
         self.write("glossary.json", g)
 
     def source(self, uid):
@@ -234,14 +234,13 @@ class ExtractedRegistryFixture(unittest.TestCase):
     def text(self, uid, lang):
         return synthetic(self.source(uid), lang) + " " + self.tag(uid)
 
-    def unit(self, uid, lang, **over):
-        src = self.source(uid)
-        u = {"id": uid, "kind": "interface" if ":" not in uid else "prose", "status": "approved", "text": self.text(uid, lang),
-             "source_sha256": i18n.fingerprint(src), "review": dict(REVIEW)}
+    def unit(self, uid, lang, source=None, **over):
+        kind = "interface" if ":" not in uid else "prose"
         if uid.endswith(":name"):
-            u.update(kind="name", name_basis="transliteration")
-        u.update(over)
-        return u
+            kind = "name"
+            over.setdefault("name_basis", "transliteration")
+        text = over.pop("text", None) or self.text(uid, lang)
+        return approved_unit(uid, kind, text, source or self.source(uid), **over)
 
     def read(self, rel):
         return json.loads((self.root / "i18n" / rel).read_text(encoding="utf-8"))
@@ -400,7 +399,7 @@ class NegativeRegressions(ExtractedRegistryFixture):
 
     # 13
     def test_stale_translation_is_not_eligible(self):
-        self.edit_unit("ar", "domain:government-policy:label", source_sha256=i18n.fingerprint("an older label"))
+        self.edit_unit("ar", "domain:government-policy:label", source="an older label")  # approved before the label changed
         self.assertNotIn("domain:government-policy:label", i18n.renderable_units("ar", self.root, today=TODAY))
         self.assertNotGenerated("domain:government-policy:label")
 

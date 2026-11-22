@@ -15,6 +15,7 @@
   {"id": "shell.lang.label", "kind": "interface", "text": "Language"},
   {"id": "shell.translation_notice", "kind": "disclosure", "text": "This page is a translation of the English reference. If the two differ, {english} prevails."},
   {"id": "shell.translation_notice.english", "kind": "disclosure", "text": "the English version"},
+  {"id": "shell.translation_policy", "kind": "disclosure", "text": "English is the authoritative version of this reference; this page is translated from it. Translations may be prepared with AI assistance, and each published translation is approved by a documented human reviewer. Automated checks protect identifiers, references, numbers and structure, but do not establish meaning. Corrections and source updates may require renewed review."},
   {"id": "shell.in_english", "kind": "interface", "text": "(in English)"},
   {"id": "footer.tagline", "kind": "interface", "text": "Independent evidence registry"},
   {"id": "footer.owner_note", "kind": "disclosure", "text": "Owned and operated by Sohadot"},
