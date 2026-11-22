@@ -83,7 +83,8 @@ class RepositoryState(unittest.TestCase):
         langs = json.loads((REPO / "i18n" / "languages.json").read_text(encoding="utf-8"))["languages"]
         states = {x["code"]: x["state"] for x in langs}
         self.assertEqual(states, {"en": "authoritative", "ar": "in-preparation", "fr": "in-preparation"})
-        self.assertEqual(i18n.RENDERING_LANGUAGES, frozenset())
+        # Renderers exist for ar and fr (Sprint 19B-2), but rendering is not publication: no language is published.
+        self.assertEqual(i18n.RENDERING_LANGUAGES, frozenset({"ar", "fr"}))
         self.assertEqual(check_site.published_languages(), set())
 
     def test_translation_layer_is_outside_the_canonical_contract(self):
@@ -191,8 +192,15 @@ class LanguageRegistryRules(Fixture):
         self.assertRejected("duplicate language codes")
 
     def test_cannot_publish_without_a_renderer(self):
-        self.mutate(lambda ls: ls[1].update(state="published"))
-        self.assertRejected("cannot be 'published'")
+        # Darija has no renderer: registering it as published must fail (ar and fr have renderers since 19B-2).
+        self.mutate(lambda ls: ls.append({"code": "ary", "bcp47": "ary", "script": "Arab", "dir": "rtl", "native_name": "الدارجة",
+                                          "state": "published", "route": "/ary/", "og_locale": "ary_MA"}))
+        (self.root / "i18n" / "ary").mkdir()
+        self.assertRejected("'ary' cannot be 'published'")
+
+    def test_og_locale_must_match_the_language(self):
+        self.mutate(lambda ls: ls[1].update(og_locale="fr_MA"))
+        self.assertRejected("og_locale")
 
     def test_unregistered_language_directory(self):
         (self.root / "i18n" / "es").mkdir()

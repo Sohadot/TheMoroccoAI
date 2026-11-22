@@ -1,6 +1,6 @@
 # Multilingual Reference Architecture
 
-Status: **Accepted (TMA-DEC-007, 2026-11-22).** The design was proposed in Sprint 19A and accepted with the owner decisions Q1–Q9 recorded in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). **Implementation:** only the Sprint 19B-1 foundation exists (section 13). No translation has been drafted or reviewed, and no localized page or route is published. Section 1 is the Sprint 19A inventory at `728d475`, kept as recorded. The phased plan is in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
+Status: **Accepted (TMA-DEC-007, 2026-11-22).** The design was proposed in Sprint 19A and accepted with the owner decisions Q1–Q9 recorded in [ADR_MULTILINGUAL_REFERENCE.md](ADR_MULTILINGUAL_REFERENCE.md). **Implementation:** the Sprint 19B-1 foundation (section 13) and the Sprint 19B-2 rendering engine (section 14) exist; no page is registered for localization yet. No translation has been drafted or reviewed, and no localized page or route is published. Section 1 is the Sprint 19A inventory at `728d475`, kept as recorded. The phased plan is in [MULTILINGUAL_IMPLEMENTATION_PLAN.md](MULTILINGUAL_IMPLEMENTATION_PLAN.md).
 
 Governing policy: [TMA-DEC-003](DECISION_LOG.md) (accepted) says:
 - English is the authoritative project language.
@@ -445,4 +445,39 @@ The points Sprint 19A found outside existing policy were resolved by the owner o
 
 **Not established by validation:** semantic equivalence. Only the two recorded human reviews can establish it.
 
-**Deferred extraction:** page-body prose in `build.py`, the hand-maintained homepage (inline CSS, about 1,100 words), the evaluation page (English only, TMA-DEC-002), the state page (English-specific linter), and the label maps that belong to the glossary. Each needs its own output-parity proof and is planned for Sprint 19B-2.
+**Deferred extraction:** page-body prose in `build.py`, the hand-maintained homepage (inline CSS, about 1,100 words), the evaluation page (English only, TMA-DEC-002), the state page (English-specific linter), and the label maps that belong to the glossary. Each needs its own output-parity proof. The page-body extraction moves to Sprint 19B-3 (section 14).
+
+## 14. Rendering engine and publication gates (Sprint 19B-2)
+
+The generator can now render a page in `ar` or `fr` (`RENDERING_LANGUAGES`). Rendering is not publication. A page is generated in a language only if all of the following hold:
+- the language is `published` in `i18n/languages.json`;
+- the page is registered in `LOCALIZABLE_PAGES`;
+- every gate below passes.
+
+None of these holds today, so **no localized file is generated, listed or linked**. The English output is byte-identical, and `assets/registry.css` changed with no visible effect: 28 full-page screenshots at 1440 and 390 px are pixel-identical to `main`.
+
+| Part | Implementation (`tools/build.py`, `tools/i18n.py`) |
+|---|---|
+| Render context | `RenderContext` (language, strict `Translator`, `hreflang` clusters, language registry) and `rendering()`. English is the default context, and every shell helper reads it |
+| Text | `msg()` escapes catalog text. `msg_html()` fills `{name}` placeholders with generator-built HTML (links, isolated identifiers), so catalog text never holds markup. `human_date()` uses the context's month names. `Translator.term()` returns glossary-approved labels |
+| Strictness | `i18n.Translator` reads only *renderable* units: approved, current fingerprint, complete and independent review, text and parity rules passed. A missing unit or term raises `Untranslated`, so the page is not generated. There is no English fallback |
+| Routes | `route()` and `output_path()` mirror English paths under `/ar/` and `/fr/`. `local_href()` and `link()` point internal links to the same-language page when it is generated, and otherwise to English with `hreflang="en"` and a visible "(in English)" marker |
+| Page shell | `<html lang dir>` comes from the registry. The canonical is self-referencing. A translation notice (English prevails, linked) appears on localized pages. The language switcher (`language_switcher()`) is plain links in native names, with `lang`, `dir`, `hreflang` and `aria-current`, and is shown only when the page exists in two or more languages |
+| SEO | Reciprocal `hreflang` covers only generated equivalents, plus `x-default` pointing to English. `og:locale` and `og:locale:alternate` come from `og_locale` in the registry. JSON-LD gets `inLanguage`, with `translationOfWork` on localized pages and `workTranslation` on English. Sitemap entries come from the clusters. All of this is absent while no translation is generated |
+| Eligibility (`localize()`) | Pass 1 renders each registered page per publishable language and runs the gates against the English rendering of the same path. Pass 2 renders the eligible pages with the final clusters. English pages are then rendered with those clusters |
+| Page gates (`localized_page_errors`) | Correct `lang`/`dir`; self canonical; localized title and description. Identical to English: evidence and entity identifiers, source URLs, digits (numbers and dates), classification codes, and the set of rendered messages (so qualifiers are present). Localized owner note, disclaimer and translation notice present, plus the ownership statement where English has it. Identifiers, URLs and versions isolated in right-to-left text. No untranslated English text of three or more words |
+| Site gates | `cluster_errors()` in the build, and `check_site` independently: reciprocity, self-inclusion, `x-default` to English, no unpublished or missing targets, correct `lang`/`dir` under a published language route |
+| Withdrawal | `withdrawn_files()`: a file under `/ar/`, `/fr/`, `/ary/`, `/zgh/` or `/es/` that the build did not generate is deleted by `build.py` and reported as stale by `build.py --check`. A withdrawn or stale translation therefore cannot stay publicly served |
+| CSS | `registry.css` now uses logical properties only. Arabic documents (`html[lang="ar"]`) start with the bundled Noto Kufi Arabic, with no letter-spacing, no italics and a longer line height. English pages, including their Arabic excerpts, are unaffected |
+
+**Synthetic fixtures only.** `tests/test_multilingual.py` exercises all of the above with a test-only page and mechanically generated placeholder text in temporary directories. These are not translations and are never committed.
+
+**Sprint 19B-3 (next):**
+- extract the `/registry/` and `/methodology/` bodies into the catalogs, including content units for vocabulary definitions and domain labels;
+- register those pages in `LOCALIZABLE_PAGES`;
+- prove English parity again.
+
+**Sprint 19B-4:** homepage templating.
+
+**Typography to review with real Arabic text (Q5):** Latin runs inside Arabic pages currently fall back to DM Mono.
+
