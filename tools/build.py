@@ -1996,7 +1996,7 @@ def render_methodology(model, changelog):
   <p class="label">MAI-METHOD — How the registry works</p>
   <h1>Methodology, limits and changelog</h1>
   <p class="lede">What the registry documents, what it does not establish, how evidence is admitted, and how claims are corrected. The rules below are enforced by the validator and tests that run on every change.</p>
-  <p class="notice"><strong>Independent.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project. No institution has adopted or designated this site as an official reference.</p>
+  <p class="notice"><strong>Independent.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project. No institution has adopted or designated it as an official reference.</p>
 </header>
 <section aria-labelledby="ownership-h">
   <h2 id="ownership-h">Ownership and editorial independence</h2>
@@ -2063,7 +2063,7 @@ def render_acquisition(model):
   <p class="label">MAI-ACQ — Acquisition</p>
   <h1>Acquisition</h1>
   <p class="lede">TheMoroccoAI.com and its reference assets are privately held and available for strategic acquisition. Confidential enquiries: <a href="{mail}">{CONTACT}</a>. This page separates what exists today, which can be inspected, from the owner's view of its potential, which is set out in the <a href="/#thesis">owner's thesis</a>.</p>
-  <p class="notice"><strong>Independent.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project. No institution has adopted or designated this site as an official reference.</p>
+  <p class="notice"><strong>Independent.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project. No institution has adopted or designated it as an official reference.</p>
 </header>
 <section aria-labelledby="a1-h">
   <h2 id="a1-h"><span class="section-number">01</span>What could be transferred</h2>
