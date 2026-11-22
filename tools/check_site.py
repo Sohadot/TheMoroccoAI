@@ -5,8 +5,8 @@
 
 Checks internal links and anchors, third-party resource loading, page metadata and
 canonical URLs, basic accessibility rules, the sitemap, the acquisition page and contact path,
-independence and Sohadot ownership wording, and that no confidential commercial terms or credentials are
-committed. Standard library only.
+independence and Sohadot ownership wording, language routes and hreflang alternates, and that no
+confidential commercial terms or credentials are committed. Standard library only.
 """
 import json
 import re
@@ -28,6 +28,9 @@ OWNERSHIP_STATEMENT = ("TheMoroccoAI.com is an independently developed digital a
                        "or third-party organization or company. References to external organizations, initiatives and sources "
                        "do not imply their endorsement of or participation in the project.")
 OWNERSHIP_PAGES = ("index.html", "methodology/index.html", "acquisition/index.html", "evaluation/index.html")
+# Language route prefixes reserved by the multilingual architecture (TMA-DEC-007). A route directory may exist
+# only for a language marked 'published' in i18n/languages.json: no placeholder or unfinished pages.
+RESERVED_LANGUAGE_ROUTES = ("ar", "fr", "ary", "zgh", "es")
 SKIP_DIRS = {".git", "node_modules", "tests"}
 # Phrases that must not appear on public pages: commercial terms that belong in private
 # negotiation, and self-descriptions that could read as official status.
@@ -55,6 +58,7 @@ class Page(HTMLParser):
         self.links, self.resources, self.headings, self.imgs_no_alt = [], [], [], 0
         self.meta, self.canonical, self.lang, self.title = {}, None, None, ""
         self.h1, self.svgs_unlabelled, self.empty_links, self.styles = 0, 0, [], []
+        self.alternates = []
         self.text = []
         self._in_title = self._in_style = False
         self._link_stack = []
@@ -77,6 +81,8 @@ class Page(HTMLParser):
             rel = (a.get("rel") or "").lower()
             if rel == "canonical":
                 self.canonical = a.get("href")
+            elif rel == "alternate" and a.get("hreflang"):
+                self.alternates.append((a["hreflang"], a.get("href", "")))
             else:
                 self.resources.append((f"link[{rel}]", a.get("href", "")))
         elif tag in ("script", "img", "iframe", "source", "video", "audio", "embed"):
@@ -246,6 +252,7 @@ def check(network=False):
                 errors.append(f"{css.relative_to(ROOT)}: missing file {m.group(1)}")
 
     errors += check_sitemap(parsed)
+    errors += check_languages(parsed)
     errors += check_contact(parsed, network)
     errors += check_secrets()
     return errors
@@ -278,6 +285,34 @@ def check_sitemap(parsed):
             errors.append(f"sitemap.xml: noindex page {f.relative_to(ROOT)} must not be listed")
         elif not noindex and f not in listed and f.name != "404.html":
             errors.append(f"sitemap.xml: {f.relative_to(ROOT)} is not listed")
+    return errors
+
+
+def published_languages():
+    """Codes marked 'published' in i18n/languages.json (none until a localized renderer exists)."""
+    path = ROOT / "i18n" / "languages.json"
+    if not path.exists():
+        return set()
+    return {x["code"] for x in json.loads(path.read_text(encoding="utf-8"))["languages"] if x.get("state") == "published"}
+
+
+def check_languages(parsed):
+    errors, published = [], published_languages()
+    path = ROOT / "i18n" / "languages.json"
+    registered = {x["code"] for x in json.loads(path.read_text(encoding="utf-8"))["languages"]} if path.exists() else set()
+    for code in sorted((set(RESERVED_LANGUAGE_ROUTES) | registered) - {"en"} - published):
+        if (ROOT / code).exists():
+            errors.append(f"{code}/: route for a language that is not published (no placeholder or unfinished pages)")
+    for f, page in parsed.items():
+        where = f.relative_to(ROOT).as_posix()
+        for lang, href in page.alternates:
+            code = lang.split("-")[0].lower()
+            if lang != "x-default" and code != "en" and code not in published:
+                errors.append(f"{where}: hreflang {lang!r} points to an unpublished language")
+                continue
+            r = resolve(f, href)
+            if r is None or not r[0].exists():
+                errors.append(f"{where}: hreflang {lang!r} points to a missing page {href}")
     return errors
 
 

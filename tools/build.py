@@ -20,6 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import registry  # noqa: E402
+import i18n  # noqa: E402
 
 ROOT = registry.ROOT
 SITE = "https://themoroccoai.com"
@@ -102,12 +103,23 @@ def badge(classification):
     return f'<span class="badge badge-{slug(classification)}">{escape(classification)}</span>'
 
 
+def msg(message_id, **values):
+    """English interface text from i18n/en/messages.json, HTML-escaped as element text."""
+    return escape(i18n.t(message_id, **values), quote=False)
+
+
 def human_date(value):
+    """'20 October 2026' or 'October 2026'. Month names come from the English catalog, never from strftime or
+    the process locale, so the output is the same on every platform (and can later be localized)."""
     if not value:
-        return "Not stated"
+        return i18n.t("date.not_stated")
     parts = value.split("-")
-    d = datetime.date(int(parts[0]), int(parts[1]), int(parts[2]) if len(parts) > 2 else 1)
-    return d.strftime("%-d %B %Y") if len(parts) > 2 else d.strftime("%B %Y")
+    year, month = int(parts[0]), int(parts[1])
+    datetime.date(year, month, int(parts[2]) if len(parts) > 2 else 1)  # rejects impossible dates, as before
+    name = i18n.t(f"date.month.{month:02d}")
+    if len(parts) > 2:
+        return i18n.t("date.day_month_year", day=int(parts[2]), month=name, year=year)
+    return i18n.t("date.month_year", month=name, year=year)
 
 
 def entity_url(eid):
@@ -150,21 +162,26 @@ class Model:
 
 # ─── PAGE SHELL ────────────────────────────────────────────────────────────
 
-# Canonical ownership and independence statement (decision TMA-DEC-001). tools/check_site.py
-# holds the same text and fails any page listed in OWNERSHIP_PAGES that alters it.
-OWNERSHIP_STATEMENT = ("TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. "
-                       "It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, "
-                       "or third-party organization or company. References to external organizations, initiatives and sources "
-                       "do not imply their endorsement of or participation in the project.")
+# Canonical ownership and independence statement (decision TMA-DEC-001), kept in i18n/en/messages.json.
+# tools/check_site.py holds the same text independently and fails any page listed in OWNERSHIP_PAGES that
+# alters it; a test checks that the two agree.
+OWNERSHIP_STATEMENT = i18n.t("disclosure.ownership_statement")
 
 
 def footer(model):
     """Site footer shared by every generated page; /evaluation/ (hand-maintained) must carry it verbatim."""
+    note = " · ".join([msg("footer.owner_note"), msg("footer.disclaimer"),
+                       msg("footer.registry_version", version=model.evidence["version"]),
+                       msg("footer.as_of", date=human_date(model.as_of))])
+    links = " · ".join(f'<a href="{href}">{msg(key)}</a>' for href, key in (
+        ("/methodology/#ownership-h", "footer.link.ownership"), ("/methodology/", "footer.link.methodology"),
+        ("/data/", "footer.link.data"), ("/evaluation/", "footer.link.evaluation"),
+        ("/acquisition/", "footer.link.acquisition")))
     return f"""<footer>
   <div class="footer-inner">
-    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
-    <span class="footer-note">Owned and operated by Sohadot · Not affiliated with the Government of Morocco · Registry v{escape(model.evidence["version"])} · as of {escape(human_date(model.as_of))}</span>
-    <span class="footer-note"><a href="/methodology/#ownership-h">Ownership and independence</a> · <a href="/methodology/">Methodology</a> · <a href="/data/">Data</a> · <a href="/evaluation/">Independent evaluation</a> · <a href="/acquisition/">Acquisition</a></span>
+    <span class="footer-brand">TheMoroccoAI.com · {msg("footer.tagline")}</span>
+    <span class="footer-note">{note}</span>
+    <span class="footer-note">{links}</span>
   </div>
 </footer>
 """
@@ -200,18 +217,18 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
 <link rel="stylesheet" href="/assets/registry.css">
 {ld}</head>
 <body>
-<a class="skip-link" href="#content">Skip to content</a>
+<a class="skip-link" href="#content">{msg("shell.skip_link")}</a>
 <div class="zellige-bg" aria-hidden="true"></div>
-<nav class="site-nav" aria-label="Primary">
+<nav class="site-nav" aria-label="{escape(i18n.t("shell.nav.label"))}">
   <a class="nav-mark" href="/">{SIGIL}<span class="nav-name">TheMoroccoAI</span></a>
   <ul class="nav-links">
-    {nav_link("/registry/", "Registry", "registry")}
-    {nav_link("/registry/questions/", "Questions", "questions", "nav-optional")}
-    {nav_link("/registry/matrix/", "Matrix", "matrix", "nav-optional")}
-    {nav_link("/registry/gaps/", "Gaps", "gaps", "nav-optional")}
-    {nav_link("/registry/evidence/", "Evidence", "evidence", "nav-optional")}
-    {nav_link("/methodology/", "Methodology", "methodology", "nav-optional")}
-    {nav_link("/acquisition/", "Acquisition", "acquisition", "nav-optional")}
+    {nav_link("/registry/", msg("shell.nav.registry"), "registry")}
+    {nav_link("/registry/questions/", msg("shell.nav.questions"), "questions", "nav-optional")}
+    {nav_link("/registry/matrix/", msg("shell.nav.matrix"), "matrix", "nav-optional")}
+    {nav_link("/registry/gaps/", msg("shell.nav.gaps"), "gaps", "nav-optional")}
+    {nav_link("/registry/evidence/", msg("shell.nav.evidence"), "evidence", "nav-optional")}
+    {nav_link("/methodology/", msg("shell.nav.methodology"), "methodology", "nav-optional")}
+    {nav_link("/acquisition/", msg("shell.nav.acquisition"), "acquisition", "nav-optional")}
   </ul>
 </nav>
 <main id="content">
