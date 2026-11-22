@@ -28,15 +28,67 @@ class PublishedSite(unittest.TestCase):
         for page in (REPO / "registry").glob("*/index.html"):
             self.assertIn(f"/registry/{page.parent.name}/", sitemap)
 
+    @staticmethod
+    def _text(page):
+        """Visible page text with whitespace collapsed, so assertions do not depend on formatting."""
+        parser = check_site.Page()
+        parser.feed(page.read_text(encoding="utf-8"))
+        return re.sub(r"\s+", " ", " ".join(parser.text)), parser
+
     def test_all_public_pages_disclose_sohadot_ownership(self):
+        # "Sohadot" alone would match the contact address; require the owner note itself.
         for page in check_site.site_pages():
-            body = page.read_text(encoding="utf-8")
-            self.assertIn("Sohadot", body, page.relative_to(REPO))
-            self.assertIn("Not affiliated with the Government of Morocco", body, page.relative_to(REPO))
-        method = (REPO / "methodology" / "index.html").read_text(encoding="utf-8")
-        self.assertIn('id="ownership-h"', method)
-        self.assertIn("References to external organizations", method)
-        self.assertIn('href="/methodology/#ownership-h"', (REPO / "index.html").read_text(encoding="utf-8"))
+            text, parser = self._text(page)
+            where = page.relative_to(REPO)
+            self.assertIn(check_site.OWNER_NOTE, text, where)
+            self.assertIn(check_site.DISCLAIMER, text, where)
+            self.assertIn("/methodology/#ownership-h", parser.links, where)
+
+    def test_canonical_ownership_statement_is_shared_and_published(self):
+        self.assertEqual(build.OWNERSHIP_STATEMENT, check_site.OWNERSHIP_STATEMENT)
+        statement = check_site.OWNERSHIP_STATEMENT
+        for claim in ("owned and operated by Sohadot",
+                      "not affiliated with, endorsed by, or operated on behalf of any government, public institution",
+                      "do not imply their endorsement of or participation in the project"):
+            self.assertIn(claim, statement)
+        for rel in check_site.OWNERSHIP_PAGES:
+            text, _ = self._text(REPO / rel)
+            self.assertIn(statement, text, rel)
+
+    def test_methodology_ownership_section_and_anchor(self):
+        text, parser = self._text(REPO / "methodology" / "index.html")
+        self.assertIn("ownership-h", parser.ids)
+        html = (REPO / "methodology" / "index.html").read_text(encoding="utf-8")
+        section = html[html.index('<section aria-labelledby="ownership-h">'):]
+        section = section[:section.index("</section>")]
+        self.assertIn(check_site.OWNERSHIP_STATEMENT, re.sub(r"\s+", " ", section))
+        self.assertIn("not an official registry", section)
+        self.assertIn("Source attribution is not a claim of institutional partnership or endorsement", section)
+
+    def test_no_stale_disclosure_variants_remain(self):
+        stale = ("External references do not imply participation or endorsement",
+                 "References to external sources do not imply their participation",
+                 "Not affiliated with the Government of Morocco or endorsed by",
+                 "The asset is not a government platform. It is not affiliated with, endorsed by or operated by",
+                 "TheMoroccoAI is not affiliated with, endorsed by or operated by the Government")
+        for page in check_site.site_pages():
+            text, _ = self._text(page)
+            for variant in stale:
+                self.assertNotIn(variant, text, page.relative_to(REPO))
+
+    def test_evaluation_footer_matches_the_generated_footer(self):
+        # /evaluation/ is hand-maintained; its footer must not drift from the generator's.
+        evidence, ontology = registry.load_all()
+        expected = re.sub(r"\s+", " ", build.footer(build.Model(evidence, ontology)))
+        page = re.sub(r"\s+", " ", (REPO / "evaluation" / "index.html").read_text(encoding="utf-8"))
+        self.assertIn(expected.strip(), page)
+
+    def test_disclosure_claims_no_institutional_validation(self):
+        for rel in check_site.OWNERSHIP_PAGES:
+            text, _ = self._text(REPO / rel)
+            for claim in ("endorsed by the", "in partnership with", "officially recognised", "officially recognized",
+                          "certified by", "accredited by", "validated by"):
+                self.assertNotIn(claim, text.lower(), f"{rel}: {claim}")
 
     def test_evaluation_is_private_by_design_and_not_in_sitemap(self):
         page = (REPO / "evaluation" / "index.html").read_text(encoding="utf-8")
@@ -396,7 +448,8 @@ GOOD_PAGE = """<!DOCTYPE html><html lang="en"><head>
 <meta property="og:url" content="https://themoroccoai.com/">
 </head><body><main><h1>Title</h1>
 <section id="acquire"><a href="mailto:agent@sohadot.com">Contact</a> <a href="/acquisition/">Acquisition</a></section>
-<p>Not affiliated with the Government of Morocco</p>
+<p>Not affiliated with the Government of Morocco · Owned and operated by Sohadot</p>
+<p>""" + check_site.OWNERSHIP_STATEMENT + """</p>
 </main></body></html>"""
 
 
@@ -466,6 +519,19 @@ class GatesCatchRegressions(unittest.TestCase):
     def test_missing_independence_disclaimer(self):
         self.assertCaught(GOOD_PAGE.replace("Not affiliated with the Government of Morocco", "Hello"),
                           "independence disclaimer")
+
+    def test_missing_ownership_note(self):
+        self.assertCaught(GOOD_PAGE.replace("Owned and operated by Sohadot", "Hello"), "missing ownership note")
+
+    def test_missing_canonical_ownership_statement(self):
+        self.assertCaught(GOOD_PAGE.replace(check_site.OWNERSHIP_STATEMENT, "Independent."),
+                          "canonical ownership and independence statement")
+
+    def test_altered_canonical_ownership_statement(self):
+        altered = check_site.OWNERSHIP_STATEMENT.replace("References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project.",
+                                                         "External references do not imply participation or endorsement.")
+        self.assertCaught(GOOD_PAGE.replace(check_site.OWNERSHIP_STATEMENT, altered),
+                          "canonical ownership and independence statement")
 
     def test_official_status_wording(self):
         page = GOOD_PAGE.replace("<h1>Title</h1>", "<h1>The sovereign reference infrastructure</h1>")

@@ -150,6 +150,26 @@ class Model:
 
 # ─── PAGE SHELL ────────────────────────────────────────────────────────────
 
+# Canonical ownership and independence statement (decision TMA-DEC-001). tools/check_site.py
+# holds the same text and fails any page listed in OWNERSHIP_PAGES that alters it.
+OWNERSHIP_STATEMENT = ("TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. "
+                       "It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, "
+                       "or third-party organization or company. References to external organizations, initiatives and sources "
+                       "do not imply their endorsement of or participation in the project.")
+
+
+def footer(model):
+    """Site footer shared by every generated page; /evaluation/ (hand-maintained) must carry it verbatim."""
+    return f"""<footer>
+  <div class="footer-inner">
+    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
+    <span class="footer-note">Owned and operated by Sohadot · Not affiliated with the Government of Morocco · Registry v{escape(model.evidence["version"])} · as of {escape(human_date(model.as_of))}</span>
+    <span class="footer-note"><a href="/methodology/#ownership-h">Ownership and independence</a> · <a href="/methodology/">Methodology</a> · <a href="/data/">Data</a> · <a href="/evaluation/">Independent evaluation</a> · <a href="/acquisition/">Acquisition</a></span>
+  </div>
+</footer>
+"""
+
+
 def page(model, *, path, title, description, body, jsonld=None, current=""):
     canonical = SITE + path
     ld = ""
@@ -199,14 +219,7 @@ def page(model, *, path, title, description, body, jsonld=None, current=""):
 {body}
 </div>
 </main>
-<footer>
-  <div class="footer-inner">
-    <span class="footer-brand">TheMoroccoAI.com · Independent evidence registry</span>
-    <span class="footer-note">Owned and operated by Sohadot · Not affiliated with the Government of Morocco · Registry v{escape(model.evidence["version"])} · as of {escape(human_date(model.as_of))}</span>
-    <span class="footer-note"><a href="/methodology/#ownership-h">Ownership and independence</a> · <a href="/methodology/">Methodology</a> · <a href="/data/">Data</a> · <a href="/evaluation/">Independent evaluation</a> · <a href="/acquisition/">Acquisition</a></span>
-  </div>
-</footer>
-</body>
+{footer(model)}</body>
 </html>
 """
 
@@ -1996,11 +2009,11 @@ def render_methodology(model, changelog):
   <p class="label">MAI-METHOD — How the registry works</p>
   <h1>Methodology, limits and changelog</h1>
   <p class="lede">What the registry documents, what it does not establish, how evidence is admitted, and how claims are corrected. The rules below are enforced by the validator and tests that run on every change.</p>
-  <p class="notice"><strong>Independent.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project. No institution has adopted or designated it as an official reference.</p>
+  <p class="notice"><strong>Independent.</strong> {OWNERSHIP_STATEMENT} No institution has adopted or designated it as an official reference.</p>
 </header>
 <section aria-labelledby="ownership-h">
   <h2 id="ownership-h">Ownership and editorial independence</h2>
-  <p class="prose">TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project.</p>
+  <p class="prose">{OWNERSHIP_STATEMENT}</p>
   <p class="prose">This is a privately governed research resource, not an official registry. Source attribution is not a claim of institutional partnership or endorsement. Evidence classifications, limitations and corrections are documented below. English is the authoritative editorial language; other language editions are planned and are not represented as complete.</p>
 </section>
 <section aria-labelledby="m1-h">
@@ -2063,7 +2076,7 @@ def render_acquisition(model):
   <p class="label">MAI-ACQ — Acquisition</p>
   <h1>Acquisition</h1>
   <p class="lede">TheMoroccoAI.com and its reference assets are privately held and available for strategic acquisition. Confidential enquiries: <a href="{mail}">{CONTACT}</a>. This page separates what exists today, which can be inspected, from the owner's view of its potential, which is set out in the <a href="/#thesis">owner's thesis</a>.</p>
-  <p class="notice"><strong>Independent.</strong> TheMoroccoAI.com is an independently developed digital asset owned and operated by Sohadot. It is not affiliated with, endorsed by, or operated on behalf of any government, public institution, or third-party organization or company. References to external organizations, initiatives and sources do not imply their endorsement of or participation in the project. No institution has adopted or designated it as an official reference.</p>
+  <p class="notice"><strong>Independent.</strong> {OWNERSHIP_STATEMENT} No institution has adopted or designated it as an official reference.</p>
 </header>
 <section aria-labelledby="a1-h">
   <h2 id="a1-h"><span class="section-number">01</span>What could be transferred</h2>
