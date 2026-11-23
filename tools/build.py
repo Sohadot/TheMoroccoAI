@@ -679,7 +679,10 @@ def _table(label, headers, rows, empty):
         return f'<p class="prose">{escape(empty)}</p>'
     head = "".join(f'<th scope="col">{escape(h)}</th>' for h in headers)
     body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
-    return (f'<p class="table-hint">Scroll the table sideways to see all {len(headers)} columns.</p>'
+    # Shown only on narrow screens (registry.css hides .table-hint above 700 px).
+    hint = ("Scroll horizontally to see both columns." if len(headers) == 2
+            else f"Scroll horizontally to see all {len(headers)} columns.")
+    return (f'<p class="table-hint">{hint}</p>'
             f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
             f'<table class="qtable"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
 
@@ -1152,7 +1155,7 @@ def render_matrix(model):
 
 
 def _table_bodies(label, head, bodies):
-    return (f'<p class="table-hint">Scroll the table sideways to see all columns.</p>'
+    return (f'<p class="table-hint">Scroll horizontally to see all columns.</p>'
             f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
             f'<table class="qtable"><thead><tr>{head}</tr></thead>{"".join(bodies)}</table></div>')
 
@@ -1591,7 +1594,7 @@ def _stable(label, headers, rows, empty="None recorded here."):
         return f'<p class="prose">{escape(empty)}</p>'
     head = "".join(f'<th scope="col">{escape(h)}</th>' for h in headers)
     body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
-    return (f'<p class="table-hint">Scroll the table sideways to see all columns.</p>'
+    return (f'<p class="table-hint">Scroll horizontally to see all columns.</p>'
             f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
             f'<table class="qtable"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
 
@@ -1747,7 +1750,7 @@ def render_state(model, s, gaps):
     body = f"""<div class="state-page">
 <header class="page-head">
   <p class="breadcrumb"><a href="/registry/">Registry</a> / Reference state</p>
-  <p class="label">MAI-STATE — Registry {ver} · as of {as_of}</p>
+  <p class="label">MAI-STATE — Registry {ver} · Data as of {as_of}</p>
   <h1>TheMoroccoAI Reference State</h1>
   <p class="lede">What this registry currently records: how its records are classified, which lifecycle stage is documented for each project, model and dataset, which official targets it holds and which evidence questions remain open. Every governed value below is read from <a href="/registry/reference-state.json">reference-state.json</a>; human-readable names, titles and definitions are presentation lookups from the canonical registry files.</p>
   <div class="notice state-boundary"><strong>Methodology boundary</strong> (as of {as_of})<ul>{boundary}</ul></div>
@@ -2055,7 +2058,7 @@ def render_data_reference(model, gaps, man):
                 for k, v in ref.items() if isinstance(v, dict) and "provenance" in v]
     body = f"""<header class="page-head">
   <p class="breadcrumb"><a href="/registry/">Registry</a> / Data</p>
-  <p class="label">MAI-DATA — Registry v{escape(ver)} · as of {escape(human_date(model.as_of))}</p>
+  <p class="label">MAI-DATA — Registry v{escape(ver)} · Data as of {escape(human_date(model.as_of))}</p>
   <h1>Using the registry data</h1>
   <p class="lede">The registry is published as JSON files that can be read and checked without this site's code. This page describes the files and their identifiers, where each statement comes from, what null and absent values mean, how versions work, and which answers can be recomputed from the data.</p>
   <p class="notice"><strong>Rights.</strong> No content or data licence has been declared for the registry. Each record quotes a third-party source, and those quotations remain subject to their publishers' rights: nothing here grants a right to republish source material. TheMoroccoAI is independent and is not affiliated with the Government of Morocco or any institution it lists.</p>
@@ -2279,17 +2282,17 @@ def render_acquisition(model):
   <p class="label">MAI-ACQ — Acquisition</p>
   <h1>Acquisition</h1>
   <p class="lede">TheMoroccoAI.com and its reference assets are privately held and available for strategic acquisition. Confidential enquiries: <a href="{mail}">{CONTACT}</a>. This page separates what exists today, which can be inspected, from the owner's view of its potential, which is set out in the <a href="/#thesis">owner's thesis</a>.</p>
-  <p class="notice"><strong>Independent.</strong> {OWNERSHIP_STATEMENT} No institution has adopted or designated it as an official reference.</p>
+  <p class="notice"><strong>Independent.</strong> {OWNERSHIP_STATEMENT}</p>
 </header>
 <section aria-labelledby="a1-h">
   <h2 id="a1-h"><span class="section-number">01</span>What could be transferred</h2>
   <ul class="prose">
     <li>The TheMoroccoAI.com domain name.</li>
-    <li>The site source: pages, static generator, validator, source checker and tests.</li>
-    <li>The evidence registry and ontology data: version {escape(model.evidence["version"])}, {n_rec} records, {n_ent} entities, {n_rel} relationships.</li>
-    <li>The visual identity and logo.</li>
+    <li>The site source: pages, static generator, validator, source checker, multilingual engine and tests.</li>
+    <li>The evidence registry and ontology: version {escape(model.evidence["version"])}, {n_rec} evidence records, {n_ent} entities, {n_rel} relationships, with their classifications, identifiers and change history.</li>
+    <li>The visual identity: the hexagon mark, the site design and the social-sharing image.</li>
   </ul>
-  <p class="prose">No content or data licence has been declared. Bundled fonts remain under the SIL Open Font License.</p>
+  <p class="prose">These assets are owned and operated by Sohadot, and the definitive agreement sets out what is transferred and on what terms. Two elements travel with the site under their own terms: the source excerpts, which are quotations of their publishers' material, and the bundled fonts, which are licensed under the SIL Open Font License 1.1.</p>
 </section>
 <section aria-labelledby="a2-h">
   <h2 id="a2-h"><span class="section-number">02</span>Existing assets and future potential</h2>
@@ -2298,15 +2301,16 @@ def render_acquisition(model):
        "A national category name for AI in Morocco that cannot be recreated, only acquired"],
       [f'An evidence registry of {n_rec} sourced records and {n_ent} entities, each claim classified (<a href="/registry/">registry</a>)',
        "A category-level reference on Morocco's AI ecosystem"],
-      ['Machine-readable data (<a href="/data/evidence.json">evidence.json</a>, <a href="/data/ontology.json">ontology.json</a>) and a <a href="/registry/questions/">questions page</a> generated from it',
+      ['Machine-readable data (<a href="/data/evidence.json">evidence.json</a>, <a href="/data/ontology.json">ontology.json</a>), a published data contract with a SHA-256 manifest and an example consumer (<a href="/data/">data reference</a>), and a <a href="/registry/questions/">questions page</a> generated from it',
        "A data layer that organisations working on Moroccan AI could build on"],
       ['Published rules enforced by a validator and automated tests on every change (<a href="/methodology/">methodology</a>)',
        "A governed reference whose method can be audited"],
       ['A public change history tied to each published version (<a href="/methodology/#m6-h">changelog</a>)',
        "Provenance a successor can keep extending without a break in its record"],
-      ["An English edition", "Arabic, French and Tamazight editions (planned, not published)"],
+      ["An English edition, with an Arabic and French rendering engine and a human-approval workflow built and tested",
+       "Arabic, French and Tamazight editions (planned, not published)"],
   ], "")}
-  <p class="prose">Nothing on this site indicates that any institution or company has expressed interest. No price, traffic or revenue figures are published.</p>
+  <p class="prose">Price and terms are discussed confidentially. No traffic or revenue figures are published.</p>
 </section>
 <section aria-labelledby="a3-h">
   <h2 id="a3-h"><span class="section-number">03</span>Who it may suit, in the owner's view</h2>
@@ -2512,6 +2516,7 @@ def _homepage_html(model, blocks):
         "hero.lede": {"emphasis": em("strong", P + "hero.lede.emphasis")},
         "hero.notice": {"independent": em("strong", P + "hero.notice.independent")},
         "coverage.intro": {"count": b("domains")},
+        "coverage.overlap": {"records": b("records")},
         "access.evidence_json.text": {"count": b("records")},
         "access.ontology_json.text": {"types": b("entity-types"), "entities": b("entities")},
         "examples.intro": {"questions": link("/registry/questions/", msg(P + "examples.intro.link"))},
