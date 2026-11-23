@@ -344,6 +344,8 @@
   {"id": "page.home.og_title", "kind": "metadata", "text": "TheMoroccoAI — Mapping Morocco's AI Landscape"},
   {"id": "page.home.twitter_description", "kind": "metadata", "text": "Structured evidence and independent research on Morocco's evolving AI ecosystem."},
   {"id": "page.home.twitter_image_alt", "kind": "metadata", "text": "TheMoroccoAI — mapping Morocco's AI landscape."},
-  {"id": "page.home.coverage.overlap", "kind": "qualifier", "text": "A record that documents entities in several domains counts in each, so the domain figures add up to more than the {records} unique evidence records."}
+  {"id": "page.home.coverage.overlap", "kind": "qualifier", "text": "A record that documents entities in several domains counts in each, so the domain figures add up to more than the {records} unique evidence records."},
+  {"id": "page.methodology.changelog.changes", "kind": "prose", "text": "Every change to the documented record between versions, classified record by record with its evidence and dates, is listed on {changes}."},
+  {"id": "page.methodology.changelog.changes_link", "kind": "navigation", "text": "Evidence changes"}
  ]
 }

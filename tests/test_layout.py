@@ -24,7 +24,8 @@ WIDTHS = (320, 375)
 # Pages that carry evidence cards, wide tables or long identifiers.
 PAGES = ("registry/evidence/", "registry/idarati-ai/", "registry/sovereign-ai-marketplace/",
          "registry/ministry-digital-transition/", "registry/questions/", "registry/matrix/", "registry/gaps/",
-         "registry/jazari-root/", "registry/toubkal-supercomputer/", "registry/nexus-ai-factory/", "registry/state/", "data/", "")
+         "registry/jazari-root/", "registry/toubkal-supercomputer/", "registry/nexus-ai-factory/", "registry/state/", "registry/changes/",
+         "data/", "")
 
 PROBE = """<script>
 addEventListener('load', () => setTimeout(() => {

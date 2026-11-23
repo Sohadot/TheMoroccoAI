@@ -193,6 +193,8 @@ Columns: **kind** is the semantic class (`qualifier` marks text that limits a cl
 | `page.methodology.admission.unpublished` | prose | Candidates that do not meet these rules are not published. | — | `render_methodology` | /methodology/ | reused | — |
 | `page.methodology.breadcrumb` | navigation | Methodology | — | `render_methodology` | /methodology/ | reused | — |
 | `page.methodology.changelog.breaking` | heading | Breaking changes to the data contract | — | `render_methodology` | /methodology/ | reused | — |
+| `page.methodology.changelog.changes` | prose | Every change to the documented record between versions, classified record by record with its evidence and dates, is listed on {changes}. | `{changes}` | `render_methodology` | /methodology/ | new | link to /registry/changes/ |
+| `page.methodology.changelog.changes_link` | navigation | Evidence changes | — | `render_methodology` | /methodology/ | new | inside `page.methodology.changelog.changes` |
 | `page.methodology.changelog.corrections` | heading | Corrections to previously published content | — | `render_methodology` | /methodology/ | reused | — |
 | `page.methodology.changelog.figures` | interface | v{version} · {records} records, {entities} entities, {relationships} relationships | `{entities}`, `{records}`, `{relationships}`, `{version}` | `render_methodology` | /methodology/ | reused | changelog entry metadata line |
 | `page.methodology.changelog.h2` | heading | Changelog | — | `render_methodology` | /methodology/ | reused | — |
