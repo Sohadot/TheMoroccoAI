@@ -2025,7 +2025,7 @@ def manifest(model, files):
             "status_basis": {k: STATUS_BASIS_LABELS[k] for k in registry.STATUS_BASES},
         },
         "breaking_changes": BREAKING_CHANGES,
-        "rights": "No content or data licence has been declared. Source excerpts are quotations of third-party material and remain subject to their publishers' rights.",
+        "rights": "Original compilation, ontology structure and site code are subject to verification of ownership and third-party licences; source excerpts remain subject to their publishers' rights. Any acquisition transfer is governed by the definitive agreement.",
         "note": "Canonical files are maintained by hand and validated on every build; derived files are generated from them. Each sha256 is that of the file published in the same build: a mismatch means a file came from a different build (for example while a new version propagates through caches) or was altered. The hashes are published by the same site as the files and are not a signature: they show that a set of files belongs together, not who published it or that its content is accurate.",
         "resources": resources,
     }
@@ -2289,7 +2289,7 @@ def render_acquisition(model):
     <li>The evidence registry and ontology data: version {escape(model.evidence["version"])}, {n_rec} records, {n_ent} entities, {n_rel} relationships.</li>
     <li>The visual identity and logo.</li>
   </ul>
-  <p class="prose">No content or data licence has been declared. Bundled fonts remain under the SIL Open Font License.</p>
+  <p class="prose">The acquisition package may include Sohadot-owned original site code, research compilation, ontology structure and brand assets, subject to verification of rights and the definitive transfer agreement. Third-party source excerpts and bundled fonts remain subject to their respective rights and licences.</p>
 </section>
 <section aria-labelledby="a2-h">
   <h2 id="a2-h"><span class="section-number">02</span>Existing assets and future potential</h2>
@@ -2306,7 +2306,7 @@ def render_acquisition(model):
        "Provenance a successor can keep extending without a break in its record"],
       ["An English edition", "Arabic, French and Tamazight editions (planned, not published)"],
   ], "")}
-  <p class="prose">Nothing on this site indicates that any institution or company has expressed interest. No price, traffic or revenue figures are published.</p>
+  <p class="prose">No asking price, traffic or revenue figures are published on this page.</p>
 </section>
 <section aria-labelledby="a3-h">
   <h2 id="a3-h"><span class="section-number">03</span>Who it may suit, in the owner's view</h2>
