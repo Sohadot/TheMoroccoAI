@@ -679,7 +679,7 @@ def _table(label, headers, rows, empty):
         return f'<p class="prose">{escape(empty)}</p>'
     head = "".join(f'<th scope="col">{escape(h)}</th>' for h in headers)
     body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
-    return (f'<p class="table-hint">Scroll the table sideways to see all {len(headers)} columns.</p>'
+    return (f'<p class="table-hint">On narrow screens, scroll horizontally to compare both columns.</p>' if len(headers) == 2 else f'<p class="table-hint">On narrow screens, scroll horizontally to view all {len(headers)} columns.</p>'
             f'<div class="table-wrap" role="region" aria-label="{escape(label)}" tabindex="0">'
             f'<table class="qtable"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
 
