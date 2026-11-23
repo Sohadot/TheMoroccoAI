@@ -424,16 +424,21 @@ def social_meta_errors(where, p):
 
 
 def check_draft_leaks():
-    """Translation drafts and owner review packages must never be committed: every file on main is publicly
-    served. They carry a workspace marker (tools/i18n.py DRAFT_MARKER)."""
-    marker = "themoroccoai-" + "translation-draft"
+    """Translation drafts, owner review packages and source-observatory staging files must never be committed:
+    every file on main is publicly served. They carry workspace markers (tools/i18n.py DRAFT_MARKER,
+    tools/observatory.py STAGING_MARKER)."""
+    markers = ("themoroccoai-" + "translation-draft", "themoroccoai-" + "observatory-staging")
     errors = []
     for f in ROOT.rglob("*"):
         if not f.is_file() or f.suffix not in TEXT_SUFFIXES or SKIP_DIRS & set(f.relative_to(ROOT).parts):
             continue
-        if marker in f.read_text(encoding="utf-8", errors="ignore"):
+        text = f.read_text(encoding="utf-8", errors="ignore")
+        if markers[0] in text:
             errors.append(f"{f.relative_to(ROOT)}: unapproved translation draft or review package in the repository "
                           "(drafts stay outside the publicly served repository)")
+        if markers[1] in text:
+            errors.append(f"{f.relative_to(ROOT)}: source-observatory staging material (observations, candidates, review "
+                          "notes or proposals) in the repository; it stays outside the publicly served repository")
     return errors
 
 

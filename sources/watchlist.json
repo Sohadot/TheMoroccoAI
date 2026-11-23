@@ -1,0 +1,359 @@
+{
+ "schema_version": "1.0",
+ "note": "Public sources the registry already cites, watched for changes that may matter to its records. Every source here is cited by at least one evidence record; inclusion says nothing about any relationship with the publisher. Observations, candidates and review notes are kept outside this public repository (docs/SOURCE_INTELLIGENCE.md).",
+ "sources": [
+  {
+   "id": "SRC-001",
+   "slug": "ai.mmsp.gov.ma",
+   "name": "Ministry of Digital Transition and Administration Reform — AI Marketplace portal",
+   "url": "https://ai.mmsp.gov.ma/",
+   "category": "government_portal",
+   "language": "fr",
+   "relevance": "Lists the ministry's AI services; the registry's operational status for the sovereign AI marketplace and Idarati AI rests on it.",
+   "records": [
+    "MAI-EV-0034"
+   ],
+   "entities": [
+    "agentic-ai",
+    "idarati-ai",
+    "ministry-digital-transition",
+    "public-administration",
+    "sovereign-ai-marketplace"
+   ],
+   "method": "http-get",
+   "frequency": "weekly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-002",
+   "slug": "idarati.ma",
+   "name": "Ministry of Digital Transition and Administration Reform — Idarati portal",
+   "url": "https://www.idarati.ma/",
+   "category": "government_portal",
+   "language": "fr",
+   "relevance": "Public-service portal that exposes the Idarati assistant; supports Idarati AI's public availability.",
+   "records": [
+    "MAI-EV-0035"
+   ],
+   "entities": [
+    "idarati-ai",
+    "ministry-digital-transition"
+   ],
+   "method": "http-get",
+   "frequency": "weekly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-003",
+   "slug": "chatbot.idarati.ma",
+   "name": "Ministry of Digital Transition and Administration Reform — Idarati AI assistant",
+   "url": "https://chatbot.idarati.ma/",
+   "category": "government_portal",
+   "language": "fr",
+   "relevance": "Entry page of the Idarati AI assistant; supports its public availability.",
+   "records": [
+    "MAI-EV-0038"
+   ],
+   "entities": [
+    "idarati-ai",
+    "ministry-digital-transition"
+   ],
+   "method": "http-get",
+   "frequency": "weekly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-004",
+   "slug": "top500-toubkal",
+   "name": "TOP500 — Toubkal system listing",
+   "url": "https://top500.org/system/179908/",
+   "category": "independent_list",
+   "language": "en",
+   "relevance": "Independent listing of the Toubkal supercomputer's measured performance.",
+   "records": [
+    "MAI-EV-0020"
+   ],
+   "entities": [
+    "high-performance-computing",
+    "toubkal-supercomputer",
+    "um6p"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "paused",
+   "added": "2026-11-23",
+   "status_reason": "robots.txt disallows automated retrieval by this observer (checked 2026-11-23); review manually."
+  },
+  {
+   "id": "SRC-005",
+   "slug": "un-egov-morocco",
+   "name": "United Nations DESA — E-Government Knowledgebase, Morocco",
+   "url": "https://publicadministration.un.org/egovkb/en-us/Data/Country-Information/id/115-Morocco",
+   "category": "intergovernmental_organization",
+   "language": "en",
+   "relevance": "Independent international e-government indices for Morocco cited by the registry.",
+   "records": [
+    "MAI-EV-0046"
+   ],
+   "entities": [
+    "digital-morocco-2030",
+    "public-administration"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "paused",
+   "added": "2026-11-23",
+   "status_reason": "robots.txt disallows automated retrieval by this observer (checked 2026-11-23); review manually."
+  },
+  {
+   "id": "SRC-006",
+   "slug": "cndp-loi-09-08",
+   "name": "CNDP — Law 09-08 page",
+   "url": "https://www.cndp.ma/loi-09-08/",
+   "category": "regulator",
+   "language": "fr",
+   "relevance": "The regulator's page for Law 09-08 on personal data, cited for the legal framework.",
+   "records": [
+    "MAI-EV-0017"
+   ],
+   "entities": [
+    "cndp",
+    "law-09-08"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-007",
+   "slug": "hf-atlas-chat-9b",
+   "name": "Hugging Face — MBZUAI-Paris/Atlas-Chat-9B model card",
+   "url": "https://huggingface.co/MBZUAI-Paris/Atlas-Chat-9B",
+   "category": "technical_repository",
+   "language": "en",
+   "relevance": "Model card of a Moroccan Darija language model recorded in the registry.",
+   "records": [
+    "MAI-EV-0022"
+   ],
+   "entities": [
+    "atlas-chat",
+    "darija-sft-mixture",
+    "large-language-models",
+    "mbzuai-france-lab"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23",
+   "ignore_patterns": [
+    "(?i)^downloads? last month",
+    "(?i)^\\d[\\d,.]*\\s*(downloads?|likes?|followers?)$",
+    "(?i)^(updated|last updated) .{0,40}ago$",
+    "(?i)^\\d+\\s*(days?|hours?|minutes?|months?) ago$"
+   ]
+  },
+  {
+   "id": "SRC-008",
+   "slug": "hf-darijabert",
+   "name": "Hugging Face — SI2M-Lab/DarijaBERT model card",
+   "url": "https://huggingface.co/SI2M-Lab/DarijaBERT",
+   "category": "technical_repository",
+   "language": "en",
+   "relevance": "Model card of DarijaBERT, recorded in the registry.",
+   "records": [
+    "MAI-EV-0024"
+   ],
+   "entities": [
+    "aiox-labs",
+    "darijabert",
+    "insea",
+    "natural-language-processing"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23",
+   "ignore_patterns": [
+    "(?i)^downloads? last month",
+    "(?i)^\\d[\\d,.]*\\s*(downloads?|likes?|followers?)$",
+    "(?i)^(updated|last updated) .{0,40}ago$",
+    "(?i)^\\d+\\s*(days?|hours?|minutes?|months?) ago$"
+   ]
+  },
+  {
+   "id": "SRC-009",
+   "slug": "hf-al-atlas",
+   "name": "Hugging Face — atlasia/Al-Atlas-0.5B model card",
+   "url": "https://huggingface.co/atlasia/Al-Atlas-0.5B",
+   "category": "technical_repository",
+   "language": "en",
+   "relevance": "Model card of Al-Atlas-0.5B, recorded in the registry.",
+   "records": [
+    "MAI-EV-0025"
+   ],
+   "entities": [
+    "al-atlas",
+    "atlasia",
+    "large-language-models"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23",
+   "ignore_patterns": [
+    "(?i)^downloads? last month",
+    "(?i)^\\d[\\d,.]*\\s*(downloads?|likes?|followers?)$",
+    "(?i)^(updated|last updated) .{0,40}ago$",
+    "(?i)^\\d+\\s*(days?|hours?|minutes?|months?) ago$"
+   ]
+  },
+  {
+   "id": "SRC-010",
+   "slug": "hf-darija-sft-mixture",
+   "name": "Hugging Face — MBZUAI-Paris/Darija-SFT-Mixture dataset card",
+   "url": "https://huggingface.co/datasets/MBZUAI-Paris/Darija-SFT-Mixture",
+   "category": "technical_repository",
+   "language": "en",
+   "relevance": "Dataset card of a Darija instruction dataset recorded in the registry.",
+   "records": [
+    "MAI-EV-0023"
+   ],
+   "entities": [
+    "atlas-chat",
+    "darija-sft-mixture",
+    "mbzuai-france-lab"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23",
+   "ignore_patterns": [
+    "(?i)^downloads? last month",
+    "(?i)^\\d[\\d,.]*\\s*(downloads?|likes?|followers?)$",
+    "(?i)^(updated|last updated) .{0,40}ago$",
+    "(?i)^\\d+\\s*(days?|hours?|minutes?|months?) ago$"
+   ]
+  },
+  {
+   "id": "SRC-011",
+   "slug": "atlasia.ma",
+   "name": "AtlasIA — organisation website",
+   "url": "https://www.atlasia.ma/",
+   "category": "organization_website",
+   "language": "en",
+   "relevance": "The organisation's own description of its Moroccan AI work, cited by the registry.",
+   "records": [
+    "MAI-EV-0026"
+   ],
+   "entities": [
+    "al-atlas",
+    "atlasia"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-012",
+   "slug": "deepecho.io",
+   "name": "DeepEcho — company website",
+   "url": "https://deepecho.io/",
+   "category": "organization_website",
+   "language": "en",
+   "relevance": "The company's own description of its ultrasound software, whose lifecycle stage is unresolved in the registry.",
+   "records": [
+    "MAI-EV-0029"
+   ],
+   "entities": [
+    "deepecho",
+    "deepecho-ultrasound-software",
+    "health",
+    "medical-imaging-ai"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-013",
+   "slug": "aiox-labs.com",
+   "name": "AIOX Labs — company website",
+   "url": "https://www.aiox-labs.com/",
+   "category": "organization_website",
+   "language": "en",
+   "relevance": "The company's own description of its AI work, cited by the registry.",
+   "records": [
+    "MAI-EV-0027"
+   ],
+   "entities": [
+    "aiox-labs",
+    "deepecho"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-014",
+   "slug": "insea.ac.ma",
+   "name": "INSEA — institute website",
+   "url": "https://www.insea.ac.ma/",
+   "category": "organization_website",
+   "language": "fr",
+   "relevance": "The institute's own website, cited for its AI training activity.",
+   "records": [
+    "MAI-EV-0031"
+   ],
+   "entities": [
+    "insea"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "active",
+   "added": "2026-11-23"
+  },
+  {
+   "id": "SRC-015",
+   "slug": "fda-k242594",
+   "name": "U.S. FDA — 510(k) database entry K242594",
+   "url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm?ID=K242594",
+   "category": "regulator",
+   "language": "en",
+   "relevance": "Regulatory clearance entry for DeepEcho's ultrasound software, cited by the registry.",
+   "records": [
+    "MAI-EV-0032"
+   ],
+   "entities": [
+    "deepecho",
+    "deepecho-ultrasound-software"
+   ],
+   "method": "http-get",
+   "frequency": "monthly",
+   "access": "Public page; robots.txt is checked before every retrieval; one request per host every 2 seconds at most; no login, paywall or challenge is bypassed.",
+   "status": "paused",
+   "added": "2026-11-23",
+   "status_reason": "The database answers automated requests with HTTP 400 (checked 2026-11-23); review manually."
+  }
+ ]
+}
