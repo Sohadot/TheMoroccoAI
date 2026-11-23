@@ -359,9 +359,11 @@ class ReferenceFirstPositioning(unittest.TestCase):
         self.assertIn(f'href="mailto:{check_site.CONTACT}?subject=', page)
         self.assertIn("Owner's view of potential (not established)", text)
         self.assertIn("no interest from any specific party is implied", text)
-        self.assertIn("No price, traffic or revenue figures are published", text)
-        self.assertIn("No institution has adopted or designated it", text)
+        self.assertIn("No traffic or revenue figures are published", text)
         self.assertIn(check_site.DISCLAIMER, text)
+        self.assertIn(check_site.OWNERSHIP_STATEMENT, text)
+        # Issue #26: the market has not been tested, so the page must not suggest buyers looked and declined.
+        self.assertNotIn("Nothing on this site indicates that any institution or company has expressed interest", text)
 
     def test_every_page_links_to_acquisition_quietly(self):
         for f in [REPO / "registry" / "index.html", REPO / "methodology" / "index.html", REPO / "registry" / "idarati-ai" / "index.html"]:

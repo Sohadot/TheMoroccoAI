@@ -31,7 +31,7 @@ Columns: **kind** is the semantic class (`qualifier` marks text that limits a cl
 | `facts.currency.recent` | qualifier | Latest supporting evidence {date}, within {months} months; operation after that date not reconfirmed | `{date}`, `{months}` | `deployment_facts()` | / | new | — |
 | `facts.currency.stale` | qualifier | Latest supporting evidence {date} is more than {months} months old; current operation has not been reconfirmed | `{date}`, `{months}` | `deployment_facts()` | / (conditional: data-dependent label) | new | — |
 | `facts.observed` | interface | {date} (observed) | `{date}` | `deployment_facts()` | / | new | inside `facts.currency.*` |
-| `footer.as_of` | interface | as of {date} | `{date}` | `page()` / `footer()` | shell (every page) | reused | — |
+| `footer.as_of` | interface | Data as of {date} | `{date}` | `page()` / `footer()` | shell (every page) | reused | — |
 | `footer.disclaimer` | disclosure | Not affiliated with the Government of Morocco | — | `page()` / `footer()` | /, /methodology/, /registry/ | reused | — |
 | `footer.link.acquisition` | interface | Acquisition | — | `page()` / `footer()` | /, /methodology/, /registry/ | reused | — |
 | `footer.link.data` | interface | Data | — | `page()` / `footer()` | /, /methodology/, /registry/ | reused | — |
@@ -65,6 +65,7 @@ Columns: **kind** is the semantic class (`qualifier` marks text that limits a cl
 | `page.home.acquire.title` | heading | Ownership and acquisition | — | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.coverage.h2` | heading | What the registry{break}covers so far. | `{break}` | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.coverage.intro` | qualifier | {count} domains, each populated only from verified records. Coverage is partial: if an organisation or project is absent, the registry has not documented it yet. That is not evidence that it does not exist. | `{count}` | `homepage.tmpl` / `render_homepage` | / | new | — |
+| `page.home.coverage.overlap` | qualifier | A record that documents entities in several domains counts in each, so the domain figures add up to more than the {records} unique evidence records. | `{records}` | `homepage.tmpl` / `render_homepage` | / | new | follows `page.home.coverage.intro` |
 | `page.home.coverage.number` | heading | 01 — COVERAGE | — | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.description` | metadata | An independent, evidence-backed registry of institutions, initiatives, projects, models and datasets in Morocco's AI ecosystem, with sources, classifications and open JSON data. Not a government platform. | — | `homepage.tmpl` / `render_homepage` | / | new | — |
 | `page.home.domain.cta.status` | interface | Open | — | `homepage_blocks` | / | new | — |
