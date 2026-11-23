@@ -22,6 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import registry  # noqa: E402
+import changes  # noqa: E402
 import i18n  # noqa: E402
 
 ROOT = registry.ROOT
@@ -505,8 +506,12 @@ def render_entity(model, e):
 {cards}
   </ul>
 </section>
+<section aria-labelledby="hist-h">
+  <h2 id="hist-h"><span class="section-number">03</span>Record history</h2>
+  {entity_history(model, change_log(), eid)}
+</section>
 <section aria-labelledby="data-h">
-  <h2 id="data-h"><span class="section-number">03</span>Machine-readable</h2>
+  <h2 id="data-h"><span class="section-number">04</span>Machine-readable</h2>
   <p class="prose">This entity is <code>{escape(eid)}</code> in <a href="/data/ontology.json">/data/ontology.json</a>. Its records are in <a href="/data/evidence.json">/data/evidence.json</a>. The same data is embedded in this page as JSON-LD.</p>
 </section>"""
 
@@ -1605,6 +1610,204 @@ def _lifecycle_cells(model, s, base, x):
             _sv(_ptr(*base, "lifecycle"), x["lifecycle"], LIFECYCLE_LABELS[x["lifecycle"]])]
 
 
+CHANGES_PATH = "/registry/changes/"
+_CHANGE_LOG = {}
+
+
+def change_log():
+    """The classified change log between published versions (tools/changes.py), computed once per build from the
+    repository's history. It needs the full git history, as CI provides (fetch-depth: 0)."""
+    if "log" not in _CHANGE_LOG:
+        _CHANGE_LOG["log"] = changes.change_log(changes.snapshots(ROOT))
+    return _CHANGE_LOG["log"]
+
+
+def _vid(version):
+    return "v" + version.replace(".", "-")
+
+
+def _ev_ref(ids):
+    return ", ".join(f'<a href="/registry/evidence/#{x}">{x}</a>' for x in ids)
+
+
+def _ent_ref(model, eid):
+    return (f'<a href="{entity_url(eid)}">{escape(model.entities[eid]["name"])}</a>' if eid in model.entities
+            else f"<code>{escape(eid)}</code>")
+
+
+def _rel_ref(model, key):
+    subj, pred, obj = key.split("|")
+    label = model.predicates.get(pred, {}).get("label", pred.replace("_", " "))
+    return f"{_ent_ref(model, subj)} <em>{escape(label)}</em> {_ent_ref(model, obj)}"
+
+
+def _val(v):
+    if v is None:
+        return "none"
+    if isinstance(v, list):
+        return ", ".join(escape(str(x)) for x in v) if v and not isinstance(v[0], dict) else f"{len(v)} item(s)"
+    return escape(str(v))
+
+
+def change_sentence(model, c):
+    """One change in plain language, with links to its records and entities. It states what changed in the
+    record; it never says that something happened in the world."""
+    cls, sid = c["class"], c["subject"]["id"]
+    f = {x["field"]: x for x in c.get("fields", [])}
+    ev = f' On {_ev_ref(c["evidence"])}.' if c.get("evidence") else ""
+    dates = c.get("dates") or {}
+    if cls == "evidence.added":
+        pub = human_date(dates["source_published"]) if dates.get("source_published") else "no date stated by the source"
+        return (f'{_ev_ref([sid])} admitted: {escape(c.get("note", ""))}. Source published: {pub}; '
+                f'retrieved by the registry: {human_date(dates["retrieved"])}.')
+    if cls == "evidence.reclassified":
+        x = f["classification"]
+        return f'{_ev_ref([sid])}: classification changed from {_val(x["before"])} to {_val(x["after"])}.'
+    if cls == "evidence.verification_changed":
+        x = f["verification_status"]
+        return f'{_ev_ref([sid])}: verification status changed from {_val(x["before"])} to {_val(x["after"])}.'
+    if cls == "evidence.superseded":
+        return f'{_ev_ref([sid])} marked as superseded by {_ev_ref(f["superseded_by"]["after"])}.'
+    if cls == "entity.added":
+        return f'{_ent_ref(model, sid)} added ({escape(c.get("note", "").split(":")[0])}).{ev}'
+    if cls == "entity.lifecycle_changed":
+        x = f["lifecycle"]
+        return f'{_ent_ref(model, sid)}: lifecycle stage changed from {_val(x["before"])} to {_val(x["after"])}.{ev}'
+    if cls == "entity.lifecycle_recorded":
+        return f'{_ent_ref(model, sid)}: lifecycle stage first recorded as {_val(f["lifecycle"]["after"])}.{ev}'
+    if cls == "relationship.added":
+        return f'Relationship documented: {_rel_ref(model, sid)} ({escape(c.get("note", ""))}).{ev}'
+    if cls == "relationship.removed":
+        return f'Relationship removed from the record: {_rel_ref(model, sid)}.'
+    if cls == "relationship.reclassified":
+        x = f["classification"]
+        return f'{_rel_ref(model, sid)}: classification changed from {_val(x["before"])} to {_val(x["after"])}.{ev}'
+    if cls == "gap.opened":
+        return f'<a href="/registry/gaps/#{escape(sid.lower())}">{escape(sid)}</a> opened: {escape(c.get("note", ""))}'
+    if cls == "gap.state_changed":
+        x = f["state"]
+        return f'<a href="/registry/gaps/#{escape(sid.lower())}">{escape(sid)}</a>: state changed from {_val(x["before"])} to {_val(x["after"])}.{ev}'
+    if cls == "gap.register_started":
+        return escape(c.get("note", ""))
+    if c["subject"]["kind"] == "schema":
+        return f'Data contract: field <code>{escape(sid)}</code> {"added" if cls.endswith("added") else "removed"}.'
+    subject = {"evidence": lambda: _ev_ref([sid]), "entity": lambda: _ent_ref(model, sid),
+               "relationship": lambda: _rel_ref(model, sid),
+               "gap": lambda: f'<a href="/registry/gaps/#{escape(sid.lower())}">{escape(sid)}</a>'}[c["subject"]["kind"]]()
+    named = [x for x in f if x not in ("evidence", "lifecycle_evidence", "origin_evidence")]
+    fields = f' ({", ".join(escape(x.replace("_", " ")) for x in named)})' if named else ""
+    return f'{subject}: {escape(c["label"].lower())}{fields}.{ev}'
+
+
+def _change_details(c):
+    """Before and after texts of a wording revision, so a reader can judge it (the tool does not)."""
+    if c["materiality"] not in ("undetermined", "editorial"):
+        return ""
+    rows = "".join(f'<p class="change-sub">{escape(x["field"].replace("_", " "))}</p>'
+                   f'<p class="prose"><strong>Before:</strong> {_val(x["before"])}</p>'
+                   f'<p class="prose"><strong>After:</strong> {_val(x["after"])}</p>' for x in c.get("fields", [])
+                   if isinstance(x["before"], str) or isinstance(x["after"], str))
+    return f"<details><summary>Before and after</summary>{rows}</details>" if rows else ""
+
+
+CHANGE_GROUPS = (("evidence", "Evidence records"), ("entity", "Entities"), ("relationship", "Relationships"),
+                 ("gap", "Evidence gaps"), ("schema", "Data contract"))
+
+
+def render_changes(model, log):
+    trans = list(reversed(log["transitions"]))
+    summary_rows = []
+    for t in trans:
+        v, m = t["to"]["version"], t["materiality"]
+        n = len(t["changes"])
+        summary_rows.append([f'<a href="#{_vid(v)}">v{escape(v)}</a>', human_date(t["to"]["as_of"]),
+                             str(m.get("research", 0)), str(m.get("undetermined", 0)),
+                             str(m.get("editorial", 0) + m.get("structural", 0)),
+                             "No change to the documented record" if not n else
+                             ", ".join(f"{k}: {sum(1 for c in t['changes'] if c['subject']['kind'] == k)}"
+                                       for k, _ in CHANGE_GROUPS if any(c["subject"]["kind"] == k for c in t["changes"]))])
+    sections = []
+    for t in trans:
+        v = t["to"]["version"]
+        if not t["changes"]:
+            body = ('<p class="prose">No change to the documented record: this version changed the site, its tooling or its '
+                    'published derivations, not the evidence, entities, relationships or gaps.</p>')
+        else:
+            groups = []
+            for kind, title in CHANGE_GROUPS:
+                items = [c for c in t["changes"] if c["subject"]["kind"] == kind]
+                if not items:
+                    continue
+                lis = "".join(f'<li id="{escape(_vid(v) + "-" + re.sub(r"[^a-z0-9]+", "-", c["class"] + "-" + c["subject"]["id"].lower()))}">'
+                              f'<span class="change-class">{escape(c["label"])}</span> {change_sentence(model, c)}'
+                              f'{_change_details(c)}</li>' for c in items)
+                groups.append(f'<h3>{title} ({len(items)})</h3><ul class="change-list">{lis}</ul>')
+            body = "".join(groups)
+        sections.append(f"""<section aria-labelledby="{_vid(v)}">
+  <h2 id="{_vid(v)}">v{escape(v)} <span class="change-meta">from v{escape(t["from"]["version"])} · sources checked {human_date(t["to"]["as_of"])}</span></h2>
+  {body}
+</section>""")
+    total = sum(len(t["changes"]) for t in log["transitions"])
+    research = sum(t["materiality"].get("research", 0) for t in log["transitions"])
+    first, last = log["snapshots"][0], log["snapshots"][-1]
+    body = f"""<header class="page-head">
+  <p class="breadcrumb"><a href="/registry/">Registry</a> / Evidence changes</p>
+  <p class="label">MAI-CHANGES — Registry v{escape(last["version"])} · Data as of {human_date(last["as_of"])}</p>
+  <h1>Evidence changes</h1>
+  <p class="lede">What changed in the registry's documented record between its {len(log["snapshots"])} published versions, from v{escape(first["version"])} to v{escape(last["version"])}: records admitted or corrected, classifications changed, lifecycle stages recorded or changed, relationships documented, gaps opened and reassessed. {total} changes, {research} of them to documented findings.</p>
+  <p class="notice"><strong>Record changes, not events.</strong> Each entry describes a change to this registry's record. A record admitted in a version documents something that may have happened long before; a stage first recorded did not change. The dates below say which is which.</p>
+</header>
+<section aria-labelledby="c-dates">
+  <h2 id="c-dates"><span class="section-number">01</span>How to read the dates</h2>
+  <dl class="facts">
+    <dt>Sources checked</dt><dd>The version's as-of date: when the registry's sources were last checked for that version.</dd>
+    <dt>Source published</dt><dd>The source's own date, when it states one.</dd>
+    <dt>Retrieved</dt><dd>When the registry retrieved the source.</dd>
+    <dt>Event date</dt><dd>Not inferred. Where a record documents when something happened, it says so in its own text.</dd>
+  </dl>
+</section>
+<section aria-labelledby="c-sum">
+  <h2 id="c-sum"><span class="section-number">02</span>Versions at a glance</h2>
+  {_table("Changes by version", ["Version", "Sources checked", "Findings changed", "Wording revised", "Editorial or structural", "What changed"], summary_rows, "")}
+  <p class="prose"><em>Wording revised</em> counts revisions whose effect on the finding is not judged automatically; each shows its before and after text. <em>Editorial or structural</em> covers formatting, schema and bookkeeping changes that leave every finding as it was.</p>
+</section>
+<section aria-labelledby="c-data">
+  <h2 id="c-data"><span class="section-number">03</span>Machine-readable</h2>
+  <p class="prose"><a href="{CHANGES_PATH}changes.json">changes.json</a> lists every change with its class, materiality, subject, before and after values, evidence and dates, under schema version {escape(log["schema_version"])}. Versions are identified by number, as-of date and the SHA-256 of their canonical content. It is computed from the repository's published history by <code>tools/changes.py</code> and listed in the <a href="/data/manifest.json">manifest</a>. The narrative history is the <a href="/methodology/#m6-h">changelog</a>.</p>
+</section>
+{"".join(sections)}"""
+    return page(model, path=CHANGES_PATH, current="registry",
+                title="Evidence Changes — TheMoroccoAI",
+                description="How the registry's documented record of Morocco's AI ecosystem changed between published versions: records admitted or corrected, lifecycle stages, relationships and evidence gaps, with dates kept apart.",
+                body=body,
+                jsonld={"@context": "https://schema.org", "@type": "Dataset", "name": "TheMoroccoAI evidence changes",
+                        "url": SITE + CHANGES_PATH, "description": "Classified changes to the registry's documented record between published versions.",
+                        "version": last["version"], "dateModified": last["as_of"], "isAccessibleForFree": True,
+                        "distribution": {"@type": "DataDownload", "encodingFormat": "application/json",
+                                         "contentUrl": SITE + CHANGES_PATH + "changes.json"}})
+
+
+def entity_history(model, log, eid):
+    """The entity's record history: its own changes and those of relationships it takes part in."""
+    rows = []
+    present_from = log["snapshots"][0]["version"]
+    for t in log["transitions"]:
+        for c in t["changes"]:
+            sid, kind = c["subject"]["id"], c["subject"]["kind"]
+            if (kind == "entity" and sid == eid) or (kind == "relationship" and eid in sid.split("|")[::2]):
+                rows.append((t["to"], c))
+                if kind == "entity" and c["class"] == "entity.added":
+                    present_from = t["to"]["version"]
+    first = f"In the registry since v{escape(present_from)}."
+    if not rows:
+        return f'<p class="prose">{first} No change to this entry since then.</p>'
+    items = "".join(f'<li><a href="{CHANGES_PATH}#{_vid(v["version"])}">v{escape(v["version"])}</a> '
+                    f'<span class="change-class">{escape(c["label"])}</span> {change_sentence(model, c)}</li>'
+                    for v, c in reversed(rows))
+    return (f'<p class="prose">{first} Changes to this entry, newest first; they describe the record, not events. '
+            f'All versions: <a href="{CHANGES_PATH}">evidence changes</a>.</p><ul class="change-list">{items}</ul>')
+
+
 def render_state(model, s, gaps):
     """/registry/state/ from the reference snapshot s. Membership, grouping, stages, classifications and counts come from
     s only; model and gaps supply display names, titles, definitions and the display order of GAP-07's dimensions."""
@@ -1977,6 +2180,7 @@ RESOURCES = (
     ("data/changelog.json", "canonical", "Published registry versions, corrections, and the commit or pull request behind each."),
     ("registry/matrix/matrix.json", "derived", "One row per relationship between an organisation or initiative and what it acts on, with the rules used to derive each row."),
     ("registry/gaps/gaps.json", "derived", "The gap register as published, with computed relationship lists resolved; it omits the checks and digests kept in data/gaps.json."),
+    ("registry/changes/changes.json", "derived", "Classified changes to the documented record between published registry versions (evidence, entities, relationships, gaps, data contract), each with materiality, subject, before and after values, evidence and labelled dates. Computed from the repository's published history by tools/changes.py; it describes the record, not events in the world."),
     ("registry/reference-state.json", "derived", "Reference projections of the canonical data (counts, lifecycle and status-basis projections, official target records with their covering gap, open gaps, entity assessments, announcement-only and inferred relationships), each with its published rule and the SHA-256 of the canonical files it was computed from. No scores, conflicts or progress."),
 )
 CONSUMER = "examples/registry_consumer.py"
@@ -2269,6 +2473,7 @@ def render_methodology(model, changelog):
 <section aria-labelledby="m6-h">
   <h2 id="m6-h"><span class="section-number">06</span>{msg(P + "changelog.h2")}</h2>
   <p class="prose">{content("changelog:" + ids[(0, "note", 0)] + ":text", changelog["note"])}</p>
+  <p class="prose">{msg_html(P + "changelog.changes", changes=link(CHANGES_PATH, msg(P + "changelog.changes_link")))}</p>
   <ol class="changelog">{"".join(entries)}</ol>
 </section>"""
     return page(model, path="/methodology/", current="methodology",
@@ -2910,7 +3115,7 @@ def withdrawn_files(root, files):
 
 
 def sitemap(model, localized=()):
-    paths = (["/", "/registry/", "/registry/state/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/data/", "/methodology/", "/acquisition/"]
+    paths = (["/", "/registry/", "/registry/state/", "/registry/questions/", "/registry/matrix/", "/registry/gaps/", "/registry/evidence/", "/registry/changes/", "/data/", "/methodology/", "/acquisition/"]
              + [entity_url(e) for e in sorted(model.entities)] + list(localized))
     urls = "".join(f"  <url><loc>{SITE}{p}</loc><lastmod>{model.as_of}</lastmod></url>\n" for p in paths)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
@@ -2958,7 +3163,9 @@ def _english_outputs(model, localized_paths):
         "methodology/index.html": render_methodology(model, registry.load(registry.ROOT / "data" / "changelog.json")),
         "acquisition/index.html": render_acquisition(model),
         "sitemap.xml": sitemap(model, localized_paths),
+        "registry/changes/changes.json": _json(change_log()),
     }
+    files["registry/changes/index.html"] = render_changes(model, change_log())
     canonical = {p: (ROOT / p).read_bytes() for p in REFERENCE_INPUTS}
     files["registry/reference-state.json"] = _json(reference_state(model, gaps, canonical))
     files["registry/state/index.html"] = render_state(model, json.loads(files["registry/reference-state.json"]), gaps)

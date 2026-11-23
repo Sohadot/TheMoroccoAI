@@ -112,6 +112,13 @@
    "sha256": "3013a97b992f2356687d97489da9eefd33525a91ee286385b9f2f1bf650b863f"
   },
   {
+   "bytes": 238002,
+   "path": "/registry/changes/changes.json",
+   "purpose": "Classified changes to the documented record between published registry versions (evidence, entities, relationships, gaps, data contract), each with materiality, subject, before and after values, evidence and labelled dates. Computed from the repository's published history by tools/changes.py; it describes the record, not events in the world.",
+   "role": "derived",
+   "sha256": "8b441e1cf73b10f9876836c32c9d6f3c525510ae8468894c3bd9d2db9b386fb3"
+  },
+  {
    "bytes": 32609,
    "path": "/registry/reference-state.json",
    "purpose": "Reference projections of the canonical data (counts, lifecycle and status-basis projections, official target records with their covering gap, open gaps, entity assessments, announcement-only and inferred relationships), each with its published rule and the SHA-256 of the canonical files it was computed from. No scores, conflicts or progress.",
