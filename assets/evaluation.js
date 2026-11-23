@@ -33,6 +33,7 @@
       " · Task " + (state.index + 1) + " of " + tasks[state.mode].length;
     $("eval-prompt").textContent = tasks[state.mode][state.index];
     $("eval-next").hidden = state.index >= tasks[state.mode].length - 1;
+    $("eval-prev").hidden = state.index === 0;
     restore();
   }
   modes.forEach(button => button.addEventListener("click", () => {
@@ -42,8 +43,15 @@
   $("eval-next").addEventListener("click", () => {
     save();
     if (state.index < tasks[state.mode].length - 1) {
-      state.index += 1; render(); $("eval-task").focus?.();
+      state.index += 1; render(); $("eval-task").focus();
       $("eval-status").textContent = "Draft task saved in this tab only.";
+    }
+  });
+  $("eval-prev").addEventListener("click", () => {
+    save();
+    if (state.index > 0) {
+      state.index -= 1; render(); $("eval-task").focus();
+      $("eval-status").textContent = "Draft task saved. Returned to the previous task.";
     }
   });
   $("eval-copy").addEventListener("click", () => {

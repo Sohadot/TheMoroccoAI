@@ -21,7 +21,7 @@
   {"id": "footer.owner_note", "kind": "disclosure", "text": "Owned and operated by Sohadot"},
   {"id": "footer.disclaimer", "kind": "disclosure", "text": "Not affiliated with the Government of Morocco"},
   {"id": "footer.registry_version", "kind": "interface", "text": "Registry v{version}"},
-  {"id": "footer.as_of", "kind": "interface", "text": "as of {date}"},
+  {"id": "footer.as_of", "kind": "interface", "text": "Data as of {date}"},
   {"id": "footer.link.ownership", "kind": "interface", "text": "Ownership and independence"},
   {"id": "footer.link.methodology", "kind": "interface", "text": "Methodology"},
   {"id": "footer.link.data", "kind": "interface", "text": "Data"},
@@ -343,6 +343,7 @@
   {"id": "shell.og_image_alt", "kind": "metadata", "text": "TheMoroccoAI — independent research infrastructure mapping Morocco's AI landscape."},
   {"id": "page.home.og_title", "kind": "metadata", "text": "TheMoroccoAI — Mapping Morocco's AI Landscape"},
   {"id": "page.home.twitter_description", "kind": "metadata", "text": "Structured evidence and independent research on Morocco's evolving AI ecosystem."},
-  {"id": "page.home.twitter_image_alt", "kind": "metadata", "text": "TheMoroccoAI — mapping Morocco's AI landscape."}
+  {"id": "page.home.twitter_image_alt", "kind": "metadata", "text": "TheMoroccoAI — mapping Morocco's AI landscape."},
+  {"id": "page.home.coverage.overlap", "kind": "qualifier", "text": "A record that documents entities in several domains counts in each, so the domain figures add up to more than the {records} unique evidence records."}
  ]
 }
